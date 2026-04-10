@@ -1,12 +1,16 @@
 import { useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import type { Category } from '../types'
-import { categoryEmoji, categoryLabels, recipes } from '../data/recipes'
+import { recipes } from '../data/recipes'
+import { t, categoryEmoji } from '../i18n'
+import { useLanguage } from '../context/LanguageContext'
 import RecipeCard from './RecipeCard'
 
 const categories: Category[] = ['breakfast', 'lunch', 'dinner', 'dessert', 'salad', 'soup', 'snack', 'bread', 'sauce']
 
 export default function Home() {
+  const { lang } = useLanguage()
+  const tx = t[lang]
   const [search, setSearch] = useState('')
   const [activeCategory, setActiveCategory] = useState<Category | null>(null)
 
@@ -15,15 +19,25 @@ export default function Home() {
     if (activeCategory) list = list.filter(r => r.category === activeCategory)
     if (search.trim()) {
       const q = search.toLowerCase()
-      list = list.filter(r =>
-        r.title.toLowerCase().includes(q) ||
-        r.description.toLowerCase().includes(q) ||
-        r.tags.some(t => t.toLowerCase().includes(q)) ||
-        (r.cuisine?.toLowerCase().includes(q))
-      )
+      list = list.filter(r => {
+        if (lang === 'en') {
+          return (
+            r.title.toLowerCase().includes(q) ||
+            (r.descriptionEn ?? r.description).toLowerCase().includes(q) ||
+            (r.tagsEn ?? r.tags).some(t => t.toLowerCase().includes(q)) ||
+            (r.cuisine?.toLowerCase().includes(q))
+          )
+        }
+        return (
+          (r.titleHe ?? r.title).toLowerCase().includes(q) ||
+          r.description.toLowerCase().includes(q) ||
+          r.tags.some(t => t.toLowerCase().includes(q)) ||
+          (r.cuisine?.toLowerCase().includes(q))
+        )
+      })
     }
     return list
-  }, [search, activeCategory])
+  }, [search, activeCategory, lang])
 
   const featured = recipes.filter(r => r.featured)
 
@@ -38,7 +52,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             className="text-amber text-sm font-semibold uppercase tracking-widest mb-3"
           >
-            Tugy's Kitchen
+            Tugy's Cookbook
           </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 16 }}
@@ -46,8 +60,11 @@ export default function Home() {
             transition={{ delay: 0.1 }}
             className="font-serif text-5xl sm:text-7xl font-bold text-cream leading-tight mb-4"
           >
-            Recipes with
-            <span className="block text-amber">Love</span>
+            {lang === 'he' ? (
+              <>מתכונים עם<span className="block text-amber">אהבה</span></>
+            ) : (
+              <>Recipes with<span className="block text-amber">Love</span></>
+            )}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 12 }}
@@ -55,7 +72,7 @@ export default function Home() {
             transition={{ delay: 0.2 }}
             className="text-cream/60 text-lg max-w-lg mx-auto mb-10"
           >
-            Mediterranean & Israeli home cooking — tested, loved, and shared by Tugy.
+            {tx.heroSubtitle}
           </motion.p>
 
           {/* Search */}
@@ -66,7 +83,7 @@ export default function Home() {
             className="max-w-md mx-auto relative"
           >
             <svg
-              className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-cream/30"
+              className={`absolute ${lang === 'he' ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 w-4 h-4 text-cream/30`}
               fill="none" viewBox="0 0 24 24" stroke="currentColor"
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -75,23 +92,24 @@ export default function Home() {
               type="text"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Search recipes..."
-              className="input-field pl-11 w-full"
+              placeholder={tx.searchPlaceholder}
+              className={`input-field ${lang === 'he' ? 'pr-11 text-right' : 'pl-11'} w-full`}
+              dir={lang === 'he' ? 'rtl' : 'ltr'}
             />
           </motion.div>
         </div>
       </div>
 
-      {/* Featured strip (only on home without filters) */}
+      {/* Featured strip */}
       {!search && !activeCategory && featured.length > 0 && (
         <div className="max-w-6xl mx-auto px-4 mb-10">
           <div className="flex items-center gap-3 mb-5">
             <span className="text-amber text-lg">★</span>
-            <h2 className="font-serif text-xl font-bold text-cream">Featured</h2>
+            <h2 className="font-serif text-xl font-bold text-cream">{tx.featured}</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {featured.map((r, i) => (
-              <RecipeCard key={r.id} recipe={r} index={i} />
+              <RecipeCard key={r.id} recipe={r} index={i} searchQuery="" />
             ))}
           </div>
         </div>
@@ -108,7 +126,7 @@ export default function Home() {
                 : 'bg-surface border border-white/10 text-cream/60 hover:text-cream'
             }`}
           >
-            All
+            {tx.categories.all}
           </button>
           {categories.map(cat => (
             <button
@@ -121,7 +139,7 @@ export default function Home() {
               }`}
             >
               <span>{categoryEmoji[cat]}</span>
-              <span>{categoryLabels[cat]}</span>
+              <span>{tx.categories[cat]}</span>
             </button>
           ))}
         </div>
@@ -132,17 +150,17 @@ export default function Home() {
         {filtered.length === 0 ? (
           <div className="text-center py-24 text-cream/40">
             <p className="text-4xl mb-3">🥺</p>
-            <p className="text-lg">No recipes found</p>
-            <p className="text-sm mt-1">Try a different search or category</p>
+            <p className="text-lg">{tx.noResultsTitle}</p>
+            <p className="text-sm mt-1">{tx.noResultsHint}</p>
           </div>
         ) : (
           <>
             {(search || activeCategory) && (
-              <p className="text-cream/40 text-sm mb-5">{filtered.length} recipe{filtered.length !== 1 ? 's' : ''} found</p>
+              <p className="text-cream/40 text-sm mb-5">{tx.searchResultsCount(filtered.length)}</p>
             )}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {filtered.map((r, i) => (
-                <RecipeCard key={r.id} recipe={r} index={i} />
+                <RecipeCard key={r.id} recipe={r} index={i} searchQuery={search} />
               ))}
             </div>
           </>

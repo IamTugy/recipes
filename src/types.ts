@@ -1,3 +1,5 @@
+export type Lang = 'he' | 'en'
+
 export type Category =
   | 'breakfast'
   | 'lunch'
@@ -14,44 +16,53 @@ export type Difficulty = 'easy' | 'medium' | 'hard'
 export interface IngredientItem {
   amount: number
   unit: string
-  name: string
+  name: string        // Hebrew
+  nameEn?: string     // English
   note?: string
+  noteEn?: string
 }
 
 export interface IngredientGroup {
-  group?: string
+  group?: string      // Hebrew group label
+  groupEn?: string    // English group label
   items: IngredientItem[]
 }
 
 export interface StepItem {
-  instruction: string
+  instruction: string      // Hebrew
+  instructionEn?: string   // English
   timerMinutes?: number
-  tip?: string
+  tip?: string             // Hebrew
+  tipEn?: string           // English
 }
 
 export interface StepGroup {
-  title?: string
+  title?: string     // Hebrew section title
+  titleEn?: string   // English section title
   items: StepItem[]
 }
 
 export interface Recipe {
   id: string
-  title: string
-  titleHe?: string
+  title: string          // English title
+  titleHe?: string       // Hebrew title
   category: Category
-  tags: string[]
+  tags: string[]         // Hebrew tags
+  tagsEn?: string[]      // English tags
   cuisine?: string
   image: string
-  description: string
-  prepTime: number   // minutes
-  cookTime: number   // minutes
+  description: string    // Hebrew description
+  descriptionEn?: string // English description
+  prepTime: number       // minutes
+  cookTime: number       // minutes
   servings: number
   difficulty: Difficulty
   ingredients: IngredientGroup[]
   steps: StepGroup[]
   source?: string
   featured?: boolean
-  tips?: string[]
+  tips?: string[]        // Hebrew tips
+  tipsEn?: string[]      // English tips
 }
 
 export interface TimerState {
