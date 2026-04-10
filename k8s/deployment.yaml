@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recipes
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: recipes
+  template:
+    metadata:
+      labels:
+        app: recipes
+    spec:
+      containers:
+        - name: web
+          image: tugy/recipes:latest
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi

@@ -1,0 +1,14 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: recipes
+  namespace: apps
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`recipes.tugy.dev`)
+      kind: Rule
+      services:
+        - name: recipes
+          port: 80
