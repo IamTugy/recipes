@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { getRecipe } from '../data/recipes'
@@ -24,7 +24,15 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
 
   const [multiplier, setMultiplier] = useState(1)
   const [customInput, setCustomInput] = useState('')
-  const [checkedSteps, setCheckedSteps] = useState<Set<string>>(new Set())
+  const [checkedSteps, setCheckedSteps] = useState<Set<string>>(() => {
+    try {
+      const saved = sessionStorage.getItem(`checked-${id}`)
+      return saved ? new Set(JSON.parse(saved)) : new Set()
+    } catch { return new Set() }
+  })
+
+  // Scroll to top when recipe opens
+  useEffect(() => { window.scrollTo(0, 0) }, [id])
 
   if (!recipe) {
     return (
@@ -56,6 +64,7 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
     setCheckedSteps(prev => {
       const next = new Set(prev)
       next.has(key) ? next.delete(key) : next.add(key)
+      try { sessionStorage.setItem(`checked-${id}`, JSON.stringify([...next])) } catch {}
       return next
     })
   }
@@ -98,7 +107,7 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
         <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/40 to-transparent" />
         <button
           onClick={() => navigate('/')}
-          className={`absolute top-4 ${lang === 'he' ? 'right-4' : 'left-4'} flex items-center gap-2 px-3 py-2 bg-black/40 backdrop-blur-sm text-cream/80 hover:text-cream rounded-xl text-sm transition-colors border border-tint/10`}
+          className={`absolute top-4 ${lang === 'he' ? 'right-4' : 'left-4'} flex items-center gap-2 px-3 py-2 bg-black/40 backdrop-blur-sm text-white/80 hover:text-white rounded-xl text-sm transition-colors border border-white/10`}
         >
           <svg
             className={`w-4 h-4 ${lang === 'he' ? 'rotate-180' : ''}`}
