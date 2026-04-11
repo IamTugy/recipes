@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import { motion } from 'framer-motion'
 import type { Category } from '../types'
 import { recipes } from '../data/recipes'
 import { t, categoryEmoji } from '../i18n'
@@ -43,31 +42,10 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-bg">
-      {/* Hero */}
+      {/* Search bar */}
       <div className="pt-14">
-        <div className="max-w-6xl mx-auto px-6 pt-16 pb-12 sm:pt-24 sm:pb-16 text-center">
-          <motion.h1
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="font-serif text-4xl sm:text-6xl font-light text-cream tracking-wide"
-          >
-            Tugy's Cookbook
-          </motion.h1>
-          <motion.div
-            initial={{ opacity: 0, scaleX: 0 }}
-            animate={{ opacity: 1, scaleX: 1 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-            className="w-12 h-px bg-amber/50 mx-auto mt-6 mb-8"
-          />
-
-          {/* Search */}
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.4 }}
-            className="max-w-sm mx-auto relative"
-          >
+        <div className="max-w-6xl mx-auto px-6 pt-10 pb-8">
+          <div className="max-w-sm relative">
             <svg
               className={`absolute ${lang === 'he' ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 w-4 h-4 text-cream/25`}
               fill="none" viewBox="0 0 24 24" stroke="currentColor"
@@ -82,7 +60,7 @@ export default function Home() {
               className={`input-field ${lang === 'he' ? 'pr-11 text-right' : 'pl-11'} w-full`}
               dir={lang === 'he' ? 'rtl' : 'ltr'}
             />
-          </motion.div>
+          </div>
         </div>
       </div>
 
