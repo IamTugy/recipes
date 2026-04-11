@@ -110,7 +110,7 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
         </button>
       </div>
 
-      <div className="max-w-3xl mx-auto px-4 -mt-16 relative pb-32">
+      <div className="max-w-3xl mx-auto px-4 -mt-16 relative pb-24">
         {/* Header card */}
         <div className="card p-6 mb-6">
           <div className="flex flex-wrap items-center gap-2 mb-3">
