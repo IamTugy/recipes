@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { getRecipe } from '../data/recipes'
 import { formatTime, scaleAmount } from '../utils/format'
-import { t, categoryEmoji } from '../i18n'
+import { t, categoryEmoji, heUnits } from '../i18n'
 import { useLanguage } from '../context/LanguageContext'
 import type { TimerState } from '../types'
 
@@ -219,7 +219,7 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
                         return (
                           <li key={ii} className="flex gap-2 text-sm">
                             <span className="font-semibold text-cream/90 shrink-0 w-14 text-right" dir="ltr">
-                              {scaleAmount(item.amount, multiplier)} {item.unit}
+                              {scaleAmount(item.amount, multiplier)} {lang === 'he' ? (heUnits[item.unit] ?? item.unit) : item.unit}
                             </span>
                             <span className="text-cream/70" dir={lang === 'he' ? 'rtl' : 'ltr'}>
                               {itemName}

@@ -46,15 +46,11 @@ export default function Home() {
         <div className="pt-14">
           <div className="max-w-6xl mx-auto px-6 pt-8 pb-6">
             <div className="mb-6">
-              <p className="font-serif text-2xl sm:text-3xl font-light text-cream/90 leading-snug mb-1" dir={lang === 'he' ? 'rtl' : 'ltr'}>
-                {lang === 'he'
-                  ? 'מתכונים שאני מבשל, אוהב, ומתכנן לנסות.'
-                  : 'Recipes I cook, love, and plan to try.'}
+              <p className="font-serif text-2xl sm:text-3xl font-light text-cream/90 leading-snug mb-1.5" dir={lang === 'he' ? 'rtl' : 'ltr'}>
+                {tx.heroLine1}
               </p>
-              <p className="text-sm text-cream/35" dir={lang === 'he' ? 'rtl' : 'ltr'}>
-                {lang === 'he'
-                  ? 'אוסף אישי - לא המצאות שלי, אבל נבדקו ואהובים.'
-                  : 'A personal collection - not my inventions, but tested and loved.'}
+              <p className="text-sm text-cream/40 leading-relaxed" dir={lang === 'he' ? 'rtl' : 'ltr'}>
+                {tx.heroLine2}
               </p>
             </div>
 

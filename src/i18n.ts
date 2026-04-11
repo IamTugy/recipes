@@ -1,10 +1,25 @@
 import type { Category, Difficulty } from './types'
 
+export const heUnits: Record<string, string> = {
+  g: 'גרם',
+  kg: 'ק"ג',
+  cup: 'כוס',
+  cups: 'כוסות',
+  tbsp: 'כף',
+  tsp: 'כפית',
+  ml: 'מ"ל',
+  l: 'ליטר',
+  cm: 'ס"מ',
+  mm: 'מ"מ',
+  pcs: "יח'",
+  pc: "יח'",
+}
+
 export const t = {
   he: {
     siteTitle: "המטבח של טוגי",
-    heroTagline: "מתכונים עם אהבה",
-    heroSubtitle: "בישול ביתי ים-תיכוני וישראלי - נבדק, אהוב ומשותף על ידי טוגי.",
+    heroLine1: 'לא המתכונים שלי. המטבח שלי.',
+    heroLine2: 'ארכיון אישי של בישול ים-תיכוני וישראלי - נבדק, נאהב, ומשותף.',
     searchPlaceholder: "חפשו מתכון...",
     searchResultsCount: (n: number) => `נמצאו ${n} מתכון${n !== 1 ? 'ות' : ''}`,
     noResultsTitle: "לא נמצאו מתכונים",
@@ -41,8 +56,8 @@ export const t = {
   },
   en: {
     siteTitle: "Tugy's Cookbook",
-    heroTagline: "Recipes with Love",
-    heroSubtitle: "Mediterranean & Israeli home cooking - tested, loved, and shared by Tugy.",
+    heroLine1: 'Not my recipes. My kitchen.',
+    heroLine2: 'A personal archive of Mediterranean and Israeli cooking - tested, loved, and shared.',
     searchPlaceholder: "Search recipes...",
     searchResultsCount: (n: number) => `${n} recipe${n !== 1 ? 's' : ''} found`,
     noResultsTitle: "No recipes found",
