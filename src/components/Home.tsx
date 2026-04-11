@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
 import type { Category } from '../types'
 import { recipes } from '../data/recipes'
 import { t, categoryEmoji } from '../i18n'
@@ -39,63 +38,24 @@ export default function Home() {
     return list
   }, [search, activeCategory, lang])
 
-  const featured = recipes.filter(r => r.featured)
-
   return (
     <div className="min-h-screen bg-bg">
 
-      {/* Hero - featured recipe strip */}
+      {/* Hero - description + search */}
       {!search && !activeCategory && (
         <div className="pt-14">
           <div className="max-w-6xl mx-auto px-6 pt-8 pb-6">
-            {/* Featured grid */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-8" style={{ gridTemplateRows: '220px' }}>
-              {/* Large left card */}
-              {featured[0] && (
-                <Link
-                  to={`/recipe/${featured[0].id}`}
-                  className="col-span-2 row-span-1 relative overflow-hidden rounded-xl group"
-                  style={{ height: '220px' }}
-                >
-                  <img
-                    src={featured[0].image}
-                    alt=""
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    onError={e => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1466637574441-749b8f19452f?w=900&q=80' }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 p-4">
-                    <p className="text-[10px] text-amber/80 uppercase tracking-widest mb-1 font-medium">{tx.featured}</p>
-                    <h3 className="font-serif text-white text-lg sm:text-xl font-medium leading-tight line-clamp-2" dir={lang === 'he' ? 'rtl' : 'ltr'}>
-                      {lang === 'he' ? (featured[0].titleHe ?? featured[0].title) : featured[0].title}
-                    </h3>
-                  </div>
-                </Link>
-              )}
-
-              {/* Right column - 2 stacked */}
-              <div className="col-span-2 grid grid-cols-2 gap-2 sm:gap-3" style={{ height: '220px' }}>
-                {featured.slice(1, 5).map(r => (
-                  <Link
-                    key={r.id}
-                    to={`/recipe/${r.id}`}
-                    className="relative overflow-hidden rounded-xl group"
-                  >
-                    <img
-                      src={r.image}
-                      alt=""
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      onError={e => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1466637574441-749b8f19452f?w=900&q=80' }}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
-                    <div className="absolute bottom-0 left-0 right-0 p-2.5">
-                      <h3 className="font-serif text-white text-xs sm:text-sm font-medium leading-tight line-clamp-2" dir={lang === 'he' ? 'rtl' : 'ltr'}>
-                        {lang === 'he' ? (r.titleHe ?? r.title) : r.title}
-                      </h3>
-                    </div>
-                  </Link>
-                ))}
-              </div>
+            <div className="mb-6">
+              <p className="font-serif text-2xl sm:text-3xl font-light text-cream/90 leading-snug mb-1" dir={lang === 'he' ? 'rtl' : 'ltr'}>
+                {lang === 'he'
+                  ? 'מתכונים שאני מבשל, אוהב, ומתכנן לנסות.'
+                  : 'Recipes I cook, love, and plan to try.'}
+              </p>
+              <p className="text-sm text-cream/35" dir={lang === 'he' ? 'rtl' : 'ltr'}>
+                {lang === 'he'
+                  ? 'אוסף אישי - לא המצאות שלי, אבל נבדקו ואהובים.'
+                  : 'A personal collection - not my inventions, but tested and loved.'}
+              </p>
             </div>
 
             {/* Search */}
