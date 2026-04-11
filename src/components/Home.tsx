@@ -46,68 +46,30 @@ export default function Home() {
   }, [search, activeCategory, lang])
 
   return (
-    <div className="min-h-screen bg-bg">
+    <div className="min-h-screen bg-bg pt-14">
 
-      {/* Hero - description + search */}
-      {!search && !activeCategory && (
-        <div className="pt-14">
-          <div className="max-w-6xl mx-auto px-6 pt-8 pb-6">
-            <div className="mb-6">
-              <p className="font-serif text-2xl sm:text-3xl font-light text-cream/90 leading-snug mb-1.5" dir={lang === 'he' ? 'rtl' : 'ltr'}>
-                {tx.heroLine1}
-              </p>
-              <p className="text-sm text-cream/40 leading-relaxed" dir={lang === 'he' ? 'rtl' : 'ltr'}>
-                {tx.heroLine2}
-              </p>
-            </div>
-
-            {/* Search */}
-            <div className="max-w-sm relative">
-              <svg
-                className={`absolute ${lang === 'he' ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 w-4 h-4 text-cream/25`}
-                fill="none" viewBox="0 0 24 24" stroke="currentColor"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <input
-                type="text"
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                placeholder={tx.searchPlaceholder}
-                className={`input-field ${lang === 'he' ? 'pr-11 text-right' : 'pl-11'} w-full`}
-                dir={lang === 'he' ? 'rtl' : 'ltr'}
-              />
-            </div>
-          </div>
+      {/* Search + categories */}
+      <div className="max-w-6xl mx-auto px-6 pt-6 pb-4">
+        <div className="relative max-w-md">
+          <svg
+            className={`absolute ${lang === 'he' ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 w-4 h-4 text-cream/25`}
+            fill="none" viewBox="0 0 24 24" stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input
+            type="text"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder={tx.searchPlaceholder}
+            className={`input-field ${lang === 'he' ? 'pr-11 text-right' : 'pl-11'} w-full`}
+            dir={lang === 'he' ? 'rtl' : 'ltr'}
+          />
         </div>
-      )}
-
-      {/* Search-only header (when searching/filtering) */}
-      {(search || activeCategory) && (
-        <div className="pt-14">
-          <div className="max-w-6xl mx-auto px-6 pt-8 pb-6">
-            <div className="max-w-sm relative">
-              <svg
-                className={`absolute ${lang === 'he' ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 w-4 h-4 text-cream/25`}
-                fill="none" viewBox="0 0 24 24" stroke="currentColor"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <input
-                type="text"
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                placeholder={tx.searchPlaceholder}
-                className={`input-field ${lang === 'he' ? 'pr-11 text-right' : 'pl-11'} w-full`}
-                dir={lang === 'he' ? 'rtl' : 'ltr'}
-              />
-            </div>
-          </div>
-        </div>
-      )}
+      </div>
 
       {/* Category filter */}
-      <div className="max-w-6xl mx-auto px-6 mb-8">
+      <div className="max-w-6xl mx-auto px-6 mb-6">
         <div className="flex gap-1 overflow-x-auto pb-1 scrollbar-none">
           <button
             onClick={() => setActiveCategory(null)}
