@@ -134,22 +134,27 @@ export default function Home() {
 
       {/* Recipe grid */}
       <div className="max-w-6xl mx-auto px-6 pb-24">
+        {/* Count line - always shown */}
+        <p className="text-cream/25 text-xs tracking-wider mb-5">
+          {(search || activeCategory)
+            ? `${filtered.length} / ${recipes.length}`
+            : `${recipes.length}`
+          }
+          {' '}
+          {lang === 'he' ? 'מתכונים' : 'recipes'}
+        </p>
+
         {filtered.length === 0 ? (
           <div className="text-center py-24 text-cream/30">
             <p className="text-sm tracking-widest uppercase mb-2">{tx.noResultsTitle}</p>
             <p className="text-xs">{tx.noResultsHint}</p>
           </div>
         ) : (
-          <>
-            {(search || activeCategory) && (
-              <p className="text-cream/25 text-xs tracking-wider mb-6">{tx.searchResultsCount(filtered.length)}</p>
-            )}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filtered.map((r, i) => (
-                <RecipeCard key={r.id} recipe={r} index={i} searchQuery={search} />
-              ))}
-            </div>
-          </>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filtered.map((r, i) => (
+              <RecipeCard key={r.id} recipe={r} index={i} searchQuery={search} />
+            ))}
+          </div>
         )}
       </div>
     </div>
