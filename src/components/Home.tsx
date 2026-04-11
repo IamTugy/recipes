@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import type { Category } from '../types'
 import { recipes } from '../data/recipes'
 import { t, categoryEmoji } from '../i18n'
@@ -42,40 +43,102 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-bg">
-      {/* Search bar */}
-      <div className="pt-14">
-        <div className="max-w-6xl mx-auto px-6 pt-10 pb-8">
-          <div className="max-w-sm relative">
-            <svg
-              className={`absolute ${lang === 'he' ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 w-4 h-4 text-cream/25`}
-              fill="none" viewBox="0 0 24 24" stroke="currentColor"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <input
-              type="text"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder={tx.searchPlaceholder}
-              className={`input-field ${lang === 'he' ? 'pr-11 text-right' : 'pl-11'} w-full`}
-              dir={lang === 'he' ? 'rtl' : 'ltr'}
-            />
+
+      {/* Hero - featured recipe strip */}
+      {!search && !activeCategory && (
+        <div className="pt-14">
+          <div className="max-w-6xl mx-auto px-6 pt-8 pb-6">
+            {/* Featured grid */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-8" style={{ gridTemplateRows: '220px' }}>
+              {/* Large left card */}
+              {featured[0] && (
+                <Link
+                  to={`/recipe/${featured[0].id}`}
+                  className="col-span-2 row-span-1 relative overflow-hidden rounded-xl group"
+                  style={{ height: '220px' }}
+                >
+                  <img
+                    src={featured[0].image}
+                    alt=""
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    onError={e => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1466637574441-749b8f19452f?w=900&q=80' }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-4">
+                    <p className="text-[10px] text-amber/80 uppercase tracking-widest mb-1 font-medium">{tx.featured}</p>
+                    <h3 className="font-serif text-white text-lg sm:text-xl font-medium leading-tight line-clamp-2" dir={lang === 'he' ? 'rtl' : 'ltr'}>
+                      {lang === 'he' ? (featured[0].titleHe ?? featured[0].title) : featured[0].title}
+                    </h3>
+                  </div>
+                </Link>
+              )}
+
+              {/* Right column - 2 stacked */}
+              <div className="col-span-2 grid grid-cols-2 gap-2 sm:gap-3" style={{ height: '220px' }}>
+                {featured.slice(1, 5).map(r => (
+                  <Link
+                    key={r.id}
+                    to={`/recipe/${r.id}`}
+                    className="relative overflow-hidden rounded-xl group"
+                  >
+                    <img
+                      src={r.image}
+                      alt=""
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      onError={e => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1466637574441-749b8f19452f?w=900&q=80' }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-2.5">
+                      <h3 className="font-serif text-white text-xs sm:text-sm font-medium leading-tight line-clamp-2" dir={lang === 'he' ? 'rtl' : 'ltr'}>
+                        {lang === 'he' ? (r.titleHe ?? r.title) : r.title}
+                      </h3>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Search */}
+            <div className="max-w-sm relative">
+              <svg
+                className={`absolute ${lang === 'he' ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 w-4 h-4 text-cream/25`}
+                fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                type="text"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder={tx.searchPlaceholder}
+                className={`input-field ${lang === 'he' ? 'pr-11 text-right' : 'pl-11'} w-full`}
+                dir={lang === 'he' ? 'rtl' : 'ltr'}
+              />
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
-      {/* Featured strip */}
-      {!search && !activeCategory && featured.length > 0 && (
-        <div className="max-w-6xl mx-auto px-6 mb-10">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="flex-1 h-px bg-white/[0.05]" />
-            <span className="text-cream/30 text-[10px] tracking-[0.25em] uppercase font-medium">{tx.featured}</span>
-            <div className="flex-1 h-px bg-white/[0.05]" />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {featured.map((r, i) => (
-              <RecipeCard key={r.id} recipe={r} index={i} searchQuery="" />
-            ))}
+      {/* Search-only header (when searching/filtering) */}
+      {(search || activeCategory) && (
+        <div className="pt-14">
+          <div className="max-w-6xl mx-auto px-6 pt-8 pb-6">
+            <div className="max-w-sm relative">
+              <svg
+                className={`absolute ${lang === 'he' ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 w-4 h-4 text-cream/25`}
+                fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                type="text"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder={tx.searchPlaceholder}
+                className={`input-field ${lang === 'he' ? 'pr-11 text-right' : 'pl-11'} w-full`}
+                dir={lang === 'he' ? 'rtl' : 'ltr'}
+              />
+            </div>
           </div>
         </div>
       )}
@@ -112,14 +175,12 @@ export default function Home() {
 
       {/* Recipe grid */}
       <div className="max-w-6xl mx-auto px-6 pb-24">
-        {/* Count line - always shown */}
         <p className="text-cream/25 text-xs tracking-wider mb-5">
           {(search || activeCategory)
             ? `${filtered.length} / ${recipes.length}`
             : `${recipes.length}`
           }
-          {' '}
-          {lang === 'he' ? 'מתכונים' : 'recipes'}
+          {' '}{lang === 'he' ? 'מתכונים' : 'recipes'}
         </p>
 
         {filtered.length === 0 ? (

@@ -98,7 +98,7 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
         <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/40 to-transparent" />
         <button
           onClick={() => navigate('/')}
-          className={`absolute top-4 ${lang === 'he' ? 'right-4' : 'left-4'} flex items-center gap-2 px-3 py-2 bg-black/40 backdrop-blur-sm text-cream/80 hover:text-cream rounded-xl text-sm transition-colors border border-white/10`}
+          className={`absolute top-4 ${lang === 'he' ? 'right-4' : 'left-4'} flex items-center gap-2 px-3 py-2 bg-black/40 backdrop-blur-sm text-cream/80 hover:text-cream rounded-xl text-sm transition-colors border border-tint/10`}
         >
           <svg
             className={`w-4 h-4 ${lang === 'he' ? 'rotate-180' : ''}`}
@@ -148,7 +148,7 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
               { label: tx.total, value: formatTime(totalTime), icon: '⏱' },
               { label: tx.servings, value: scaledServings.toString(), icon: '🍽' },
             ].map(item => (
-              <div key={item.label} className="bg-white/[0.03] rounded-xl p-3 text-center border border-white/5">
+              <div key={item.label} className="bg-tint/[0.03] rounded-xl p-3 text-center border border-tint/5">
                 <p className="text-xl mb-1">{item.icon}</p>
                 <p className="font-bold text-cream text-lg">{item.value}</p>
                 <p className="text-cream/40 text-xs">{item.label}</p>
@@ -169,14 +169,14 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
                   className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
                     multiplier === m && !customInput
                       ? 'bg-amber text-bg scale-105'
-                      : 'bg-white/[0.04] text-cream/60 hover:text-cream hover:bg-white/[0.08] border border-white/10'
+                      : 'bg-tint/[0.04] text-cream/60 hover:text-cream hover:bg-tint/[0.08] border border-tint/10'
                   }`}
                 >
                   {presetLabels[m]}
                 </button>
               ))}
               {/* Custom portion input */}
-              <div className="flex items-center gap-1.5 bg-white/[0.04] border border-white/10 rounded-lg px-2 py-1">
+              <div className="flex items-center gap-1.5 bg-tint/[0.04] border border-tint/10 rounded-lg px-2 py-1">
                 <input
                   type="number"
                   min="1"
@@ -267,13 +267,13 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
                             className={`relative rounded-xl border p-4 transition-colors cursor-pointer ${
                               checked
                                 ? 'border-herb/30 bg-herb/5'
-                                : 'border-white/5 bg-white/[0.02] hover:border-white/10'
+                                : 'border-tint/5 bg-tint/[0.02] hover:border-tint/10'
                             }`}
                             onClick={() => toggleStep(stepKey)}
                           >
                             <div className="flex gap-3">
                               <div className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${
-                                checked ? 'bg-herb text-white' : 'bg-white/10 text-cream/50'
+                                checked ? 'bg-herb text-white' : 'bg-tint/10 text-cream/50'
                               }`}>
                                 {checked ? '✓' : stepNum}
                               </div>

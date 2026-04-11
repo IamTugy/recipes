@@ -87,7 +87,7 @@ export default function RecipeCard({ recipe, index, searchQuery }: RecipeCardPro
             </p>
 
             {/* Meta row */}
-            <div className="flex items-center gap-3 text-[11px] text-cream/35 border-t border-white/[0.04] pt-3">
+            <div className="flex items-center gap-3 text-[11px] text-cream/35 border-t border-tint/[0.04] pt-3">
               <span className="flex items-center gap-1">
                 <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0114 0z" />

@@ -4,13 +4,18 @@ export default {
   theme: {
     extend: {
       colors: {
-        bg:      '#18120e',
-        surface: '#221a13',
-        card:    '#2a1f17',
-        amber:   { DEFAULT: '#f59e0b', dim: '#d4860a', soft: 'rgba(245,158,11,0.12)' },
-        terra:   { DEFAULT: '#e07a5f', dim: '#c4614a' },
-        cream:   { DEFAULT: '#fef3e2', muted: '#a08c7a', faint: '#5a4a3a' },
-        herb:    '#4a7c59',
+        bg:      'rgb(var(--color-bg) / <alpha-value>)',
+        surface: 'rgb(var(--color-surface) / <alpha-value>)',
+        card:    'rgb(var(--color-card) / <alpha-value>)',
+        amber:   {
+          DEFAULT: 'rgb(var(--color-amber) / <alpha-value>)',
+          dim:  'rgb(var(--color-amber) / 0.7)',
+          soft: 'rgb(var(--color-amber) / 0.12)',
+        },
+        terra:   'rgb(var(--color-terra) / <alpha-value>)',
+        cream:   'rgb(var(--color-cream) / <alpha-value>)',
+        herb:    'rgb(var(--color-herb) / <alpha-value>)',
+        tint:    'rgb(var(--color-tint) / <alpha-value>)',
       },
       fontFamily: {
         serif: ['"Frank Ruhl Libre"', '"Playfair Display"', 'Georgia', 'serif'],

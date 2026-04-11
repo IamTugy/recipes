@@ -59,13 +59,13 @@ export default function TimerPanel({ timers, onToggle, onRemove, onReset }: Time
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 12, scale: 0.97 }}
             transition={{ duration: 0.18 }}
-            className="w-full bg-surface/97 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-3"
+            className="w-full bg-surface/97 backdrop-blur-xl border border-tint/10 rounded-2xl shadow-2xl p-3"
           >
             <div className="flex flex-col gap-2">
               {timers.map(timer => (
                 <div
                   key={timer.id}
-                  className="flex items-center gap-3 bg-white/[0.03] rounded-xl px-3 py-2"
+                  className="flex items-center gap-3 bg-tint/[0.03] rounded-xl px-3 py-2"
                 >
                   <TimerRing timer={timer} />
                   <div className="flex-1 min-w-0">
@@ -78,7 +78,7 @@ export default function TimerPanel({ timers, onToggle, onRemove, onReset }: Time
                     {!timer.done && (
                       <button
                         onClick={() => onToggle(timer.id)}
-                        className="w-8 h-8 rounded-lg flex items-center justify-center text-cream/60 hover:text-cream hover:bg-white/10 transition-colors"
+                        className="w-8 h-8 rounded-lg flex items-center justify-center text-cream/60 hover:text-cream hover:bg-tint/10 transition-colors"
                       >
                         {timer.running ? (
                           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -93,7 +93,7 @@ export default function TimerPanel({ timers, onToggle, onRemove, onReset }: Time
                     )}
                     <button
                       onClick={() => onReset(timer.id)}
-                      className="w-8 h-8 rounded-lg flex items-center justify-center text-cream/40 hover:text-cream/70 hover:bg-white/10 transition-colors"
+                      className="w-8 h-8 rounded-lg flex items-center justify-center text-cream/40 hover:text-cream/70 hover:bg-tint/10 transition-colors"
                     >
                       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -101,7 +101,7 @@ export default function TimerPanel({ timers, onToggle, onRemove, onReset }: Time
                     </button>
                     <button
                       onClick={() => onRemove(timer.id)}
-                      className="w-8 h-8 rounded-lg flex items-center justify-center text-cream/30 hover:text-red-400 hover:bg-white/10 transition-colors"
+                      className="w-8 h-8 rounded-lg flex items-center justify-center text-cream/30 hover:text-red-400 hover:bg-tint/10 transition-colors"
                     >
                       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -118,7 +118,7 @@ export default function TimerPanel({ timers, onToggle, onRemove, onReset }: Time
       {/* Compact pill - always visible */}
       <button
         onClick={() => setExpanded(e => !e)}
-        className="flex items-center gap-2.5 px-4 py-2.5 bg-surface/97 backdrop-blur-xl border border-white/10 rounded-full shadow-2xl hover:border-amber/30 transition-colors"
+        className="flex items-center gap-2.5 px-4 py-2.5 bg-surface/97 backdrop-blur-xl border border-tint/10 rounded-full shadow-2xl hover:border-amber/30 transition-colors"
       >
         {/* Pulse dot */}
         <span className={`w-2 h-2 rounded-full shrink-0 ${primary.done ? 'bg-herb' : primary.running ? 'bg-amber animate-pulse' : 'bg-cream/30'}`} />
@@ -134,7 +134,7 @@ export default function TimerPanel({ timers, onToggle, onRemove, onReset }: Time
         )}
 
         {/* Divider */}
-        <span className="w-px h-4 bg-white/10 mx-0.5" />
+        <span className="w-px h-4 bg-tint/10 mx-0.5" />
 
         {/* Label truncated */}
         <span className="text-xs text-cream/40 truncate max-w-[100px]">{primary.label}</span>
