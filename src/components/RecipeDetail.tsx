@@ -228,7 +228,12 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
                         return (
                           <li key={ii} className="flex gap-2 text-sm">
                             <span className="font-semibold text-cream/90 shrink-0 w-14 text-right" dir="ltr">
-                              {scaleAmount(item.amount, multiplier)} {lang === 'he' ? (heUnits[item.unit] ?? item.unit) : item.unit}
+                              {(() => {
+                                const amt = scaleAmount(item.amount, multiplier)
+                                const unit = lang === 'he' ? (heUnits[item.unit] ?? item.unit) : item.unit
+                                if (!unit) return amt
+                                return lang === 'he' ? `${unit} ${amt}` : `${amt} ${unit}`
+                              })()}
                             </span>
                             <span className="text-cream/70" dir={lang === 'he' ? 'rtl' : 'ltr'}>
                               {itemName}

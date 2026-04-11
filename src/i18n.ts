@@ -3,10 +3,10 @@ import type { Category, Difficulty } from './types'
 export const heUnits: Record<string, string> = {
   g: 'גרם',
   kg: 'ק"ג',
-  cup: 'כוס',
+  cup: 'כוסות',
   cups: 'כוסות',
-  tbsp: 'כף',
-  tsp: 'כפית',
+  tbsp: 'כפות',
+  tsp: 'כפיות',
   ml: 'מ"ל',
   l: 'ליטר',
   cm: 'ס"מ',
