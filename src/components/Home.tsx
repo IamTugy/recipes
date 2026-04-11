@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { Category } from '../types'
 import { recipes } from '../data/recipes'
 import { t, categoryEmoji } from '../i18n'
 import { useLanguage } from '../context/LanguageContext'
 import RecipeCard from './RecipeCard'
+import RecipeCardSkeleton from './RecipeCardSkeleton'
 
 const categories: Category[] = ['breakfast', 'lunch', 'dinner', 'dessert', 'salad', 'soup', 'snack', 'bread', 'sauce']
 
@@ -12,6 +13,12 @@ export default function Home() {
   const tx = t[lang]
   const [search, setSearch] = useState('')
   const [activeCategory, setActiveCategory] = useState<Category | null>(null)
+  const [loaded, setLoaded] = useState(false)
+
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setLoaded(true))
+    return () => cancelAnimationFrame(id)
+  }, [])
 
   const filtered = useMemo(() => {
     let list = recipes
@@ -139,7 +146,13 @@ export default function Home() {
           {' '}{lang === 'he' ? 'מתכונים' : 'recipes'}
         </p>
 
-        {filtered.length === 0 ? (
+        {!loaded ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <RecipeCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : filtered.length === 0 ? (
           <div className="text-center py-24 text-cream/30">
             <p className="text-sm tracking-widest uppercase mb-2">{tx.noResultsTitle}</p>
             <p className="text-xs">{tx.noResultsHint}</p>
