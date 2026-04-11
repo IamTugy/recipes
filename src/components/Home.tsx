@@ -44,49 +44,35 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-bg">
       {/* Hero */}
-      <div className="relative overflow-hidden pt-14">
-        <div className="absolute inset-0 bg-gradient-to-b from-amber/5 via-transparent to-transparent pointer-events-none" />
-        <div className="max-w-6xl mx-auto px-4 py-16 sm:py-24 text-center">
-          <motion.p
-            initial={{ opacity: 0, y: 12 }}
+      <div className="pt-14">
+        <div className="max-w-6xl mx-auto px-6 pt-16 pb-12 sm:pt-24 sm:pb-16 text-center">
+          <motion.h1
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-amber text-sm font-semibold uppercase tracking-widest mb-3"
+            transition={{ duration: 0.5 }}
+            className="font-serif text-4xl sm:text-6xl font-light text-cream tracking-wide"
           >
             Tugy's Cookbook
-          </motion.p>
-          <motion.h1
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="font-serif text-5xl sm:text-7xl font-bold text-cream leading-tight mb-4"
-          >
-            {lang === 'he' ? (
-              <>מתכונים עם<span className="block text-amber">אהבה</span></>
-            ) : (
-              <>Recipes with<span className="block text-amber">Love</span></>
-            )}
           </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-cream/60 text-lg max-w-lg mx-auto mb-10"
-          >
-            {tx.heroSubtitle}
-          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, scaleX: 0 }}
+            animate={{ opacity: 1, scaleX: 1 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="w-12 h-px bg-amber/50 mx-auto mt-6 mb-8"
+          />
 
           {/* Search */}
           <motion.div
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="max-w-md mx-auto relative"
+            transition={{ delay: 0.3, duration: 0.4 }}
+            className="max-w-sm mx-auto relative"
           >
             <svg
-              className={`absolute ${lang === 'he' ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 w-4 h-4 text-cream/30`}
+              className={`absolute ${lang === 'he' ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 w-4 h-4 text-cream/25`}
               fill="none" viewBox="0 0 24 24" stroke="currentColor"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input
               type="text"
@@ -102,10 +88,11 @@ export default function Home() {
 
       {/* Featured strip */}
       {!search && !activeCategory && featured.length > 0 && (
-        <div className="max-w-6xl mx-auto px-4 mb-10">
-          <div className="flex items-center gap-3 mb-5">
-            <span className="text-amber text-lg">★</span>
-            <h2 className="font-serif text-xl font-bold text-cream">{tx.featured}</h2>
+        <div className="max-w-6xl mx-auto px-6 mb-10">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="flex-1 h-px bg-white/[0.05]" />
+            <span className="text-cream/30 text-[10px] tracking-[0.25em] uppercase font-medium">{tx.featured}</span>
+            <div className="flex-1 h-px bg-white/[0.05]" />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {featured.map((r, i) => (
@@ -116,14 +103,14 @@ export default function Home() {
       )}
 
       {/* Category filter */}
-      <div className="max-w-6xl mx-auto px-4 mb-6">
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
+      <div className="max-w-6xl mx-auto px-6 mb-8">
+        <div className="flex gap-1 overflow-x-auto pb-1 scrollbar-none">
           <button
             onClick={() => setActiveCategory(null)}
-            className={`shrink-0 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
+            className={`shrink-0 px-4 py-2 text-xs tracking-wider font-medium transition-colors rounded-lg ${
               activeCategory === null
-                ? 'bg-amber text-bg'
-                : 'bg-surface border border-white/10 text-cream/60 hover:text-cream'
+                ? 'text-amber bg-amber/10 border border-amber/20'
+                : 'text-cream/40 hover:text-cream/70 border border-transparent'
             }`}
           >
             {tx.categories.all}
@@ -132,13 +119,13 @@ export default function Home() {
             <button
               key={cat}
               onClick={() => setActiveCategory(cat === activeCategory ? null : cat)}
-              className={`shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
+              className={`shrink-0 flex items-center gap-1.5 px-4 py-2 text-xs tracking-wider font-medium transition-colors rounded-lg ${
                 activeCategory === cat
-                  ? 'bg-amber text-bg'
-                  : 'bg-surface border border-white/10 text-cream/60 hover:text-cream'
+                  ? 'text-amber bg-amber/10 border border-amber/20'
+                  : 'text-cream/40 hover:text-cream/70 border border-transparent'
               }`}
             >
-              <span>{categoryEmoji[cat]}</span>
+              <span className="text-sm">{categoryEmoji[cat]}</span>
               <span>{tx.categories[cat]}</span>
             </button>
           ))}
@@ -146,17 +133,16 @@ export default function Home() {
       </div>
 
       {/* Recipe grid */}
-      <div className="max-w-6xl mx-auto px-4 pb-24">
+      <div className="max-w-6xl mx-auto px-6 pb-24">
         {filtered.length === 0 ? (
-          <div className="text-center py-24 text-cream/40">
-            <p className="text-4xl mb-3">🥺</p>
-            <p className="text-lg">{tx.noResultsTitle}</p>
-            <p className="text-sm mt-1">{tx.noResultsHint}</p>
+          <div className="text-center py-24 text-cream/30">
+            <p className="text-sm tracking-widest uppercase mb-2">{tx.noResultsTitle}</p>
+            <p className="text-xs">{tx.noResultsHint}</p>
           </div>
         ) : (
           <>
             {(search || activeCategory) && (
-              <p className="text-cream/40 text-sm mb-5">{tx.searchResultsCount(filtered.length)}</p>
+              <p className="text-cream/25 text-xs tracking-wider mb-6">{tx.searchResultsCount(filtered.length)}</p>
             )}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {filtered.map((r, i) => (

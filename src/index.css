@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@300;400;500;700;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&family=Heebo:wght@300;400;500;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -28,14 +28,13 @@
   }
   .card {
     background: #2a1f17;
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    border-radius: 1rem;
-    transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 0.75rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
   }
   .card:hover {
-    border-color: rgba(245, 158, 11, 0.3);
-    transform: translateY(-3px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    border-color: rgba(245, 158, 11, 0.2);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.35);
   }
   .tag {
     display: inline-flex; align-items: center; gap: 4px;

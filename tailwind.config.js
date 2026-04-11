@@ -13,8 +13,8 @@ export default {
         herb:    '#4a7c59',
       },
       fontFamily: {
-        serif: ['"Playfair Display"', 'Georgia', 'serif'],
-        sans:  ['Inter', 'system-ui', 'sans-serif'],
+        serif: ['"Frank Ruhl Libre"', '"Playfair Display"', 'Georgia', 'serif'],
+        sans:  ['Inter', 'Heebo', 'system-ui', 'sans-serif'],
         mono:  ['"JetBrains Mono"', 'monospace'],
       },
       borderRadius: { '2xl': '1rem', '3xl': '1.5rem', '4xl': '2rem' },
