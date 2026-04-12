@@ -1,19 +1,36 @@
 import type { Category, Difficulty } from './types'
 
-export const heUnits: Record<string, string> = {
-  g: 'גרם',
-  kg: 'ק"ג',
-  cup: 'כוסות',
-  cups: 'כוסות',
-  tbsp: 'כפות',
-  tsp: 'כפיות',
-  ml: 'מ"ל',
-  l: 'ליטר',
-  cm: 'ס"מ',
-  mm: 'מ"מ',
-  pcs: "יח'",
-  pc: "יח'",
+// singular / plural pairs for Hebrew units
+const heUnitForms: Record<string, [string, string]> = {
+  g:      ['גרם',    'גרם'],
+  kg:     ['ק"ג',   'ק"ג'],
+  cup:    ['כוס',   'כוסות'],
+  cups:   ['כוס',   'כוסות'],
+  tbsp:   ['כף',    'כפות'],
+  tsp:    ['כפית',  'כפיות'],
+  ml:     ['מ"ל',   'מ"ל'],
+  l:      ['ליטר',  'ליטר'],
+  liter:  ['ליטר',  'ליטר'],
+  liters: ['ליטר',  'ליטר'],
+  cm:     ['ס"מ',   'ס"מ'],
+  mm:     ['מ"מ',   'מ"מ'],
+  pcs:    ["יח'",   "יח'"],
+  pc:     ["יח'",   "יח'"],
+  cloves: ['שן',    'שיניים'],
+  bunch:  ['צרור',  'צרורות'],
+  sprigs: ['ענף',   'ענפים'],
 }
+
+export function heUnit(unit: string, amount: number): string {
+  const forms = heUnitForms[unit]
+  if (!forms) return unit
+  return amount === 1 ? forms[0] : forms[1]
+}
+
+// Keep for backward compat
+export const heUnits: Record<string, string> = Object.fromEntries(
+  Object.entries(heUnitForms).map(([k, [, plural]]) => [k, plural])
+)
 
 export const t = {
   he: {

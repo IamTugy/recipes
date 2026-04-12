@@ -18,7 +18,7 @@ export default {
         tint:    'rgb(var(--color-tint) / <alpha-value>)',
       },
       fontFamily: {
-        serif: ['"Frank Ruhl Libre"', '"Playfair Display"', 'Georgia', 'serif'],
+        serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
         sans:  ['Inter', 'Heebo', 'system-ui', 'sans-serif'],
         mono:  ['"JetBrains Mono"', 'monospace'],
       },

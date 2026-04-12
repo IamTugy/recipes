@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { getRecipe } from '../data/recipes'
 import { formatTime, scaleAmount } from '../utils/format'
-import { t, categoryEmoji, heUnits } from '../i18n'
+import { t, categoryEmoji, heUnit } from '../i18n'
 import { useLanguage } from '../context/LanguageContext'
 import type { TimerState } from '../types'
 
@@ -79,6 +79,10 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
 
   function handleCustomInput(val: string) {
     setCustomInput(val)
+    if (val === '') {
+      setMultiplier(1)
+      return
+    }
     const n = parseFloat(val)
     if (!isNaN(n) && n > 0 && n <= 100) {
       setMultiplier(n / recipe!.servings)
@@ -196,7 +200,6 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
                   className="w-14 bg-transparent text-cream text-sm text-center outline-none placeholder-cream/30"
                   dir="ltr"
                 />
-                <span className="text-cream/30 text-xs">{lang === 'he' ? 'מנות' : 'srv'}</span>
               </div>
             </div>
             {multiplier !== 1 && (
@@ -229,10 +232,11 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
                           <li key={ii} className="flex gap-2 text-sm">
                             <span className="font-semibold text-cream/90 shrink-0 w-14 text-right" dir="ltr">
                               {(() => {
+                                const scaled = item.amount * multiplier
                                 const amt = scaleAmount(item.amount, multiplier)
-                                const unit = lang === 'he' ? (heUnits[item.unit] ?? item.unit) : item.unit
+                                const unit = lang === 'he' ? heUnit(item.unit, scaled) : item.unit
                                 if (!unit) return amt
-                                return lang === 'he' ? `${unit} ${amt}` : `${amt} ${unit}`
+                                return `${amt} ${unit}`
                               })()}
                             </span>
                             <span className="text-cream/70" dir={lang === 'he' ? 'rtl' : 'ltr'}>

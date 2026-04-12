@@ -21,7 +21,7 @@ export default function Nav() {
           {/* Theme toggle */}
           <button
             onClick={toggleTheme}
-            className="w-8 h-8 flex items-center justify-center rounded-lg text-cream/40 hover:text-cream/70 border border-tint/10 hover:bg-tint/[0.05] transition-colors"
+            className="h-7 w-7 flex items-center justify-center rounded-lg text-cream/40 hover:text-cream/70 border border-tint/10 hover:bg-tint/[0.05] transition-colors"
             title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
           >
             {theme === 'light' ? (
@@ -38,7 +38,7 @@ export default function Nav() {
           {/* Language toggle */}
           <button
             onClick={() => setLang(lang === 'he' ? 'en' : 'he')}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold tracking-widest border border-tint/10 bg-tint/[0.03] hover:bg-tint/[0.07] transition-colors"
+            className="flex items-center gap-1.5 px-3 h-7 rounded-lg text-xs font-semibold tracking-widest border border-tint/10 bg-tint/[0.03] hover:bg-tint/[0.07] transition-colors"
             title={lang === 'he' ? 'Switch to English' : 'עבור לעברית'}
           >
             <span className={lang === 'he' ? 'text-amber' : 'text-cream/35'}>עב</span>

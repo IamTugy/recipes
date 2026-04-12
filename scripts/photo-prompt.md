@@ -1,0 +1,16 @@
+# Recipe Photo Prompt
+
+Used by `generate-images.mjs` to generate recipe images via Gemini.
+
+## Prompt Template
+
+```
+A high-end, professional culinary photograph of {RECIPE_TITLE} for a fine-dining website. {DESCRIPTION}
+The dish is elegantly plated with chef-level precision and artistic garnishes. The camera angle is a 
+low-perspective, tight close-up (macro food photography) focusing on texture and detail, with very little 
+background visible. The background is a crisp, clean white linen sheet with soft, natural side-lighting. 
+Minimalist aesthetic. No utensils, no cutlery, and no hands in the frame. Only the main dish and its 
+immediate accompaniment (like a small side plate or garnish) are shown, tightly grouped. 8k resolution, 
+shallow depth of field with a soft bokeh effect. Do not use elements that are not in the recipe, unless 
+that element is usually served alongside this dish.
+```
