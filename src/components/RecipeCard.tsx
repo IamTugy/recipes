@@ -5,6 +5,7 @@ import { formatTime } from '../utils/format'
 import { t, categoryEmoji } from '../i18n'
 import { useLanguage } from '../context/LanguageContext'
 import Highlight from './Highlight'
+import RecipePlaceholder from './RecipePlaceholder'
 
 interface RecipeCardProps {
   recipe: Recipe
@@ -40,15 +41,16 @@ export default function RecipeCard({ recipe, index, searchQuery }: RecipeCardPro
         <div className="card overflow-hidden">
           {/* Image */}
           <div className="relative h-44 sm:h-48 overflow-hidden">
-            <img
-              src={recipe.image}
-              alt={displayTitle}
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-              loading="lazy"
-              onError={e => {
-                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1466637574441-749b8f19452f?w=900&q=80'
-              }}
-            />
+            {recipe.image.includes('assets.tugy.dev') ? (
+              <img
+                src={recipe.image}
+                alt={displayTitle}
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                loading="lazy"
+              />
+            ) : (
+              <RecipePlaceholder recipe={recipe} />
+            )}
             <div className="absolute inset-0 bg-gradient-to-t from-card/95 via-card/30 to-transparent" />
             <div className="absolute top-3 left-3">
               <span className="tag flex items-center gap-1">

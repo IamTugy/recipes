@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import RecipePlaceholder from './RecipePlaceholder'
 import { useNavigate, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { getRecipe } from '../data/recipes'
@@ -100,14 +101,15 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
     <div className="min-h-screen bg-bg pt-14" dir={lang === 'he' ? 'rtl' : 'ltr'}>
       {/* Hero image */}
       <div className="relative h-64 sm:h-96 overflow-hidden">
-        <img
-          src={recipe.image}
-          alt={displayTitle}
-          className="w-full h-full object-cover"
-          onError={e => {
-            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1466637574441-749b8f19452f?w=900&q=80'
-          }}
-        />
+        {recipe.image.includes('assets.tugy.dev') ? (
+          <img
+            src={recipe.image}
+            alt={displayTitle}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <RecipePlaceholder recipe={recipe} />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/40 to-transparent" />
         <button
           onClick={() => navigate('/')}
