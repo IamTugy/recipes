@@ -1171,20 +1171,16 @@ export const recipes: Recipe[] = [
           { amount: 200, unit: 'g', name: 'פרלינה (מחית נוגט) או 180 גרם אבקת נוגט מעורבבת עם 20 גרם שמן קנולה', nameEn: 'Praline (nougat puree) or 180 grams of nougat powder mixed with 20 grams of canola oil' },
         ],
       },
-      {
-        group: 'לבצק',
-        items: [
-          { amount: 4, unit: 'mm', name: 'ומקפיאים.קורצים את הבצק לצורה הרצויה (עיגול, פרח, מרובע) ויוצרים במחצית העוגיות חור קטן במרכזן.אופים בחום של', nameEn: 'and freeze. Cut the dough into the desired shape (circle, flower, square) and make a small hole in the center of half of the cookies. Bake at a temperature of' },
-          { amount: 150, unit: '', name: 'מעלות ל-', nameEn: 'degrees to' },
-          { amount: 22, unit: '', name: 'דקות עד הזהבה עדינה ומצננים.מצמידים כל זוג עוגיות עם פרלינה, כך שחלקה העליון של העוגייה מחורר.מאבקים קלות באבקת סוכר.', nameEn: 'Bake until lightly golden and cool. Attach each pair of cookies with praline, so that the upper part of the cookie is perforated. Dust lightly with powdered sugar.' },
-        ],
-      },
     ],
     steps: [
       {
         title: '',
         items: [
-          { instruction: '' },
+          { instruction: 'מרדדים את הבצק לעובי 4 מ"מ ומקפיאים.', instructionEn: 'Roll the dough to 4mm thick and freeze.' },
+          { instruction: 'קורצים את הבצק לצורה הרצויה (עיגול, פרח, מרובע) ויוצרים במחצית העוגיות חור קטן במרכזן.', instructionEn: 'Cut into the desired shape (circle, flower, or square) and make a small hole in the center of half the cookies.' },
+          { instruction: 'אופים בחום של 150 מעלות ל-22 דקות עד הזהבה עדינה ומצננים.', instructionEn: 'Bake at 150°C for 22 minutes until lightly golden. Cool.' },
+          { instruction: 'מצמידים כל זוג עוגיות עם פרלינה, כך שחלקה העליון של העוגייה מחורר.', instructionEn: 'Attach each pair of cookies with praline, perforated side up.' },
+          { instruction: 'מאבקים קלות באבקת סוכר.', instructionEn: 'Dust lightly with powdered sugar.' },
         ],
       },
     ],
@@ -1605,6 +1601,7 @@ export const recipes: Recipe[] = [
   },
   {
     id: 'nut-popcorn-cake-kosher-for-passover-gluten-free',
+    hidden: true,
     title: 'Nut Popcorn Cake Kosher for Passover/Gluten Free',
     titleHe: 'עוגת פופקורן אגוזים כשר לפסח/ללא גלוטן',
     description: 'עוגת פופקורן אגוזים כשר לפסח/ללא גלוטן',
@@ -2909,21 +2906,17 @@ export const recipes: Recipe[] = [
           { amount: 0, unit: '', name: 'אבקת סוכר לקישוט', nameEn: 'Powdered sugar for decoration' },
         ],
       },
-      {
-        group: 'לבצק',
-        items: [
-          { amount: 6, unit: '', name: 'שעות לפחות.למילוי- מערבבים היטב את כל החומרים לתערובת אחידה.הרכבה- מרדדים את הבצק לעלה מלבני רחב ובעובי של', nameEn: 'hours at least. For the filling - mix all the ingredients well into a uniform mixture. Assembly - roll the dough into a wide rectangular sheet with a thickness of' },
-          { amount: 80, unit: '', name: '% מנפח המקורי.מחממים תנור לחום של', nameEn: '% of the original volume. Heat an oven to a temperature of' },
-          { amount: 160, unit: '', name: 'מעלות ואופים את העוגה', nameEn: 'Raise and bake the cake' },
-          { amount: 40, unit: '', name: 'דקות.מצננים ומאבקים באבקת סוכר.', nameEn: 'minutes. Cool and dust with powdered sugar.' },
-        ],
-      },
     ],
     steps: [
       {
         title: '',
         items: [
-          { instruction: '' },
+          { instruction: 'מתפיחים את הבצק לפחות 6 שעות.', instructionEn: 'Let the dough rise for at least 6 hours.' },
+          { instruction: 'למילוי: מערבבים היטב את כל החומרים לתערובת אחידה.', instructionEn: 'For the filling: mix all the ingredients well into a uniform mixture.' },
+          { instruction: 'הרכבה: מרדדים את הבצק לעלה מלבני רחב.', instructionEn: 'Assembly: roll the dough into a wide rectangular sheet.' },
+          { instruction: 'מתפיחים ל-80% מהנפח המקורי.', instructionEn: 'Let rise to 80% of the original volume.' },
+          { instruction: 'מחממים תנור ל-160 מעלות ואופים 40 דקות.', instructionEn: 'Heat oven to 160°C and bake for 40 minutes.' },
+          { instruction: 'מצננים ומאבקים באבקת סוכר.', instructionEn: 'Cool and dust with powdered sugar.' },
         ],
       },
     ],
@@ -2971,23 +2964,18 @@ export const recipes: Recipe[] = [
           { amount: 150, unit: 'g', name: 'מים', nameEn: 'water' },
         ],
       },
-      {
-        group: 'הבצק',
-        items: [
-          { amount: 0, unit: '', name: 'מכניסים לקערת המיקסר את כל המרכיבים, למעט החמאה, ולשים', nameEn: 'Put all the ingredients, except the butter, into the mixer bowl and mix' },
-          { amount: 5, unit: '', name: 'דקות.מוסיפים את החמאה וממשיכים ללוש עוד', nameEn: 'minutes. Add the butter and continue kneading some more' },
-          { amount: 3, unit: '', name: 'דקות.מעבירים לקערה ומתפיחים להכפלת נפח (מומלץ להתפיח שעה בטמרפטורת החדר ועוד לפחות', nameEn: 'minutes. Transfer to a bowl and let it rise until it doubles in volume (it is recommended to let it rise for an hour at room temperature and at least more' },
-          { amount: 5, unit: '', name: 'שעות בקירור).המילוי: מערבבים את כל החומרים ומצננים למרקם משחתי.מרדדים', nameEn: 'Hours in the refrigerator). The filling: mix all the ingredients and cool to a paste texture. Roll out' },
-          { amount: 0.25, unit: '', name: 'מהבצק למלבן רחב, מורחים', nameEn: 'Spread the dough into a wide rectangle' },
-          { amount: 180, unit: '', name: 'מעלות כ-12 דקות.הסירופ: מרתיחים יחד את הסוכר והמים.מזגגים את הרוגלעך מיד עם יציאתם מהתנור בסירופ החם.', nameEn: 'Heat for about 12 minutes. The syrup: boil the sugar and water together. Glaze the rolls immediately after they come out of the oven in the hot syrup.' },
-        ],
-      },
     ],
     steps: [
       {
         title: '',
         items: [
-          { instruction: '' },
+          { instruction: 'מכניסים לקערת המיקסר את כל מרכיבי הבצק, למעט החמאה, ולשים 5 דקות.', instructionEn: 'Put all the dough ingredients except the butter into the mixer bowl and knead for 5 minutes.' },
+          { instruction: 'מוסיפים את החמאה וממשיכים ללוש עוד 3 דקות.', instructionEn: 'Add the butter and continue kneading for 3 more minutes.' },
+          { instruction: 'מעבירים לקערה ומתפיחים להכפלת נפח (שעה בטמפרטורת החדר ועוד לפחות 5 שעות בקירור).', instructionEn: 'Transfer to a bowl and let rise until doubled (1 hour at room temperature then at least 5 hours in the fridge).' },
+          { instruction: 'המילוי: מערבבים את כל החומרים ומצננים למרקם משחתי.', instructionEn: 'The filling: mix all the ingredients and cool to a paste texture.' },
+          { instruction: 'מרדדים רבע מהבצק למלבן רחב ומורחים את המילוי.', instructionEn: 'Roll out 1/4 of the dough into a wide rectangle and spread the filling.' },
+          { instruction: 'אופים ב-180 מעלות כ-12 דקות.', instructionEn: 'Bake at 180°C for about 12 minutes.' },
+          { instruction: 'הסירופ: מרתיחים יחד את הסוכר והמים. מזגגים את הרוגלעך מיד עם יציאתם מהתנור בסירופ החם.', instructionEn: 'The syrup: boil the sugar and water together. Glaze the rolls immediately after they come out of the oven in the hot syrup.' },
         ],
       },
     ],
@@ -2995,6 +2983,7 @@ export const recipes: Recipe[] = [
   },
   {
     id: 'yeast-snail',
+    hidden: true,
     title: 'Yeast Snail "Double Chocolate"',
     titleHe: 'שבלול שמרים "דאבל שוקולד"',
     description: 'שבלול שמרים "דאבל שוקולד"',
@@ -3149,20 +3138,16 @@ export const recipes: Recipe[] = [
           { amount: 0, unit: '', name: 'אבקת סוכר לקישוט', nameEn: 'Powdered sugar for decoration' },
         ],
       },
-      {
-        group: 'למילוי',
-        items: [
-          { amount: 0, unit: '', name: 'מערבבים את כל החומרים לתערובת אחידה ומצננים.', nameEn: 'Mix all the ingredients to a uniform mixture and cool.' },
-          { amount: 0, unit: '', name: 'הרכבה-מחממים תנור ל-170 מעלות.מרדדים כל בצק לעלה מלבני בעובי', nameEn: 'Assembly-heat the oven to 170 degrees. Roll each dough into a thick rectangular sheet' },
-          { amount: 20, unit: '', name: 'דקות, עד הזהבה קלה.מוציאים מהתנור ומאבקים מיד באבקת סוכר. מצננים ומגישים.', nameEn: 'minutes, until lightly golden. Remove from the oven and immediately dust with powdered sugar. Cool and serve.' },
-        ],
-      },
     ],
     steps: [
       {
         title: '',
         items: [
-          { instruction: '' },
+          { instruction: 'מערבבים את כל חומרי המילוי לתערובת אחידה ומצננים.', instructionEn: 'Mix all the filling ingredients into a uniform mixture and cool.' },
+          { instruction: 'מחממים תנור ל-170 מעלות.', instructionEn: 'Heat the oven to 170°C.' },
+          { instruction: 'מרדדים כל בצק לעלה מלבני ומורחים את המילוי.', instructionEn: 'Roll each dough into a rectangular sheet and spread the filling.' },
+          { instruction: 'אופים 20 דקות עד הזהבה קלה.', instructionEn: 'Bake for 20 minutes until lightly golden.' },
+          { instruction: 'מוציאים מהתנור ומאבקים מיד באבקת סוכר. מצננים ומגישים.', instructionEn: 'Remove from the oven and immediately dust with powdered sugar. Cool and serve.' },
         ],
       },
     ],
@@ -3170,6 +3155,7 @@ export const recipes: Recipe[] = [
   },
   {
     id: 'haman-ears-filled-with-brownie-fudge',
+    hidden: true,
     title: 'Haman ears filled with brownie fudge',
     titleHe: 'אוזני המן במילוי פאדג׳ בראוני',
     description: 'אוזני המן במילוי פאדג׳ בראוני',
@@ -3283,6 +3269,7 @@ export const recipes: Recipe[] = [
   },
   {
     id: 'chocolate-chocolate-manna-ears',
+    hidden: true,
     title: 'Chocolate-chocolate manna ears',
     titleHe: 'אוזני המן שוקולד-שוקולד',
     description: 'אוזני המן שוקולד-שוקולד',
@@ -3731,6 +3718,7 @@ export const recipes: Recipe[] = [
   },
   {
     id: 'benitza-cheese-pastry-and-filo-balkani',
+    hidden: true,
     title: 'Benitza - cheese pastry and filo balkani',
     titleHe: 'בניצה- מאפה גבינות ופילו בלקני',
     description: 'בניצה- מאפה גבינות ופילו בלקני',
@@ -3821,6 +3809,7 @@ export const recipes: Recipe[] = [
   },
   {
     id: 'quick-puff-pastry',
+    hidden: true,
     title: 'Quick puff pastry (\'bluff\')',
     titleHe: 'בצק עלים מהיר הכנה (׳בלוף׳)',
     description: 'בצק עלים מהיר הכנה (׳בלוף׳)',
@@ -4396,6 +4385,7 @@ export const recipes: Recipe[] = [
   },
   {
     id: 'sauteed-chicken-breast-with-green-vegetables',
+    hidden: true,
     title: 'Sauteed chicken breast with green vegetables',
     titleHe: 'חזה עוף מוקפץ עם ירקות ירוקים',
     description: 'חזה עוף מוקפץ עם ירקות ירוקים',
@@ -5221,6 +5211,7 @@ export const recipes: Recipe[] = [
   },
   {
     id: 'quick-grain-bread',
+    hidden: true,
     title: 'Quick grain bread',
     titleHe: 'לחם גרעינים מהיר',
     description: 'לחם גרעינים מהיר',
@@ -5410,6 +5401,7 @@ export const recipes: Recipe[] = [
   },
   {
     id: 'sesame-buns-for-sandwich',
+    hidden: true,
     title: 'Sesame buns for sandwich',
     titleHe: 'לחמניות שומשום לסנדוויץ\'',
     description: 'לחמניות שומשום לסנדוויץ\'',
@@ -5446,6 +5438,7 @@ export const recipes: Recipe[] = [
   },
   {
     id: 'bread-ab8bd4-2',
+    hidden: true,
     title: '"Pyrah" buns for a hamburger',
     titleHe: 'לחמניות ׳פירה׳ להמבורגר',
     description: 'לחמניות ׳פירה׳ להמבורגר',
@@ -5815,6 +5808,7 @@ export const recipes: Recipe[] = [
   },
   {
     id: 'meat-stuffed-meatloaf',
+    hidden: true,
     title: 'Meat-stuffed meatloaf',
     titleHe: 'מלפוף ממולא בשרים',
     description: 'מלפוף ממולא בשרים',
@@ -6682,6 +6676,7 @@ export const recipes: Recipe[] = [
   },
   {
     id: 'kumquat-ginger-jam',
+    hidden: true,
     title: 'Kumquat-ginger jam',
     titleHe: 'ריבת קומקוואט-ג׳ינג׳ר',
     description: 'ריבת קומקוואט-ג׳ינג׳ר',
@@ -6976,6 +6971,7 @@ export const recipes: Recipe[] = [
   },
   {
     id: 'cauliflower-and-broccoli-surprise-meatballs',
+    hidden: true,
     title: 'Cauliflower and broccoli surprise meatballs',
     titleHe: 'קציצות הפתעה כרובית וברוקולי',
     description: 'קציצות הפתעה כרובית וברוקולי',
@@ -7197,6 +7193,7 @@ export const recipes: Recipe[] = [
   },
   {
     id: 'airy-orange-cake',
+    hidden: true,
     title: 'Airy orange cake',
     titleHe: 'עוגת תפוזים אוורירית',
     description: 'עוגת תפוזים אוורירית',
@@ -7959,6 +7956,7 @@ export const recipes: Recipe[] = [
   },
   {
     id: 'lachma-bejin-bread-with-meat',
+    hidden: true,
     title: 'Lachma Bejin (bread with meat)',
     titleHe: 'לחמא בעג׳ין (לחם עם בשר)',
     description: 'לחמא בעג׳ין (לחם עם בשר)',
@@ -8049,6 +8047,7 @@ export const recipes: Recipe[] = [
   },
   {
     id: 'vegetarian',
+    hidden: true,
     title: 'Vegetarian \'Non Carna\' lasagna',
     titleHe: 'לזניה ׳נון קארנה׳ צמחונית',
     description: 'לזניה ׳נון קארנה׳ צמחונית',
@@ -8546,6 +8545,7 @@ export const recipes: Recipe[] = [
   },
   {
     id: 'a-quick-to-prepare-apple-tart',
+    hidden: true,
     title: 'A quick-to-prepare apple tart',
     titleHe: 'טארט תפוחים מהיר הכנה',
     description: 'טארט תפוחים מהיר הכנה',
@@ -8909,6 +8909,7 @@ export const recipes: Recipe[] = [
   },
   {
     id: 'patented-oil-free-granola',
+    hidden: true,
     title: 'Patented oil-free granola',
     titleHe: 'גרנולה פטנט ללא שמן',
     description: 'גרנולה פטנט ללא שמן',
@@ -9122,6 +9123,7 @@ export const recipes: Recipe[] = [
   },
   {
     id: 'super-quick-cheese-burkits',
+    hidden: true,
     title: 'Super quick cheese burkits',
     titleHe: 'בורקיטס גבינות סופר מהירים',
     description: 'בורקיטס גבינות סופר מהירים',

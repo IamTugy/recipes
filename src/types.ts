@@ -61,6 +61,7 @@ export interface Recipe {
   steps: StepGroup[]
   source?: string
   featured?: boolean
+  hidden?: boolean
   tips?: string[]        // Hebrew tips
   tipsEn?: string[]      // English tips
 }

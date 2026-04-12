@@ -21,7 +21,7 @@ export default function Home() {
   }, [])
 
   const filtered = useMemo(() => {
-    let list = recipes
+    let list = recipes.filter(r => !r.hidden)
     if (activeCategory) list = list.filter(r => r.category === activeCategory)
     if (search.trim()) {
       const q = search.toLowerCase()
