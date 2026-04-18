@@ -214,7 +214,7 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
 
         <div className="grid grid-cols-1 sm:grid-cols-5 gap-6">
           {/* Ingredients */}
-          <div className="sm:col-span-2">
+          {recipe.ingredients.length > 0 && <div className="sm:col-span-2">
             <h2 className="font-serif text-xl font-bold text-cream mb-4">{tx.ingredients}</h2>
             <div className="space-y-4">
               {recipe.ingredients.map((group, gi) => {
@@ -254,7 +254,7 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
                 )
               })}
             </div>
-          </div>
+          </div>}
 
           {/* Steps */}
           <div className="sm:col-span-3">
