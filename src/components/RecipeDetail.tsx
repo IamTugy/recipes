@@ -3,7 +3,7 @@ import RecipePlaceholder from './RecipePlaceholder'
 import { useNavigate, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { getRecipe } from '../data/recipes'
-import { formatTime, scaleAmount } from '../utils/format'
+import { formatTime, formatSeconds, scaleAmount } from '../utils/format'
 import { t, categoryEmoji, heUnit } from '../i18n'
 import { useLanguage } from '../context/LanguageContext'
 import type { TimerState } from '../types'
@@ -317,9 +317,17 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
                                 {step.timerMinutes && !checked && (
                                   <div className="mt-3" onClick={e => e.stopPropagation()}>
                                     {existingTimer ? (
-                                      <div className="flex items-center gap-2 text-xs text-amber/70">
-                                        <span>⏱</span>
-                                        <span>{tx.timerRunning}</span>
+                                      <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-mono font-semibold border ${
+                                        existingTimer.done
+                                          ? 'text-herb border-herb/30 bg-herb/10'
+                                          : existingTimer.running
+                                            ? 'text-amber border-amber/30 bg-amber/10'
+                                            : 'text-cream/50 border-tint/20 bg-tint/5'
+                                      }`}>
+                                        <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        {existingTimer.done ? tx.timerDone : formatSeconds(existingTimer.remainingSeconds)}
                                       </div>
                                     ) : (
                                       <button

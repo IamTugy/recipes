@@ -56,6 +56,7 @@ export const t = {
     instructions: "אופן הכנה",
     tipsTitle: "טיפים והערות",
     timerRunning: "טיימר פועל - ראו פאנל למטה",
+    timerDone: "הסתיים! ✓",
     startTimer: (m: number) => `הפעל טיימר ${m} דקות`,
     difficulty: { easy: 'קל', medium: 'בינוני', hard: 'מאתגר' } as Record<Difficulty, string>,
     categories: {
@@ -94,6 +95,7 @@ export const t = {
     instructions: "Instructions",
     tipsTitle: "Tips & Notes",
     timerRunning: "Timer running - see panel below",
+    timerDone: "Done! ✓",
     startTimer: (m: number) => `Start ${m}m timer`,
     difficulty: { easy: 'Easy', medium: 'Medium', hard: 'Hard' } as Record<Difficulty, string>,
     categories: {
