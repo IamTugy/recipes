@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { TimerState } from '../types'
 import { formatSeconds } from '../utils/format'
+import { useLanguage } from '../context/LanguageContext'
 
 interface TimerPanelProps {
   timers: TimerState[]
@@ -80,6 +81,7 @@ function playDoneSound() {
 }
 
 export default function TimerPanel({ timers, onToggle, onRemove, onReset }: TimerPanelProps) {
+  const { lang } = useLanguage()
   const [mobileIdx, setMobileIdx] = useState(0)
   const prevDoneIds = useRef<Set<string>>(new Set(timers.filter(t => t.done).map(t => t.id)))
 
@@ -145,7 +147,7 @@ export default function TimerPanel({ timers, onToggle, onRemove, onReset }: Time
                 onClick={() => setMobileIdx(i => (i - 1 + timers.length) % timers.length)}
                 className="w-7 h-7 flex items-center justify-center rounded-lg text-cream/30 hover:text-cream/60 hover:bg-tint/[0.06] transition-colors shrink-0"
               >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
+                <svg className={`w-4 h-4 ${lang === 'he' ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
               </button>
             )}
 
@@ -171,7 +173,7 @@ export default function TimerPanel({ timers, onToggle, onRemove, onReset }: Time
                 onClick={() => setMobileIdx(i => (i + 1) % timers.length)}
                 className="w-7 h-7 flex items-center justify-center rounded-lg text-cream/30 hover:text-cream/60 hover:bg-tint/[0.06] transition-colors shrink-0"
               >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/></svg>
+                <svg className={`w-4 h-4 ${lang === 'he' ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/></svg>
               </button>
             )}
           </div>
