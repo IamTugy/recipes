@@ -234,6 +234,7 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
                           <li key={ii} className={`flex gap-2 text-sm ${lang === 'he' ? 'flex-row-reverse' : ''}`}>
                             <span className="font-semibold text-cream/90 shrink-0 w-14 text-right" dir="ltr">
                               {(() => {
+                                if (!item.amount) return null
                                 const scaled = item.amount * multiplier
                                 const amt = scaleAmount(item.amount, multiplier)
                                 const unit = lang === 'he' ? heUnit(item.unit, scaled) : item.unit
