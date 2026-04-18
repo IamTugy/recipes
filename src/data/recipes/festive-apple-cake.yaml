@@ -1,0 +1,116 @@
+id: festive-apple-cake
+title: Festive apple cake
+titleHe: עוגת תפוחים חגיגית
+description: עוגת תפוחים חגיגית
+descriptionEn: Festive apple cake
+image: https://assets.tugy.dev/festive-apple-cake.jpg
+category: dessert
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - קינוח
+  - מתוק
+  - עוגה
+ingredients:
+  - group: לשכבת התפוחים
+    items:
+      - amount: 2
+        unit: ""
+        name: תפוחי עץ
+        nameEn: Apples
+      - amount: 100
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 30
+        unit: g
+        name: דבש
+        nameEn: honey
+      - amount: 150
+        unit: g
+        name: מים
+        nameEn: water
+  - group: לעוגה
+    items:
+      - amount: 150
+        unit: g
+        name: סוכר דמררה
+        nameEn: Demerara sugar
+      - amount: 150
+        unit: g
+        name: סוכר לבן
+        nameEn: white sugar
+      - amount: 3
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 80
+        unit: g
+        name: שמן קנולה
+        nameEn: Canola oil
+      - amount: 3
+        unit: ""
+        name: תפוחי עץ מזן גרני סמית, מגוררים גס
+        nameEn: Granny Smith apples, coarsely grated
+      - amount: 210
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 3
+        unit: g
+        name: אבקת אפייה
+        nameEn: baking powder
+      - amount: 3
+        unit: g
+        name: אבקת קינמון
+        nameEn: Cinnamon powder
+      - amount: 2
+        unit: g
+        name: אגוז מוסקט טחון
+        nameEn: Ground nutmeg
+  - group: לקישוט
+    items:
+      - amount: 0
+        unit: ""
+        name: נפאז׳ נייטרלי
+        nameEn: Nafage is neutral
+      - amount: 0
+        unit: ""
+        name: קוקוס לבן
+        nameEn: White coconut
+      - amount: 0
+        unit: ""
+        name: אבקת זהב
+        nameEn: gold powder
+steps:
+  - title: ""
+    items:
+      - instruction: >-
+          לפרוסות התפוחים- פורסים את התפוחים לפרוסות רוחב דקיקות (לא מקלפים או מגלענים את התפוחים), ניתן להיעזר גם
+          במנדולינה.
+        instructionEn: >-
+          For the apple slices - slice the apples into thin widthwise slices (do not peel or core the apples), you can
+          also use a mandoline.
+      - instruction: מבשלים את הסוכר והמים לסירופ, מניחים את פרוסות התפוחים בסיר הסירופ, מביאים לרתיחה ומכבים את הלהבה.
+        instructionEn: >-
+          Boil the sugar and water into syrup, place the apple slices in the syrup pot, bring to a boil and turn off the
+          flame.
+      - instruction: >-
+          מניחים לצינון בסירופ.מרפדים את התבנית בנייר אפייה ומסדרים מעל את פרוסות התפוחים בצורה חופפת.לעוגה- במיקסר
+          מצויד בבלון הקצפה מקציפים את הסוכרים, הביצים והזסט כ-10 דקות, לקבלת תערובת תפוחה מאוד.
+        instructionEn: >-
+          Leave to cool in the syrup. Line the pan with baking paper and arrange the apple slices on top in an
+          overlapping manner. For the cake - in a mixer fitted with the whisk balloon, beat the sugars, eggs and zest
+          for about 10 minutes, to obtain a very puffy mixture.
+      - instruction: מזרזפים את השמן בזרם דק.
+        instructionEn: Pour the oil in a thin stream.
+      - instruction: >-
+          מערבבים בעדינות את התפוחים המגוררים, מנפים את החומרים היבשים ומערבלים בעדינות פנימה. מעבירים אל התבנית ואופים
+          בחום של 160 מעלות כ-45 דקות. מצננים ומשחררים את העוגה. ניתן להברישה בנפאז׳ חם ולעטרה בקוקוס ואבקת זהב.
+        instructionEn: >-
+          Gently mix the grated apples, sift the dry ingredients and gently mix in. Transfer to the pan and bake at 160
+          degrees for about 45 minutes. Cool and release the cake. Can be brushed with hot nefage and crowned with
+          coconut and gold powder.
+tips: []

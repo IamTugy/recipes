@@ -1,0 +1,129 @@
+id: cereal-bread
+title: Cereal bread
+titleHe: לחם דגנים
+description: לחם דגנים
+descriptionEn: Cereal bread
+image: https://assets.tugy.dev/cereal-bread.jpg
+category: bread
+difficulty: hard
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - מאפה
+  - לחם
+ingredients:
+  - group: ""
+    items:
+      - amount: 2
+        unit: ""
+        name: כיכרות לחם     מצרכים לפוליש (בצק מקדים) - נעשה
+        nameEn: Loaves of bread ingredients for polishing (pre-dough) - done
+      - amount: 24
+        unit: ""
+        name: "שעות מראש:"
+        nameEn: "Hours in advance:"
+      - amount: 200
+        unit: g
+        name: קמח מחיטה מלאה
+        nameEn: Whole wheat flour
+      - amount: 200
+        unit: g
+        name: מים קורט שמרים יבשים
+        nameEn: Water and a pinch of dry yeast
+      - amount: 0
+        unit: ""
+        name: "מצרכים ללחם דגנים:"
+        nameEn: "Ingredients for cereal bread:"
+      - amount: 350
+        unit: g
+        name: קמח לחם
+        nameEn: Bread flour
+      - amount: 250
+        unit: g
+        name: קמח חיטה מלא
+        nameEn: Whole wheat flour
+      - amount: 15
+        unit: g
+        name: אבקת גלוטן (ניתן להשיג בחנויות אפייה מתמחות)
+        nameEn: Gluten powder (available at specialty baking stores)
+      - amount: 400
+        unit: g
+        name: בצק מקדים (הבצק שנוצר בפוליש)
+        nameEn: Pre-dough (the dough created by polishing)
+      - amount: 30
+        unit: g
+        name: מלח
+        nameEn: salt
+      - amount: 60
+        unit: g
+        name: סוכר חום
+        nameEn: brown sugar
+      - amount: 350
+        unit: g
+        name: מים
+        nameEn: water
+      - amount: 70
+        unit: g
+        name: שמן זית
+        nameEn: olive oil
+      - amount: 10
+        unit: g
+        name: שמרים יבשים
+        nameEn: dry yeast
+      - amount: 50
+        unit: g
+        name: גרעיני חמניה
+        nameEn: Sunflower seeds
+      - amount: 50
+        unit: g
+        name: פשתן
+        nameEn: linen
+      - amount: 50
+        unit: g
+        name: גרעיני דלעת
+        nameEn: Pumpkin seeds
+      - amount: 50
+        unit: g
+        name: שיבולת שועל שלמה
+        nameEn: Whole oats
+steps:
+  - title: ""
+    items:
+      - instruction: "אופן הכנה הבצק המקדים (פוליש): מערבבים את כל החומרים לתערובת אחידה."
+        instructionEn: "How to prepare the preliminary dough (polishing): mix all the ingredients to a uniform mixture."
+      - instruction: מכסים ומניחים לתסוס בטמפרטורת החדר במשך 24 שעות.
+        instructionEn: Cover and leave to ferment at room temperature for 24 hours.
+      - instruction: להכנת הבצק הסופי:במיקסר מצויד בוו לישה מניחים את כל החומרים למעט הדגנים, המים והשמן.
+        instructionEn: >-
+          To prepare the final dough: In a mixer equipped with a kneading hook, place all the ingredients except for the
+          grains, water and oil.
+      - instruction: לשים את החומרים ומוסיפים בהדרגה את המים והשמן.
+        instructionEn: Put the ingredients and gradually add the water and oil.
+      - instruction: אם הבצק יבש, מוסיפים מעט מים, אם הוא מתקבל דביק, מעט קמח.
+        instructionEn: If the dough is dry, add a little water, if it is sticky, add a little flour.
+      - instruction: לשים את הבצק 10 דקות במהירות נמוכה.
+        instructionEn: Knead the dough for 10 minutes at low speed.
+      - instruction: הבצק אמור להתקבל חלק, משי ומעט דביק.
+        instructionEn: The dough should be smooth, silky and slightly sticky.
+      - instruction: מוסיפים את הדגנים ומטמיעים אותם בבצק (אפשר גם בלישה ידנית).
+        instructionEn: Add the grains and incorporate them into the dough (hand kneading is also possible).
+      - instruction: מעבירים את הבצק לקערה משומנת קלות ומכסים בניילון נצמד.
+        instructionEn: Transfer the dough to a lightly oiled bowl and cover with plastic wrap.
+      - instruction: משהים להתפחה עד להכפלת הנפח.
+        instructionEn: Leave to rise until doubled in volume.
+      - instruction: מחלקים את הבצק לשני חלקים ומעצבים לצורת כיכר רצויה.
+        instructionEn: Divide the dough into two parts and shape into a desired loaf shape.
+      - instruction: מניחים על תבנית אפיה ומכסים שוב.
+        instructionEn: Place on a baking sheet and cover again.
+      - instruction: >-
+          מתפיחים ל-75% התפחה (מעט פחות מכפול).מחממים תנור לחום של 200 מעלות, מאבקים את הכיכרות במעט קמח וחורצים אותם
+          בעזרת סכין חדה.
+        instructionEn: >-
+          Rise to 75% of the rise (slightly less than double). Heat an oven to 200 degrees, dust the loaves with a
+          little flour and score them with a sharp knife.
+      - instruction: אופים את הכיכרות במשך 35-40 דקות.
+        instructionEn: Bake the loaves for 35-40 minutes.
+      - instruction: מוציאים ומניחים לצינון מלא מעל רשת צינון.
+        instructionEn: Remove and leave to cool completely on a cooling rack.
+tips: []

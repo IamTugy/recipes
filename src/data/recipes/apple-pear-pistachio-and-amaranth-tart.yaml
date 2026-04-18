@@ -1,0 +1,138 @@
+id: apple-pear-pistachio-and-amaranth-tart
+title: Apple, pear, pistachio and amaranth tart
+titleHe: טארט תפוח, אגס, פיסטוק ואמרנה
+description: טארט תפוח, אגס, פיסטוק ואמרנה
+descriptionEn: Apple, pear, pistachio and amaranth tart
+image: https://assets.tugy.dev/apple-pear-pistachio-and-amaranth-tart.jpg
+category: dessert
+difficulty: medium
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - קינוח
+  - מתוק
+ingredients:
+  - group: ""
+    items:
+      - amount: 0
+        unit: ""
+        name: תבנית טארט
+        nameEn: Tart mold
+      - amount: 20
+        unit: ""
+        name: x14 ס״מ     לבצק פריך:180 גרם קמח
+        nameEn: "x14 cm for crispy dough: 180 grams of flour"
+      - amount: 50
+        unit: g
+        name: אבקת שקדים מולבנים
+        nameEn: blanched almond powder
+      - amount: 40
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 130
+        unit: g
+        name: חמאה קרה
+        nameEn: cold butter
+      - amount: 1
+        unit: ""
+        name: ביצה
+        nameEn: egg
+      - amount: 70
+        unit: g
+        name: אבקת שקדים מולבנים
+        nameEn: blanched almond powder
+      - amount: 70
+        unit: g
+        name: חמאה
+        nameEn: butter
+      - amount: 70
+        unit: g
+        name: אבקת סוכר
+        nameEn: icing sugar
+      - amount: 25
+        unit: g
+        name: קורנפלור
+        nameEn: Cornflour
+      - amount: 20
+        unit: g
+        name: משחת פיסטוק
+        nameEn: Pistachio paste
+      - amount: 1
+        unit: ""
+        name: ביצה
+        nameEn: egg
+      - amount: 10
+        unit: g
+        name: אמרטו
+        nameEn: Amaretto
+      - amount: 1
+        unit: ""
+        name: אגס, קלוף, מגולען וחתוך לשישיות
+        nameEn: Pear, peeled, cored and cut into six
+      - amount: 1
+        unit: ""
+        name: תפוח, קלוף, מגולען וחתוך לשמיניות
+        nameEn: Apple, peeled, cored and cut into eighths
+      - amount: 80
+        unit: g
+        name: דובדבני אמרנה
+        nameEn: Amaranth cherries
+  - group: תכנון
+    items:
+      - amount: 0.333
+        unit: cup
+        name: חומץ בין יין,
+        nameEn: vinegar between wine,
+      - amount: 2
+        unit: ""
+        name: שיני שום כתושות,
+        nameEn: crushed garlic cloves,
+      - amount: 0.5
+        unit: tsp
+        name: מלח,
+        nameEn: salt,
+      - amount: 1
+        unit: tsp
+        name: סוכר,
+        nameEn: sugar,
+steps:
+  - title: ""
+    items:
+      - instruction: "מכינים את הבצק: במעבד מזון מעבדים קמח, סוכר ואבקת שקדים."
+        instructionEn: "Prepare the dough: process flour, sugar and almond powder in a food processor."
+      - instruction: מוסיפים חמאה ומעבדים לתערובת פירורית.מוסיפים ביצה ומעבדים עד לקבלת פירורי בצק גדולים ולחים.
+        instructionEn: Add butter and process to a crumbly mixture. Add an egg and process until you get large, moist dough crumbs.
+      - instruction: >-
+          מוציאים מהמכשיר, מאחדים לבצק, עוטפים בניילון נצמד ומאפסנים במקרר במשך כחצי שעה. מרדדים את הבצק על משטח מקומח
+          לעובי 4 מ"מ ומניחים בתבנית טארט.
+        instructionEn: >-
+          Remove from the device, combine into a dough, wrap in cling film and refrigerate for about half an hour. Roll
+          out the dough on a floured surface to a thickness of 4 mm and place in a tart pan.
+      - instruction: >-
+          מניחים משקולת לאפייה עיוורת (מסדרים נילון נצמד עמיד בחום או נייר אלומיניום על גבי הקלתיתו שמים קטניות
+          כמשקולת).
+        instructionEn: >-
+          Place a weight for blind baking (arrange heat-resistant cling film or aluminum foil on top of it and put
+          legumes as a weight).
+      - instruction: מצננים 20 דקות בצורה זו ומחממים תנור ל-170 מעלות.אופים את הקלתית אפייה עיוורת במשך כ-15 דקות.
+        instructionEn: >-
+          Cool for 20 minutes in this way and heat the oven to 170 degrees. Bake the cheese blind baking for about 15
+          minutes.
+      - instruction: מסירים את המשקולת ואופים 5 דקות נוספות לייבוש הבסיס.
+        instructionEn: Remove the weight and bake another 5 minutes to dry the base.
+      - instruction: "מצננים קלות.מכינים קרם פיסטוק: טוחנים שקדים, אבקת סוכר וקמח במעבד מזון."
+        instructionEn: "Cool slightly. Make pistachio cream: grind almonds, powdered sugar and flour in a food processor."
+      - instruction: >-
+          מוסיפים חמאה, ביצה, משחת פיסטוק ואמרטו ומעבדים עד שמתקבל קרם אחיד. מורחים את הקרם על קלתית הבצק הקרה ומסדרים
+          מעל את הפירות בצורת מניפה. אופים במשך 35-45 דקות, עד שפני הטארט מזהיבים ויציבים למגע.
+        instructionEn: >-
+          Add butter, egg, pistachio paste and Amaranth and process until a uniform cream is obtained. Spread the cream
+          on the cold dough and arrange the fruits on top in the shape of a fan. Bake for 35-45 minutes, until the
+          surface of the tart is golden and firm to the touch.
+      - instruction: מזגגים את הקרם בנפאז' ומעטרים בפיסטוק, אמרנה ואבקת סוכר.
+        instructionEn: Glaze the cream with Nafage and garnish with pistachios, amaranth and powdered sugar.
+      - instruction: בלוג  טיפים לאירוח המוני בחג
+        instructionEn: Blog tips for mass entertaining on a holiday
+tips: []

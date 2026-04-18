@@ -1,0 +1,83 @@
+id: beef-wellington-boeuf-wellington
+title: Beef Wellington Boeuf Wellington
+titleHe: ביף וולינגטון Boeuf Wellington
+description: ביף וולינגטון Boeuf Wellington
+descriptionEn: Beef Wellington Boeuf Wellington
+image: https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=900&q=80
+category: dinner
+difficulty: hard
+prepTime: 15
+cookTime: 40
+servings: 8
+tags:
+  - ארוחת ערב
+ingredients:
+  - group: ""
+    items:
+      - amount: 2
+        unit: tbsp
+        name: חרדל דיז׳ון
+        nameEn: Dijon mustard
+  - group: לדוקסל
+    items:
+      - amount: 2
+        unit: ""
+        name: סלסלות פטריות פורטובלו
+        nameEn: Portobello mushroom baskets
+      - amount: 4
+        unit: ""
+        name: שיני שום קצוצותמלח, פלפל שחור, מעט טימין
+        nameEn: Chopped garlic cloves, salt, black pepper, a little thyme
+      - amount: 400
+        unit: g
+        name: בצק עלים איכותי, מרודד דק
+        nameEn: High-quality puff pastry, thinly rolled
+steps:
+  - title: ""
+    items:
+      - instruction: מתבלים היטב את הפילה.
+        instructionEn: Season the fillet well.
+      - instruction: מחממים שמן זית במחבת וצורבים את הבשר להשחמה מכל הכיוונים.
+        instructionEn: Heat olive oil in a pan and sear the meat until browned on all sides.
+      - instruction: מוציאים מהמחבת ומברישים מיד בחרדל מכל הכיוונים.
+        instructionEn: Remove from the pan and immediately brush with mustard from all directions.
+      - instruction: מצננים.לדוקסל- קוצצים שום ומעבירים למעבד מזון.
+        instructionEn: Cool. For Duxel - chop garlic and transfer to a food processor.
+      - instruction: מניחים גם את הפטריות וקוצצים דק.
+        instructionEn: Place the mushrooms as well and chop finely.
+      - instruction: מעבירים למחבת יבשה ומחממים עד לנידוף כל הנוזלים.
+        instructionEn: Transfer to a dry pan and heat until all the liquid evaporates.
+      - instruction: מתבלים במלח, פלפל שחור וטימין.
+        instructionEn: Season with salt, black pepper and thyme.
+      - instruction: מעבירים לקירור מלא.הרכבה 1- פורשים יריעת ניילון נצמד רחבה ועלה מסדרים בצורה חופפת את פרוסות הפסטרמה.
+        instructionEn: >-
+          Transfer to cool completely. Assembly 1- Spread a wide cling film and arrange the slices of pastrami in an
+          overlapping manner.
+      - instruction: משטחים מעל את הדוקסל בשכבה אחידה.
+        instructionEn: Spread over the doxel in an even layer.
+      - instruction: מניחים מעל את נתח הפילה הקר ומגלגלים מעליו את שכבות הפסטרמה והדוקסל עם הניילון.
+        instructionEn: Place the cold fillet piece on top and roll the layers of pastrami and duxel with the plastic over it.
+      - instruction: מהדקים היטב ומניחים לקירור לפחות של שעתיים.הרכבה 2- מרדדים את הבצק לעלה רחב בעובי 2 מ״מ.
+        instructionEn: >-
+          Tighten well and leave to cool for at least two hours. Assembly 2- Roll the dough into a wide sheet with a
+          thickness of 2 mm.
+      - instruction: מניחים מעליו את הפילה המגולגל (ללא הניילון) ועוטפים בעזרת הבצק.
+        instructionEn: Place the rolled fillet on top of it (without the plastic) and wrap with the dough.
+      - instruction: מסירים קצוות בצק מיותרים במידה וישי.
+        instructionEn: Remove excess dough edges if necessary.
+      - instruction: עוטפים בניילון נצמד ומהדקים היטב.
+        instructionEn: Wrap in cling film and tighten well.
+      - instruction: >-
+          מניחים בקירור לשעתיים לפחות.מחממים תנור לחום גבוה של 200 מעלות.מברישים את המאפה בביצה טרופה, חורצים מעל בעזר
+          סכין טורנה ומפזרים גרגרי מלח גס.
+        instructionEn: >-
+          Place in the refrigerator for at least two hours. Heat the oven to a high temperature of 200 degrees. Brush
+          the pastry with a beaten egg, make slits on top with the help of a Torna knife and sprinkle with grains of
+          coarse salt.
+      - instruction: אופים כ-40 דקות או על למידת העשייה הרצויה.
+        instructionEn: Bake for about 40 minutes or until desired doneness.
+      - instruction: מוציאים מהתנור ומניחים ל-15 דקות לפחות לפני הפריסה.מגישים בליווי רוטב יין אדום ותפוחי אדמה אפויים.
+        instructionEn: >-
+          Remove from the oven and leave for at least 15 minutes before serving. Serve with red wine sauce and baked
+          potatoes.
+tips: []

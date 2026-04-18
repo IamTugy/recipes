@@ -1,0 +1,117 @@
+id: papillon-yeast-ricotta
+title: Papillon yeast-ricotta
+titleHe: פפיון שמרים-ריקוטה
+description: פפיון שמרים-ריקוטה
+descriptionEn: Papillon yeast-ricotta
+image: https://images.unsplash.com/photo-1509440159596-0249088772ff?w=900&q=80
+category: bread
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 20
+tags:
+  - מאפה
+ingredients:
+  - group: ""
+    items:
+      - amount: 500
+        unit: g
+        name: קמח לחם
+        nameEn: Bread flour
+      - amount: 150
+        unit: g
+        name: חלב
+        nameEn: milk
+      - amount: 15
+        unit: g
+        name: שמרים יבשים/ 25 גרם שמרים לחים
+        nameEn: Dry yeast/ 25 grams of moist yeast
+      - amount: 100
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 5
+        unit: g
+        name: מלח
+        nameEn: salt
+      - amount: 2
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 0
+        unit: ""
+        name: קליפה מגוררת מלימון
+        nameEn: Grated lemon peel
+      - amount: 100
+        unit: g
+        name: חמאה רכה
+        nameEn: Soft butter
+  - group: לקיפול
+    items:
+      - amount: 200
+        unit: g
+        name: חמאה
+        nameEn: butter
+  - group: למילוי
+    items:
+      - amount: 100
+        unit: g
+        name: ריקוטה
+        nameEn: ricotta
+      - amount: 20
+        unit: g
+        name: קורנפלור
+        nameEn: Cornflour
+      - amount: 30
+        unit: g
+        name: חמאה רכה
+        nameEn: Soft butter
+      - amount: 80
+        unit: g
+        name: אבקת סוכר
+        nameEn: icing sugar
+      - amount: 60
+        unit: g
+        name: צימוקים
+        nameEn: raisins
+      - amount: 0
+        unit: ""
+        name: סוכר לבן לפיזור
+        nameEn: White sugar for spreading
+      - amount: 0
+        unit: ""
+        name: אבקת סוכר
+        nameEn: icing sugar
+steps:
+  - title: ""
+    items:
+      - instruction: >-
+          אופן הכנת הבצק: מכניסים לקערת המיקסר את כל המרכיבים, למעט החמאה, ולשים 5 דקות. מוסיפים את החמאה וממשיכים ללוש
+          עוד 3 דקות או עד הטמעות מלאה שלה בבצק. מעבירים לקערה ומתפיחים כשעה. מעבירים להתפחה נוספת בקירור, ל-6 שעות.
+        instructionEn: >-
+          How to make the dough: Put all the ingredients, except the butter, into the mixer bowl and let it sit for 5
+          minutes. Add the butter and continue kneading for another 3 minutes or until it is fully incorporated into the
+          dough. Transfer to a bowl and leave to rise for about an hour. Transfer to another rise in the refrigerator,
+          for 6 hours.
+      - instruction: >-
+          למחרת מקפלים את החמאה (200 גרם) לתוך הבצק: מרדדים את הבצק על משטח מקומח לעלה בגודל 50X30 ס"מ. משטחים את החמאה
+          בין שתי יריעות ניילון לעלה מלבני בגודל 2/3 ממלבן הבצק.
+        instructionEn: >-
+          The next day, fold the butter (200 grams) into the dough: roll the dough on a floured surface into a 50x30 cm
+          sheet. Spread the butter between two plastic sheets into a rectangular sheet 2/3 the size of the dough
+          rectangle.
+      - instruction: >-
+          מניחים את מלבן החמאה על מלבן הבצק ב-2/3 התחתונים שלו ומקפלים את החלק החשוף של הבצק מעל 1/2 מהחמאה ואת החלק
+          התחתון מעל (מתקבל קיפול המדמה ספר). מסובבים את הבצק ב-90 מעלות , מרדדים למלבן וחוזרים שוב על פעולת הקיפול.
+          מצננים כשעתיים.
+        instructionEn: >-
+          Place the rectangle of butter on the rectangle of dough in its lower 2/3 and fold the exposed part of the
+          dough over 1/2 of the butter and the bottom part over (a fold simulating a book is obtained). Turn the dough
+          90 degrees, roll it into a rectangle and repeat the folding process again. Cool for about two hours.
+      - instruction: >-
+          מרדדים את הבצק למלבן רחב, מורחים את המלית בשכבה אחידה ומקפלים לחצי, מרדדים קלות וחותכים למלבנים. קורצים בצורת
+          פפיון.
+        instructionEn: >-
+          Roll the dough into a wide rectangle, spread the filling in an even layer and fold in half, roll slightly and
+          cut into rectangles. Shape into bow-ties (papillons).
+tips: []

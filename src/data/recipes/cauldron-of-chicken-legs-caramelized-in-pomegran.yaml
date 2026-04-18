@@ -1,0 +1,111 @@
+id: cauldron-of-chicken-legs-caramelized-in-pomegran
+title: Cauldron of chicken legs caramelized in pomegranates, onions and glazed apples and balsamic
+titleHe: קדירת שוקי עוף מקורמלים ברימונים, בצלים ותפוחים מזוגגים ובלסמי
+description: קדירת שוקי עוף מקורמלים ברימונים, בצלים ותפוחים מזוגגים ובלסמי
+descriptionEn: Cauldron of chicken legs caramelized in pomegranates, onions and glazed apples and balsamic
+image: https://assets.tugy.dev/cauldron-of-chicken-legs-caramelized-in-pomegran.jpg
+category: dinner
+difficulty: hard
+prepTime: 15
+cookTime: 10
+servings: 12
+tags:
+  - ארוחת ערב
+ingredients:
+  - group: ""
+    items:
+      - amount: 3
+        unit: ""
+        name: בצלים סגולים, קלופים וחתוכים לשישיות
+        nameEn: purple onions, peeled and cut into sixths
+      - amount: 3
+        unit: ""
+        name: בצלים לבנים, קלופים וחתוכים לשישיות
+        nameEn: white onions, peeled and cut into sixths
+      - amount: 0
+        unit: ""
+        name: מלח, פלפל שחור
+        nameEn: salt, black pepper
+      - amount: 0
+        unit: ""
+        name: עלים מ-3 ענפי טימין
+        nameEn: leaves from 3 thyme sprigs
+      - amount: 2
+        unit: tbsp
+        name: דבש
+        nameEn: honey
+      - amount: 0
+        unit: ""
+        name: מיץ מלימון אחד
+        nameEn: juice from one lemon
+  - group: לתבשיל
+    groupEn: for the stew
+    items:
+      - amount: 20
+        unit: ""
+        name: שוקי עוף, קצוצות עקב
+        nameEn: chicken shanks, heel trimmed
+      - amount: 0
+        unit: ""
+        name: שמן זית לטיגון
+        nameEn: olive oil for frying
+      - amount: 0
+        unit: ""
+        name: מלח, פלפל שחור
+        nameEn: salt, black pepper
+      - amount: 6
+        unit: ""
+        name: שיני שום פרוסות
+        nameEn: sliced garlic cloves
+      - amount: 100
+        unit: g
+        name: רכז תפוחים (סיידר הגליל)
+        nameEn: apple concentrate (Cider HaGalil)
+      - amount: 100
+        unit: g
+        name: חומץ בלסמי
+        nameEn: balsamic vinegar
+      - amount: 10
+        unit: ""
+        name: גבעולי טימין (עלים)
+        nameEn: thyme sprigs (leaves)
+      - amount: 100
+        unit: g
+        name: רכז רימונים
+        nameEn: pomegranate concentrate
+      - amount: 2
+        unit: ""
+        name: תפוחי עץ מזן גרני סמית, קלופים, מגולענים וחתוכים לשמינייות
+        nameEn: Granny Smith apples, peeled, cored and cut into eighths
+      - amount: 750
+        unit: g
+        name: ציר עוף או מים
+        nameEn: chicken stock or water
+steps:
+  - title: ""
+    items:
+      - instruction: מכינים את הבצלים- מחממים תנור לחום של 220 מעלות.
+        instructionEn: Prepare the onions - heat the oven to 220 degrees.
+      - instruction: מתבלים את הבצלים ומסדרים על מגש האפייה וצולים 25 דקות להזהבה.
+        instructionEn: Season the onions and arrange on the baking tray and roast for 25 minutes until golden.
+      - instruction: מצננים מעט.מכינים את התבשיל- מחממים שמן זית בסיר שטוח ורחב, מתבלים את השוקיים ומטגנים להזהבה.
+        instructionEn: Cool a little. Prepare the stew - heat olive oil in a flat, wide pot, season the shanks and fry until golden.
+      - instruction: מוציאים ובאותו סיר מטגנים קלות את השום ותיבול.
+        instructionEn: Take out and in the same pot lightly fry the garlic and seasoning.
+      - instruction: >-
+          מוסיפים את הרכז התפוחים, והחומץ, טימין ורכז רימונים מביאים לרתיחה.מסדרים את העוף הצורה נאה ושוזרים את הבצלים
+          המקורמלים ותפוחי העץ.
+        instructionEn: >-
+          Add the apple concentrate, and the vinegar, thyme and pomegranate concentrate bring to a boil. Arrange the
+          chicken in a nice shape and weave in the caramelized onions and apples.
+      - instruction: יוצקים מעל את ציר עוף או מים, מתבלים, מרתיחים ומבשלים על להבה נמוכה כשעה.
+        instructionEn: Pour over the chicken stock or water, season, boil and cook on a low flame for about an hour.
+      - instruction: מידי פעם מטלטלים את הסיר.
+        instructionEn: Occasionally shake the pot.
+      - instruction: >-
+          לקראת סוף הבישול פותחים את המכסה ומצמצמים את הרוטב קלות.להגשה- מעבירים לכלי הגשה נאה, מפזרים מעל שומשום,
+          רימונים ותלתלי בצל ירוק.
+        instructionEn: >-
+          Towards the end of cooking, open the lid and reduce the sauce slightly. To serve - transfer to a nice serving
+          dish, sprinkle sesame seeds, pomegranates and green onion curls on top.
+tips: []

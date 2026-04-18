@@ -1,0 +1,106 @@
+id: trabados-borictis-de-mile
+title: Trabados (Borictis de Mile)
+titleHe: טרבדוס (בוריקטיס דה מייל)
+description: טרבדוס (בוריקטיס דה מייל)
+descriptionEn: Trabados (Borictis de Mile)
+image: https://assets.tugy.dev/trabados-borictis-de-mile.jpg
+category: bread
+difficulty: medium
+prepTime: 15
+cookTime: 10
+servings: 60
+tags:
+  - מאפה
+ingredients:
+  - group: ""
+    items:
+      - amount: 100
+        unit: g
+        name: שמן
+        nameEn: oil
+      - amount: 200
+        unit: g
+        name: חמאה רכה
+        nameEn: soft butter
+      - amount: 240
+        unit: g
+        name: מים
+        nameEn: water
+      - amount: 1
+        unit: tsp
+        name: משחת וניל
+        nameEn: vanilla paste
+      - amount: 720
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 20
+        unit: g
+        name: אבקת אפייה
+        nameEn: baking powder
+  - group: למילוי
+    items:
+      - amount: 200
+        unit: g
+        name: אגוזי מלך, טחונים דק
+        nameEn: Walnuts, finely ground
+      - amount: 150
+        unit: g
+        name: אבקת שקדים
+        nameEn: almond powder
+      - amount: 0.5
+        unit: tsp
+        name: קינמון
+        nameEn: cinnamon
+      - amount: 75
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 1
+        unit: ""
+        name: חלבון
+        nameEn: protein
+  - group: לסירופ
+    items:
+      - amount: 1
+        unit: kg
+        name: סוכר
+        nameEn: sugar
+      - amount: 400
+        unit: g
+        name: מים
+        nameEn: water
+      - amount: 0
+        unit: ""
+        name: מיץ וסרט קליפה מלימון אחד
+        nameEn: juice and strip of peel from one lemon
+steps:
+  - title: ""
+    items:
+      - instruction: לבצקמניחים את כל החומרים במיקסר מצויד בוו גיטרה ולשים עד קבלת בצק אחיד.עוטפים ומניחים בקירור לשעה.
+        instructionEn: >-
+          For the dough, place all the ingredients in a mixer equipped with a guitar hook and knead until a uniform
+          dough is obtained. Wrap and refrigerate for an hour.
+      - instruction: למילוימערבבים את כל החומרים לתערובת בצקית סמיכה.
+        instructionEn: For the filling, mix all the ingredients into a thick doughy mixture.
+      - instruction: לסירופמביאים את כל החומרים לרתיחה ומבשלים 5 דקות.
+        instructionEn: Bring all the ingredients to a boil and cook for 5 minutes.
+      - instruction: מחממים את התנור לחום של 170 מעלות.
+        instructionEn: Heat the oven to 170 degrees.
+      - instruction: >-
+          הרכבהמחלקים את הבצק לשני חלקים ומרדדים כל חלק לעלה דק על משטח מקומח. קורצים עיגולים בקוטר 6-8 ס"מ ומניחים מעל
+          כל אחד כפית גדושה מהמילוי. סוגרים לצורת חצי סהר ומהדקים היטב את השוליים. מניחים על תבנית אפייה מרופדת בנייר
+          אפיה ואופים 1/2 שעה, להזהבה.
+        instructionEn: >-
+          The assembly divides the dough into two parts and rolls each part into a thin sheet on a floured surface. Cut
+          circles with a diameter of 6-8 cm and place a heaping spoonful of the filling on top of each one. Close into a
+          half-moon shape and tighten the edges well. Place on a baking sheet lined with baking paper and bake for 1/2
+          hour, until golden.
+      - instruction: >-
+          מצננים.מביאים את הסירופ לרתיחה ומניחים בכל פעם כ-10 בורקיטס לבישול קצר של דקה.מעבירים לקופסא ויוצקים את שארית
+          הסירופ מעל.שומרים ומגישים בטמפרטורת החדר עד כ-10 ימים.
+        instructionEn: >-
+          Cool. Bring the syrup to a boil and place about 10 burkits each time for a short cooking of one minute.
+          Transfer to a box and pour the rest of the syrup on top. Store and serve at room temperature for up to about
+          10 days.
+tips: []

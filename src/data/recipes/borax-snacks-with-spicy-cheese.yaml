@@ -1,0 +1,46 @@
+id: borax-snacks-with-spicy-cheese
+title: Borax snacks with spicy cheese
+titleHe: חטיפי בורקס עם גבינה חריפה
+description: חטיפי בורקס עם גבינה חריפה
+descriptionEn: Borax snacks with spicy cheese
+image: https://assets.tugy.dev/borax-snacks-with-spicy-cheese.jpg
+category: bread
+difficulty: easy
+prepTime: 15
+cookTime: 22
+servings: 50
+tags:
+  - מאפה
+  - גבינה
+ingredients:
+  - group: ""
+    items:
+      - amount: 600
+        unit: g
+        name: בצק עלים איכותי, על בסיס חמאה
+        nameEn: High-quality puff pastry, based on butter
+      - amount: 250
+        unit: g
+        name: גבינה חריפה מגוררת (קשקבל, פרמזן, גרוייר וכו')ביצה טרופהשומשום לציפוי
+        nameEn: Grated spicy cheese (Kashkabal, Parmesan, Gruyère, etc.) Beaten egg Sesame for coating
+steps:
+  - title: ""
+    items:
+      - instruction: >-
+          מרדדים את הבצק לעלה בעובי 5 מ"מ ומפזרים מעל את מחצית מהגבינה.מקפלים את הבצק קיפול ספר - מפגישים במרכז את שני
+          קצוות הבצק ומקפלים אותם אחד מעל השני.
+        instructionEn: >-
+          Roll the dough into a sheet with a thickness of 5 mm and sprinkle half of the cheese on top. Fold the dough
+          into a book fold - bring the two ends of the dough together in the center and fold them one on top of the
+          other.
+      - instruction: >-
+          מצננים לשעה.חוזרים על פעולת קיפול זו פעם נוספת ומצננים היטב שוב.מרדדים את הבצק לעלה בעובי 6 מ"מ, מברישים בביצה
+          טרופה ומפזרים מעל שומשום בנדיבות.
+        instructionEn: >-
+          Cool for an hour. Repeat this folding operation one more time and cool well again. Roll the dough into a sheet
+          6 mm thick, brush with beaten egg and sprinkle sesame generously on top.
+      - instruction: מקפיאים.קורצים את הבצק לעיגולים או חותכים לריבועים ומניחים על תבנית מרופדת בנייר אפיה.
+        instructionEn: Freeze. Tear the dough into circles or cut into squares and place on a tray lined with baking paper.
+      - instruction: אופים 17-22 דקות בחום של 170 מעלות.מגישים בעודם חמים.
+        instructionEn: Bake for 17-22 minutes at 170 degrees. Serve while still hot.
+tips: []

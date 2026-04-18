@@ -1,0 +1,128 @@
+id: poppy-cake-and-chocolates
+title: Poppy cake and chocolates
+titleHe: עוגת פרג ושוקולדים
+description: עוגת פרג ושוקולדים
+descriptionEn: Poppy cake and chocolates
+image: https://assets.tugy.dev/poppy-cake-and-chocolates.jpg
+category: dessert
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - קינוח
+  - מתוק
+  - שוקולד
+  - עוגה
+  - פרג
+ingredients:
+  - group: ""
+    items:
+      - amount: 80
+        unit: g
+        name: חמאה רכה
+        nameEn: Soft butter
+      - amount: 40
+        unit: g
+        name: שמן קנולה
+        nameEn: Canola oil
+      - amount: 360
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 0
+        unit: ""
+        name: קליפה מגוררת מלימון אחד
+        nameEn: Grated peel from one lemon
+      - amount: 0
+        unit: ""
+        name: קליפה מגוררת מתפוז אחד
+        nameEn: Grated peel from one orange
+      - amount: 0
+        unit: ""
+        name: כף תמצית וניל
+        nameEn: A spoonful of vanilla extract
+      - amount: 3
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 150
+        unit: g
+        name: פרג טחון טרי
+        nameEn: Fresh ground poppy
+      - amount: 180
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 10
+        unit: g
+        name: אבקת אפייה
+        nameEn: baking powder
+      - amount: 80
+        unit: g
+        name: שוקולד לבן, קצוץ
+        nameEn: White chocolate, chopped
+      - amount: 80
+        unit: g
+        name: שוקולד מריר, קצוץ
+        nameEn: Dark chocolate, chopped
+      - amount: 200
+        unit: g
+        name: רוויון
+        nameEn: satiety
+      - amount: 1
+        unit: ""
+        name: תפוח עץ מרוסק דק
+        nameEn: Finely crushed apple
+      - amount: 100
+        unit: g
+        name: צימוקים מושרים ברום
+        nameEn: Raisins soaked in rum
+  - group: לציפוי
+    items:
+      - amount: 100
+        unit: g
+        name: שמנת מתוקה
+        nameEn: sweet cream
+      - amount: 100
+        unit: g
+        name: נפאז' נייטרלי (להשיג בחנויות אפיה)
+        nameEn: Neutral Nafage (available in baking stores)
+      - amount: 100
+        unit: g
+        name: שוקולד מריר או חלב
+        nameEn: Dark chocolate or milk
+steps:
+  - title: ""
+    items:
+      - instruction: >-
+          מחממים תנור ל - 160 מעלות.במיקסר מצויד בוו גיטרה, מקציפים את החמאה, השמן, הסוכר, קליפת ההדרים ותמצית הוניל
+          לתערובת חלקה.
+        instructionEn: >-
+          Heat the oven to 160 degrees. In a mixer fitted with a guitar hook, beat the butter, oil, sugar, citrus peel
+          and vanilla extract until smooth.
+      - instruction: >-
+          מוסיפים את הביצים בהדרגה ומקציפים עוד 3 דקות. טוחנים את השוקולדים והקמח במעבד מזון לתערובת אבקתית גסה. מקפלים
+          באופן ידני את החומרים היבשים, לסירוגין עם הרוויון והתפוחים.
+        instructionEn: >-
+          Add the eggs gradually and beat for another 3 minutes. Grind the chocolates and flour in a food processor to a
+          coarse powdery mixture. Manually fold in the dry ingredients, alternating with the filling and the apples.
+      - instruction: >-
+          מעבירים לתבנית משומנת ומקומחת ואופים כ- 40-45 דקות עד להזהבה, או עד ששיפוד עץ שנועצים בעוגה יוצא עם מעט
+          פירורים לחים. משחררים מהתבנית ומעבירים לצינון מלא מעל רשת. להכנת הציפוי, מחממים את השמנת והנפאז' עד לסף רתיחה
+          והמסה מלאה של הנפאז'.
+        instructionEn: >-
+          Transfer to a greased and floured pan and bake for about 40-45 minutes until golden, or until a wooden skewer
+          inserted into the cake comes out with a few moist crumbs. Release from the mold and transfer to cool
+          completely on a wire rack. To prepare the coating, heat the cream and the nafage until it boils and the nafage
+          is completely dissolved.
+      - instruction: >-
+          יוצקים אל השוקולד, מכסים את הקערה וממתינים דקה.בוחשים בעזרת מטרפה לתערובת חלקה ואחידה.משתמשים מיד או מצננים
+          בכלי אטום עד שבוע בקירור ועד חודשיים בהקפאה.
+        instructionEn: >-
+          Pour into the chocolate, cover the bowl and wait a minute. Stir with a whisk until a smooth and uniform
+          mixture. Use immediately or cool in an airtight container for up to a week in the refrigerator and up to two
+          months in the freezer.
+      - instruction: לפני כל שימוש יש לחמם בעדינות מעל באן מארי.
+        instructionEn: Before each use, gently heat over a bain marie.
+tips: []

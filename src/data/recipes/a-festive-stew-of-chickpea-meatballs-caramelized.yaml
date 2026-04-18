@@ -1,0 +1,157 @@
+id: a-festive-stew-of-chickpea-meatballs-caramelized
+title: A festive stew of chickpea meatballs, caramelized leeks and green spring vegetables
+titleHe: תבשיל חגיגי של קציצות פרגית, כרישה מקורמלת וירקות אביב ירוקים
+description: תבשיל חגיגי של קציצות פרגית, כרישה מקורמלת וירקות אביב ירוקים
+descriptionEn: A festive stew of chickpea meatballs, caramelized leeks and green spring vegetables
+image: https://assets.tugy.dev/a-festive-stew-of-chickpea-meatballs-caramelized.jpg
+category: dinner
+difficulty: hard
+prepTime: 15
+cookTime: 10
+servings: 12
+tags:
+  - ארוחת ערב
+  - פרג
+ingredients:
+  - group: ""
+    items:
+      - amount: 50
+        unit: g
+        name: שמן זית
+        nameEn: olive oil
+      - amount: 1
+        unit: ""
+        name: בצל קלוף ומגורר גס
+        nameEn: peeled and coarsely grated onion
+      - amount: 2
+        unit: ""
+        name: כרישה, קצוצה
+        nameEn: leek, chopped
+      - amount: 0
+        unit: ""
+        name: צרור עלי סלרי, קצוצים
+        nameEn: bunch of celery leaves, chopped
+      - amount: 600
+        unit: g
+        name: בשר פרגית עוף טחון
+        nameEn: minced chicken thigh meat
+      - amount: 0
+        unit: ""
+        name: צרור פטרוזיליה קצוצה
+        nameEn: bunch of chopped parsley
+      - amount: 5
+        unit: ""
+        name: שיני שום כתושות
+        nameEn: crushed garlic cloves
+      - amount: 2
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 0.5
+        unit: cup
+        name: קמח תירס
+        nameEn: cornmeal
+      - amount: 0.5
+        unit: cup
+        name: קמח חומוס
+        nameEn: chickpea flour
+      - amount: 0
+        unit: ""
+        name: מלח, פלפל שחור בנדיבות
+        nameEn: salt, black pepper generously
+      - amount: 0.5
+        unit: tsp
+        name: כמון טחון
+        nameEn: ground cumin
+      - amount: 0.5
+        unit: tsp
+        name: קארי
+        nameEn: curry
+      - amount: 0.5
+        unit: tsp
+        name: קינמון
+        nameEn: cinnamon
+  - group: לרוטב
+    items:
+      - amount: 2
+        unit: ""
+        name: בצלים, קלופים חתוכים לחצאי טבעות
+        nameEn: Onions, peeled and cut into half rings
+      - amount: 10
+        unit: ""
+        name: שיני שום פרוסות דק
+        nameEn: Thinly sliced ​​garlic cloves
+      - amount: 3
+        unit: tbsp
+        name: שמן זית
+        nameEn: olive oil
+      - amount: 0
+        unit: ""
+        name: צרור עלי מנגולד, קצוצים
+        nameEn: bunch of chard leaves, chopped
+      - amount: 200
+        unit: g
+        name: פול ירוק קלוף
+        nameEn: Peeled green beans
+      - amount: 200
+        unit: g
+        name: אפונה טרייה
+        nameEn: fresh peas
+      - amount: 1
+        unit: l
+        name: מים
+        nameEn: water
+      - amount: 100
+        unit: g
+        name: משמשים מיובשים, קצוצים
+        nameEn: dried apricots, chopped
+      - amount: 0
+        unit: ""
+        name: מיץ וקליפה מגוררת מלימון
+        nameEn: juice and grated peel of a lemon
+      - amount: 1
+        unit: tsp
+        name: צ׳ילי יבש גרוס
+        nameEn: crushed dry chili
+      - amount: 0
+        unit: ""
+        name: מלח, פלפל שחור
+        nameEn: salt, black pepper
+      - amount: 0
+        unit: ""
+        name: כוסברה טרייה להגשה
+        nameEn: fresh coriander for serving
+steps:
+  - title: ""
+    items:
+      - instruction: "לקציצות: מחממים מחבת רחבה ומטגנים את הבצל והכרישה עד לריכוך ולהזהבה."
+        instructionEn: "For the meatballs: heat a wide pan and fry the onion and leek until softened and golden."
+      - instruction: מצננים.
+        instructionEn: cooling
+      - instruction: מניחים בקערה את כל יתר החומרים, לשים ומעבדים היטב את עיסת הקציצות.
+        instructionEn: Place all the other ingredients in a bowl, put and process the meatball pulp well.
+      - instruction: "משהים במקרר כחצי שעה.לרוטב: מחממים בסיר רחב (רצוי סיר שמתאים גם לאפייה בתנור) את שמן הזית."
+        instructionEn: >-
+          Put in the refrigerator for about half an hour. For the sauce: heat the olive oil in a wide pot (preferably a
+          pot that is also suitable for baking in the oven).
+      - instruction: מוסיפים את הבצלים והשום ומטגנים תוך ערבוב עד לקבלת גוון חום זהבהב.
+        instructionEn: Add the onions and garlic and fry while stirring until golden brown.
+      - instruction: >-
+          מוסיפים את שאר החומרים, מערבבים, מכסים וממשיכים לבשל כרבע שעה.מוציאים את העיסה מהמקרר ויוצרים קציצות בקוטר 4־5
+          ס"מ.
+        instructionEn: >-
+          Add the rest of the ingredients, mix, cover and continue to cook for about fifteen minutes. Remove the dough
+          from the refrigerator and make meatballs with a diameter of 4-5 cm.
+      - instruction: מכניסים את הקציצות בעדינות אל הרוטב.
+        instructionEn: Put the meatballs gently into the sauce.
+      - instruction: מנענעים קלות את הסיר כך שהרוטב יצפה את הקציצות.
+        instructionEn: Shake the pot slightly so that the sauce covers the meatballs.
+      - instruction: מכסים את הסיר ומביאים לרתיחה.מעבירים לתנור שחומם מראש לחום בינוני (180 מעלות), וממשיכים לבשל כשעה.
+        instructionEn: >-
+          Cover the pot and bring to a boil. Transfer to an oven preheated to medium heat (180 degrees), and continue to
+          cook for about an hour.
+      - instruction: לקראת תום הבישול מסירים את המכסה ומזהיבים את הקציצות קלות.
+        instructionEn: Towards the end of cooking, remove the lid and lightly brown the meatballs.
+      - instruction: מוציאים ומעטרים בעלי כוסברה טרייה קצוצה גס
+        instructionEn: Remove and garnish with coarsely chopped fresh coriander leaves
+tips: []

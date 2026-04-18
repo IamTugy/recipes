@@ -1,0 +1,60 @@
+id: sweet-cheese-fritters
+title: Sweet cheese fritters
+titleHe: לביבות גבינה מתוקות
+description: לביבות גבינה מתוקות
+descriptionEn: Sweet cheese fritters
+image: https://assets.tugy.dev/sweet-cheese-fritters.jpg
+category: breakfast
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 40
+tags:
+  - ארוחת בוקר
+  - גבינה
+ingredients:
+  - group: ""
+    items:
+      - amount: 500
+        unit: g
+        name: גבינת טוב טעם
+        nameEn: Good tasting cheese
+      - amount: 2
+        unit: ""
+        name: תפוחי עץ מסוג גרני סמית, מגוררים
+        nameEn: Granny Smith apples, grated
+      - amount: 1
+        unit: cm
+        name: שורש ג'ינג'ר, מגורר
+        nameEn: Ginger root, grated
+      - amount: 120
+        unit: g
+        name: סולת
+        nameEn: semolina
+      - amount: 100
+        unit: g
+        name: קמח תופח
+        nameEn: raising flour
+      - amount: 3
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 100
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 50
+        unit: g
+        name: צימוקים קצוצים½ כפית משחת וניל
+        nameEn: Chopped raisins ½ teaspoon vanilla paste
+steps:
+  - title: ""
+    items:
+      - instruction: >-
+          מערבבים את כל המרכיבים בקערה, מניחים למנוחה לכ-30 דקות. מחממים שמן לטיגון עמוק לחום של 160 מעלות. צרים לביבות
+          עגולות בעזרת ידיים משומנות ומטגנים בעדינות כ-2 דקות. מעבירים לנייר סופג ומגישים עם שמנת חמוצה.
+        instructionEn: >-
+          Mix all the ingredients in a bowl, leave to rest for about 30 minutes. Heat oil for deep frying to 160
+          degrees. Roll into round pancakes with oiled hands and fry gently for about 2 minutes. Transfer to absorbent
+          paper and serve with sour cream.
+tips: []

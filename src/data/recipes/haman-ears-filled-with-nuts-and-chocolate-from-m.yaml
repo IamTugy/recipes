@@ -1,0 +1,89 @@
+id: haman-ears-filled-with-nuts-and-chocolate-from-m
+title: Haman ears filled with nuts and chocolate from mottled dough
+titleHe: אוזני המן במילוי אגוזים ושוקולד מבצק מנומר
+description: אוזני המן במילוי אגוזים ושוקולד מבצק מנומר
+descriptionEn: Haman ears filled with nuts and chocolate from mottled dough
+image: https://images.unsplash.com/photo-1603532648955-039310d9ed75?w=900&q=80
+category: bread
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 40
+tags:
+  - מאפה
+  - שוקולד
+ingredients:
+  - group: לבצק
+    items:
+      - amount: 200
+        unit: g
+        name: חמאה
+        nameEn: butter
+      - amount: 80
+        unit: g
+        name: אבקת סוכר
+        nameEn: icing sugar
+      - amount: 300
+        unit: g
+        name: קמח לבן
+        nameEn: white flour
+      - amount: 30
+        unit: g
+        name: פרג שלם
+        nameEn: Whole poppy
+      - amount: 3
+        unit: g
+        name: אבקת אפייה
+        nameEn: baking powder
+      - amount: 1
+        unit: ""
+        name: ביצה
+        nameEn: egg
+      - amount: 50
+        unit: g
+        name: קקאו
+        nameEn: cocoa
+  - group: למילוי אגוזים-שוקולד
+    items:
+      - amount: 100
+        unit: g
+        name: אגוזים, טחונים דק
+        nameEn: Nuts, finely ground
+      - amount: 50
+        unit: g
+        name: ברס או פקאן סיני קצוץ
+        nameEn: Chopped Chinese pine nuts or pecans
+      - amount: 0
+        unit: ""
+        name: כפית תמצית וניל
+        nameEn: A teaspoon of vanilla extract
+      - amount: 80
+        unit: g
+        name: שוקולד מריר מומס
+        nameEn: melted dark chocolate
+      - amount: 50
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 1
+        unit: ""
+        name: חלבון
+        nameEn: protein
+      - amount: 0
+        unit: ""
+        name: אבקת סוכר לקישוט
+        nameEn: Powdered sugar for decoration
+steps:
+  - title: ""
+    items:
+      - instruction: מערבבים את כל חומרי המילוי לתערובת אחידה ומצננים.
+        instructionEn: Mix all the filling ingredients into a uniform mixture and cool.
+      - instruction: מחממים תנור ל-170 מעלות.
+        instructionEn: Heat the oven to 170°C.
+      - instruction: מרדדים כל בצק לעלה מלבני ומורחים את המילוי.
+        instructionEn: Roll each dough into a rectangular sheet and spread the filling.
+      - instruction: אופים 20 דקות עד הזהבה קלה.
+        instructionEn: Bake for 20 minutes until lightly golden.
+      - instruction: מוציאים מהתנור ומאבקים מיד באבקת סוכר. מצננים ומגישים.
+        instructionEn: Remove from the oven and immediately dust with powdered sugar. Cool and serve.
+tips: []

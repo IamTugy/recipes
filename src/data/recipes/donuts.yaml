@@ -1,0 +1,75 @@
+id: donuts
+title: Donuts
+titleHe: דונאטס
+description: דונאטס
+descriptionEn: Donuts
+image: https://assets.tugy.dev/donuts.jpg
+category: bread
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 30
+tags:
+  - מאפה
+ingredients:
+  - group: ""
+    items:
+      - amount: 1000
+        unit: g
+        name: קמח לחם קשה
+        nameEn: Hard bread flour
+      - amount: 35
+        unit: g
+        name: שמרים יבשים
+        nameEn: dry yeast
+      - amount: 120
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 15
+        unit: g
+        name: מלח
+        nameEn: salt
+      - amount: 4
+        unit: ""
+        name: חלמונים
+        nameEn: egg yolks
+      - amount: 2
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 500
+        unit: g
+        name: חלב
+        nameEn: milk
+      - amount: 200
+        unit: g
+        name: חמאה רכה
+        nameEn: Soft butter
+steps:
+  - title: ""
+    items:
+      - instruction: >-
+          מכניסים את כל מרכיבי הבצק למעט החמאה למיקסר, ולשים כ-7 דקות. מוסיפים את החמאה ולשים עוד 3-4 דקות לקבלת בצק רך
+          אך לא דביק. מכסים ומתפיחים להכפלת נפח, רצוי בקירור למשך 6 שעות. משטחים את הבצק לעלה מלבני עבה (1 ס"מ) ומקפיאים
+          ל-30 דקות.
+        instructionEn: >-
+          Put all the ingredients of the dough except the butter into the mixer, and put for about 7 minutes. Add the
+          butter and knead for another 3-4 minutes to obtain a soft but not sticky dough. Cover and let rise until
+          doubled in volume, preferably refrigerated for 6 hours. Roll out the dough into a thick rectangular sheet (1
+          cm) and freeze for 30 minutes.
+      - instruction: >-
+          קורצים עיגולים בקוטר 8 ס"מ ועיגולים פנימיים בקוטר 3 ס"מ. מניחים כל טבעת על ריבוע נייר אפייה המונח על תבנית
+          משומנת, מכסים ומתפיחים עד הכפלת נפח.
+        instructionEn: >-
+          Draw circles with a diameter of 8 cm and inner circles with a diameter of 3 cm. Place each ring on a square of
+          baking paper placed on a greased tray, cover and let rise until doubled in volume.
+      - instruction: >-
+          מחממים שמן לטיגון עמוק לטמפרטורה של 150 מעלות ומטגנים את הדונאטס כ-3 דקות מכל צד(מרימים את הבצק התפוח עם נייר
+          האפיה והופכים בזהירות אל השמן).
+        instructionEn: >-
+          Heat oil for deep frying to a temperature of 150 degrees and fry the donuts for about 3 minutes on each side
+          (pick up the puffed dough with the baking paper and carefully turn it into the oil).
+      - instruction: מעבירים לנייר סופג.מצפים בציפוי הנבחר.
+        instructionEn: Transfer to absorbent paper. Cover with the chosen coating.
+tips: []

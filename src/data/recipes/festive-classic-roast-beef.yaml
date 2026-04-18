@@ -1,0 +1,72 @@
+id: festive-classic-roast-beef
+title: Festive classic roast beef
+titleHe: רוסטביף קלאסי חגיגי
+description: רוסטביף קלאסי חגיגי
+descriptionEn: Festive classic roast beef
+image: https://assets.tugy.dev/festive-classic-roast-beef.jpg
+category: dinner
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 10
+tags:
+  - ארוחת ערב
+ingredients:
+  - group: ""
+    items:
+      - amount: 10
+        unit: ""
+        name: מנות
+        nameEn: Dishes
+      - amount: 2
+        unit: kg
+        name: נתח סינטה או אנטריקוט מיושן
+        nameEn: A piece of aged sirloin or entrecote
+      - amount: 0
+        unit: ""
+        name: לתיבול-½ כוס שמן זית
+        nameEn: For seasoning - ½ cup olive oil
+      - amount: 3
+        unit: tbsp
+        name: חרדל דיז'ון (רצוי עם גרגרים)
+        nameEn: Dijon mustard (preferably with grains)
+      - amount: 2
+        unit: tsp
+        name: פלפל שחור גרוס
+        nameEn: ground black pepper
+      - amount: 0.5
+        unit: ""
+        name: צרור טימין טרי, קצוץ
+        nameEn: A bunch of fresh thyme, chopped
+      - amount: 0.5
+        unit: ""
+        name: צרור רוזמרין טרי, קצוץ
+        nameEn: A bunch of fresh rosemary, chopped
+      - amount: 0.333
+        unit: cup
+        name: דבש או סילאן
+        nameEn: honey or silan
+      - amount: 6
+        unit: ""
+        name: שיני שום כתושותמלח לפי הטעם
+        nameEn: Crushed garlic cloves and salt to taste
+steps:
+  - title: ""
+    items:
+      - instruction: מערבבים את כל מרכיבי התיבול, מורחים על נתח הבשר ומעסים היטב.קושרים בעזרת חוט שפגאט את הנתח כולו.
+        instructionEn: >-
+          Mix all the seasoning ingredients, apply to the piece of meat and massage well. Tie the whole piece with a
+          string.
+      - instruction: משהים במקרר לשעתיים לפחות, רצוי ללילה שלם. כשעתיים לפני הצלייה, מוצאים את הנתח לעמוד בטמפרטורת החדר.
+        instructionEn: >-
+          Place in the refrigerator for at least two hours, preferably overnight. About two hours before roasting, the
+          piece is found to stand at room temperature.
+      - instruction: >-
+          מחממים תנור לחום מקסימלי, מניחים את נתח הסינטה על רשת וצולים בתנור החם 15 דקות, מנמיכים את החום ל-180 מעלות
+          וצולים עוד כ-40 דקות (לדרגת צלייה מידיום). מוציאים מהתנור ומשהים כ- 10 דקות לפני הפריסה. פורסים לפרוסות
+          דקיקות.
+        instructionEn: >-
+          Heat an oven to maximum heat, place the sirloin piece on a grill and roast in the hot oven for 15 minutes,
+          lower the heat to 180 degrees and roast for another 40 minutes (for a medium roast). Remove from the oven and
+          wait for about 10 minutes before serving. Slice into thin slices.
+tips: []

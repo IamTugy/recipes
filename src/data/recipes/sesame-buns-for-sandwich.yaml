@@ -1,0 +1,47 @@
+id: sesame-buns-for-sandwich
+hidden: true
+title: Sesame buns for sandwich
+titleHe: לחמניות שומשום לסנדוויץ'
+description: לחמניות שומשום לסנדוויץ'
+descriptionEn: Sesame buns for sandwich
+image: https://images.unsplash.com/photo-1551024506-0bccd828d307?w=900&q=80
+category: dessert
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 20
+tags:
+  - קינוח
+  - מתוק
+ingredients:
+  - group: לבצק
+    items:
+      - amount: 1
+        unit: ""
+        name: ק״ג  קמח לחם לבן
+        nameEn: kg of white bread flour
+      - amount: 25
+        unit: g
+        name: שמרים יבשים
+        nameEn: dry yeast
+      - amount: 20
+        unit: g
+        name: מלח ים
+        nameEn: sea ​​salt
+      - amount: 100
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 100
+        unit: g
+        name: שמן קנולה
+        nameEn: Canola oil
+      - amount: 600
+        unit: g
+        name: מים
+        nameEn: water
+steps:
+  - title: ""
+    items:
+      - instruction: ""
+tips: []

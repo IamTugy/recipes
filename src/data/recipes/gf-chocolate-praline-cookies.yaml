@@ -1,0 +1,93 @@
+id: gf-chocolate-praline-cookies
+title: Gluten-Free Chocolate Praline Cookies
+titleHe: עוגיות שוקולד-פרלינה ללא גלוטן
+category: dessert
+tags:
+  - ללא גלוטן
+  - שוקולד
+  - פרלינה
+  - עוגיות
+tagsEn:
+  - gluten-free
+  - chocolate
+  - praline
+  - cookies
+image: https://assets.tugy.dev/gf-chocolate-praline-cookies.jpg
+description: עוגיות שוקולד ללא גלוטן עם אגוזי לוז, שוקולד חלב ושוקולד מריר - פריכות בחוץ ורכות בפנים.
+descriptionEn: Gluten-free chocolate cookies with hazelnuts, milk and dark chocolate - crisp outside, soft inside.
+prepTime: 20
+cookTime: 10
+servings: 20
+difficulty: easy
+ingredients:
+  - items:
+      - amount: 80
+        unit: g
+        name: חמאה רכה
+        nameEn: soft butter
+      - amount: 20
+        unit: g
+        name: סוכר לבן
+        nameEn: white sugar
+      - amount: 40
+        unit: g
+        name: סוכר חום
+        nameEn: brown sugar
+      - amount: 60
+        unit: g
+        name: פרלינה לוז
+        nameEn: hazelnut praline paste
+      - amount: 30
+        unit: g
+        name: ביצה
+        nameEn: egg
+      - amount: 50
+        unit: g
+        name: קמח נטול גלוטן
+        nameEn: gluten-free flour
+      - amount: 35
+        unit: g
+        name: קמח אורז
+        nameEn: rice flour
+      - amount: 1
+        unit: g
+        name: אבקת סודה לשתייה
+        nameEn: baking soda
+      - amount: 30
+        unit: g
+        name: שוקולד מריר, קצוץ
+        nameEn: dark chocolate, chopped
+      - amount: 30
+        unit: g
+        name: שוקולד חלב, קצוץ
+        nameEn: milk chocolate, chopped
+      - amount: 20
+        unit: g
+        name: אגוזי לוז, קלויים וקצוצים
+        nameEn: hazelnuts, toasted and chopped
+      - amount: 1
+        unit: ""
+        name: פרלינה לוז לזילוף
+        nameEn: hazelnut praline for drizzling
+steps:
+  - items:
+      - instruction: מנפים את החומרים היבשים ומניחים בצד.
+        instructionEn: Sift the dry ingredients and set aside.
+      - instruction: במיקסר טורפים חמאה, פרלינה וסוכרים. מוסיפים ביצה ומניחים חומרים יבשים לחיבור. לבסוף מוסיפים שוקולדים ואגוזים.
+        instructionEn: >-
+          In a mixer, cream butter, praline and sugars. Add egg and fold in dry ingredients until just combined. Fold in
+          chocolates and hazelnuts.
+      - instruction: מעבירים לקירור לחצי שעה לפחות.
+        instructionEn: Refrigerate for at least 30 minutes.
+        timerMinutes: 30
+      - instruction: יוצרים כדורים של 20 גרם ומניחים על תבנית. אופים ב-200° כ-10 דקות.
+        instructionEn: Roll 20g balls and place on a baking tray. Bake at 200°C for about 10 minutes.
+        timerMinutes: 10
+        tip: הוציאו כשהמרכז עדיין קצת נע - הם מתייצבים בצינון.
+        tipEn: Remove when the center still moves slightly - they set as they cool.
+      - instruction: מצננים ומזלפים פרלינה מעל.
+        instructionEn: Cool completely and drizzle with praline paste.
+tips:
+  - ניתן להחליף קמח נטול גלוטן בקמח שקדים לגרסה עוד יותר עשירה.
+tipsEn:
+  - Swap the gluten-free flour for almond flour for an even richer version.

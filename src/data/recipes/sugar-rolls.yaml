@@ -1,0 +1,78 @@
+id: sugar-rolls
+title: Sugar rolls
+titleHe: לחמניות סוכר
+description: לחמניות סוכר
+descriptionEn: Sugar rolls
+image: https://assets.tugy.dev/sugar-rolls.jpg
+category: bread
+difficulty: medium
+prepTime: 15
+cookTime: 10
+servings: 20
+tags:
+  - מאפה
+ingredients:
+  - group: ""
+    items:
+      - amount: 0
+        unit: ""
+        name: לכ-20 מנות     לבצק-1 ק"ג קמח לחם
+        nameEn: For about 20 servings for the dough - 1 kg of bread flour
+      - amount: 80
+        unit: g
+        name: אבקת חלב
+        nameEn: milk powder
+      - amount: 20
+        unit: g
+        name: מלח
+        nameEn: salt
+      - amount: 40
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 30
+        unit: g
+        name: שמרים יבשים
+        nameEn: dry yeast
+      - amount: 600
+        unit: g
+        name: מים
+        nameEn: water
+      - amount: 0
+        unit: ""
+        name: לטבילה-200 גרם סוכר
+        nameEn: For dipping - 200 grams of sugar
+      - amount: 2
+        unit: l
+        name: מים רותחיםכפית סודה לשתייה
+        nameEn: Boiling water, a teaspoon of baking soda
+steps:
+  - title: ""
+    items:
+      - instruction: במיקסר מצויד בוו לישה, מערבבים את החומרים היבשים מוסיפים את המים בהדרגה ולשים לבצק אחיד, 10 דקות.
+        instructionEn: >-
+          In a mixer equipped with a kneading hook, mix the dry ingredients, gradually add the water and knead into a
+          uniform dough, 10 minutes.
+      - instruction: מניחים בקערה משומנת קלו ומכסים בניילון נצמד.
+        instructionEn: Place in a lightly oiled bowl and cover with plastic wrap.
+      - instruction: מתפיחים עד להכפלת הנפח.מחלקים את הבצק למנות במשקל 70 גרם ומעצבים כל אחד מהן ללחמניות מואורכות.
+        instructionEn: >-
+          Let it rise until it doubles in volume. Divide the dough into portions weighing 70 grams and shape each of
+          them into oblong buns.
+      - instruction: >-
+          מניחים על תבנית מרופדת בנייר אפייה ומניחים בקירור לשעה. לטבילה- מכינים מהסוכר קרמל ומוסיפים אליו מים רותחים
+          ואבקת סודה לשתייה. מבשלים את הלחמניות במי הקרמל למשך דקה לכל צד ומעבירים מיד לטבילה במי קרח להפסקת הבישול.
+        instructionEn: >-
+          Place on a tray lined with baking paper and refrigerate for an hour. For dipping - make caramel from the sugar
+          and add boiling water and baking soda powder to it. Cook the buns in the caramel water for a minute on each
+          side and immediately transfer to the immersion in ice water to stop the cooking.
+      - instruction: >-
+          מניחים על גבי מגש האפייה, חורצים חתכים אלכסוניים מעל כל אחת מהלחמניות ואופים בחום של 200 מעלות כ-15-17 דקות,
+          עד קבלת גוון זהוב. בינתיים מכינים את הציפוי- מרתיחים את המים והסוכר 3 דקות ומברישים את הלחמניות בעודן חמות.
+        instructionEn: >-
+          Place on the baking tray, make diagonal cuts above each of the buns and bake at 200 degrees for about 15-17
+          minutes, until golden. In the meantime prepare the coating - boil the water and sugar for 3 minutes and brush
+          the buns while they are still hot.
+      - instruction: מפזרים שפע של סוכר גבישי מעל ומגישים.
+        instructionEn: Sprinkle plenty of granulated sugar on top and serve.
+tips: []

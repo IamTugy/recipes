@@ -1,0 +1,90 @@
+id: walnut-orange-pressburger
+title: Walnut-orange pressburger
+titleHe: פרסבורגר אגוזים-תפוז
+description: פרסבורגר אגוזים-תפוז
+descriptionEn: Walnut-orange pressburger
+image: https://images.unsplash.com/photo-1576618148400-f54bed99fcfd?w=900&q=80
+category: bread
+difficulty: easy
+prepTime: 15
+cookTime: 25
+servings: 4
+tags:
+  - מאפה
+  - הדרים
+ingredients:
+  - group: לבצק
+    items:
+      - amount: 400
+        unit: g
+        name: קמח לחם
+        nameEn: Bread flour
+      - amount: 3
+        unit: g
+        name: שמרים יבשים
+        nameEn: dry yeast
+      - amount: 2
+        unit: g
+        name: מלח
+        nameEn: salt
+      - amount: 50
+        unit: g
+        name: חלב
+        nameEn: milk
+      - amount: 150
+        unit: g
+        name: חמאה רכה
+        nameEn: Soft butter
+      - amount: 0
+        unit: ""
+        name: קליפה מגוררת מחצי תפוז
+        nameEn: Grated peel from half an orange
+      - amount: 50
+        unit: g
+        name: דבש
+        nameEn: honey
+      - amount: 0
+        unit: ""
+        name: כפית תמצית וניל
+        nameEn: A teaspoon of vanilla extract
+  - group: למילוי
+    items:
+      - amount: 200
+        unit: g
+        name: אגוזי מלך טוחנים
+        nameEn: Ground walnuts
+      - amount: 200
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 1
+        unit: ""
+        name: חלבון
+        nameEn: protein
+      - amount: 0
+        unit: ""
+        name: קליפה מגוררת מחצי תפוז
+        nameEn: Grated peel from half an orange
+      - amount: 0
+        unit: ""
+        name: ביצה טרופה
+        nameEn: scrambled egg
+steps:
+  - title: ""
+    items:
+      - instruction: >-
+          מכניסים את כל מרכיבי הבצק למיקסר מצויד בוו גיטרה ולשים לבצק רך וחלק, כ-8 דקות. עוטפים ומצננים 4 שעות. מערבבים
+          את כל מרכיבי המילוי לתערובת אחידה ובצקית. מחלקים את הבצק לשני חלקים. מרדדים כל חלק לעלה מלבני מדויק ודק,
+          מורחים את המילוי ומגלגלים.
+        instructionEn: >-
+          Put all the ingredients of the dough into a mixer equipped with a guitar hook and knead into a soft and smooth
+          dough, about 8 minutes. Wrap and chill for 4 hours. Mix all the filling ingredients into a uniform and doughy
+          mixture. Divide the dough into two parts. Roll each part into a precise and thin rectangular sheet, spread the
+          filling and roll.
+      - instruction: >-
+          מניחים על תבנית מרופדת, מברישים בביצה, מתפיחים 30 דקות ומברישים שוב."שורטים" במזלג ודוקרים בעזרת קיסם לאורך
+          הגלילה. אופים כ-20-25 דקות בחום של 180 מעלות.
+        instructionEn: >-
+          Place on a lined baking sheet, brush with egg, let rise for 30 minutes and brush again. Bake for about 20-25
+          minutes at 180 degrees.
+tips: []

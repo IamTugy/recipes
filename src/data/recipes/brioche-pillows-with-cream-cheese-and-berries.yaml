@@ -1,0 +1,114 @@
+id: brioche-pillows-with-cream-cheese-and-berries
+title: Brioche pillows with cream cheese and berries
+titleHe: כריות בריוש עם קרם גבינה ופירות יער
+description: כריות בריוש עם קרם גבינה ופירות יער
+descriptionEn: Brioche pillows with cream cheese and berries
+image: https://assets.tugy.dev/brioche-pillows-with-cream-cheese-and-berries.jpg
+category: bread
+difficulty: hard
+prepTime: 15
+cookTime: 10
+servings: 30
+tags:
+  - מאפה
+  - בריוש
+  - גבינה
+ingredients:
+  - group: ""
+    items:
+      - amount: 400
+        unit: g
+        name: קמח לחם קשה
+        nameEn: Hard bread flour
+      - amount: 12
+        unit: g
+        name: שמרים יבשים
+        nameEn: dry yeast
+      - amount: 40
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 10
+        unit: g
+        name: מלח
+        nameEn: salt
+      - amount: 120
+        unit: g
+        name: חלב
+        nameEn: milk
+      - amount: 20
+        unit: g
+        name: קומפאונד פירות יער
+        nameEn: Berry compound
+      - amount: 20
+        unit: g
+        name: אבקת סלק
+        nameEn: Beetroot powder
+      - amount: 200
+        unit: g
+        name: חמאה בטמפ' החדר
+        nameEn: Butter at room temperature
+  - group: לקרם גבינה פירות יער
+    items:
+      - amount: 50
+        unit: g
+        name: חמאה רכה
+        nameEn: Soft butter
+      - amount: 75
+        unit: g
+        name: אבקת סוכר
+        nameEn: icing sugar
+      - amount: 50
+        unit: g
+        name: אבקת שקדים
+        nameEn: almond powder
+      - amount: 20
+        unit: g
+        name: קורנפלור
+        nameEn: Cornflour
+      - amount: 20
+        unit: g
+        name: קומפאונד פירות יער
+        nameEn: Berry compound
+      - amount: 200
+        unit: g
+        name: גבינת טוב טעם
+        nameEn: Good tasting cheese
+      - amount: 100
+        unit: g
+        name: פטל קפוא
+        nameEn: frozen raspberry
+steps:
+  - title: ""
+    items:
+      - instruction: לקרם גבינה- מניחים את כל החומרים, חוץ מפירות היער הקפואים, במעבד מזון וטוחנים לתערובת אחידה. מעבירים לקירור.
+        instructionEn: >-
+          For the cream cheese - place all the ingredients, except the frozen berries, in a food processor and grind to
+          a uniform mixture. Transfer to the refrigerator.
+      - instruction: לבריוש- במערבל מכניסים את כל מרכיבי הבצק למעט החמאה, לשים לבצק אחיד. (את נוזלים בהדרגה).
+        instructionEn: >-
+          For the brioche - put all the ingredients of the dough in a mixer, except for the butter, to make a uniform
+          dough. (the liquids gradually).
+      - instruction: לשים 3 דקות.
+        instructionEn: put 3 minutes.
+      - instruction: מוסיפים את החמאה בחתיכות קטנות, תוך לישה.
+        instructionEn: Add the butter in small pieces, while kneading.
+      - instruction: לשים כ-6 דקות.
+        instructionEn: put for about 6 minutes.
+      - instruction: מתפיחים מעט בחוץ ומעבירים להתפחה של 4 שעות לפחות בקירור.
+        instructionEn: Leave to rise a little outside and leave to rise for at least 4 hours in the refrigerator.
+      - instruction: הרכבה- מרדדים את הבצק לעלה בעובי 3-4 מ״מ.
+        instructionEn: Assembly - roll the dough into a 3-4 mm thick sheet.
+      - instruction: חותכים לריבועים בגודל של 7x7 ס״מ (ניתן לאחר הרידוד להקפיא מעט את הבצק על מנת להקל על החיתוך).
+        instructionEn: Cut into 7x7 cm squares (after rolling, you can freeze the dough a little to make cutting easier).
+      - instruction: מזלפים תלולית מילוי במרכז כל ריבוע ומניחים מעל פטל קפוא.
+        instructionEn: Spoon a mound of filling in the center of each square and place frozen raspberries on top.
+      - instruction: סוגרים לצורת מעטפה ומניחים על מגש אפייה.
+        instructionEn: Close into an envelope shape and place on a baking tray.
+      - instruction: מברישים בביצה ומפזרים גבישי סוכר.
+        instructionEn: Brush with egg and sprinkle with sugar crystals.
+      - instruction: מכסים ומתפיחים ל-80% מהנפח המקורי.
+        instructionEn: Cover and swell to 80% of the original volume.
+      - instruction: אופים בחום של 170 מעלות כ-15 דקות או עד הזהבה.
+        instructionEn: Bake at 170 degrees for about 15 minutes or until golden.
+tips: []

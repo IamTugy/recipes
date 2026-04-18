@@ -1,0 +1,85 @@
+id: apple-and-berry-crumble
+title: Apple and berry crumble
+titleHe: קראמבל תפוחים ופירות יער
+description: קראמבל תפוחים ופירות יער
+descriptionEn: Apple and berry crumble
+image: https://assets.tugy.dev/apple-and-berry-crumble.jpg
+category: dessert
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 10
+tags:
+  - קינוח
+  - מתוק
+ingredients:
+  - group: ""
+    items:
+      - amount: 60
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 3
+        unit: pcs
+        name: תפוח קלוף פרוס לפרוסות דקות
+        nameEn: Peeled apple sliced ​​into thin slices
+      - amount: 100
+        unit: g
+        name: פירות יער קפואים
+        nameEn: frozen berries
+      - amount: 40
+        unit: g
+        name: חמאה מומסת
+        nameEn: melted butter
+      - amount: 0
+        unit: ""
+        name: כפית משחת וניל
+        nameEn: A teaspoon of vanilla paste
+  - group: לקראמבל
+    items:
+      - amount: 100
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 60
+        unit: g
+        name: אבקת שקדים
+        nameEn: almond powder
+      - amount: 100
+        unit: g
+        name: חמאה
+        nameEn: butter
+      - amount: 70
+        unit: g
+        name: סוכר דמררה
+        nameEn: Demerara sugar
+  - group: להגשה
+    items:
+      - amount: 0
+        unit: ""
+        name: קצפת
+        nameEn: whipped cream
+      - amount: 0
+        unit: ""
+        name: אבקת סוכר
+        nameEn: icing sugar
+steps:
+  - title: ""
+    items:
+      - instruction: מערבבים בקערה את התפוחים עם הסוכר, צימוקים החמאה והוניל.
+        instructionEn: Mix the apples with the sugar, raisins, butter and vanilla in a bowl.
+      - instruction: מוסיפים פירות יער.· משמנים היטב כלים אישיים בחמאה.
+        instructionEn: Add berries. · Grease personal utensils well with butter.
+      - instruction: ממלאים עד שני שליש גובה בתערובת התפוחים.· מכינים פירורים- במעבד מזון טוחנים קמח עם שקדים.
+        instructionEn: >-
+          Fill up to two-thirds of the height with the apple mixture. Make crumbs - grind flour with almonds in a food
+          processor.
+      - instruction: מוסיפים סוכר וחמאה ומעבדים בפולסים לקבלת פירורים לחים.
+        instructionEn: Add sugar and butter and process in pulses to obtain moist crumbs.
+      - instruction: >-
+          מקפיאים 10 דקות ומפזרים את הפירורים מעל הפירות.· מכניסים לאפיה בחום של 180 מעלות כ- 20 דקות או עד שהפירורים
+          מזהיבים.· מקשטים באבקת סוכר ותלולית קצפת.
+        instructionEn: >-
+          Freeze for 10 minutes and sprinkle the crumbs over the fruit. Put in the oven at 180 degrees for about 20
+          minutes or until the crumbs are golden. Decorate with powdered sugar and a mound of whipped cream.
+tips: []

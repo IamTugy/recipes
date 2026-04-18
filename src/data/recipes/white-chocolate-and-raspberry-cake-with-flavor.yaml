@@ -1,0 +1,79 @@
+id: white-chocolate-and-raspberry-cake-with-flavor
+title: White chocolate and raspberry cake with flavor
+titleHe: עוגת שוקולד לבן ופטל בחושה
+description: עוגת שוקולד לבן ופטל בחושה
+descriptionEn: White chocolate and raspberry cake with flavor
+image: https://assets.tugy.dev/white-chocolate-and-raspberry-cake-with-flavor.jpg
+category: dessert
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - קינוח
+  - מתוק
+  - שוקולד
+  - עוגה
+ingredients:
+  - group: ""
+    items:
+      - amount: 200
+        unit: g
+        name: חמאה רכה
+        nameEn: Soft butter
+      - amount: 200
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 0
+        unit: ""
+        name: כפית משחת וניל
+        nameEn: A teaspoon of vanilla paste
+      - amount: 0
+        unit: ""
+        name: קליפה מגוררת מלימון אחד
+        nameEn: Grated peel from one lemon
+      - amount: 0
+        unit: ""
+        name: קורט מלח
+        nameEn: A pinch of salt
+      - amount: 4
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 250
+        unit: g
+        name: קמח תופח
+        nameEn: raising flour
+      - amount: 120
+        unit: g
+        name: יוגורט
+        nameEn: yogurt
+      - amount: 150
+        unit: g
+        name: שוקולד לבן קצוץ
+        nameEn: Chopped white chocolate
+      - amount: 100
+        unit: g
+        name: פטל אדום, קפוא
+        nameEn: Red raspberry, frozen
+steps:
+  - title: ""
+    items:
+      - instruction: מחממים תנור ל-160 מעלות.
+        instructionEn: Heat the oven to 160 degrees.
+      - instruction: >-
+          משמנים ומקמחים את התבנית. במיקסר עם וו גיטרה מקציפים היטב חמאה, סוכר, וניל, קליפת לימון ומלח במשך כ-5 דקות.
+          מוסיפים את הביצים אחת-אחת, כאשר ממתינים עד שביצה אחת נבלעת לפני הוספת הביצה הבאה. מוסיפים לסירוגין את הקמח
+          והיוגורט ומערבלים עד לאיחוד מלא.
+        instructionEn: >-
+          Grease and flour the mold. In a mixer with a guitar hook, beat butter, sugar, vanilla, lemon peel and salt
+          well for about 5 minutes. Add the eggs one by one, waiting until one egg is swallowed before adding the next
+          egg. Alternately add the flour and yogurt and mix until fully combined.
+      - instruction: >-
+          מוסיפים את השוקולד והפטל בתנועת עטיפה ידנית בעזרת לקקן. אופים במשך 50-60 דקות, או עד שקיסם הננעץ בעוגה יוצא עם
+          מעט פירורים לחים עליו.
+        instructionEn: >-
+          Add the chocolate and raspberry in a manual wrapping motion with the help of a spatula. Bake for 50-60
+          minutes, or until a toothpick inserted into the cake comes out with a few moist crumbs on it.
+tips: []

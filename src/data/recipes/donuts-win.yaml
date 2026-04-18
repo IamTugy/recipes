@@ -1,0 +1,81 @@
+id: donuts-win
+title: Donuts win
+titleHe: סופגניות מנצחות
+description: סופגניות מנצחות
+descriptionEn: Donuts win
+image: https://assets.tugy.dev/donuts-win.jpg
+category: bread
+difficulty: medium
+prepTime: 15
+cookTime: 10
+servings: 30
+tags:
+  - מאפה
+ingredients:
+  - group: ""
+    items:
+      - amount: 1000
+        unit: g
+        name: קמח לחם קשה
+        nameEn: Hard bread flour
+      - amount: 35
+        unit: g
+        name: שמרים יבשים
+        nameEn: dry yeast
+      - amount: 120
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 15
+        unit: g
+        name: מלח
+        nameEn: salt
+      - amount: 4
+        unit: ""
+        name: חלמונים
+        nameEn: egg yolks
+      - amount: 2
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 500
+        unit: g
+        name: חלב
+        nameEn: milk
+      - amount: 200
+        unit: g
+        name: חמאה רכה
+        nameEn: Soft butter
+steps:
+  - title: ""
+    items:
+      - instruction: מכניסים את כל מרכיבי הבצק היבשים למיקסר מצויד בוו לישה.
+        instructionEn: Put all the dry dough ingredients into a mixer equipped with a kneading hook.
+      - instruction: מפעילים על מהירות נמוכה ומסיפים את הנוזלים והביצים בהדרגה.
+        instructionEn: Turn on low speed and add the liquids and eggs gradually.
+      - instruction: >-
+          ממשיכים כ-7 דקות. מוסיפים את קוביות החמאה ולשים עוד 3-4 דקות להטמעות מלאה של החמאה ולקבלת בצק רך אך לא דביק.
+          מכסים ומתפיחים להכפלת נפח, רצוי בקירור למשך 6 שעות.
+        instructionEn: >-
+          Continue for about 7 minutes. Add the cubes of butter and leave for another 3-4 minutes to fully absorb the
+          butter and to obtain a soft but not sticky dough. Cover and let rise until doubled in volume, preferably
+          refrigerated for 6 hours.
+      - instruction: >-
+          מחלקים את הבצק למנות במשקל 40 גרם, מכדררים לכדור מתוח וחלק ומניחים על ריבוע נייר אפייה המונח על תבנית, מכסים
+          ומתפיחים עד הכפלת נפח.
+        instructionEn: >-
+          Divide the dough into portions weighing 40 grams, roll into a tight and smooth ball and place on a square of
+          baking paper placed on a tray, cover and let rise until doubled in volume.
+      - instruction: >-
+          מחממים שמן לטיגון עמוק לטמפרטורה של 150 מעלות ומטגנים כ-3 דקות מכל צד (מרימים את הבצק התפוח עם נייר האפיה
+          והופכים בזהירות אל השמן).
+        instructionEn: >-
+          Heat oil for deep frying to a temperature of 150 degrees and fry for about 3 minutes on each side (pick up the
+          puffed dough with baking paper and carefully turn it into the oil).
+      - instruction: מעבירים לנייר סופג.
+        instructionEn: Transfer to absorbent paper.
+      - instruction: מצננים מעט וממלאים בקונפיטורה.
+        instructionEn: Cool slightly and fill with jam.
+      - instruction: מאבקים באבקת סוכר.
+        instructionEn: Struggles with powdered sugar.
+tips: []

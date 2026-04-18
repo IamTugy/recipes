@@ -1,0 +1,93 @@
+id: honey-cherry-challah
+title: Honey & Cherry Challah
+titleHe: חלת דבש וצימוקי דובדבנים
+category: bread
+tags:
+  - חלה
+  - שבת
+  - דבש
+  - דובדבנים
+tagsEn:
+  - challah
+  - Shabbat
+  - honey
+  - cherries
+cuisine: Jewish
+image: https://assets.tugy.dev/honey-cherry-challah.jpg
+description: חלה שבת חגיגית עם דבש וצימוקי דובדבנים מתוקים - קלועה, מבריקה ועשירה.
+descriptionEn: Festive Shabbat challah with honey and sweet dried cherries - braided, glossy and rich.
+prepTime: 40
+cookTime: 25
+servings: 16
+difficulty: medium
+featured: true
+ingredients:
+  - items:
+      - amount: 1
+        unit: kg
+        name: קמח לחם קשה
+        nameEn: strong bread flour
+      - amount: 40
+        unit: g
+        name: שמרים יבשים
+        nameEn: dried yeast
+      - amount: 60
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 50
+        unit: g
+        name: דבש
+        nameEn: honey
+      - amount: 20
+        unit: g
+        name: מלח
+        nameEn: salt
+      - amount: 100
+        unit: g
+        name: שמן קנולה
+        nameEn: canola oil
+      - amount: 200
+        unit: g
+        name: ביצים (~4 ביצים)
+        nameEn: eggs (~4 eggs)
+      - amount: 350
+        unit: g
+        name: מים
+        nameEn: water
+      - amount: 150
+        unit: g
+        name: צימוקי דובדבנים, קצוצים
+        nameEn: dried cherries, chopped
+      - amount: 1
+        unit: ""
+        name: ביצה טרופה להברשה
+        nameEn: egg, beaten, for brushing
+steps:
+  - items:
+      - instruction: מניחים חומרים יבשים בקערת מיקסר ומערבבים. מוסיפים נוזלים ולשים 10 דקות עד לבצק חלק. מוסיפים צימוקים.
+        instructionEn: >-
+          Place dry ingredients in a mixer bowl and mix. Add wet ingredients and knead 10 minutes until smooth. Add
+          cherries.
+        timerMinutes: 10
+      - instruction: מניחים בכלי מכוסה להתפחה עד הכפלת הנפח (~60 דקות).
+        instructionEn: Place in a covered container and proof until doubled (~60 minutes).
+        timerMinutes: 60
+      - instruction: מחלקים לחצי. מחלקים כל חצי ל-4 חלקים שווים, מרדדים לגלילים וקולעים לצמה עגולה. מניחים על תבנית.
+        instructionEn: >-
+          Divide in half. Divide each half into 4 equal portions, roll into strands and braid into a round loaf. Place
+          on a baking tray.
+      - instruction: מכסים ומתפיחים עד הכפלת הנפח (~45 דקות). מברישים בביצה טרופה.
+        instructionEn: Cover and proof until doubled (~45 minutes). Brush with beaten egg.
+        timerMinutes: 45
+        tip: ברישה כפולה בביצה תיתן ברק וצבע עמוק יותר.
+        tipEn: A double egg wash gives a deeper gloss and color.
+      - instruction: אופים ב-170° כ-25 דקות עד להזהבה יפה. מצננים היטב לפני הפריסה.
+        instructionEn: Bake at 170°C for about 25 minutes until beautifully golden. Cool completely before slicing.
+        timerMinutes: 25
+tips:
+  - צימוקי הדובדבן הופכים לגומי אם הם בצמה ולא נחתכים - קיצוץ עדין מפזר אותם טוב יותר.
+  - שמרו חלה שנותרה בכלי אטום - מחמיצה מהר בגלל הדבש.
+tipsEn:
+  - Whole dried cherries become rubbery in the braid - gentle chopping distributes them better.
+  - Store leftover challah in an airtight container - the honey makes it go stale faster.

@@ -1,0 +1,89 @@
+id: muffin
+title: Muffin's chocolate chips
+titleHe: מאפינ'ס שוקולד צ'יפס
+description: מאפינ'ס שוקולד צ'יפס
+descriptionEn: Muffin's chocolate chips
+image: https://assets.tugy.dev/muffin.jpg
+category: dessert
+difficulty: easy
+prepTime: 15
+cookTime: 20
+servings: 4
+tags:
+  - קינוח
+  - מתוק
+  - שוקולד
+ingredients:
+  - group: ""
+    items:
+      - amount: 0
+        unit: ""
+        name: החומרים ל-18 מאפינ'ס
+        nameEn: The ingredients for 18 muffins
+      - amount: 230
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 5
+        unit: g
+        name: אבקת אפיה
+        nameEn: baking powder
+      - amount: 3
+        unit: g
+        name: אבקת סודה לשתיה
+        nameEn: Soda powder for drinking
+      - amount: 0.5
+        unit: tsp
+        name: מלח
+        nameEn: salt
+      - amount: 2
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 70
+        unit: g
+        name: סוכר חום
+        nameEn: brown sugar
+      - amount: 70
+        unit: ""
+        name: סוכר לבן
+        nameEn: white sugar
+      - amount: 160
+        unit: ml
+        name: חלב
+        nameEn: milk
+      - amount: 75
+        unit: g
+        name: חמאה מומסת
+        nameEn: melted butter
+      - amount: 0.5
+        unit: tsp
+        name: משחת וניל
+        nameEn: Vanilla paste
+      - amount: 200
+        unit: g
+        name: שוקולד צ'יפס
+        nameEn: Chocolate chips
+      - amount: 70
+        unit: g
+        name: אגוזים קצוצים
+        nameEn: chopped nuts
+steps:
+  - title: ""
+    items:
+      - instruction: >-
+          מחממים מראש תנור לחום בינוני, 180 מעלות. מערבבים בקערה גדולה את כל החומרים היבשים: קמח,אבקת אפיה סודה ומלח.
+          בקערה נפרדת טורפים את הביצים והסוכרים, מוסיפים את החלב, החמאה ומשחת הוניל. יוצרים גומה במרכז החומרים היבשים,
+          ומוסיפים את החומרים הרטובים.
+        instructionEn: >-
+          Preheat the oven to medium heat, 180 degrees. Mix all the dry ingredients in a large bowl: flour, baking
+          powder, soda and salt. In a separate bowl, beat the eggs and sugars, add the milk, butter and vanilla paste.
+          Make a well in the center of the dry ingredients, and add the wet ingredients.
+      - instruction: >-
+          מערבבים רק עד אשר התערובת אחידה.מוסיפים את השוקולד צ'יפס והאגוזים בתנועת קיפול פנימה.מחלקים את התערובת לתבניות
+          השקעים.אופים 15-20 דקות או עד שקיסם הננעץ באמצע המאפינס יוצא עם מעט פירורים לחים עליו.
+        instructionEn: >-
+          Mix just until the mixture is uniform. Add the chocolate chips and nuts in a folding motion. Divide the
+          mixture into the socket molds. Bake for 15-20 minutes or until a toothpick inserted in the middle of the
+          muffins comes out with a few moist crumbs on it.
+tips: []

@@ -1,0 +1,92 @@
+id: sauteed-chicken-breast-with-green-vegetables
+hidden: true
+title: Sauteed chicken breast with green vegetables
+titleHe: חזה עוף מוקפץ עם ירקות ירוקים
+description: חזה עוף מוקפץ עם ירקות ירוקים
+descriptionEn: Sauteed chicken breast with green vegetables
+image: https://assets.tugy.dev/sauteed-chicken-breast-with-green-vegetables.jpg
+category: dinner
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 6
+tags:
+  - ארוחת ערב
+ingredients:
+  - group: לעוף
+    items:
+      - amount: 1
+        unit: ""
+        name: ק״ג חזה עוף שלם, נקי וחתוך לקוביות של
+        nameEn: 1 kg of whole chicken breast, clean and cut into cubes
+      - amount: 3
+        unit: ""
+        name: "*3 ס״מ"
+        nameEn: "*3 cm"
+      - amount: 3
+        unit: ""
+        name: שיני שום כתושות
+        nameEn: Crushed garlic cloves
+      - amount: 2
+        unit: ""
+        name: ס״מ שורש ג׳ינג׳ר מגורר
+        nameEn: cm grated ginger root
+      - amount: 50
+        unit: g
+        name: רוטב סויה
+        nameEn: soy sauce
+      - amount: 50
+        unit: g
+        name: רוטב טריאקי
+        nameEn: Teriyaki sauce
+      - amount: 40
+        unit: g
+        name: קורנפלור
+        nameEn: Cornflour
+      - amount: 5
+        unit: tbsp
+        name: שמן תירס/קנולה
+        nameEn: Corn/canola oil
+  - group: לרוטב
+    items:
+      - amount: 120
+        unit: g
+        name: רוטב צ׳ילי מתוק
+        nameEn: Sweet chili sauce
+      - amount: 40
+        unit: g
+        name: רוטב סויה
+        nameEn: soy sauce
+      - amount: 50
+        unit: g
+        name: רוטב טריאקי
+        nameEn: Teriyaki sauce
+      - amount: 1
+        unit: tbsp
+        name: שמן שומשום
+        nameEn: Sesame oil
+      - amount: 50
+        unit: g
+        name: מירין (יין אורז מתוק)
+        nameEn: Mirin (sweet rice wine)
+      - amount: 40
+        unit: g
+        name: חומץ אורז
+        nameEn: rice vinegar
+      - amount: 30
+        unit: g
+        name: סוכר חום
+        nameEn: brown sugar
+      - amount: 0.5
+        unit: tsp
+        name: מלח
+        nameEn: salt
+      - amount: 100
+        unit: g
+        name: שומשום קלוי
+        nameEn: toasted sesame
+steps:
+  - title: ""
+    items:
+      - instruction: ""
+tips: []

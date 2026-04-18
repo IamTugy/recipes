@@ -1,0 +1,86 @@
+id: cinnamon-butter-and-pecan-cake
+title: Cinnamon, butter and pecan cake
+titleHe: עוגת קינמון, חמאה ופקאן
+description: עוגת קינמון, חמאה ופקאן
+descriptionEn: Cinnamon, butter and pecan cake
+image: https://assets.tugy.dev/cinnamon-butter-and-pecan-cake.jpg
+category: dessert
+difficulty: easy
+prepTime: 15
+cookTime: 40
+servings: 4
+tags:
+  - קינוח
+  - מתוק
+  - עוגה
+ingredients:
+  - group: ""
+    items:
+      - amount: 0
+        unit: ""
+        name: תבנית אינגליש קייק
+        nameEn: English cake pattern
+      - amount: 25
+        unit: ""
+        name: ס״מ     לבצק
+        nameEn: cm for the dough
+      - amount: 125
+        unit: g
+        name: חמאה רכה
+        nameEn: Soft butter
+      - amount: 200
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 1
+        unit: tsp
+        name: משחת וניל
+        nameEn: Vanilla paste
+      - amount: 2
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 200
+        unit: g
+        name: יוגורט או שמנת חמוצה
+        nameEn: Yogurt or sour cream
+      - amount: 175
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 5
+        unit: g
+        name: אבקת אפיה
+        nameEn: baking powder
+      - amount: 2
+        unit: g
+        name: אבקת  סודה לשתייהלמילוי
+        nameEn: Baking soda powder for filling
+      - amount: 60
+        unit: g
+        name: סוכר חום
+        nameEn: brown sugar
+      - amount: 60
+        unit: g
+        name: אגוזי פקאן קצוצים כפית קינמון
+        nameEn: chopped pecans a teaspoon of cinnamon
+steps:
+  - title: ""
+    items:
+      - instruction: מחממים תנור ל-160 מעלות.
+        instructionEn: Heat the oven to 160 degrees.
+      - instruction: משמנים ומקמחים את תבנית האפייה.במיקסר מצויד בוו גיטרה מקציפים חמאה, וניל וסוכר.
+        instructionEn: Grease and flour the baking pan. In a mixer fitted with a guitar hook, beat butter, vanilla and sugar.
+      - instruction: >-
+          מוסיפים את הביצים בהדרגה. בקערה נפרדת, מנפים קמח עם אבקת אפיה וסודה לשתייה. מנמיכים את מהירות המיקסר ומוסיפים
+          לסירוגין ובהדרגה את תערובת הקמח ואתהשמנת החמוצה. יוצקים מחצית מהתערובת לתבנית. מערבבים בקערית את חומרי המילוי
+          ומפזרים על התערובת שבתבנית.
+        instructionEn: >-
+          Add the eggs gradually. In a separate bowl, sift flour with baking powder and baking soda. Reduce the speed of
+          the mixer and alternately and gradually add the flour mixture and the sour cream. Pour half of the mixture
+          into the mold. Mix the filling ingredients in a bowl and sprinkle over the mixture in the mold.
+      - instruction: מוסיפים את שאר התערובת ומחליקים. אופים 40 דקות או עד שקיסם שננעץ בעוגה יוצא עם פירורים לחים.
+        instructionEn: >-
+          Add the rest of the mixture and smooth. Bake for 40 minutes or until a toothpick inserted into the cake comes
+          out with moist crumbs.
+tips: []

@@ -1,0 +1,135 @@
+id: carambola-berries
+title: Carambola berries
+titleHe: קרמבו פירות יער
+description: קרמבו פירות יער
+descriptionEn: Carambola berries
+image: https://assets.tugy.dev/carambola-berries.jpg
+category: dessert
+difficulty: hard
+prepTime: 15
+cookTime: 10
+servings: 40
+tags:
+  - קינוח
+  - מתוק
+ingredients:
+  - group: לבסיס פריך
+    items:
+      - amount: 250
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 140
+        unit: g
+        name: חמאה קרה
+        nameEn: cold butter
+      - amount: 20
+        unit: g
+        name: אבקת פירות יער
+        nameEn: Berry powder
+      - amount: 20
+        unit: g
+        name: אבקת סלק
+        nameEn: Beetroot powder
+      - amount: 80
+        unit: g
+        name: סוכר
+        nameEn: sugar
+  - group: למרנג איטלקי
+    items:
+      - amount: 120
+        unit: g
+        name: חלבונים
+        nameEn: proteins
+      - amount: 200
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 20
+        unit: g
+        name: אבקת פירות יער
+        nameEn: Berry powder
+      - amount: 8
+        unit: g
+        name: מים
+        nameEn: water
+      - amount: 40
+        unit: g
+        name: מיץ לימון
+        nameEn: lemon juice
+      - amount: 14
+        unit: g
+        name: מסת ג'לטין (2 גרם אבקת ג׳לטין מעורבבת עם
+        nameEn: Gelatin mass (2 grams of gelatin powder mixed with
+      - amount: 12
+        unit: g
+        name: מים קרים)
+        nameEn: cold water)
+  - group: לציפוי
+    items:
+      - amount: 40
+        unit: g
+        name: שמן קנולה
+        nameEn: Canola oil
+      - amount: 300
+        unit: g
+        name: שוקולד לבן
+        nameEn: white chocolate
+steps:
+  - title: ""
+    items:
+      - instruction: מכינים את הבסיס- במעבד מזון מניחים חומרים יבשים וחמאה קרה ומעבדים לפירורים.
+        instructionEn: Prepare the base - place dry ingredients and cold butter in a food processor and process to crumbs.
+      - instruction: מוסיפים ביצה ומעבדים עד קבלת פירורי בצק גדולים.
+        instructionEn: Add an egg and process until you get large dough crumbs.
+      - instruction: מעבירים למשטח עבודה ומהדקים לבצק אחיד.
+        instructionEn: Transfer to a work surface and press into a uniform dough.
+      - instruction: מרדדים את הבצק בין שני דפי גיטרה או ניירות אפייה לעלה בעובי 4-5 מ״מ ומקפיאים ל-30 דקות.
+        instructionEn: Roll the dough between two guitar sheets or baking papers into a 4-5 mm thick sheet and freeze for 30 minutes.
+      - instruction: >-
+          קורצים מהבסיס הקפוא עיגולים בקוטר 4-5 ס״מ ומניחים על משטח אפייה.מחממים תנור לחום נמוך של 140 מעלות ואופים את
+          הבסיסים 25 דקות.
+        instructionEn: >-
+          Cut circles of 4-5 cm in diameter from the frozen base and place on a baking surface. Heat the oven to a low
+          temperature of 140 degrees and bake the bases for 25 minutes.
+      - instruction: מצננים.מכינים את המרנג האיטלקי- מניחים את החלבון במיקסר מצויד בבלון ההקצפה.
+        instructionEn: Cool. Prepare the Italian meringue - place the protein in a mixer equipped with the whisk balloon.
+      - instruction: מניחים בקלחת את המים והלימון.
+        instructionEn: Place the water and lemon in the cauldron.
+      - instruction: בנפרד מערבבים היטב את הסוכר ואבקת פירות היער.
+        instructionEn: Separately mix well the sugar and berry powder.
+      - instruction: מוסיפים את תערובת הסוכר אל סיר המים  ומביאים לרתיחה.
+        instructionEn: Add the sugar mixture to the pot of water and bring to a boil.
+      - instruction: >-
+          מבשלים את הסירופ לטמפרטורה של 116-118 מעלות צלסיוס (נעזרים במד טמפרטורה). כשהסירופ נמצא בטמפרטורה של 110 מעלות
+          צלסיוס מתחילים להקציף את החלבונים שבמיקסר לקצף יציב. כשהסירופ מוכן, מסירים מהאש ומוסיפים אליו את מסת הג׳לטין.
+        instructionEn: >-
+          Cook the syrup to a temperature of 116-118 degrees Celsius (using a thermometer). When the syrup is at a
+          temperature of 110 degrees Celsius, start whipping the egg whites in the mixer to a stable foam. When the
+          syrup is ready, remove from the heat and add the gelatin mass to it.
+      - instruction: בוחשים להמסה מלאה ויוצקים את הסירופ הרותח לתוך קערת המיקסר (יש לשים לב לצקת את הסירופ על דופן הקערה הפנימית).
+        instructionEn: >-
+          Stir to dissolve completely and pour the boiling syrup into the mixer bowl (pay attention to pouring the syrup
+          on the inner side of the bowl).
+      - instruction: >-
+          מקציפים במהירות בינונית כ-8 דקות או עד שהמרנג מגיע לטמפרטורת הגוף.מעבירים את המרנג לשק זילוף מצויד בצנתר חלק
+          בקוטר 10 מ״מ ומזלפים ערימות קרם גבוהות על בסיסי הבצק האפוי.
+        instructionEn: >-
+          Beat at medium speed for about 8 minutes or until the meringue reaches body temperature. Transfer the meringue
+          to a piping bag fitted with a 10 mm diameter smooth nozzle and pour high piles of cream on the bases of the
+          baked dough.
+      - instruction: מניחים בקירור או בהקפאה ל-10 דקותמכינים את הציפוי- ממיסים שוקולד ומערבבים עד להמסה.
+        instructionEn: Refrigerate or freeze for 10 minutes. Prepare the coating - melt chocolate and stir until melted.
+      - instruction: מוסיפים שמן.
+        instructionEn: Add oil.
+      - instruction: >-
+          מעבירים לכוס רחבה.טובלים את הקרמבו (הפוך, גבעות כלפי מטה) בציפוי, מניחים על מגש אפייה ומפזרים מיד שבבי פטל/תות
+          מיובשים.
+        instructionEn: >-
+          Transfer to a wide glass. Dip the krambo (upside down, hills down) in the coating, place on a baking tray and
+          immediately sprinkle with dried raspberry/strawberry chips.
+      - instruction: מעבירים למקרר עד התייצבות.
+        instructionEn: Transfer to the refrigerator until set.
+      - instruction: שומרים בשכבה אחת בכלי אטום במקרר.
+        instructionEn: Store in a single layer in an airtight container in the refrigerator.
+tips: []

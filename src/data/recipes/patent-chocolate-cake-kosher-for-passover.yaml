@@ -1,0 +1,81 @@
+id: patent-chocolate-cake-kosher-for-passover
+title: Patent chocolate cake kosher for Passover
+titleHe: עוגת שוקולד פטנט כשר לפסח
+description: עוגת שוקולד פטנט כשר לפסח
+descriptionEn: Patent chocolate cake kosher for Passover
+image: https://assets.tugy.dev/patent-chocolate-cake-kosher-for-passover.jpg
+category: dessert
+difficulty: easy
+prepTime: 15
+cookTime: 45
+servings: 4
+tags:
+  - קינוח
+  - מתוק
+  - שוקולד
+  - עוגה
+  - ללא גלוטן
+ingredients:
+  - group: ""
+    items:
+      - amount: 0
+        unit: ""
+        name: חלק א׳100 גרם שקדים או אגוזים
+        nameEn: Part A. 100 grams of almonds or walnuts
+      - amount: 100
+        unit: g
+        name: שוקולד מריר
+        nameEn: dark chocolate
+      - amount: 30
+        unit: g
+        name: קקאו כפית נסקפה
+        nameEn: A teaspoon of cocoa
+      - amount: 220
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 50
+        unit: g
+        name: קמח מצה
+        nameEn: Matzah flour
+      - amount: 50
+        unit: g
+        name: קורנפלור
+        nameEn: Cornflour
+      - amount: 2
+        unit: g
+        name: מלח
+        nameEn: salt
+      - amount: 10
+        unit: g
+        name: אבקת אפייה
+        nameEn: baking powder
+      - amount: 0
+        unit: ""
+        name: חלק ב׳4 ביצים
+        nameEn: Part in 4 eggs
+      - amount: 200
+        unit: g
+        name: שמן קנולה
+        nameEn: Canola oil
+      - amount: 200
+        unit: g
+        name: יוגורט (חלבי) או חלב קוקוס (פרווה)
+        nameEn: Yogurt (dairy) or coconut milk (fur)
+steps:
+  - title: ""
+    items:
+      - instruction: >-
+          מחממים את התנור לחום של 160 מעלות. מניחים את כל החומרים היבשים- חומרי חלק א׳, במעבד מזון עם להב הפלדה וטוחנים
+          לאבקה, כדקה רצופה. מוסיפים את כל החומרים הרטובים, חומרי חלק ב׳, ומפעילים שוב לאיחוד.
+        instructionEn: >-
+          Heat the oven to 160 degrees. Place all the dry ingredients - ingredients of part A, in a food processor with
+          the steel blade and grind to a powder, for about a minute straight. Add all the wet ingredients, ingredients
+          of part B, and stir again to combine.
+      - instruction: >-
+          מעבירים לתבנית משומנת היטב ואופים כ-45 דקות, או עד אשר קיסם הננעץ בעוגה יוצא עם מעט פירורים לחים דבוקים אליו.
+          מצננים, הופכים על צלחת הגשה ומאבקים באבקת סוכר.
+        instructionEn: >-
+          Transfer to a well-greased pan and bake for about 45 minutes, or until a toothpick inserted into the cake
+          comes out with a few moist crumbs stuck to it. Cool, turn on a serving plate and dust with powdered sugar.
+tips: []

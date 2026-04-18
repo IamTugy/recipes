@@ -1,0 +1,93 @@
+id: oatmeal-peanut-butter-and-chocolate-cookies
+title: Oatmeal, peanut butter and chocolate cookies
+titleHe: עוגיות שיבולת שועל, חמאת בוטנים ושוקולד
+description: עוגיות שיבולת שועל, חמאת בוטנים ושוקולד
+descriptionEn: Oatmeal, peanut butter and chocolate cookies
+image: https://assets.tugy.dev/oatmeal-peanut-butter-and-chocolate-cookies.jpg
+category: dessert
+difficulty: easy
+prepTime: 15
+cookTime: 17
+servings: 25
+tags:
+  - קינוח
+  - מתוק
+  - שוקולד
+  - עוגיות
+ingredients:
+  - group: ""
+    items:
+      - amount: 200
+        unit: g
+        name: חמאה רכה
+        nameEn: Soft butter
+      - amount: 250
+        unit: g
+        name: חמאת בוטנים חלקה ללא סוכר
+        nameEn: Smooth peanut butter without sugar
+      - amount: 150
+        unit: g
+        name: סוכר דמררה
+        nameEn: Demerara sugar
+      - amount: 150
+        unit: g
+        name: סוכר לבן
+        nameEn: white sugar
+      - amount: 2
+        unit: g
+        name: מלח
+        nameEn: salt
+      - amount: 2
+        unit: g
+        name: אבקת קינמון
+        nameEn: Cinnamon powder
+      - amount: 0
+        unit: ""
+        name: כפית משחת וניל
+        nameEn: A teaspoon of vanilla paste
+      - amount: 2
+        unit: ""
+        name: ביצים בטמפרטורת החדר
+        nameEn: Eggs at room temperature
+      - amount: 160
+        unit: g
+        name: קמח תופח
+        nameEn: raising flour
+      - amount: 2
+        unit: g
+        name: אבקת סודה לשתייה
+        nameEn: Baking soda powder
+      - amount: 2
+        unit: g
+        name: אבקת אפייה
+        nameEn: baking powder
+      - amount: 200
+        unit: g
+        name: שיבולת שועל
+        nameEn: Oatmeal
+      - amount: 300
+        unit: g
+        name: שוקולד קצוץ/מטבעות קטנים (מריר/חלב/לבן/תערובת)
+        nameEn: Chopped chocolate/small coins (bitter/milk/white/mixture)
+steps:
+  - title: ""
+    items:
+      - instruction: מחממים תנור לחום של 180 מעלות.במיקסר מצויד בוו גיטרה מקציפים חמאה, חמאת בוטנים, סוכרים, מלח, קינמון ווניל.
+        instructionEn: >-
+          Heat an oven to 180 degrees. In a mixer fitted with a guitar hook, beat butter, peanut butter, sugars, salt,
+          cinnamon and vanilla.
+      - instruction: >-
+          מקפידים לקלף את דפנות הקערה מידי פעם. מוסיפים את הביצים אחת אחת, תוך הקפדה על ניקוי דפנות הקערה. מערבבים את
+          הקמח עם אבקות ההתפחה ומוסיפים אל הקערה לערבוב קצר. מוסיפים את שיבולת השועל והשוקולדים ומערבלים לאיחוד, מקפידים
+          לא לערבב יותר מידי.
+        instructionEn: >-
+          Make sure to peel the sides of the bowl from time to time. Add the eggs one by one, making sure to clean the
+          sides of the bowl. Mix the flour with the baking powder and add to the bowl for a short mixing. Add the oats
+          and chocolates and mix to combine, being careful not to mix too much.
+      - instruction: יוצרים כדורים במשקל 40 גרם, או בעזרת כף גלידה קפיצית ומניחים על מגש אפייה מרופד בנייר.
+        instructionEn: Form balls weighing 40 grams, or with a springy ice cream scoop and place on a baking tray lined with paper.
+      - instruction: אופים כ-15-17 דקות להזהבה ונזהרים מאפיית יתר.מצננים היטב ושומרים בכלי אטום.
+        instructionEn: >-
+          Bake for about 15-17 minutes until golden and be careful not to overbake. Cool well and keep in an airtight
+          container.
+tips: []

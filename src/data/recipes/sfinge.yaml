@@ -1,0 +1,96 @@
+id: sfinge
+title: Sfinge
+titleHe: ספינג'
+category: snack
+tags:
+  - טיגון
+  - בצק שמרים
+  - ספרדי-יהודי
+  - מתוק
+tagsEn:
+  - fried
+  - yeast dough
+  - Sephardic-Jewish
+  - sweet
+cuisine: Sephardic
+image: https://assets.tugy.dev/sfinge.jpg
+description: ספינג' הם טבעות בצק שמרים מטוגנות רכות מבפנים ופריכות מבחוץ, מגולגלות בסוכר - מסורת ספרדית-יהודית.
+descriptionEn: >-
+  Sfinge are soft fried yeast-dough rings - pillowy inside, crisp outside, rolled in sugar. A beloved Sephardic-Jewish
+  tradition.
+prepTime: 20
+cookTime: 30
+servings: 35
+difficulty: medium
+ingredients:
+  - items:
+      - amount: 600
+        unit: g
+        name: קמח לחם קשה
+        nameEn: strong bread flour
+      - amount: 20
+        unit: g
+        name: שמרים יבשים
+        nameEn: dried yeast
+      - amount: 80
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 10
+        unit: g
+        name: מלח
+        nameEn: salt
+      - amount: 2
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 250
+        unit: g
+        name: מים
+        nameEn: water
+      - amount: 100
+        unit: g
+        name: מיץ תפוזים
+        nameEn: orange juice
+      - amount: 50
+        unit: g
+        name: שמן קנולה
+        nameEn: canola oil
+      - amount: 1
+        unit: cup
+        name: סוכר לבן לטבילה
+        nameEn: white sugar for rolling
+      - amount: 1
+        unit: liter
+        name: שמן לטיגון עמוק
+        nameEn: oil for deep frying
+steps:
+  - items:
+      - instruction: מכניסים את כל חומרי הבצק למיקסר עם וו גיטרה ולשים כ-7 דקות עד לבצק דביק וחלק.
+        instructionEn: >-
+          Place all dough ingredients in a stand mixer with a hook attachment and knead 7 minutes until smooth and
+          sticky.
+        timerMinutes: 7
+      - instruction: מכסים ומניחים להתפחה כשעה עד להכפלת הנפח.
+        instructionEn: Cover and proof for about 1 hour until doubled in volume.
+        timerMinutes: 60
+      - instruction: "\"מפילים\" את הבצק שתפח ומניחים לו לתפוח שוב כשעה."
+        instructionEn: Punch down the risen dough and let it rise again for another hour.
+        timerMinutes: 60
+        tip: התפחה כפולה נותנת מרקם אוורירי ועדין הרבה יותר.
+        tipEn: A double proof gives a much airier, softer texture.
+      - instruction: >-
+          מחממים שמן לטיגון עמוק ל-160°. ביד משומנת לוקחים פיסות בצק, יוצרים חור במרכז ומטגנים 2 דקות מכל צד עד להזהבה
+          עדינה.
+        instructionEn: >-
+          Heat oil to 160°C for deep frying. With an oiled hand, take pieces of dough, poke a hole in the center and fry
+          2 minutes per side until lightly golden.
+        timerMinutes: 4
+      - instruction: מעבירים לנייר סופג, מגלגלים מיד בסוכר ומגישים חם.
+        instructionEn: Transfer to paper towels, roll immediately in sugar and serve warm.
+tips:
+  - חשוב שהשמן יהיה בטמפרטורה קבועה של 160° - גבוה מדי יישרף מבחוץ לפני שהפנים יתבשל.
+  - מגישים מיד - הספינג' בשיאם לפני שמתקררים.
+tipsEn:
+  - Keep the oil at a steady 160°C - too hot and the outside burns before the inside cooks.
+  - Serve immediately - sfinge are at their best before they cool.

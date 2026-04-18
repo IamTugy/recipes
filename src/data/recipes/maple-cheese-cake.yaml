@@ -1,0 +1,111 @@
+id: maple-cheese-cake
+title: Maple White Chocolate Cheese Cake
+titleHe: עוגת מייפל-גבינה-שוקולד לבן רכה
+category: dessert
+tags:
+  - עוגה
+  - גבינה
+  - מייפל
+  - שוקולד לבן
+  - שישייה
+tagsEn:
+  - cake
+  - cheese
+  - maple
+  - white chocolate
+  - swirl
+image: https://assets.tugy.dev/maple-cheese-cake.jpg
+description: עוגה רכה ולחה עם שישיית גבינה-שוקולד לבן על בלילת מייפל עשירה - מראה מרשים, טעם מנצח.
+descriptionEn: >-
+  A moist, soft cake with a white-chocolate cheese swirl on a rich maple batter - stunning presentation, unbeatable
+  flavor.
+prepTime: 20
+cookTime: 55
+servings: 12
+difficulty: medium
+featured: true
+ingredients:
+  - group: שישייה (שלב 1)
+    groupEn: Swirl (Step 1)
+    items:
+      - amount: 100
+        unit: g
+        name: שוקולד לבן מותך
+        nameEn: white chocolate, melted
+      - amount: 250
+        unit: g
+        name: גבינה לבנה 5%
+        nameEn: 5% white cheese (labneh style)
+      - amount: 1
+        unit: tsp
+        name: משחת וניל
+        nameEn: vanilla paste
+  - group: נוזלים (שלב 2)
+    groupEn: Wet ingredients (Step 2)
+    items:
+      - amount: 100
+        unit: g
+        name: שמן צמחי
+        nameEn: vegetable oil
+      - amount: 50
+        unit: g
+        name: חמאה מותכת
+        nameEn: melted butter
+      - amount: 200
+        unit: g
+        name: יוגורט טבעי
+        nameEn: plain yogurt
+      - amount: 3
+        unit: ""
+        name: ביצים L
+        nameEn: large eggs
+      - amount: 1
+        unit: tsp
+        name: משחת וניל
+        nameEn: vanilla paste
+      - amount: 220
+        unit: g
+        name: סוכר לבן
+        nameEn: white sugar
+      - amount: 100
+        unit: g
+        name: סירופ מייפל
+        nameEn: maple syrup
+      - amount: 2
+        unit: g
+        name: מלח
+        nameEn: salt
+  - group: יבשים (שלב 3)
+    groupEn: Dry ingredients (Step 3)
+    items:
+      - amount: 150
+        unit: g
+        name: קמח לבן
+        nameEn: plain flour
+      - amount: 50
+        unit: g
+        name: סולת
+        nameEn: semolina
+      - amount: 10
+        unit: g
+        name: אבקת אפייה
+        nameEn: baking powder
+steps:
+  - items:
+      - instruction: מחממים תנור ל-160°. משמנים ומקמחים תבנית 20×20 ס"מ.
+        instructionEn: Preheat oven to 160°C. Grease and flour a 20×20 cm tin.
+      - instruction: שלב 1 - מערבבים מהר שוקולד לבן, גבינה ווניל. מניחים בצד.
+        instructionEn: Step 1 - Quickly mix white chocolate, cheese and vanilla. Set aside.
+      - instruction: שלב 2 - מניחים את כל חומרי השלב 2 במעבד מזון וטורפים היטב.
+        instructionEn: Step 2 - Place all Step 2 ingredients in a food processor and whisk well.
+      - instruction: שלב 3 - מנפים את היבשים ומוסיפים לתערובת, מערבלים עד איחוד בלבד. לא מעבדים יתר.
+        instructionEn: Step 3 - Sift the dry ingredients into the wet mixture and fold until just combined. Do not overmix.
+      - instruction: מוסיפים 80 גרם מהבלילה לקערת הגבינה ומערבבים היטב.
+        instructionEn: Add 80g of the batter to the cheese bowl and mix well.
+      - instruction: יוצקים את בלילת העוגה לתבנית. מניחים עליה כפות מתערובת הגבינה ומשיישים בסכין.
+        instructionEn: Pour the cake batter into the tin. Dollop the cheese mixture on top and swirl with a knife.
+        tip: לשישייה יפה - פשוט גררו את הסכין בתנועות S על פני הבלילה.
+        tipEn: For a beautiful swirl, drag the knife in S-shaped strokes across the surface.
+      - instruction: אופים 45-60 דקות עד שקיסם יוצא עם מעט פירורים לחים.
+        instructionEn: Bake 45-60 minutes until a skewer comes out with just a few moist crumbs.
+        timerMinutes: 55

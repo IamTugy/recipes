@@ -1,0 +1,104 @@
+id: alphahors-zebra-cookies
+title: Alphahors Zebra cookies
+titleHe: עוגיות אלפחורס זברה
+description: עוגיות אלפחורס זברה
+descriptionEn: Alphahors Zebra cookies
+image: https://assets.tugy.dev/alphahors-zebra-cookies.jpg
+category: dessert
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 20
+tags:
+  - קינוח
+  - מתוק
+  - עוגיות
+ingredients:
+  - group: ""
+    items:
+      - amount: 150
+        unit: g
+        name: קורנפלור
+        nameEn: Cornflour
+      - amount: 75
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 2
+        unit: g
+        name: אבקת סודה לשתייה
+        nameEn: Baking soda powder
+      - amount: 4
+        unit: g
+        name: אבקת אפייה
+        nameEn: baking powder
+      - amount: 100
+        unit: g
+        name: חמאה רכה
+        nameEn: Soft butter
+      - amount: 80
+        unit: g
+        name: אבקת סוכר
+        nameEn: icing sugar
+      - amount: 1
+        unit: tsp
+        name: משחת וניל
+        nameEn: Vanilla paste
+      - amount: 40
+        unit: g
+        name: שמנת מתוקה
+        nameEn: sweet cream
+      - amount: 3
+        unit: ""
+        name: חלמונים
+        nameEn: egg yolks
+      - amount: 20
+        unit: g
+        name: קקאו כהה
+        nameEn: dark cocoa
+  - group: למילוי ולציפוי
+    items:
+      - amount: 200
+        unit: g
+        name: ריבת חלב
+        nameEn: milk jam
+      - amount: 0
+        unit: ""
+        name: קוקוס טחון
+        nameEn: Ground coconut
+steps:
+  - title: ""
+    items:
+      - instruction: >-
+          מנפים את הקורנפלור, קמח, אבקת הסודה ואבקת האפייה. בקערת מערבל מצויד בוו גיטרה מקציפים את החמאה, וניל ואבקת
+          הסוכר, לקבלת תערובת חלקה ואחידה. מוסיפים את החלמונים אחד אחד, ומקציפים היטב לאחר כל הוספה. מוסיפים את השמנת
+          המתוקה ומערבבים לאיחוד.
+        instructionEn: >-
+          Sift the cornflour, flour, baking soda and baking powder. In the bowl of a mixer fitted with a guitar hook,
+          beat the butter, vanilla and powdered sugar to obtain a smooth and uniform mixture. Add the egg yolks one by
+          one, and beat well after each addition. Add the sweet cream and mix to combine.
+      - instruction: >-
+          מוסיפים את תערובת היבשים במהירות נמוכה, ומערבלים קצרות רק עד שהם נספגים בתערובת. מחלקים את התערובת ל-2
+          ומוסיפים למחצית את הקקאו. מערבבים חלקית את התערובת הבהירה עם התערובת הכהה. עוטפים בניילון נצמד ומקררים לשעה.
+          מחממים את התנור לחום 160 מעלות.
+        instructionEn: >-
+          Add the dry mixture at low speed, and mix briefly just until they are absorbed into the mixture. Divide the
+          mixture into 2 and add the cocoa to half. Partially mix the light mixture with the dark mixture. Wrap in cling
+          film and refrigerate for an hour. Heat the oven to 160 degrees.
+      - instruction: מרדדים את הבצק לעובי אחיד של 4 מ"מ.
+        instructionEn: Roll out the dough to a uniform thickness of 4 mm.
+      - instruction: >-
+          מקפיאים. קורצים מהבצקים עיגולים בקוטר של 3-4 ס"מ. אם במהלך העבודה בבצק מתחמם ומתרכך, מעבירים לצינון זריז
+          במקפיא. מניחים את העוגיות על תבניות אפייה מרופדות בנייר, אופים כ-8 דקות עד שהן יציבות ועדיין צבען בהיר מאוד.
+        instructionEn: >-
+          Freezers. Cut the dough into circles with a diameter of 3-4 cm. If while working with the dough it warms up
+          and softens, transfer to a quick cooling in the freezer. Place the cookies on baking sheets lined with paper,
+          bake for about 8 minutes until they are firm and still very light in color.
+      - instruction: >-
+          מצננים.מזלפים ריבת חלב על מחצית מהעוגיות ומצמידים כל זוג ליצירת עוגיות סנדוויץ'.מורחים גם את שולי העוגייה.שמים
+          את הקוקוס בקערה בינונית ומגלגלים כמו גלגל את השוליים הדביקים בתוך שבבי הקוקוס.
+        instructionEn: >-
+          Cool. Pour milk jam on half of the cookies and attach each pair to create sandwich cookies. Spread the edges
+          of the cookie as well. Put the coconut in a medium bowl and roll the sticky edges like a wheel inside the
+          coconut shavings.
+tips: []

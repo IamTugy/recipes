@@ -1,0 +1,88 @@
+id: vegetable-fritters
+title: Root Vegetable Fritters
+titleHe: לביבות ירקות
+category: snack
+tags:
+  - ירקות
+  - טבעוני
+  - מהיר
+  - מנה ראשונה
+tagsEn:
+  - vegetables
+  - vegan
+  - quick
+  - starter
+image: https://assets.tugy.dev/vegetable-fritters.jpg
+description: לביבות ירקות שורש קטיפתיות - בטטה, סלרי, לפת ותפוח אדמה - מטוגנות בשמן זית עד להזהבה עדינה.
+descriptionEn: >-
+  Velvety root vegetable fritters with sweet potato, celeriac, turnip and potato - pan-fried in olive oil to a gentle
+  golden.
+prepTime: 20
+cookTime: 20
+servings: 12
+difficulty: easy
+ingredients:
+  - items:
+      - amount: 2
+        unit: ""
+        name: בטטות, קלופות וחתוכות לקוביות
+        nameEn: sweet potatoes, peeled and cubed
+      - amount: 2
+        unit: ""
+        name: שורשי סלרי, קלופים וחתוכים לקוביות
+        nameEn: celeriac roots, peeled and cubed
+      - amount: 1
+        unit: ""
+        name: כרישה, שטופה וחתוכה לטבעות
+        nameEn: leek, washed and sliced into rings
+      - amount: 1
+        unit: ""
+        name: לפת, קלופה וחתוכה לקוביות
+        nameEn: turnip, peeled and cubed
+      - amount: 1
+        unit: large
+        name: תפוח אדמה, קלוף וחתוך לקוביות
+        nameEn: large potato, peeled and cubed
+      - amount: 1
+        unit: liter
+        name: חלב
+        nameEn: milk
+      - amount: 0.75
+        unit: cup
+        name: קמח תופח
+        nameEn: self-raising flour
+      - amount: 3
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 2
+        unit: tbsp
+        name: רוטב צ'ילי מתוק
+        nameEn: sweet chili sauce
+      - amount: 1
+        unit: tsp
+        name: מלח
+        nameEn: salt
+      - amount: 0.5
+        unit: tsp
+        name: פלפל שחור גרוס
+        nameEn: ground black pepper
+      - amount: 3
+        unit: tbsp
+        name: שמן זית לטיגון
+        nameEn: olive oil for frying
+steps:
+  - items:
+      - instruction: מבשלים ירקות שורש בחלב עד ריכוך. מצננים, מסננים ומועכים למחית.
+        instructionEn: Cook root vegetables in milk until soft. Cool, drain and mash to a puree.
+        timerMinutes: 20
+      - instruction: מערבבים מחית ירקות עם קמח, ביצים, רוטב צ'ילי, מלח ופלפל. משהים 10 דקות.
+        instructionEn: Mix vegetable puree with flour, eggs, chili sauce, salt and pepper. Rest 10 minutes.
+        timerMinutes: 10
+      - instruction: מחממים שמן זית בגובה ½ ס"מ במחבת. יוצקים לביבות ומטגנים כ-1 דקה מכל צד עד הזהבה.
+        instructionEn: Heat olive oil to 0.5 cm depth in a pan. Pour fritters and fry about 1 minute per side until golden.
+        timerMinutes: 2
+        tip: העבירו את הבלילה לבקבוק פלסטי לחיץ - כך קל יותר ליצוק לביבות בצורה אחידה.
+        tipEn: Transfer the batter to a squeeze bottle - makes pouring even fritters much easier.
+      - instruction: מגישים חם עם שמנת חמוצה או יוגורט.
+        instructionEn: Serve warm with sour cream or yogurt.

@@ -1,0 +1,143 @@
+id: macaron-tart
+title: Macaron tart
+titleHe: טארט מקארון
+description: טארט מקארון
+descriptionEn: Macaron tart
+image: https://assets.tugy.dev/macaron-tart.jpg
+category: dessert
+difficulty: hard
+prepTime: 15
+cookTime: 15
+servings: 10
+tags:
+  - קינוח
+  - מתוק
+ingredients:
+  - group: ""
+    items:
+      - amount: 200
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 60
+        unit: g
+        name: אבקת שקדים
+        nameEn: almond powder
+      - amount: 140
+        unit: g
+        name: חמאה קרה, חתוכה לקוביות
+        nameEn: Cold butter, cut into cubes
+      - amount: 60
+        unit: g
+        name: אבקת סוכר
+        nameEn: icing sugar
+      - amount: 40
+        unit: g
+        name: חלמון
+        nameEn: yolk
+  - group: למילוי
+    items:
+      - amount: 60
+        unit: g
+        name: אבקת שקדים
+        nameEn: almond powder
+      - amount: 60
+        unit: g
+        name: אבקת סוכר
+        nameEn: icing sugar
+      - amount: 120
+        unit: g
+        name: מרציפן גולמי
+        nameEn: Raw marzipan
+      - amount: 50
+        unit: ""
+        name: "% שקדים, חתוך לקוביות"
+        nameEn: "% almonds, cut into cubes"
+      - amount: 100
+        unit: g
+        name: חמאה רכה
+        nameEn: Soft butter
+      - amount: 40
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 100
+        unit: g
+        name: דובדבני אמרנה, מסוננים
+        nameEn: Amaranth cherries, drained
+  - group: לציפוי מקארון
+    items:
+      - amount: 85
+        unit: g
+        name: אבקת שקדים
+        nameEn: almond powder
+      - amount: 130
+        unit: g
+        name: אבקת סוכר
+        nameEn: icing sugar
+      - amount: 15
+        unit: g
+        name: קורנפלור
+        nameEn: Cornflour
+      - amount: 70
+        unit: g
+        name: חלבון
+        nameEn: protein
+      - amount: 30
+        unit: g
+        name: סוכר
+        nameEn: sugar
+steps:
+  - title: ""
+    items:
+      - instruction: "הכנת הבצק:"
+        instructionEn: "Preparation of the dough:"
+      - instruction: מכניסים את החומרים היבשים והחמאה הקרה למעבד מזון וטוחנים לתערובת פירורית.
+        instructionEn: Put the dry ingredients and the cold butter into a food processor and grind to a crumbly mixture.
+      - instruction: מוסיפים חלמון ומעבדים לפירורים לחים.
+        instructionEn: Add yolk and process into moist crumbs.
+      - instruction: מאחדים לבצק, עוטפים בניילון נצמד ומצננים לשעה.
+        instructionEn: Combine into a dough, wrap in cling film and refrigerate for an hour.
+      - instruction: מחממים תנור לחום של 160 מעלות.
+        instructionEn: Heat the oven to 160 degrees.
+      - instruction: מרדדים את הבצק לעלה בעובי 3 מ"מ ומרפדים את תבניות הטארט.
+        instructionEn: Roll the dough into a 3 mm thick sheet and line the tart pans.
+      - instruction: מרפדים בניילון נצמד או נייר אפיה ומניחים משקולת (קטניות, אורז) מעל.
+        instructionEn: Line with plastic wrap or baking paper and place a weight (beans, rice) on top.
+      - instruction: מצננים שוב ל-15 דקות ואופים 15 דקות.
+        instructionEn: Cool again for 15 minutes and bake for 15 minutes.
+      - instruction: מוציאים את המשקולות ומחזירים לעוד 8 דקות אפיה.
+        instructionEn: Take out the weights and return to baking for another 8 minutes.
+      - instruction: מצננים.
+        instructionEn: cooling
+      - instruction: מורידים את חום התנור ל-150 מעלות.
+        instructionEn: Lower the oven heat to 150 degrees.
+      - instruction: "הכנת המילוי:"
+        instructionEn: "Preparation of the filling:"
+      - instruction: מעבדים את כל החומרים, למעט הדובדבנים, במיקסר מצויד בוו גיטרה.
+        instructionEn: Process all the ingredients, except the cherries, in a mixer fitted with a guitar hook.
+      - instruction: מעבירים לשק זילוף וממלאים את בצקים החצי אפויים, 2/3 מגובהם.
+        instructionEn: Transfer to a piping bag and fill the half-baked doughs, 2/3 of their height.
+      - instruction: משבצים 5-6 דובדבני אמרנה מעל.
+        instructionEn: Place 5-6 Amaranth cherries on top.
+      - instruction: אופים 8 דקות.
+        instructionEn: Bake for 8 minutes.
+      - instruction: מצננים.
+        instructionEn: cooling
+      - instruction: מנפים אבקת שקדים, אבקת סוכר וקורנפלור.
+        instructionEn: Sieve almond powder, powdered sugar and cornflour.
+      - instruction: במיקסר מצויד בבלון הקצפה, מקציפים חלבונים, צבע וסוכר 10 דקות, למרנג יציב מאוד.
+        instructionEn: >-
+          In a mixer equipped with the whisk balloon, beat egg whites, color and sugar for 10 minutes, for a very stable
+          meringue.
+      - instruction: מקפלים את היבשים לתוך המרנג בתנועות מהירות ומעבדים בתנועות קיפול עד שהתערובת אחידה, חלקה ומבריקה.
+        instructionEn: >-
+          Fold the dry ingredients into the meringue with quick movements and process with folding movements until the
+          mixture is uniform, smooth and shiny.
+      - instruction: מזלפים את תערובת המקארון מעל הטארטים, כך שהתערובת תכסה את כל המילוי.
+        instructionEn: Sprinkle the macaron mixture over the tarts, so that the mixture covers the entire filling.
+      - instruction: אופים בחום של 150 מעלות כ-15-17 דקות.
+        instructionEn: Bake at 150 degrees for about 15-17 minutes.
+      - instruction: מצננים היטב.
+        instructionEn: Cool well.
+tips: []

@@ -1,0 +1,134 @@
+id: gf-apple-almond-tart
+title: Gluten-Free Apple & Almond Tart
+titleHe: טארט תפוחים וקרם שקדים ללא גלוטן
+category: dessert
+tags:
+  - ללא גלוטן
+  - טארט
+  - תפוחים
+  - שקדים
+tagsEn:
+  - gluten-free
+  - tart
+  - apple
+  - almond
+image: https://assets.tugy.dev/gf-apple-almond-tart.jpg
+description: טארט תפוחים עדין עם בצק קורנפלור פריך וקרם שקדים עשיר - ללא גלוטן, מלא טעם.
+descriptionEn: A delicate apple tart with a crisp cornstarch pastry and rich almond cream - gluten-free and full of flavor.
+prepTime: 35
+cookTime: 40
+servings: 12
+difficulty: medium
+ingredients:
+  - group: בצק
+    groupEn: Pastry
+    items:
+      - amount: 150
+        unit: g
+        name: קורנפלור
+        nameEn: cornstarch
+      - amount: 30
+        unit: g
+        name: עמילן טפיוקה
+        nameEn: tapioca starch
+      - amount: 30
+        unit: g
+        name: אבקת שקדים
+        nameEn: almond flour
+      - amount: 50
+        unit: g
+        name: קמח אורז
+        nameEn: rice flour
+      - amount: 130
+        unit: g
+        name: חמאה קרה, חתוכה לקוביות
+        nameEn: cold butter, cubed
+      - amount: 75
+        unit: g
+        name: אבקת סוכר
+        nameEn: powdered sugar
+      - amount: 1
+        unit: tsp
+        name: משחת וניל
+        nameEn: vanilla paste
+      - amount: 1
+        unit: ""
+        name: ביצה
+        nameEn: egg
+  - group: קרם שקדים
+    groupEn: Almond Cream
+    items:
+      - amount: 100
+        unit: g
+        name: אבקת סוכר
+        nameEn: powdered sugar
+      - amount: 100
+        unit: g
+        name: אבקת שקדים
+        nameEn: almond flour
+      - amount: 50
+        unit: g
+        name: קורנפלור
+        nameEn: cornstarch
+      - amount: 1
+        unit: ""
+        name: ביצה
+        nameEn: egg
+      - amount: 100
+        unit: g
+        name: חמאה רכה
+        nameEn: soft butter
+      - amount: 1
+        unit: tbsp
+        name: רום כהה
+        nameEn: dark rum
+  - group: עיטור
+    groupEn: Topping
+    items:
+      - amount: 4
+        unit: ""
+        name: תפוחי עץ, קלופים ופרוסים לפרוסות דקות
+        nameEn: apples, peeled and thinly sliced
+      - amount: 2
+        unit: tbsp
+        name: סוכר
+        nameEn: sugar
+steps:
+  - title: בצק
+    titleEn: Pastry
+    items:
+      - instruction: >-
+          במעבד מזון טוחנים חומרים יבשים עם חמאה קרה לפירורים דקים. מוסיפים וניל וביצה ומעבדים לפירורים לחים. מאחדים
+          ומשטחים.
+        instructionEn: >-
+          In a food processor, pulse dry ingredients with cold butter to fine crumbs. Add vanilla and egg and pulse to
+          moist crumbs. Press together and flatten.
+      - instruction: מניחים עטוף בקירור לחצי שעה.
+        instructionEn: Wrap and refrigerate for 30 minutes.
+        timerMinutes: 30
+      - instruction: מרדדים לעלה 3 מ"מ ומרפדים תבנית טארט. אופים אפייה עיוורת (עם משקולת) ב-160° עד להזהבה מלאה.
+        instructionEn: Roll to 3mm thick and line a tart tin. Blind bake (with weights) at 160°C until fully golden.
+        timerMinutes: 20
+        tip: בצק ללא גלוטן עדין יותר - הדקו אותו בזהירות לתבנית ואל תמשכו.
+        tipEn: Gluten-free pastry is more delicate - press it carefully into the tin without stretching.
+  - title: קרם שקדים ורכבה
+    titleEn: Almond Cream & Assembly
+    items:
+      - instruction: טוחנים חומרים יבשים ואבקת שקדים במעבד. מוסיפים חמאה ומאחדים. מוסיפים ביצה ורום לתערובת אחידה.
+        instructionEn: >-
+          Pulse dry ingredients and almond flour in the processor. Add butter and combine. Add egg and rum and mix until
+          smooth.
+      - instruction: מורחים קרם שקדים על בסיס הטארט. מסדרים פרוסות תפוח מעל ומפזרים סוכר.
+        instructionEn: Spread almond cream over the tart base. Arrange apple slices on top and scatter with sugar.
+      - instruction: אופים ב-160° כ-40 דקות עד להזהבה ובעבוע הקרם.
+        instructionEn: Bake at 160°C for about 40 minutes until golden and the cream is bubbling.
+        timerMinutes: 40
+      - instruction: מצננים לחלוטין לפני הגשה - הקרם מתייצב בצינון.
+        instructionEn: Cool completely before serving - the cream sets as it cools.
+        timerMinutes: 60
+tips:
+  - ניתן לצפות בג'לה תפוחים לקבלת ברק יפה.
+  - הטארט נשמר עד 3 ימים בקירור.
+tipsEn:
+  - Glaze with apple jelly for a beautiful shine.
+  - The tart keeps for up to 3 days refrigerated.

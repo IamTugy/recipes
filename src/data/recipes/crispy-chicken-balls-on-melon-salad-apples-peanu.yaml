@@ -1,0 +1,190 @@
+id: crispy-chicken-balls-on-melon-salad-apples-peanu
+title: Crispy chicken balls on melon salad, apples, peanuts, and kohlrabi in Asian honey vinaigrette
+titleHe: כדורי עוף פריכים על סלט מלון, תפוחים, בוטנים, וקולרבי בויניגרט דבש אסיאתי
+description: כדורי עוף פריכים על סלט מלון, תפוחים, בוטנים, וקולרבי בויניגרט דבש אסיאתי
+descriptionEn: Crispy chicken balls on melon salad, apples, peanuts, and kohlrabi in Asian honey vinaigrette
+image: https://assets.tugy.dev/crispy-chicken-balls-on-melon-salad-apples-peanu.jpg
+category: salad
+difficulty: medium
+prepTime: 15
+cookTime: 10
+servings: 12
+tags:
+  - סלט
+ingredients:
+  - group: ""
+    items:
+      - amount: 250
+        unit: g
+        name: עוף טחון (פרגית או חזה)
+        nameEn: Ground chicken (pullet or breast)
+      - amount: 0.5
+        unit: ""
+        name: זר פטרוזיליה, קצוץ
+        nameEn: Parsley bouquet, chopped
+      - amount: 0.5
+        unit: ""
+        name: זר בזיליקום, קצוץ
+        nameEn: Basil bouquet, chopped
+      - amount: 50
+        unit: g
+        name: עגבניות מיובשות, מסוננות משמן
+        nameEn: Dried tomatoes, filtered from oil
+      - amount: 1
+        unit: ""
+        name: בצל קלוף וחתוך לרבעים
+        nameEn: Onion peeled and cut into quarters
+      - amount: 1
+        unit: ""
+        name: ביצה
+        nameEn: egg
+      - amount: 3
+        unit: tbsp
+        name: רוטב סויה
+        nameEn: soy sauce
+      - amount: 50
+        unit: g
+        name: שמן זית
+        nameEn: olive oil
+      - amount: 0.5
+        unit: cup
+        name: פירורי לחם
+        nameEn: bread crumbs
+      - amount: 50
+        unit: g
+        name: שומשום קלוי
+        nameEn: toasted sesame
+      - amount: 0
+        unit: ""
+        name: מלח, פלפל
+        nameEn: salt, pepper
+      - amount: 1
+        unit: ""
+        name: קליפה מגוררת מלימון
+        nameEn: Grated lemon peel
+      - amount: 0
+        unit: ""
+        name: שומשום, פרג, קצח לציפוי
+        nameEn: Sesame seeds, poppy seeds, parsley for coating
+      - amount: 0
+        unit: ""
+        name: שמן לטיגון עמוק
+        nameEn: Oil for deep frying
+      - amount: 2
+        unit: ""
+        name: מלפפונים
+        nameEn: cucumbers
+      - amount: 0.5
+        unit: ""
+        name: מלון קטן, קלוף ומגולען
+        nameEn: A small hotel, peeled and gutted
+      - amount: 200
+        unit: g
+        name: עגבניות שרי, חצויות
+        nameEn: Cherry tomatoes, halved
+      - amount: 100
+        unit: g
+        name: אפונת שלג, חתוכה למקטעים בגודל של
+        nameEn: Snow peas, cut into segments the size of
+      - amount: 1
+        unit: ""
+        name: ס״מ
+        nameEn: cm
+      - amount: 100
+        unit: g
+        name: פטריות שימאג׳י, מופרדות
+        nameEn: Shimaji mushrooms, separated
+      - amount: 100
+        unit: g
+        name: נבטי שעועית עבים
+        nameEn: Bean sprouts are thick
+      - amount: 1
+        unit: ""
+        name: פלפל צ׳ילי אדום, קצוץ
+        nameEn: Red chili pepper, chopped
+      - amount: 0
+        unit: ""
+        name: גרגרים מרימון אחד
+        nameEn: Berries from one pomegranate
+      - amount: 100
+        unit: g
+        name: אפונת ווסאבי כתושה
+        nameEn: Crushed wasabi peas
+      - amount: 1
+        unit: ""
+        name: צרור עלי נענע, קרועים
+        nameEn: Bunch of mint leaves, torn
+      - amount: 0.5
+        unit: ""
+        name: צרור כוסברה, קרועים
+        nameEn: Bunch of cilantro, torn
+  - group: לסלט
+    items:
+      - amount: 0
+        unit: ""
+        name: חותכים את המלפפון והמלון לז׳וליין ומניחים בקערה עם יתרת חומרי הסלט.
+        nameEn: Cut the cucumber and melon into julienne and place in a bowl with the rest of the salad ingredients.
+  - group: לרוטב
+    items:
+      - amount: 2
+        unit: ""
+        name: שיני שום קלופות
+        nameEn: Peeled garlic cloves
+      - amount: 200
+        unit: g
+        name: מיץ ליים
+        nameEn: Lime juice
+      - amount: 2
+        unit: tbsp
+        name: דבש
+        nameEn: honey
+      - amount: 2
+        unit: tbsp
+        name: רוטב דגים (נאם פלא)
+        nameEn: Fish sauce (Nam Pla)
+      - amount: 2
+        unit: tbsp
+        name: שמן שומשום כהה
+        nameEn: Dark sesame oil
+      - amount: 1
+        unit: tbsp
+        name: שמן צ׳ילי אדום
+        nameEn: Red chili oil
+      - amount: 2
+        unit: tbsp
+        name: יוזו
+        nameEn: Yuzu
+      - amount: 2
+        unit: tbsp
+        name: שמן זית
+        nameEn: olive oil
+      - amount: 0
+        unit: ""
+        name: מלח לפי טעם
+        nameEn: salt to taste
+steps:
+  - title: ""
+    items:
+      - instruction: לכדורי העוף- מכניסים את כל המרכיבים, למעט העוף ופירורי הלחם, למעבד מזון וטוחנים למחית אחידה.
+        instructionEn: >-
+          For the chicken balls - put all the ingredients, except the chicken and the breadcrumbs, into a food processor
+          and grind to a uniform puree.
+      - instruction: מעבירים לקערה, מוסיפים את העוף ופירורי הלחם, מערבבים היטב ומשהים ל1/2 שעה.
+        instructionEn: Transfer to a bowl, add the chicken and bread crumbs, mix well and leave for 1/2 hour.
+      - instruction: אם התערובת רכה מידי לאחר המנוחה ניתן להוסיף עוד מעט פירורי לחם.
+        instructionEn: If the mixture is too soft after resting, you can add a little more breadcrumbs.
+      - instruction: יוצרים מהתערובת כדורי במשקל 25 גרם.
+        instructionEn: Form the mixture into balls weighing 25 grams.
+      - instruction: מצננים.
+        instructionEn: cooling
+      - instruction: להגשה-  מחממים שמן לטיגון עמוק, מצפים את כדורי העוף בתערובת הזרעים ומטגנים להזהבה כ-2 דקות.
+        instructionEn: >-
+          To serve - heat oil for deep frying, coat the chicken balls with the seed mixture and fry until golden for
+          about 2 minutes.
+      - instruction: מעבירים לנייר סופג.
+        instructionEn: Transfer to absorbent paper.
+      - instruction: מערבבים את החומרי הסלט עם הרוטב, עורמים על צלחת, מניחים מעל את כדורי העוף ומגישים מיד.
+        instructionEn: >-
+          Mix the salad ingredients with the dressing, pile on a plate, place the chicken balls on top and serve
+          immediately.
+tips: []

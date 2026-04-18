@@ -1,0 +1,124 @@
+id: chicken-tempura-sushi-and-roasted-peppers
+title: Chicken tempura sushi and roasted peppers
+titleHe: טמפורה סושי עוף ופלפלים קלויים
+description: טמפורה סושי עוף ופלפלים קלויים
+descriptionEn: Chicken tempura sushi and roasted peppers
+image: https://assets.tugy.dev/chicken-tempura-sushi-and-roasted-peppers.jpg
+category: dinner
+difficulty: hard
+prepTime: 15
+cookTime: 10
+servings: 6
+tags:
+  - ארוחת ערב
+ingredients:
+  - group: ""
+    items:
+      - amount: 6
+        unit: ""
+        name: מנות
+        nameEn: Dishes
+      - amount: 1
+        unit: ""
+        name: פלפל אדום קלוי וחתוך לרצועות
+        nameEn: Red pepper roasted and cut into strips
+      - amount: 1
+        unit: tsp
+        name: אבקת ווסאבי מדוללת במעט מים
+        nameEn: Wasabi powder diluted with a little water
+      - amount: 6
+        unit: ""
+        name: דפי אצת נורי לסושי
+        nameEn: Nori seaweed sheets for sushi
+  - group: לטיגון עמוק:שמן שמן
+    items:
+      - amount: 0
+        unit: ""
+        name: לאורז:½1 כוסות אורז עגול לסושי
+        nameEn: "For rice: ½ cup round rice for sushi"
+      - amount: 1
+        unit: tsp
+        name: מלח
+        nameEn: salt
+      - amount: 0.5
+        unit: tsp
+        name: פלפל שחור טחון טרי
+        nameEn: Freshly ground black pepper
+      - amount: 0.25
+        unit: tsp
+        name: אבקת שום
+        nameEn: garlic powder
+  - group: לעוף:1/2 פרפר חזה עוף טרימלחפלפל שחור גרוס
+    items:
+      - amount: 0
+        unit: ""
+        name: לטמפורה:2 ביצים טרופות מלח פלפל שחור טחון
+        nameEn: "For the tempura: 2 scrambled eggs salt and ground black pepper"
+      - amount: 1
+        unit: cup
+        name: פירורי לחם
+        nameEn: bread crumbs
+      - amount: 1
+        unit: tsp
+        name: אורגנו יבש
+        nameEn: Dry oregano
+      - amount: 1
+        unit: tsp
+        name: זעתר יבש
+        nameEn: Dry zaatar
+  - group: לרוטב
+    items:
+      - amount: 3
+        unit: tsp
+        name: מיונז משובח
+        nameEn: Fine mayonnaise
+      - amount: 2
+        unit: tsp
+        name: אבקת ווסאבי
+        nameEn: Wasabi powder
+      - amount: 3
+        unit: tbsp
+        name: רוטב סויה
+        nameEn: soy sauce
+steps:
+  - title: ""
+    items:
+      - instruction: "מכינים את האורז (לא כמו שמכינים אורז לסושי): שמים אורז ו-½1 כוסות מים בסיר."
+        instructionEn: "Prepare the rice (not like you prepare rice for sushi): put rice and ½ cup of water in a pot."
+      - instruction: מוסיפים תבלינים ומביאים לרתיחה.
+        instructionEn: Add spices and bring to a boil.
+      - instruction: מנמיכים את הלהבה ומבשלים מכוסה 25 דקות בדיוק.
+        instructionEn: Lower the flame and cook covered for exactly 25 minutes.
+      - instruction: "מצננים היטב.מכינים את העוף: חוצים את חזה העוף לרוחב, כדי ליצור 2 משטחים דקים, וחותכים לרצועות בעובי 2 ס\"מ."
+        instructionEn: >-
+          Cool well. Prepare the chicken: cut the chicken breast across, to create 2 thin surfaces, and cut into strips
+          2 cm thick.
+      - instruction: >-
+          מתבלים בפלפל ומלח.מכינים את הרולים: מניחים מחצלת לגלגול סושי על משטח עבודה ועליה דף אצת נורי, כשצידו המבריק
+          כלפי מעלה.
+        instructionEn: >-
+          Season with pepper and salt. Prepare the rolls: place a mat for rolling sushi on a work surface and place a
+          sheet of nori seaweed on it, with the shiny side up.
+      - instruction: טובלים ידיים במים ומשטחים שכבת אורז בעובי 1/2 ס"מ.
+        instructionEn: Dip your hands in water and spread a layer of rice 1/2 cm thick.
+      - instruction: מניחים רצועת עוף לרוחב העלה על האורז, לידה רצועת פלפל קלוי ועל הכל פס משחת ווסאבי.
+        instructionEn: >-
+          Place a strip of chicken across the leaf on the rice, next to it a strip of roasted pepper and all over a
+          strip of wasabi paste.
+      - instruction: מגלגלים לגלילה הדוקה מאוד.
+        instructionEn: Roll into a very tight roll.
+      - instruction: >-
+          מכינים כך את כל הרולים.מכינים את הרוטב: מערבבים את כל החומרים ושומרים בקירור.מצפים, מטגנים ומגישים: מחממים שמן
+          לטיגון עמוק, טורפים ביצים ומתבלים במלח ופלפל.
+        instructionEn: >-
+          Prepare all the rolls in this way. Prepare the sauce: mix all the ingredients and keep refrigerated. Cover,
+          fry and serve: heat oil for deep frying, beat eggs and season with salt and pepper.
+      - instruction: >-
+          בכלי נפרד מערבבים פירורי לחם עם עשבי תיבול יבשים.טובלים את הרולים בביצה טרופה, מצפים בפירורי לחם ומטגנים בשמן
+          החם כ-3 דקות להזהבה עמוקה.
+        instructionEn: >-
+          In a separate vessel, mix breadcrumbs with dry herbs. Dip the rolls in beaten egg, coat with breadcrumbs and
+          fry in the hot oil for about 3 minutes until deep golden.
+      - instruction: מעבירים לנייר סופג.פורסים את הרולים למנות ומגישים לצד הרוטב.
+        instructionEn: Transfer to absorbent paper. Slice the rolls into portions and serve alongside the sauce.
+tips: []

@@ -1,0 +1,108 @@
+id: poppy-and-orange-rolled-cookies
+title: Poppy and orange rolled cookies
+titleHe: עוגיות מגולגלות פרג ותפוזים
+description: עוגיות מגולגלות פרג ותפוזים
+descriptionEn: Poppy and orange rolled cookies
+image: https://assets.tugy.dev/poppy-and-orange-rolled-cookies.jpg
+category: dessert
+difficulty: medium
+prepTime: 15
+cookTime: 10
+servings: 60
+tags:
+  - קינוח
+  - מתוק
+  - עוגיות
+  - פרג
+  - הדרים
+ingredients:
+  - group: לבצק
+    items:
+      - amount: 200
+        unit: g
+        name: חמאה רכה
+        nameEn: Soft butter
+      - amount: 70
+        unit: g
+        name: טחינה גולמית
+        nameEn: Raw tahini
+      - amount: 100
+        unit: g
+        name: גבינה לבנה
+        nameEn: curds
+      - amount: 50
+        unit: g
+        name: אבקת סוכר
+        nameEn: icing sugar
+      - amount: 0
+        unit: ""
+        name: קליפה מגוררת מתפוז
+        nameEn: Grated peel from an orange
+      - amount: 500
+        unit: g
+        name: קמח
+        nameEn: flour
+  - group: למילוי
+    items:
+      - amount: 300
+        unit: g
+        name: פרג טחון טרי
+        nameEn: Fresh ground poppy
+      - amount: 100
+        unit: g
+        name: חלב
+        nameEn: milk
+      - amount: 50
+        unit: g
+        name: מיץ תפוזים
+        nameEn: orange juice
+      - amount: 100
+        unit: g
+        name: חמאה
+        nameEn: butter
+      - amount: 200
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 150
+        unit: g
+        name: צימוקים, קצוצים
+        nameEn: Raisins, chopped
+      - amount: 75
+        unit: g
+        name: פירורי ביסקוויטים
+        nameEn: Biscuit crumbs
+steps:
+  - title: ""
+    items:
+      - instruction: >-
+          במיקסר מצויד בוו גיטרה מקציפים חמאה, טחינה, סוכר וגבינה עד לקבלת תערובת גרגרית, מוסיפים קמח ולשים עד קבלת בצק
+          אחיד.
+        instructionEn: >-
+          In a mixer equipped with a guitar hook, beat butter, tahini, sugar and cheese until a granular mixture is
+          obtained, add flour and knead until a uniform dough is obtained.
+      - instruction: >-
+          מחלקים לשלושה חלקים, עוטפים בניילון ומקררים לשעתיים.למילוי- מכניסים את כל המרכיבים, למעט פירורי לביסקוויטים,
+          לתוך סיר, מביאים לרתיחה ומערבבים עד לקבלת תערובת אחידה.
+        instructionEn: >-
+          Divide into three parts, wrap in plastic and refrigerate for two hours. For the filling - put all the
+          ingredients, except for the biscuit crumbs, into a pot, bring to a boil and mix until a uniform mixture is
+          obtained.
+      - instruction: מסירים מן האש ומוסיפים פירורים.
+        instructionEn: Remove from heat and add crumbs.
+      - instruction: >-
+          מצננים.מרדדים כל חלק בצק על משטח מקומח לעלה דק, מניחים 1/3 מהתערובת לאורך קצה מלבן הבצק ומגלגלים לגלילה
+          מהודקת.
+        instructionEn: >-
+          Cool. Roll out each piece of dough on a floured surface into a thin sheet, place 1/3 of the mixture along the
+          edge of the dough rectangle and roll into a tight roll.
+      - instruction: >-
+          חוזרים על פעולה זו עם יתרת הבצק והמילוי. מעבירים לתבנית מרופדת בנייר אפייה ומסמנים חתכים על גבי הרולדה, שתקל
+          על פריסתה לאחר האפייה. אופים בחום של 160 מעלות כ-30 דקות, עד הזהבה, מוציאים מהתנור ופורסים לפרוסות.
+        instructionEn: >-
+          Repeat this operation with the remaining dough and filling. Transfer to a pan lined with baking paper and mark
+          cuts on top of the roulade, which will make it easier to spread after baking. Bake at 160 degrees for about 30
+          minutes, until golden, remove from the oven and cut into slices.
+      - instruction: מצננים ומגישים.
+        instructionEn: Cool and serve.
+tips: []

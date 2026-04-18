@@ -1,0 +1,76 @@
+id: coffee-almond-and-cardamom-cookies
+title: Coffee, almond and cardamom cookies
+titleHe: עוגיות קפה, שקדים והל
+description: עוגיות קפה, שקדים והל
+descriptionEn: Coffee, almond and cardamom cookies
+image: https://assets.tugy.dev/coffee-almond-and-cardamom-cookies.jpg
+category: dessert
+difficulty: medium
+prepTime: 15
+cookTime: 18
+servings: 50
+tags:
+  - קינוח
+  - מתוק
+  - עוגיות
+ingredients:
+  - group: ""
+    items:
+      - amount: 150
+        unit: g
+        name: חמאה קרה, חתוכה לקוביות
+        nameEn: Cold butter, cut into cubes
+      - amount: 120
+        unit: g
+        name: אבקת סוכר
+        nameEn: icing sugar
+      - amount: 3
+        unit: g
+        name: אבקת נס קפה
+        nameEn: Coffee miracle powder
+      - amount: 180
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 50
+        unit: g
+        name: אבקת שקדים
+        nameEn: almond powder
+      - amount: 1
+        unit: tsp
+        name: הל טחון טרי
+        nameEn: Freshly ground cardamom
+      - amount: 2
+        unit: ""
+        name: חלמונים
+        nameEn: egg yolks
+      - amount: 0
+        unit: ""
+        name: שקדים מולבנים
+        nameEn: blanched almonds
+steps:
+  - title: ""
+    items:
+      - instruction: במעבד מזון מעבדים חומרים יבשים וחמאה קרה חתוכה לקוביות עד קבלת תערובת פירורית יבשה.
+        instructionEn: >-
+          In a food processor process dry ingredients and cold butter cut into cubes until you get a dry crumbly
+          mixture.
+      - instruction: מוסיפים חלמונים ומעבדים לקבלת פירורים גדולים לחים.
+        instructionEn: Add egg yolks and process to obtain large moist crumbs.
+      - instruction: עוטפים ומצננים לשעה.מחממים תנור לחום של 160 מעלות.מרדדים את הבצק על משטח מקומח לעלה בעובי 4 מ"מ.
+        instructionEn: >-
+          Wrap and cool for an hour. Heat an oven to 160 degrees. Roll out the dough on a floured surface to a 4 mm
+          thick sheet.
+      - instruction: קורצים מן הבצק עוגיות בקוטר 4 ס"מ (ניתן לפני החיתוך לתת לבצק הקפאה קצרה של 15 דקות).
+        instructionEn: >-
+          Cut cookies from the dough with a diameter of 4 cm (you can give the dough a short freeze of 15 minutes before
+          cutting).
+      - instruction: >-
+          מניחים על משטח אפייה (על מנת לקבל את דוגמת הטקסטורה היפה שיש על בסיס העוגיות, השתמשו במשטח אפייה ייעודי
+          מסיליקון שחור הנקרא silpain).
+        instructionEn: >-
+          Place on a baking surface (in order to get the beautiful textured pattern on the base of the cookies, use a
+          dedicated black silicone baking surface called silpain).
+      - instruction: נועצים על כל עוגייה שקד מולבן.אופים כ-18 דקות ומצננים.
+        instructionEn: Press on each cookie a blanched almond. Bake for about 18 minutes and cool.
+tips: []

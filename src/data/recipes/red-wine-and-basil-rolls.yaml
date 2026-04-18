@@ -1,0 +1,70 @@
+id: red-wine-and-basil-rolls
+title: Red wine and basil rolls
+titleHe: לחמניות יין אדום ובזיליקום
+description: לחמניות יין אדום ובזיליקום
+descriptionEn: Red wine and basil rolls
+image: https://assets.tugy.dev/red-wine-and-basil-rolls.jpg
+category: bread
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 30
+tags:
+  - מאפה
+ingredients:
+  - group: ""
+    items:
+      - amount: 0
+        unit: ""
+        name: לכ-30 לחמניות
+        nameEn: For about 30 rolls
+      - amount: 500
+        unit: g
+        name: קמח לחם מנופה
+        nameEn: Sifted bread flour
+      - amount: 300
+        unit: g
+        name: קמח חיטה מלאה
+        nameEn: Whole wheat flour
+      - amount: 5
+        unit: g
+        name: גלוטן
+        nameEn: Gluten
+      - amount: 30
+        unit: g
+        name: שמרים יבשים
+        nameEn: dry yeast
+      - amount: 100
+        unit: g
+        name: דבש
+        nameEn: honey
+      - amount: 550
+        unit: g
+        name: יין אדום
+        nameEn: red wine
+      - amount: 20
+        unit: g
+        name: מלח
+        nameEn: salt
+steps:
+  - title: ""
+    items:
+      - instruction: שמים את כל החומרים היבשים בקערת המיקסר.
+        instructionEn: Put all the dry ingredients in the mixer bowl.
+      - instruction: מתחילים ללוש ומוסיפי את היין בהדרגה.
+        instructionEn: Start kneading and gradually add the wine.
+      - instruction: >-
+          לשים כ- 10 דקות.מעבירים לקערת התפחה ומתפיחים להכפלת הנפח, מכוסה.מחלקים את הבצק לפיסות במשקל 60 גרם.מכל מנה
+          יוצרים כדור חלק, משטחים כל כדור ומניחים על תבנית מקומחת בקמח תירס במרווחים שווים.
+        instructionEn: >-
+          Leave for about 10 minutes. Transfer to a proofing bowl and let it rise until it doubles in volume, covered.
+          Divide the dough into pieces weighing 60 grams. Form each portion into a smooth ball, flatten each ball and
+          place on a baking sheet floured with cornmeal at equal intervals.
+      - instruction: >-
+          מכסים רופף בניילון נצמד ומתפיחים עד הכפלת הנפח.מחממים תנור לחום 200 מעלות.בעזרת מספרי מטבח, "גוזרים" כל לחמניה
+          בצידיה בחמישה חתכים, כמעט עד למרכז, לצורת פרח.אופים עד הזהבה 18-20 דקות.
+        instructionEn: >-
+          Cover loosely with plastic wrap and let rise until doubled in volume. Heat oven to 200 degrees. Using kitchen
+          scissors, "cut" each bun on its sides in five cuts, almost to the center, into a flower shape. Bake until
+          golden, 18-20 minutes.
+tips: []

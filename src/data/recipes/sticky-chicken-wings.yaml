@@ -1,0 +1,99 @@
+id: sticky-chicken-wings
+title: Sticky Chicken Wings
+titleHe: כנפי עוף דביקות
+category: dinner
+tags:
+  - עוף
+  - כנפיים
+  - אסייתי
+  - מנגל
+tagsEn:
+  - chicken
+  - wings
+  - Asian
+  - BBQ
+cuisine: Asian Fusion
+image: https://assets.tugy.dev/sticky-chicken-wings.jpg
+description: כנפי עוף מבושלות ברוטב קרמל-חמוץ מתוק ואז צלויות לקבלת צריבה מבריקה ודביקה.
+descriptionEn: Chicken wings simmered in a sweet-sour caramel sauce, then broiled until lacquered and sticky.
+prepTime: 20
+cookTime: 55
+servings: 8
+difficulty: easy
+featured: true
+ingredients:
+  - items:
+      - amount: 20
+        unit: ""
+        name: כנפי עוף, מחולקות לשניים ונקיות
+        nameEn: chicken wings, split and cleaned
+      - amount: 60
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 100
+        unit: g
+        name: חומץ טבעי
+        nameEn: white vinegar
+      - amount: 50
+        unit: g
+        name: מים
+        nameEn: water
+      - amount: 1
+        unit: tbsp
+        name: שמן שומשום
+        nameEn: sesame oil
+      - amount: 50
+        unit: g
+        name: רוטב סויה
+        nameEn: soy sauce
+      - amount: 50
+        unit: g
+        name: רוטב תמרהינדי
+        nameEn: tamarind sauce
+      - amount: 50
+        unit: g
+        name: קטשופ
+        nameEn: ketchup
+      - amount: 50
+        unit: g
+        name: רוטב ברביקיו
+        nameEn: BBQ sauce
+      - amount: 4
+        unit: cloves
+        name: שום קצוצות
+        nameEn: garlic, minced
+      - amount: 2
+        unit: cm
+        name: שורש ג'ינג'ר טרי קצוץ
+        nameEn: fresh ginger root, minced
+      - amount: 1
+        unit: tbsp
+        name: סילאן
+        nameEn: date syrup (silan)
+      - amount: 1
+        unit: tbsp
+        name: שומשום קלוי, לגיניש
+        nameEn: toasted sesame seeds, for garnish
+steps:
+  - items:
+      - instruction: מנקים ומחצים את הכנפיים. מניחים על מגש ומסירים שאריות נוצות.
+        instructionEn: Clean and halve the wings. Place on a tray and remove any feather remnants.
+      - instruction: בסיר רחב יוצרים קרמל כהה מהסוכר. מוסיפים חומץ ואז את כל שאר חומרי הרוטב - מביאים לרתיחה.
+        instructionEn: >-
+          In a wide pot, make a dark caramel from the sugar. Add vinegar then the remaining sauce ingredients and bring
+          to a boil.
+      - instruction: מוסיפים כנפיים ומבשלים על להבה בינונית-נמוכה 20 דקות, הופכים וממשיכים עוד 20 דקות.
+        instructionEn: Add wings and cook over medium-low heat for 20 minutes, flip, then cook 20 more minutes.
+        timerMinutes: 40
+      - instruction: מוציאים את הכנפיים ומצמצמים את הרוטב לסירופ.
+        instructionEn: Remove the wings and reduce the sauce to a syrup.
+      - instruction: מסדרים כנפיים בשכבה אחת על תבנית ויוצקים רוטב מעל. צולים בתנור 220° כ-15 דקות עד לצריבה.
+        instructionEn: >-
+          Arrange wings in a single layer on a baking tray, pour sauce over. Broil at 220°C for about 15 minutes until
+          caramelized.
+        timerMinutes: 15
+        tip: הכנפיים בשיא הטעם כשהרוטב ממש מקורמל ודביק - אל תוציאו לפני.
+        tipEn: The wings are at their best when the sauce is truly caramelized and sticky - don't pull them early.
+      - instruction: מגישים עם שומשום קלוי מעל.
+        instructionEn: Serve with toasted sesame seeds sprinkled on top.

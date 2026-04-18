@@ -1,0 +1,79 @@
+id: smoked-meat-kebab-with-asian-seasoning
+title: Smoked meat kebab with Asian seasoning
+titleHe: קבב בשרים מעושן בתיבול אסיאתי
+description: קבב בשרים מעושן בתיבול אסיאתי
+descriptionEn: Smoked meat kebab with Asian seasoning
+image: https://assets.tugy.dev/smoked-meat-kebab-with-asian-seasoning.jpg
+category: dinner
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 10
+tags:
+  - ארוחת ערב
+ingredients:
+  - group: ""
+    items:
+      - amount: 500
+        unit: g
+        name: בשר בקר טחון טרי
+        nameEn: Fresh ground beef
+      - amount: 200
+        unit: g
+        name: חזה אווז, טחון
+        nameEn: Goose breast, ground
+      - amount: 200
+        unit: g
+        name: קבנוס, טחון
+        nameEn: Kabanos, ground
+      - amount: 50
+        unit: ml
+        name: שמן שומשום
+        nameEn: Sesame oil
+      - amount: 50
+        unit: ml
+        name: רוטב צ'ילי מתוק
+        nameEn: Sweet chili sauce
+      - amount: 4
+        unit: tbsp
+        name: סויה יפנית
+        nameEn: Japanese soy
+      - amount: 1
+        unit: cm
+        name: ג'ינג'ר טרי מגורר
+        nameEn: Grated fresh ginger
+      - amount: 0
+        unit: ""
+        name: קליפה מלימון אחד
+        nameEn: Zest from one lemon
+      - amount: 1
+        unit: ""
+        name: בצל קצוץ דק
+        nameEn: finely chopped onion
+      - amount: 0
+        unit: ""
+        name: כפית ממרח קארי תאילנדי
+        nameEn: A teaspoon of Thai curry paste
+      - amount: 0
+        unit: ""
+        name: צרור עלי בזיליקום קצוצים
+        nameEn: A bunch of chopped basil leaves
+      - amount: 0
+        unit: ""
+        name: מלח ים
+        nameEn: sea ​​salt
+      - amount: 0
+        unit: ""
+        name: לימון להגשה
+        nameEn: Lemon to serve
+steps:
+  - title: ""
+    items:
+      - instruction: >-
+          מערבבים את כל המרכיבים לעיסה חלקה, אחידה וגמישה, כ-3 דקותמכינים קציצות עגולות או מאורכות ומשהים כ-30 דקות
+          בקירור.צורבים על גריל פחמים או מחבת גריל לוהטת כ-2 דקות מכל צד ומגישים עם לימונים טריים.
+        instructionEn: >-
+          Mix all the ingredients into a smooth, uniform and flexible paste, about 3 minutes. Make round or oblong
+          meatballs and refrigerate for about 30 minutes. Burn on a charcoal grill or a hot grill pan for about 2
+          minutes on each side and serve with fresh lemons.
+tips: []

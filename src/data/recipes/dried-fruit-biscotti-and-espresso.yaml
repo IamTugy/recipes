@@ -1,0 +1,77 @@
+id: dried-fruit-biscotti-and-espresso
+title: Dried fruit biscotti and espresso
+titleHe: ביסקוטי פירות מיובשים ואספרסו
+description: ביסקוטי פירות מיובשים ואספרסו
+descriptionEn: Dried fruit biscotti and espresso
+image: https://assets.tugy.dev/dried-fruit-biscotti-and-espresso.jpg
+category: dessert
+difficulty: easy
+prepTime: 15
+cookTime: 30
+servings: 30
+tags:
+  - קינוח
+  - מתוק
+ingredients:
+  - group: ""
+    items:
+      - amount: 120
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 1
+        unit: tbsp
+        name: קפה שחור
+        nameEn: black coffee
+      - amount: 15
+        unit: g
+        name: אבקת אפייה
+        nameEn: baking powder
+      - amount: 3
+        unit: g
+        name: קינמון
+        nameEn: cinnamon
+      - amount: 2
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 120
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 30
+        unit: g
+        name: אספרסו
+        nameEn: espresso
+      - amount: 150
+        unit: g
+        name: תערובת אגוזים שלמים (לוז, שקדים)
+        nameEn: A mixture of whole nuts (hazelnuts, almonds)
+      - amount: 150
+        unit: g
+        name: פירות יבשים (דבלים, שזיפים, משמשים)
+        nameEn: Dried fruits (currants, plums, apricots)
+steps:
+  - title: ""
+    items:
+      - instruction: >-
+          מחממים תנור ל-180 מעלות.חותכים את הפירות המיובשים לקוביות גדולות.מנפים את החומרים היבשים לקערה.בנפרד, טורפים
+          ביצים, סוכר ואת האספרסו.
+        instructionEn: >-
+          Heat an oven to 180 degrees. Cut the dried fruits into large cubes. Sieve the dry ingredients into a bowl.
+          Separately, beat eggs, sugar and the espresso.
+      - instruction: >-
+          מוספים את האגוזים והפירות היבשים, ומערבבים לתערובת אחידה.מעבירים לתבנית אינגליש-קייק מרופדת בנייר אפיה או
+          למסגרת אפייה בגודל 8x20 ס״מ, ואופים כ-30 דקות.
+        instructionEn: >-
+          Add the nuts and dried fruits, and mix to a uniform mixture. Transfer to an English cake pan lined with baking
+          paper or to a 8x20 cm baking frame, and bake for about 30 minutes.
+      - instruction: >-
+          מצננים ומשחררים מהתבנית.פורסים את הכיכרות לפרוסות דקות מאוד ומכניסים שוב לתנור לייבוש עוד 30 דקות בחום נמוך של
+          120 מעלות.
+        instructionEn: >-
+          Cool and release from the mold. Slice the loaves into very thin slices and put them back in the oven to dry
+          for another 30 minutes at a low temperature of 120 degrees.
+      - instruction: מצננים.
+        instructionEn: cooling
+tips: []

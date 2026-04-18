@@ -1,0 +1,79 @@
+id: spiced-ginger-cookies
+title: Spiced Ginger Cookies
+titleHe: עוגיות ג'ינג'ר מתובלות
+category: dessert
+tags:
+  - ג'ינג'ר
+  - עוגיות
+  - תבלינים
+  - פריך
+tagsEn:
+  - ginger
+  - cookies
+  - spiced
+  - crisp
+image: https://assets.tugy.dev/spiced-ginger-cookies.jpg
+description: עוגיות ג'ינג'ר פריכות בציפוי סוכר מגרגר, בעלות עומק תיבול מושלם עם אגוז מוסקט ופלפל אנגלי.
+descriptionEn: Crisp ginger cookies with a crunchy sugar coating, perfectly spiced with nutmeg and allspice.
+prepTime: 20
+cookTime: 15
+servings: 90
+difficulty: easy
+ingredients:
+  - items:
+      - amount: 175
+        unit: g
+        name: חמאה
+        nameEn: butter
+      - amount: 175
+        unit: g
+        name: סוכר חום
+        nameEn: brown sugar
+      - amount: 2
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 400
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 6
+        unit: g
+        name: אבקת אפייה
+        nameEn: baking powder
+      - amount: 10
+        unit: g
+        name: ג'ינג'ר יבש טחון
+        nameEn: ground dried ginger
+      - amount: 1
+        unit: tsp
+        name: אגוז מוסקט טחון
+        nameEn: ground nutmeg
+      - amount: 2
+        unit: tsp
+        name: פלפל אנגלי טחון
+        nameEn: ground allspice
+      - amount: 1
+        unit: ""
+        name: ביצה טרופה (לציפוי)
+        nameEn: egg, beaten (for coating)
+      - amount: 0.5
+        unit: cup
+        name: סוכר (לציפוי)
+        nameEn: sugar (for coating)
+steps:
+  - items:
+      - instruction: מקציפים חמאה עם סוכר חום. מוסיפים בהדרגה את הביצים וממשיכים להקציף לתערובת אחידה.
+        instructionEn: Cream butter with brown sugar. Add eggs gradually and continue mixing until smooth.
+      - instruction: מוסיפים את יתרת המרכיבים ומגבשים לבצק חלק. מחלקים ל-4 חלקים.
+        instructionEn: Add the remaining ingredients and bring together into a smooth dough. Divide into 4 portions.
+      - instruction: יוצרים מכל חלק גליל ומקפיאים שעה.
+        instructionEn: Roll each portion into a log and freeze for 1 hour.
+        timerMinutes: 60
+        tip: הגלילים יכולים להישמר במקפיא שבועות - נוח לאפות כמות קטנה לפי הצורך.
+        tipEn: The logs keep in the freezer for weeks - great for baking small batches as needed.
+      - instruction: מברישים גלילים בביצה ומגלגלים בסוכר. פורסים לפרוסות 5 מ"מ ומניחים על תבנית.
+        instructionEn: Brush logs with beaten egg and roll in sugar. Slice into 5mm rounds and place on a baking tray.
+      - instruction: אופים ב-160° כ-15 דקות.
+        instructionEn: Bake at 160°C for about 15 minutes.
+        timerMinutes: 15

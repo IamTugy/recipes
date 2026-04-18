@@ -1,0 +1,89 @@
+id: white-chocolate-blondies-and-cranberries
+title: White chocolate blondies and cranberries
+titleHe: בלונדיז שוקולד לבן וחמוציות
+description: בלונדיז שוקולד לבן וחמוציות
+descriptionEn: White chocolate blondies and cranberries
+image: https://assets.tugy.dev/white-chocolate-blondies-and-cranberries.jpg
+category: dessert
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 16
+tags:
+  - קינוח
+  - מתוק
+  - שוקולד
+ingredients:
+  - group: ""
+    items:
+      - amount: 16
+        unit: pcs
+        name: (תבנית
+        nameEn: (pattern
+      - amount: 20
+        unit: ""
+        name: X20 ס״מ)
+        nameEn: x20 cm)
+      - amount: 100
+        unit: g
+        name: שוקולד לבן
+        nameEn: white chocolate
+      - amount: 50
+        unit: g
+        name: חמאה
+        nameEn: butter
+      - amount: 2
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 1
+        unit: tsp
+        name: מחית ונילקורט מלח
+        nameEn: Mashed vanilla and salt
+      - amount: 110
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 80
+        unit: g
+        name: שוקולד לבן, קצוץ
+        nameEn: White chocolate, chopped
+      - amount: 160
+        unit: g
+        name: גבינה לבנה
+        nameEn: curds
+      - amount: 9
+        unit: ""
+        name: "% שומן"
+        nameEn: "% fat"
+      - amount: 60
+        unit: g
+        name: אגוזי לוז, קלויים, קלופים וקצוצים גס
+        nameEn: Hazelnuts, roasted, peeled and roughly chopped
+      - amount: 100
+        unit: g
+        name: חמוציות מיובשות
+        nameEn: dried cranberries
+      - amount: 100
+        unit: g
+        name: קמח תופח
+        nameEn: raising flour
+steps:
+  - title: ""
+    items:
+      - instruction: >-
+          מחממים תנור ל-160 מעלות, משמנים ומקמחים תבנית אפיה. מעל באן מארי ממיסים שוקולד וחמאה. בנפרד, מקציפים ביצים
+          שלמות, משחת וניל, מלח וסוכר לקציפה אוורירית. מנמיכים את מהירות ההקצפה ומוסיפים את תערובת השוקולד הלבן המומס.
+        instructionEn: >-
+          Heat an oven to 160 degrees, grease and flour a baking pan. Melt chocolate and butter over a bain marie.
+          Separately, beat whole eggs, vanilla paste, salt and sugar until fluffy. Lower the whipping speed and add the
+          melted white chocolate mixture.
+      - instruction: >-
+          מוסיפים את הגבינה הלבנה ומערבבים היטב. מוסיפים אגוזים, חמוציות וקמח ומערבבים רק עד שאחיד. יוצקים את הבלילה
+          לתוך התבנית ואופים במשך 30-35 דקות עד להתייצבות. לאחר קירור מוחלט חותכים לקוביות. שומרים את הבלונדיס בכלי אטום
+          במקרר.
+        instructionEn: >-
+          Add the white cheese and mix well. Add nuts, cranberries and flour and mix just until uniform. Pour the batter
+          into the pan and bake for 30-35 minutes until set. After complete cooling, cut into cubes. Keep the blondies
+          in an airtight container in the refrigerator.
+tips: []

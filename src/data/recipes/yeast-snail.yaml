@@ -1,0 +1,94 @@
+id: yeast-snail
+hidden: true
+title: Yeast Snail "Double Chocolate"
+titleHe: שבלול שמרים "דאבל שוקולד"
+description: שבלול שמרים "דאבל שוקולד"
+descriptionEn: Yeast Snail "Double Chocolate"
+image: https://assets.tugy.dev/yeast-snail.jpg
+category: dessert
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - קינוח
+  - מתוק
+  - שוקולד
+ingredients:
+  - group: לבצק
+    items:
+      - amount: 400
+        unit: g
+        name: קמח לחם קשה
+        nameEn: Hard bread flour
+      - amount: 80
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 5
+        unit: g
+        name: מלח
+        nameEn: salt
+      - amount: 8
+        unit: g
+        name: שמרים יבשים או 16 גרם שמרים טריים
+        nameEn: dry yeast or 16 grams of fresh yeast
+      - amount: 2
+        unit: ""
+        name: חלמונים
+        nameEn: egg yolks
+      - amount: 100
+        unit: g
+        name: חלב
+        nameEn: milk
+      - amount: 120
+        unit: g
+        name: חמאה רכה
+        nameEn: Soft butter
+  - group: למילוי
+    items:
+      - amount: 100
+        unit: g
+        name: חמאה רכה
+        nameEn: Soft butter
+      - amount: 100
+        unit: g
+        name: שוקולד מריר, מומס
+        nameEn: Dark chocolate, melted
+      - amount: 100
+        unit: g
+        name: שוקולד חלב, מומס
+        nameEn: Milk chocolate, melted
+      - amount: 20
+        unit: g
+        name: קורנפלור
+        nameEn: Cornflour
+      - amount: 1
+        unit: ""
+        name: חלבון
+        nameEn: protein
+  - group: לציפוי
+    items:
+      - amount: 200
+        unit: g
+        name: שוקולד מריר
+        nameEn: dark chocolate
+      - amount: 30
+        unit: g
+        name: שמן קנולה
+        nameEn: Canola oil
+  - group: לבצק
+    items:
+      - amount: 0
+        unit: ""
+        name: במיקסר מצויד בוו גיטרה ם שמים את כל חומרי הבצק ולשים
+        nameEn: In a mixer equipped with a guitar hook, put all the ingredients for the dough and mix
+      - amount: 160
+        unit: ""
+        name: מעלות ואופים את העוגה
+        nameEn: Raise and bake the cake
+steps:
+  - title: ""
+    items:
+      - instruction: ""
+tips: []

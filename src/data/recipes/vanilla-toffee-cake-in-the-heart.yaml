@@ -1,0 +1,106 @@
+id: vanilla-toffee-cake-in-the-heart
+title: Vanilla-toffee cake in the heart
+titleHe: עוגת וניל-טופי בחושה
+description: עוגת וניל-טופי בחושה
+descriptionEn: Vanilla-toffee cake in the heart
+image: https://assets.tugy.dev/vanilla-toffee-cake-in-the-heart.jpg
+category: dessert
+difficulty: medium
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - קינוח
+  - מתוק
+  - וניל
+  - עוגה
+ingredients:
+  - group: ""
+    items:
+      - amount: 150
+        unit: g
+        name: סוכר חום
+        nameEn: brown sugar
+      - amount: 100
+        unit: g
+        name: שמנת מתוקה
+        nameEn: sweet cream
+      - amount: 20
+        unit: g
+        name: חמאה
+        nameEn: butter
+      - amount: 0
+        unit: ""
+        name: כפית תמצית וניל
+        nameEn: A teaspoon of vanilla extract
+  - group: לעוגה
+    items:
+      - amount: 180
+        unit: g
+        name: חמאה רכה בטמפרטורת החדר
+        nameEn: Soft butter at room temperature
+      - amount: 150
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 0
+        unit: ""
+        name: כפית משחת וניל או תוכן מקל וניל אחד
+        nameEn: A teaspoon of vanilla paste or the contents of one vanilla stick
+      - amount: 4
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 210
+        unit: g
+        name: קמח תופח
+        nameEn: raising flour
+      - amount: 200
+        unit: g
+        name: שמנת חמוצה
+        nameEn: Sour cream
+      - amount: 0
+        unit: ""
+        name: אבקת סוכר לקישוט
+        nameEn: Powdered sugar for decoration
+      - amount: 0
+        unit: ""
+        name: נפאז' ניטראלי (להשיג בחנויות אפיה מתמחות)
+        nameEn: Neutral Nafage (obtain in specialized baking stores)
+      - amount: 0
+        unit: ""
+        name: סוכר גבישי (להשיג בחנויות אפיה מתמחות)
+        nameEn: Granulated sugar (obtain in specialized baking stores)
+steps:
+  - title: ""
+    items:
+      - instruction: "משמנים ומקמחים את התבנית.מכינים את הטופי: שמים סוכר, שמנת, חמאה ווניל בסיר בינוני ומביאים לרתיחה."
+        instructionEn: >-
+          Grease and flour the pan. Prepare the toffee: put sugar, cream, butter and vanilla in a medium saucepan and
+          bring to a boil.
+      - instruction: מבשלים תוך כדי ערבוב במשך 5-8 דקות, עד שמתקבלת תערובת סמיכה וריחנית.
+        instructionEn: Cook while stirring for 5-8 minutes, until a thick and fragrant mixture is obtained.
+      - instruction: >-
+          מצננים את התערובת לטמפרטורת החדר. מחממים תנור ל-160 מעלות. מכינים את העוגה: במיקסר עם וו גיטרה מקציפים חמאה,
+          סוכר ווניל במשך 5 דקות במהירות גבוהה. מוסיפים את הביצים בהדרגה (ביצה אחת בכל פעם) ומקציפים 3 דקות נוספות.
+        instructionEn: >-
+          Cool the mixture to room temperature. Heat the oven to 160 degrees. Prepare the cake: in a mixer with a guitar
+          hook, beat butter, sugar and vanilla for 5 minutes at high speed. Add the eggs gradually (one egg at a time)
+          and beat for another 3 minutes.
+      - instruction: >-
+          מוסיפים לתוך התערובת שבמיקסר את הקמח והשמנת החמוצה לסירוגין וממשיכים לערבב רק עד שהתערובת חלקה. מחלקים את
+          הבלילה לשני חלקים.
+        instructionEn: >-
+          Add the flour and sour cream alternately to the mixture in the mixer and continue to mix only until the
+          mixture is smooth. Divide the batter into two parts.
+      - instruction: >-
+          מוסיפים את תערובת הטופי לחלק אחד ומערבבים היטב. מניחים את הבלילה בתבנית לסירוגין ובעזרת סכין יוצרים אפקט שיש.
+          אופים במשך כ-40-45 דקות, או עד שקיסם הננעץ בעוגה יוצא עם פירורים לחים. כשהעוגה מוכנה, מוציאים מהתנור ומצננים
+          בטמפרטורת החדר במשך 10 דקות.
+        instructionEn: >-
+          Add the toffee mixture to one part and mix well. Place the batter in the pan alternately and with a knife
+          create a marble effect. Bake for about 40-45 minutes, or until a toothpick inserted into the cake comes out
+          with moist crumbs. When the cake is ready, remove from the oven and cool at room temperature for 10 minutes.
+      - instruction: הופכים את העוגה, מצננים על רשת לחלוטין ומקשטים באבקת סוכר.
+        instructionEn: Turn the cake over, cool completely on a wire rack and decorate with powdered sugar.
+tips: []

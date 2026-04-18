@@ -1,0 +1,88 @@
+id: cheese-dough-spirals-with-antipasti-and-parmesan
+title: Cheese dough spirals with antipasti and parmesan
+titleHe: ספירלות בצק גבינות עם אנטיפסטי ופרמזן
+description: ספירלות בצק גבינות עם אנטיפסטי ופרמזן
+descriptionEn: Cheese dough spirals with antipasti and parmesan
+image: https://assets.tugy.dev/cheese-dough-spirals-with-antipasti-and-parmesan.jpg
+category: bread
+difficulty: medium
+prepTime: 15
+cookTime: 30
+servings: 20
+tags:
+  - מאפה
+  - גבינה
+ingredients:
+  - group: ""
+    items:
+      - amount: 300
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 3
+        unit: g
+        name: אבקת אפייה
+        nameEn: baking powder
+      - amount: 5
+        unit: g
+        name: מלח
+        nameEn: salt
+      - amount: 50
+        unit: g
+        name: פרמזן
+        nameEn: Parmesan
+      - amount: 150
+        unit: g
+        name: חמאה קרה חתוכה לקוביות
+        nameEn: Cold butter cut into cubes
+      - amount: 100
+        unit: g
+        name: גבינה לבנה
+        nameEn: curds
+      - amount: 9
+        unit: ""
+        name: "% שומן"
+        nameEn: "% fat"
+      - amount: 30
+        unit: g
+        name: מים
+        nameEn: water
+  - group: למילוי אנטיפסטי
+    items:
+      - amount: 200
+        unit: g
+        name: גבינת פטה מעורבבת ב-150 גרם גבינת לבנה
+        nameEn: Feta cheese mixed with 150 grams of white cheese
+      - amount: 9
+        unit: ""
+        name: "%"
+steps:
+  - title: ""
+    items:
+      - instruction: לבצק- למעבד מזון מכניסים חומרים יבשים ופרמזן וטוחנים.
+        instructionEn: For the dough - put dry ingredients and Parmesan into a food processor and grind.
+      - instruction: מוסיפים חמאה קרה חתוכה לקוביות וטוחנים לפירורים דקים.
+        instructionEn: Add cold butter cut into cubes and grind into fine crumbs.
+      - instruction: מוסיפים את שאר חומרי הבצק ומעבדים עד קבלת בצק.
+        instructionEn: Add the rest of the dough ingredients and process until you get a dough.
+      - instruction: >-
+          עוטפים ומניחים בקירור לשלוש שעות.למילוי- מכינים אנטיפסטי: פורסים את הירקות דק במנדולינה, מתבלים במלח, פלפל
+          שחור ושמן זית ואופים תחת משקולת (תבנית נוספת מעל) בחום 220 מעלות כ-30 דקות.
+        instructionEn: >-
+          Wrap and refrigerate for three hours. For the filling - prepare antipasti: slice the vegetables thinly on a
+          mandoline, season with salt, black pepper and olive oil and bake under a barbell (another pan above) at 220
+          degrees for about 30 minutes.
+      - instruction: >-
+          מצננים.הרכבה- מרדדים את הבצק לעלה בעובי 1/2 ס"מ מורחים את תערובת הגבינה, מסדרים מעל את הירקות בצפיפות
+          ומגלגלים.
+        instructionEn: >-
+          Cool. Assembly - roll the dough into a sheet 1/2 cm thick, spread the cheese mixture, arrange the vegetables
+          densely on top and roll.
+      - instruction: >-
+          אם יש צורך, מצננים או מעט מקפיאים את הגלילה לפני הפריסה.בעזרת סכין משור פורסים את הרולדה ל-20 יחידות ומניחים
+          על תבנית אפיה מרופדת נייר אפיה.מחממים תנור לחום של 170 מעלות ואופים 30 דקות או עד הזהבה.
+        instructionEn: >-
+          If necessary, cool or slightly freeze the roll before rolling out. Using a paring knife, slice the roll into
+          20 pieces and place on a baking sheet lined with baking paper. Heat the oven to 170 degrees and bake for 30
+          minutes or until golden.
+tips: []

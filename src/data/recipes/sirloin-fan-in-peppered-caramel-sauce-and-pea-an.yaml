@@ -1,0 +1,117 @@
+id: sirloin-fan-in-peppered-caramel-sauce-and-pea-an
+title: Sirloin fan in peppered caramel sauce and pea and mint puree
+titleHe: מניפת סינטה ברוטב קרמל מפולפל ופירה אפונה ונענע
+description: מניפת סינטה ברוטב קרמל מפולפל ופירה אפונה ונענע
+descriptionEn: Sirloin fan in peppered caramel sauce and pea and mint puree
+image: https://assets.tugy.dev/sirloin-fan-in-peppered-caramel-sauce-and-pea-an.jpg
+category: sauce
+difficulty: medium
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - רוטב
+ingredients:
+  - group: ""
+    items:
+      - amount: 0.5
+        unit: kg
+        name: סינטה בקר מיושנת
+        nameEn: aged beef sirloin
+      - amount: 0
+        unit: ""
+        name: מלח
+        nameEn: salt
+      - amount: 0
+        unit: ""
+        name: תערובת של פלפל חריף או טוגאראשי
+        nameEn: mixture of hot pepper or togarashi
+      - amount: 1
+        unit: tbsp
+        name: גרגרי כוסברה יבשה, גרוסים
+        nameEn: dried coriander seeds, ground
+      - amount: 0
+        unit: ""
+        name: שמן זית
+        nameEn: olive oil
+  - group: לרוטב
+    groupEn: for the sauce
+    items:
+      - amount: 500
+        unit: g
+        name: יין אדום
+        nameEn: red wine
+      - amount: 500
+        unit: g
+        name: ציר בקר
+        nameEn: beef stock
+      - amount: 100
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 50
+        unit: g
+        name: מים
+        nameEn: water
+      - amount: 100
+        unit: g
+        name: חמאה או מרגרינה קרה, חתוכה לקוביות
+        nameEn: cold butter or margarine, cut into cubes
+      - amount: 0
+        unit: ""
+        name: פלפל שחור גרוס
+        nameEn: ground black pepper
+      - amount: 0
+        unit: ""
+        name: מלח ים
+        nameEn: sea salt
+  - group: לפירה
+    groupEn: for the puree
+    items:
+      - amount: 800
+        unit: g
+        name: אפונה
+        nameEn: peas
+      - amount: 250
+        unit: g
+        name: שמנת מתוקה
+        nameEn: sweet cream
+      - amount: 0.5
+        unit: ""
+        name: צרור עלי נענע
+        nameEn: bunch of mint leaves
+      - amount: 0
+        unit: ""
+        name: מלח, פלפל
+        nameEn: salt, pepper
+steps:
+  - title: ""
+    items:
+      - instruction: מנקים את הסינטה משכבות השומן והגיד ומחלקים לאורך לשלושה-ארבעה חלקים.
+        instructionEn: Clean the sirloin from the layers of fat and tendon and divide lengthwise into three-four parts.
+      - instruction: מתבלים בנדיבות בתערובת הפלפלים, במלח ים ובכוסברה יבשה גרוסה.צורבים את הנתחים במעט שמן זית.
+        instructionEn: >-
+          Generously season with the pepper mixture, sea salt and chopped dry coriander. Sear the pieces in a little
+          olive oil.
+      - instruction: "ומעבירים לתבנית תנור.לרוטב: מצמצמים את היין והציר בנפרד ל-1/3 מהנפח המקורי."
+        instructionEn: >-
+          and transfer to an oven dish. For the sauce: reduce the wine and the stock separately to 1/3 of the original
+          volume.
+      - instruction: מאחדים.
+        instructionEn: unifying
+      - instruction: >-
+          יוצרים קרמל מהסוכר והמים ופותחים עם הנוזל המצומצם, מרתיחים ומתבלים. לפירה: חולטים את האפונה והנענע במים רותחים
+          לדקה, שוטפים במים קרים, מעבירים למעבד מזון וטוחנים עם הנענע, מדללים עם שמנת ומתבלים.
+        instructionEn: >-
+          Create caramel from the sugar and water and open with the reduced liquid, boil and season. For puree: Blanch
+          the peas and mint in boiling water for a minute, rinse in cold water, transfer to a food processor and grind
+          with the mint, dilute with cream and season.
+      - instruction: לפני ההגשה צולים את הבשר לדרגת העשייה הרצויה בתנור שחומם ל- 220 מעלות, מוציאים ומניחים במקום חמים ל-10 דקות.
+        instructionEn: >-
+          Before serving, roast the meat to the desired degree of doneness in an oven heated to 220 degrees, remove and
+          place in a warm place for 10 minutes.
+      - instruction: פורסים לפרוסות דקות.מניחים פירה על צלחת הגשה, מעל את הסינטה ומעטרים עם הרוטב סביב.
+        instructionEn: >-
+          Slice into thin slices. Place mashed potatoes on a serving plate, top with the sirloin and garnish with the
+          sauce around.
+tips: []

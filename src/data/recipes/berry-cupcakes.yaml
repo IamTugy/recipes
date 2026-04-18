@@ -1,0 +1,114 @@
+id: berry-cupcakes
+title: Forest Berry Cupcakes
+titleHe: קאפקייק פירות יער
+category: dessert
+tags:
+  - קאפקייק
+  - פירות יער
+  - שמרים
+  - ציפוי
+tagsEn:
+  - cupcake
+  - berries
+  - gluten-free
+  - topping
+image: https://assets.tugy.dev/berry-cupcakes.jpg
+description: קאפקייק קטיפתי עם בסיס פירות יער מקורמל ועוגת שמרים אוורירית ללא גלוטן - יפה ומרשים.
+descriptionEn: Silky cupcakes with a caramelized berry base and an airy gluten-free sponge - beautiful and impressive.
+prepTime: 40
+cookTime: 20
+servings: 6
+difficulty: medium
+ingredients:
+  - group: בסיס פרי
+    groupEn: Berry Base
+    items:
+      - amount: 40
+        unit: g
+        name: תמרים שלמים, מגולענים/דבלים
+        nameEn: whole dates, pitted / dried figs
+      - amount: 0.5
+        unit: ""
+        name: תפוח מזן גרני סמית, מגורר
+        nameEn: Granny Smith apple, grated
+      - amount: 30
+        unit: g
+        name: מחית תות/פטל
+        nameEn: strawberry/raspberry puree
+      - amount: 30
+        unit: g
+        name: מחית קסיס
+        nameEn: blackcurrant puree
+      - amount: 25
+        unit: g
+        name: סוכר
+        nameEn: sugar
+  - group: עוגת שמרים
+    groupEn: GF Sponge
+    items:
+      - amount: 40
+        unit: g
+        name: חמאה רכה
+        nameEn: soft butter
+      - amount: 40
+        unit: g
+        name: סוכר חום כהה
+        nameEn: dark brown sugar
+      - amount: 100
+        unit: g
+        name: בסיס פרי (לעיל)
+        nameEn: berry base (above)
+      - amount: 30
+        unit: g
+        name: ביצים
+        nameEn: eggs
+      - amount: 37
+        unit: g
+        name: קמח נטול גלוטן
+        nameEn: gluten-free flour
+      - amount: 10
+        unit: g
+        name: קמח אורז
+        nameEn: rice flour
+      - amount: 10
+        unit: g
+        name: עמילן טפיוקה
+        nameEn: tapioca starch
+      - amount: 2
+        unit: g
+        name: אבקת אפייה
+        nameEn: baking powder
+      - amount: 1
+        unit: g
+        name: אבקת סודה לשתייה
+        nameEn: baking soda
+      - amount: 20
+        unit: g
+        name: חמוציות קצוצות
+        nameEn: dried cranberries, chopped
+steps:
+  - title: בסיס פרי
+    titleEn: Berry Base
+    items:
+      - instruction: >-
+          קוצצים תמרים ומביאים עם כל חומרי הבסיס לסיר, מביאים לרתיחה ומבשלים 15 דקות על להבה נמוכה, בסיר ללא כיסוי.
+          מצננים.
+        instructionEn: >-
+          Chop dates and combine with all base ingredients in a pot, bring to a boil and cook uncovered on low heat for
+          15 minutes. Cool completely.
+        timerMinutes: 15
+  - title: עוגת שמרים
+    titleEn: GF Sponge
+    items:
+      - instruction: במיקסר טורפים חמאה, סוכר, בסיס פרי וביצים. מוסיפים חומרים יבשים ומאחדים. מוסיפים חמוציות.
+        instructionEn: >-
+          In a mixer, whisk butter, sugar, berry base and eggs. Add dry ingredients and mix until combined. Fold in
+          cranberries.
+      - instruction: מחממים תנור ל-160-170°. מחלקים לתבניות קאפקייק ואופים כ-20 דקות עד שקיסם יוצא נקי.
+        instructionEn: Preheat oven to 160-170°C. Divide into cupcake tins and bake about 20 minutes until a skewer comes out clean.
+        timerMinutes: 20
+        tip: הוציאו מהתנור כשהקאפקייק עדיין מעט נע במרכז - ימשיך להתבשל בתבנית.
+        tipEn: Remove from the oven when the center still jiggles slightly - it will set in the tin.
+      - instruction: מצננים לפחות 20 דקות לפני הוצאה מהתבנית.
+        instructionEn: Cool at least 20 minutes before removing from the tin.
+        timerMinutes: 20

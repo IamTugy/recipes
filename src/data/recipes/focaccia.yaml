@@ -1,0 +1,94 @@
+id: focaccia
+title: Sea Salt & Rosemary Focaccia
+titleHe: פוקאצ׳ה מלח ים ורוזמרין
+category: bread
+tags:
+  - לחם
+  - איטלקי
+  - שמן זית
+  - צמחוני
+tagsEn:
+  - bread
+  - Italian
+  - olive oil
+  - vegetarian
+cuisine: Italian
+image: https://assets.tugy.dev/focaccia.jpg
+description: פוקאצ׳ה אוורירית עם גומות שמן זית, מלח ים גס וענפי רוזמרין טרי - פשוטה, מרשימה ומנחמת.
+descriptionEn: Airy focaccia with olive oil pools, crunchy sea salt and fresh rosemary sprigs - simple, impressive and comforting.
+prepTime: 30
+cookTime: 15
+servings: 8
+difficulty: easy
+ingredients:
+  - group: בצק
+    groupEn: Dough
+    items:
+      - amount: 1
+        unit: kg
+        name: קמח לחם
+        nameEn: bread flour
+      - amount: 20
+        unit: g
+        name: מלח
+        nameEn: salt
+      - amount: 40
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 15
+        unit: g
+        name: שמרים יבשים
+        nameEn: dried yeast
+      - amount: 680
+        unit: g
+        name: מים
+        nameEn: water
+      - amount: 50
+        unit: g
+        name: שמן זית
+        nameEn: olive oil
+  - group: לציפוי
+    groupEn: Topping
+    items:
+      - amount: 3
+        unit: tbsp
+        name: שמן זית
+        nameEn: olive oil
+      - amount: 1
+        unit: tbsp
+        name: מלח ים גס
+        nameEn: coarse sea salt
+      - amount: 4
+        unit: sprigs
+        name: רוזמרין טרי
+        nameEn: fresh rosemary
+steps:
+  - items:
+      - instruction: מנפים את כל החומרים היבשים לקערה. מוסיפים מים ושמן בהדרגה תוך לישה במהירות נמוכה.
+        instructionEn: Sift all dry ingredients into a bowl. Add water and oil gradually while kneading on low speed.
+      - instruction: לשים 10 דקות עד לקבלת בצק חלק וגמיש - מעט דביק.
+        instructionEn: Knead 10 minutes until you have a smooth, elastic dough - slightly sticky.
+        timerMinutes: 10
+      - instruction: מניחים עטוף בקערה משומנת ומתפיחים עד הכפלת הנפח (~60 דקות).
+        instructionEn: Place in a greased bowl, cover and proof until doubled (~60 minutes).
+        timerMinutes: 60
+        tip: בצק טוב לא יחכה - אם הבצק תפח מהר, עברו לשלב הבא.
+        tipEn: Good dough won't wait - if it rises quickly, move on to the next step.
+      - instruction: מחממים תנור ל-230°. מחלקים ל-4 חלקים ומניחים על משטח משומן ל-10 דקות מנוחה.
+        instructionEn: Preheat oven to 230°C. Divide into 4 pieces and rest on an oiled surface for 10 minutes.
+        timerMinutes: 10
+      - instruction: מותחים כל חלק לעלה בעובי 1 ס"מ, מניחים על תבנית משומנת ו"דוקרים" בעזרת האצבעות.
+        instructionEn: Stretch each piece to 1 cm thick, place on an oiled baking tray and dimple with your fingers.
+      - instruction: מורחים שמן זית, מפזרים מלח ים וענפי רוזמרין. מתפיחים עוד 15-20 דקות.
+        instructionEn: Drizzle with olive oil, scatter sea salt and rosemary. Proof for another 15-20 minutes.
+        timerMinutes: 20
+      - instruction: אופים 15 דקות עד הזהבה. מצננים מעט ופורסים.
+        instructionEn: Bake 15 minutes until golden. Cool slightly before slicing.
+        timerMinutes: 15
+tips:
+  - ככל שהגומות עמוקות יותר - כך יצטבר בהן יותר שמן זית ויתקבל מרקם עשיר יותר.
+  - ניתן להוסיף עגבניות שרי, זיתים או גבינה מעל לפני האפייה.
+tipsEn:
+  - The deeper the dimples, the more olive oil they hold for a richer texture.
+  - Add cherry tomatoes, olives or cheese on top before baking.

@@ -1,0 +1,127 @@
+id: chestnut-pumpkin-stuffed-with-all-vegan-goodness
+title: Chestnut pumpkin stuffed with all vegan goodness
+titleHe: דלעת ערמונים ממולאה כל טוב טבעוני
+description: דלעת ערמונים ממולאה כל טוב טבעוני
+descriptionEn: Chestnut pumpkin stuffed with all vegan goodness
+image: https://assets.tugy.dev/chestnut-pumpkin-stuffed-with-all-vegan-goodness.jpg
+category: dinner
+difficulty: medium
+prepTime: 15
+cookTime: 10
+servings: 8
+tags:
+  - ארוחת ערב
+  - טבעוני
+ingredients:
+  - group: למילוי
+    items:
+      - amount: 150
+        unit: g
+        name: קינואה מבושלת לריכוך במים מתובלים
+        nameEn: quinoa cooked to soften in seasoned water
+      - amount: 0
+        unit: ""
+        name: שמן זית
+        nameEn: olive oil
+      - amount: 2
+        unit: ""
+        name: בצלים קצוצים
+        nameEn: Chopped onions
+      - amount: 4
+        unit: ""
+        name: שיני שום
+        nameEn: Garlic cloves
+      - amount: 300
+        unit: g
+        name: פטריות פורטובלו, קצוצות דק
+        nameEn: portobello mushrooms, finely chopped
+      - amount: 0
+        unit: ""
+        name: חופן פטריות פורצ׳יני, שרויות לריכוך וקצוצות
+        nameEn: handful of porcini mushrooms, soaked to soften and chopped
+      - amount: 0
+        unit: ""
+        name: צרור בזיליקום קצוץ
+        nameEn: bunch of chopped basil
+      - amount: 50
+        unit: g
+        name: צנובר קלוי
+        nameEn: Roasted pine nuts
+      - amount: 50
+        unit: g
+        name: צימוקים
+        nameEn: raisins
+      - amount: 50
+        unit: g
+        name: שקדים קלויים קצוצים
+        nameEn: Chopped roasted almonds
+      - amount: 0.5
+        unit: tsp
+        name: קינמון טחון
+        nameEn: Ground cinnamon
+      - amount: 0.5
+        unit: tsp
+        name: מוסקט טחון
+        nameEn: ground nutmeg
+      - amount: 0
+        unit: ""
+        name: מלח, פלפל שחור
+        nameEn: salt, black pepper
+  - group: לרוטב
+    items:
+      - amount: 300
+        unit: g
+        name: יין אדום
+        nameEn: red wine
+      - amount: 0.5
+        unit: cup
+        name: סילאן
+        nameEn: date syrup
+      - amount: 0
+        unit: ""
+        name: מעט שמן זית
+        nameEn: a little olive oil
+      - amount: 3
+        unit: ""
+        name: שיני שום פרוסות
+        nameEn: sliced garlic cloves
+      - amount: 0
+        unit: ""
+        name: מלח, פלפל שחור
+        nameEn: salt, black pepper
+      - amount: 4
+        unit: ""
+        name: גבעולי מרווה
+        nameEn: Sage stems
+steps:
+  - title: ""
+    items:
+      - instruction: >-
+          מחממים את התנור לחום בינוני, 180 מעלות.לדלעות- מסירים את כיפת הדלעות (שומרים בצד) ומרוקנים בעדינות את
+          הגרעינים.
+        instructionEn: >-
+          Heat the oven to medium heat, 180 degrees. For the pumpkins - remove the dome of the pumpkins (keep aside) and
+          gently empty the seeds.
+      - instruction: מעסים את הפנים והחוץ בשמן זית ומתבלים.
+        instructionEn: Massage the inside and outside with olive oil and season.
+      - instruction: מניחים על מגש אפיה עמוק כשהחתך פונה מטה, יוצקים את הרוטב והתיבול וצולים ללא כיסוי כשעה לריכוך.
+        instructionEn: >-
+          Place on a deep baking tray with the cut facing down, pour the sauce and seasoning and roast uncovered for
+          about an hour to soften.
+      - instruction: >-
+          מצננים.מכינים את המילוי- בסיר גדול מחממים שמן זית ומטגנים את הבצל הקצוץ והשום, מוסיפים פטריות, מתבלים ומטגנים
+          קלות.
+        instructionEn: >-
+          Cool. Prepare the filling - heat olive oil in a large pot and fry the chopped onion and garlic, add mushrooms,
+          season and fry lightly.
+      - instruction: מוסיפים את שאר המרכיבים ומתבלים.ממלאים את הדלעות בתערובת כך שהיא תבלוט מעט מעל שפתם.
+        instructionEn: >-
+          Add the rest of the ingredients and season. Fill the pumpkins with the mixture so that it protrudes slightly
+          above their rim.
+      - instruction: מכסים במכסים.מניחים את הדלעות בתבנית עם הרוטב.
+        instructionEn: Cover with lids. Place the pumpkins in the pan with the sauce.
+      - instruction: מכסים ואופים 1/2 שעה.
+        instructionEn: Cover and bake for 1/2 hour.
+      - instruction: מסירים את הכיסוי ואופים עוד 15 דקות, להזהבה.
+        instructionEn: Remove the cover and bake for another 15 minutes, until golden.
+tips: []

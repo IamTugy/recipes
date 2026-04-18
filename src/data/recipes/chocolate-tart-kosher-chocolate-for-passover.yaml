@@ -1,0 +1,153 @@
+id: chocolate-tart-kosher-chocolate-for-passover
+title: Chocolate tart - kosher chocolate for Passover
+titleHe: טארט שוקולד – שוקולד כשר לפסח
+description: טארט שוקולד – שוקולד כשר לפסח
+descriptionEn: Chocolate tart - kosher chocolate for Passover
+image: https://assets.tugy.dev/chocolate-tart-kosher-chocolate-for-passover.jpg
+category: dessert
+difficulty: hard
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - קינוח
+  - מתוק
+  - שוקולד
+  - ללא גלוטן
+ingredients:
+  - group: ""
+    items:
+      - amount: 220
+        unit: g
+        name: קמח מצה
+        nameEn: Matzah flour
+      - amount: 140
+        unit: g
+        name: קורנפלור או קמח תפוחי אדמה
+        nameEn: Cornflour or potato flour
+      - amount: 20
+        unit: g
+        name: קקאו
+        nameEn: cocoa
+      - amount: 200
+        unit: g
+        name: חמאה קרה חתוכה לקוביות
+        nameEn: Cold butter cut into cubes
+      - amount: 20
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 2
+        unit: g
+        name: קורט מלח
+        nameEn: A pinch of salt
+      - amount: 1
+        unit: ""
+        name: ביצה
+        nameEn: egg
+      - amount: 1
+        unit: ""
+        name: חלמון
+        nameEn: yolk
+      - amount: 0
+        unit: ""
+        name: לשכבת הגנאש-300 גרם שמנת מתוקה
+        nameEn: For the ganache layer - 300 grams of sweet cream
+      - amount: 270
+        unit: g
+        name: שוקולד מריר,
+        nameEn: dark chocolate,
+      - amount: 56
+        unit: ""
+        name: "% מוצקי קקאו"
+        nameEn: "% cocoa solids"
+      - amount: 50
+        unit: g
+        name: גלוקוזה
+        nameEn: glucose
+      - amount: 0
+        unit: ""
+        name: למוס שוקולד-500 גרם חלבכפית משחת וניל
+        nameEn: Chocolate mousse - 500 grams of milk, a teaspoon of vanilla paste
+      - amount: 4
+        unit: ""
+        name: חלמונים
+        nameEn: egg yolks
+      - amount: 80
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 200
+        unit: g
+        name: שוקולד לבן
+        nameEn: white chocolate
+      - amount: 8
+        unit: g
+        name: אבקת ג'לטין מושרה ב-40 גרם מים קריםמעט אמרטו
+        nameEn: Gelatin powder is soaked in 40 grams of cold water with a little Amaretto
+      - amount: 400
+        unit: g
+        name: שמנת מתוקה מוקצפת
+        nameEn: Sweet whipped cream
+      - amount: 80
+        unit: ""
+        name: "%"
+  - group: לציפוי
+    items:
+      - amount: 200
+        unit: g
+        name: שוקולד מריר
+        nameEn: dark chocolate
+      - amount: 60
+        unit: ""
+        name: "%50 גרם חמאת קקאו"
+        nameEn: 50% cocoa butter
+      - amount: 120
+        unit: g
+        name: שמנת מתוקה
+        nameEn: sweet cream
+steps:
+  - title: ""
+    items:
+      - instruction: לבצק הטארט- מניחים את החומרים היבשים והחמאה במעבד מזון וטוחנים לתערובת פירורית.
+        instructionEn: For the tart dough - place the dry ingredients and butter in a food processor and grind to a crumbly mixture.
+      - instruction: מוסיפים את הביצה והחלמון ומעבדים בפולסים קצרים עד קבלת תערובת פירורית לחה.
+        instructionEn: Add the egg and yolk and process in short pulses until you get a moist crumbly mixture.
+      - instruction: אוספים, עוטפים ומניחים בקירור של שעה.
+        instructionEn: Collect, wrap and refrigerate for an hour.
+      - instruction: מחלקים את הבצק ל-8 חלקים ומרדדים כל אחד לעלה בעובי 2 מ"מ.
+        instructionEn: Divide the dough into 8 parts and roll each into a 2 mm thick sheet.
+      - instruction: מרפדים את תבניות הטארט.
+        instructionEn: Line the tart pans.
+      - instruction: מניחים יריעה של ניילון נצמד או נייר אפייה, מניחים מעל משקולת (קטניות למשל) ואופים בחום של 160 מעלות 20 דקות.
+        instructionEn: >-
+          Place a sheet of cling film or baking paper, place a weight on top (legumes for example) and bake at 160
+          degrees for 20 minutes.
+      - instruction: מסירים את המשקולת ואופים עוד 8 דקות.
+        instructionEn: Remove the dumbbell and bake for another 8 minutes.
+      - instruction: מצננים.לשכבת הגנאש- מרתיחים שמנת מתוקה וגלוקוזה ויוצקים אל השוקולד.
+        instructionEn: Cool. For the ganache layer - boil sweet cream and glucose and pour into the chocolate.
+      - instruction: ממתינים דקה ומערבבים ליצירת אמולסיה.
+        instructionEn: Wait a minute and mix to create an emulsion.
+      - instruction: יוצקים אל הטארטים ומחזירים לייצוב בקירורלמוס- מרתיחים חלב ומשחת וניל.
+        instructionEn: Pour into the tarts and put back in the refrigerator to stabilize - boil milk and vanilla paste.
+      - instruction: בקערה נפרדת מערבבים היטב חלמונים וסוכר.
+        instructionEn: In a separate bowl, mix egg yolks and sugar well.
+      - instruction: עושים השוואת טמפרטורה מחזירים לסיר לבישול עד הסמכה (85 מעלות).
+        instructionEn: Do a temperature comparison and return to the pot to cook until certified (85 degrees).
+      - instruction: מסירים מהאש ומוסיפים שוקולד לבן וג'לטין מושרה ומערבבים להמסה.
+        instructionEn: Remove from heat and add white chocolate and soaked gelatin and stir to melt.
+      - instruction: מסננים ומקררים לחום גוף.
+        instructionEn: Filter and refrigerate to body temperature.
+      - instruction: >-
+          מקפלים שמנת מתוקה ויוצקים אל 8 תבניות אישיות בצורת 1/2 כדור (שקוטר בסיסן תואם לקוטר שפת הטארט) ומקפיאים
+          היטב.לציפוי- ממיסים את כל החומרים לתערובת אחידה, משחררים את המוס הקפואה מהתבנית ומזגגים.
+        instructionEn: >-
+          Fold in sweet cream and pour into 8 individual molds in the shape of a 1/2 ball (the diameter of the base
+          corresponds to the diameter of the rim of the tart) and freeze well. For the coating - melt all the
+          ingredients into a uniform mixture, release the frozen mousse from the mold and glaze.
+      - instruction: מניחים מעל הטארט ומקשטים בפניני שוקולד סביב ומעט אבקת זהב מעל.
+        instructionEn: Place on top of the tart and decorate with chocolate pearls around and a little gold powder on top.
+      - instruction: מעבירים לקירור להפשרה ומגישים.
+        instructionEn: Transfer to the refrigerator to thaw and serve.
+tips: []

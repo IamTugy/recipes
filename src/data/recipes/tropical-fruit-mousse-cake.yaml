@@ -1,0 +1,185 @@
+id: tropical-fruit-mousse-cake
+title: Tropical fruit mousse cake
+titleHe: עוגת מוס פירות טרופיים
+description: עוגת מוס פירות טרופיים
+descriptionEn: Tropical fruit mousse cake
+image: https://assets.tugy.dev/tropical-fruit-mousse-cake.jpg
+category: dessert
+difficulty: hard
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - קינוח
+  - מתוק
+  - עוגה
+ingredients:
+  - group: ""
+    items:
+      - amount: 2
+        unit: ""
+        name: תבניות
+        nameEn: templates
+      - amount: 18
+        unit: ""
+        name: ס״מ     לבסיס פקאן-קוקוס:80 גרם חמאה
+        nameEn: "cm for the pecan-coconut base: 80 grams of butter"
+      - amount: 80
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 1
+        unit: g
+        name: מלח
+        nameEn: salt
+      - amount: 50
+        unit: g
+        name: אגוזי פקאן טוחנים דק
+        nameEn: Finely grind pecans
+      - amount: 80
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 50
+        unit: g
+        name: קוקוס טחון
+        nameEn: Ground coconut
+      - amount: 0
+        unit: ""
+        name: לדקואז פיסטוק:90 גרם חלבונים
+        nameEn: "For pistachio decoise: 90 grams of proteins"
+      - amount: 90
+        unit: g
+        name: סוכר אינברטי
+        nameEn: Invert sugar
+      - amount: 25
+        unit: g
+        name: אבקת סוכר
+        nameEn: icing sugar
+      - amount: 70
+        unit: g
+        name: פיסטוקים טחונים לאבקה
+        nameEn: Pistachios ground into powder
+      - amount: 25
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 0
+        unit: ""
+        name: למוס פירות טרופיים:100 גרם מחית או מיץ פסיפלורה
+        nameEn: "Tropical fruit puree: 100 grams of puree or passion fruit juice"
+      - amount: 200
+        unit: ""
+        name: גר מחית או רסק מנגו
+        nameEn: Gar mango puree or puree
+      - amount: 100
+        unit: g
+        name: מיץ ליים או לימון
+        nameEn: Lime or lemon juice
+      - amount: 60
+        unit: g
+        name: חלמונים
+        nameEn: egg yolks
+      - amount: 90
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 30
+        unit: g
+        name: קורנפלור
+        nameEn: Cornflour
+      - amount: 130
+        unit: g
+        name: חמאה
+        nameEn: butter
+      - amount: 20
+        unit: g
+        name: רום
+        nameEn: rum
+      - amount: 4
+        unit: g
+        name: ג'לטין שרוי ב-20 גרם מים קרים
+        nameEn: Gelatin soaked in 20 grams of cold water
+      - amount: 350
+        unit: g
+        name: שמנת מתוקה מוקצפת הקצפה קלה
+        nameEn: Light whipped sweet cream
+      - amount: 0
+        unit: ""
+        name: לזיגוג:250 גרם סוכר
+        nameEn: "For the glaze: 250 grams of sugar"
+      - amount: 150
+        unit: g
+        name: מחית או מיץ פסיפלורה
+        nameEn: Passion fruit puree or juice
+      - amount: 100
+        unit: g
+        name: מים
+        nameEn: water
+      - amount: 150
+        unit: g
+        name: שוקולד לבן, קצוץ
+        nameEn: White chocolate, chopped
+      - amount: 6
+        unit: g
+        name: ג'לטין, מרוכך ב-30 גרם מים
+        nameEn: Gelatin, softened with 30 grams of water
+steps:
+  - title: ""
+    items:
+      - instruction: >-
+          מכינים בסיס פקאן וקוקוס: מחממים תנור ל-160 מעלות ומרפדים תבנית תנור בנייר אפייה. במיקסר עם וו גיטרה מעבדים את
+          כל החומרים לבצק. מרדדים את הבצק למלבן בעובי של כ-3 מ"מ ומצננים מעט במקפיא. אופים את הבסיס במשך כ-16 דקות עד
+          הזהבה.
+        instructionEn: >-
+          Prepare a pecan and coconut base: heat the oven to 160 degrees and line an oven tray with baking paper. In a
+          mixer with a guitar hook, process all the ingredients into a dough. Roll the dough into a rectangle about 3 mm
+          thick and cool a little in the freezer. Bake the base for about 16 minutes until golden.
+      - instruction: >-
+          מיד כשמוציאים מהתנור קורצים 2 בסיסים בקוטר 16 ס"מ. מכינים דקואז פיסטוק: מגבירים את חום התנור ל-180 מעלות.
+          מקציפים חלבונים עם סוכר אינברטי ומנפים את אבקת הסוכר, הקמח והפיסטוקים הטחונים. מקפלים את האבקות לתוך הקציפה
+          בעדינות עד שמתקבלת תערובת אחידה.
+        instructionEn: >-
+          As soon as you take it out of the oven, cut out 2 bases with a diameter of 16 cm. Make a pistachio decoase:
+          increase the oven heat to 180 degrees. Beat egg whites with invert sugar and sift the powdered sugar, flour
+          and ground pistachios. Gently fold the powders into the whipped cream until a uniform mixture is obtained.
+      - instruction: >-
+          מזלפים את הדקואז מעל בסיסי הפקאן הפריכים ואופים במשך כ-15 דקות. מצננים ומשחררים מהתבניות. מכינים את המוס:
+          מרתיחים את מחיות הפרי.
+        instructionEn: >-
+          Sprinkle the decoase over the crispy pecan bases and bake for about 15 minutes. Cool and release from the
+          molds. Prepare the mousse: boil the fruit juices.
+      - instruction: >-
+          בקערה טורפים יחד חלמונים, סוכר וקורנפלור.יוצקים ממיץ הפירות הרותח אל תוך תערובת החלמונים בהדרגה, תוך כדי
+          טריפה.
+        instructionEn: >-
+          In a bowl, whisk together egg yolks, sugar and cornflour. Pour the boiling fruit juice into the egg yolk
+          mixture gradually, while whisking.
+      - instruction: מחזירים את התערובת לסיר ומביאים לרתיחה תוך כדי טריפה נמרצת.
+        instructionEn: Return the mixture to the pot and bring to a boil while whisking vigorously.
+      - instruction: מסירים מהאש ומוסיפים את החמאה, הרום והג'לטין.
+        instructionEn: Remove from the heat and add the butter, rum and gelatin.
+      - instruction: מעבירים את הקרם לקערת מיקסר עם וו גיטרה ומערבלים עד שהוא מגיע לטמפרטורת החדר.
+        instructionEn: Transfer the cream to a mixer bowl with a guitar hook and mix until it reaches room temperature.
+      - instruction: מקפלים את השמנת המתוקה לתוך הקרם הקר עד שמתקבל מוס אחיד.
+        instructionEn: Fold the sweet cream into the cold cream until a uniform mousse is obtained.
+      - instruction: >-
+          יוצקים את המוס בין שתי התבניות (קוטר 18). מניחים מעל המוס את בסיסי העוגה האפויים בלחיצה קלה, כך שבסיס העוגה
+          יותאם לגובה המוס. מקפיאים את העוגות במשך 6 שעות לפחות. מכינים זיגוג: מרתיחים מיץ פסיפלורה, מים וסוכר.
+        instructionEn: >-
+          Pour the mousse between the two molds (diameter 18). Place the baked cake bases on top of the mousse, pressing
+          lightly, so that the cake base is adjusted to the height of the mousse. Freeze the cakes for at least 6 hours.
+          Prepare glaze: boil passion fruit juice, water and sugar.
+      - instruction: מסירים מהאש ומוסיפים שוקולד לבן וג'לטין.
+        instructionEn: Remove from heat and add white chocolate and gelatin.
+      - instruction: >-
+          מערבבים היטב, מסננים ומצננים לטמפרטורת הגוף.הרכבה וציפוי: משחררים את העוגות הקפואות מהתבניות או הרינגים
+          ומניחים על גבי רשת.
+        instructionEn: >-
+          Mix well, filter and cool to body temperature. Assembly and coating: release the frozen cakes from the molds
+          or rings and place on a wire rack.
+      - instruction: יוצקים את הזיגוג על גבי העוגה, כך שיצפה את כל החלק העליון והשוליים.מעבירים לצלחת הגשה ומקשטים.
+        instructionEn: >-
+          Pour the glaze on top of the cake, so that it covers the entire top and edges. Transfer to a serving plate and
+          decorate.
+tips: []

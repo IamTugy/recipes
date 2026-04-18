@@ -1,0 +1,118 @@
+id: pistachio-marble-cake-and-amaranth-cherries
+title: Pistachio marble cake and Amaranth cherries
+titleHe: עוגת שיש פיסטוק ודובדבני אמרנה
+description: עוגת שיש פיסטוק ודובדבני אמרנה
+descriptionEn: Pistachio marble cake and Amaranth cherries
+image: https://assets.tugy.dev/pistachio-marble-cake-and-amaranth-cherries.jpg
+category: dessert
+difficulty: medium
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - קינוח
+  - מתוק
+  - עוגה
+ingredients:
+  - group: ""
+    items:
+      - amount: 125
+        unit: g
+        name: חמאה רכה
+        nameEn: Soft butter
+      - amount: 250
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 3
+        unit: ""
+        name: ביצים מס' 1
+        nameEn: "Eggs #1"
+      - amount: 120
+        unit: g
+        name: קמח לבן
+        nameEn: white flour
+      - amount: 60
+        unit: g
+        name: אבקת שקדים
+        nameEn: almond powder
+      - amount: 60
+        unit: g
+        name: קורנפלור
+        nameEn: Cornflour
+      - amount: 5
+        unit: g
+        name: אבקת אפיה
+        nameEn: baking powder
+      - amount: 50
+        unit: g
+        name: רוויון
+        nameEn: satiety
+      - amount: 40
+        unit: g
+        name: מחית פיסטוק
+        nameEn: Pistachio puree
+      - amount: 150
+        unit: g
+        name: דובדבני אמרנה, חצויים
+        nameEn: Amaranth cherries, halved
+  - group: לציפוי
+    items:
+      - amount: 100
+        unit: g
+        name: שוקולד רובי
+        nameEn: Ruby chocolate
+      - amount: 20
+        unit: g
+        name: שמן צמחי
+        nameEn: vegetable oil
+      - amount: 20
+        unit: g
+        name: לוז קלוי גרוס
+        nameEn: Roasted and ground hazelnuts
+  - group: לקישוט
+    items:
+      - amount: 0
+        unit: ""
+        name: פניני קראנצ׳ תות, פטל מיובש
+        nameEn: Strawberry crunch pearls, dried raspberries
+steps:
+  - title: ""
+    items:
+      - instruction: >-
+          מחממים תנור ל-160 מעלות ומשמנים תבנית אינגליש באורך 30 או 35 ס"מ במעט חמאה מומסת. מקציפים חמאה ואבקת סוכר
+          במיקסר עם וו גיטרה (או בעזרת מקציף חשמלי ידני) במהירות בינונית. מוסיפים את הביצים בהדרגה, אחת אחרי השניה
+          ומקציפים עד לקבלת תערובת חלקה.
+        instructionEn: >-
+          Heat an oven to 160 degrees and grease a 30 or 35 cm long English pan with a little melted butter. Beat butter
+          and powdered sugar in a mixer with a guitar hook (or with a manual electric beater) at medium speed. Add the
+          eggs gradually, one after the other and beat until a smooth mixture is obtained.
+      - instruction: מנפים חומרים יבשים (קמח, אבקת שקדים, קורנפלור, אבקת אפיה) ומוסיפים בהדרגה לקערה (שבה תערובת החמאה).
+        instructionEn: >-
+          Sift dry ingredients (flour, almond powder, cornflour, baking powder) and gradually add to the bowl (return to
+          the butter mixture).
+      - instruction: מקציפים עד לקבלת מסה חלקה.
+        instructionEn: Beat until smooth.
+      - instruction: >-
+          מחלקים את התערובת ל-1/3 ול-2/3, בשתי קערות נפרדות.בקערה נוספת (קטנה) מדללים את מחית הפיסטוק עם החלב ומוסיפים
+          ל-1/3 מהתערובת.
+        instructionEn: >-
+          Divide the mixture into 1/3 and 2/3, in two separate bowls. In another (small) bowl, dilute the pistachio
+          puree with the milk and add to 1/3 of the mixture.
+      - instruction: >-
+          מוסיפים אליה את הדובדבנים ומערבבים.מעבירים את שתי התערובות לסירוגין לתבנית ומערבבים קלות בעזרת כף או מזלג,
+          ליצירת דוגמת שיש.
+        instructionEn: >-
+          Add the cherries to it and mix. Transfer the two mixtures alternately to the mold and mix lightly with a spoon
+          or fork, to create a marble pattern.
+      - instruction: מכניסים לתנור ואופים במשך 45-55 דקות או עד שקיסם הננעץ בעוגה יוצא כשעליו פירורים.
+        instructionEn: >-
+          Put in the oven and bake for 45-55 minutes or until a toothpick inserted into the cake comes out with crumbs
+          on it.
+      - instruction: מוציאים ומצננים.לציפוי- מתיכים את כל החומרים מעל באן מארי, מצננים לום גוף ומצפים את העוגה.
+        instructionEn: >-
+          Take out and cool. For the coating - melt all the ingredients over a bain-marie, cool slightly and cover the
+          cake.
+      - instruction: מקשטים עם פניני קראנצ׳ ופטל מיובש.
+        instructionEn: Decorate with crunch pearls and dried raspberries.
+tips: []

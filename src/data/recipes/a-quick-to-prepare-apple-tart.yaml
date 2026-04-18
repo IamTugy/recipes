@@ -1,0 +1,35 @@
+id: a-quick-to-prepare-apple-tart
+hidden: true
+title: A quick-to-prepare apple tart
+titleHe: טארט תפוחים מהיר הכנה
+description: טארט תפוחים מהיר הכנה
+descriptionEn: A quick-to-prepare apple tart
+image: https://assets.tugy.dev/a-quick-to-prepare-apple-tart.jpg
+category: dessert
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - קינוח
+  - מתוק
+ingredients:
+  - group: ""
+    items:
+      - amount: 1
+        unit: ""
+        name: כמות בצק עלים
+        nameEn: Amount of puff pastry
+      - amount: 5
+        unit: ""
+        name: תפוחי עץ מזן גרני סמית
+        nameEn: Granny Smith apples
+      - amount: 60
+        unit: g
+        name: ריבת משמש, תפוחים או תות
+        nameEn: Apricot, apple or strawberry jam
+steps:
+  - title: ""
+    items:
+      - instruction: ""
+tips: []

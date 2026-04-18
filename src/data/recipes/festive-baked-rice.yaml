@@ -1,0 +1,96 @@
+id: festive-baked-rice
+title: Festive baked rice
+titleHe: אורז חגיגי אפוי
+description: אורז חגיגי אפוי
+descriptionEn: Festive baked rice
+image: https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=900&q=80
+category: dinner
+difficulty: easy
+prepTime: 15
+cookTime: 22
+servings: 6
+tags:
+  - ארוחת ערב
+ingredients:
+  - group: ""
+    items:
+      - amount: 0.333
+        unit: cup
+        name: שמן זית
+        nameEn: olive oil
+      - amount: 1
+        unit: ""
+        name: בצל קצוץ
+        nameEn: Chopped onion
+      - amount: 1
+        unit: ""
+        name: גזר מגורר גס
+        nameEn: Coarsely grated carrot
+      - amount: 2
+        unit: ""
+        name: גבעולי סלרי אמריקאי קצוצים
+        nameEn: American celery stalks chopped
+      - amount: 0.5
+        unit: ""
+        name: שומר קצוץ דק
+        nameEn: Finely chopped fennel
+      - amount: 2
+        unit: ""
+        name: שיני שום כתושות
+        nameEn: Crushed garlic cloves
+      - amount: 250
+        unit: g
+        name: אורז פרסי או בסמטי
+        nameEn: Persian or basmati rice
+      - amount: 0
+        unit: ""
+        name: כפית מלח
+        nameEn: A teaspoon of salt
+      - amount: 0
+        unit: ""
+        name: חצי כפית פלפל שחור
+        nameEn: Half a teaspoon of black pepper
+      - amount: 0.25
+        unit: tsp
+        name: אגוז מוסקט טחון
+        nameEn: Ground nutmeg
+      - amount: 1
+        unit: ""
+        name: עלה דפנה
+        nameEn: bay leaf
+      - amount: 400
+        unit: g
+        name: ציר עוף, ציר ירקות או מים
+        nameEn: Chicken stock, vegetable stock or water
+      - amount: 0.5
+        unit: ""
+        name: צרור בצל ירוק קצוץ
+        nameEn: A bunch of chopped green onions
+      - amount: 50
+        unit: g
+        name: משמשים מיובשים קצוצים
+        nameEn: chopped dried apricots
+      - amount: 50
+        unit: g
+        name: תאנים מיובשות
+        nameEn: dried figs
+      - amount: 50
+        unit: g
+        name: צימוקים
+        nameEn: raisins
+steps:
+  - title: ""
+    items:
+      - instruction: מחממים שמן במחבת או סיר שטוח (עם מכסה תואם ועמידה לתנור) ומטגנים את כל ירקות השורש.
+        instructionEn: Heat oil in a pan or flat pot (with a matching lid and ovenproof) and fry all the root vegetables.
+      - instruction: מוסיפים אורז ותבלינים ומטגנים כחמש דקות.בנפרד מרתיחים ציר ומוסיפים לאורז.
+        instructionEn: Add rice and spices and fry for about five minutes. Separately, boil stock and add to the rice.
+      - instruction: מתבלים ומכסים.מעבירים לתנור שחומם מראש ל-180 מעלות ואופים 22 דקות.
+        instructionEn: Season and cover. Transfer to an oven preheated to 180 degrees and bake for 22 minutes.
+      - instruction: מוציאים מהתנור ומניחים מכוסה לעוד 10 דקות.לפני ההגשה, מוסיפים בצל ירוק, פירות מיובשים ומערבבים בעדינות.
+        instructionEn: >-
+          Remove from the oven and leave covered for another 10 minutes. Before serving, add green onions, dried fruits
+          and mix gently.
+      - instruction: מגישים מיד.
+        instructionEn: Serve immediately.
+tips: []

@@ -1,0 +1,158 @@
+id: butter-chicken
+title: Butter Chicken
+titleHe: באטר צ'יקן
+category: dinner
+tags:
+  - עוף
+  - קארי
+  - הודי
+  - עיקרית
+tagsEn:
+  - chicken
+  - curry
+  - Indian
+  - main
+cuisine: Indian
+image: https://assets.tugy.dev/butter-chicken.jpg
+description: עוף עסיסי במרינדת תבלינים ורוטב עגבניות עשיר עם שמנת - קלאסיק הודי שכובש את כולם.
+descriptionEn: >-
+  Juicy chicken in a spiced marinade, finished in a rich tomato-cream sauce - an iconic Indian classic that wins
+  everyone over.
+prepTime: 30
+cookTime: 60
+servings: 6
+difficulty: medium
+featured: true
+ingredients:
+  - group: עוף
+    groupEn: Chicken
+    items:
+      - amount: 1
+        unit: kg
+        name: פרגית או חזה עוף, חתוכה לקוביות 3-4 ס"מ
+        nameEn: chicken thighs or breast, cut into 3-4 cm cubes
+  - group: מרינדה
+    groupEn: Marinade
+    items:
+      - amount: 1
+        unit: tsp
+        name: גרגרי כוסברה
+        nameEn: coriander seeds
+      - amount: 1
+        unit: tsp
+        name: זרעי כמון
+        nameEn: cumin seeds
+      - amount: 1
+        unit: ""
+        name: לימון, סחוט
+        nameEn: lemon, juiced
+      - amount: 3
+        unit: cloves
+        name: שום כתושות
+        nameEn: garlic, crushed
+      - amount: 30
+        unit: g
+        name: ג'ינג'ר טרי מגורר
+        nameEn: fresh ginger, grated
+      - amount: 0.25
+        unit: tsp
+        name: הל טחון
+        nameEn: ground cardamom
+      - amount: 0.5
+        unit: tsp
+        name: סוכר
+        nameEn: sugar
+      - amount: 1
+        unit: tsp
+        name: מלח
+        nameEn: salt
+      - amount: 0.25
+        unit: tsp
+        name: שבבי צ'ילי
+        nameEn: chili flakes
+      - amount: 1
+        unit: tsp
+        name: גראם מסאלה
+        nameEn: garam masala
+  - group: רוטב
+    groupEn: Sauce
+    items:
+      - amount: 80
+        unit: g
+        name: חמאה
+        nameEn: butter
+      - amount: 1
+        unit: ""
+        name: בצל קצוץ
+        nameEn: onion, chopped
+      - amount: 20
+        unit: g
+        name: ג'ינג'ר קצוץ
+        nameEn: ginger, chopped
+      - amount: 1
+        unit: tsp
+        name: גראם מסאלה
+        nameEn: garam masala
+      - amount: 2
+        unit: ""
+        name: עלי דפנה
+        nameEn: bay leaves
+      - amount: 0.5
+        unit: tsp
+        name: חילבה טחונה
+        nameEn: ground fenugreek
+      - amount: 0.5
+        unit: tsp
+        name: כורכום
+        nameEn: turmeric
+      - amount: 1
+        unit: tsp
+        name: סוכר
+        nameEn: sugar
+      - amount: 700
+        unit: g
+        name: פסאטה עגבניות
+        nameEn: tomato passata
+      - amount: 100
+        unit: g
+        name: שמנת מתוקה
+        nameEn: heavy cream
+steps:
+  - title: מרינדה
+    titleEn: Marinade
+    items:
+      - instruction: קולים את גרגרי הכוסברה והכמון ומעבירים עם שאר חומרי המרינדה למעבד מזון - טוחנים היטב.
+        instructionEn: Toast the coriander and cumin seeds, then blend with the remaining marinade ingredients until smooth.
+      - instruction: מעסים את המרינדה אל קוביות העוף, מכסים ומשהים לפחות 3 שעות (עדיף 12 שעות) בקירור.
+        instructionEn: Rub the marinade into the chicken pieces, cover and refrigerate for at least 3 hours (12 hours is ideal).
+        timerMinutes: 180
+        tip: ככל שהעוף ישהה יותר זמן במרינדה - הטעם עמוק יותר.
+        tipEn: The longer the chicken marinates, the deeper the flavor.
+  - title: רוטב
+    titleEn: Sauce
+    items:
+      - instruction: מחממים חמאה בסיר רחב ומזהיבים קלות. מטגנים בצל וג'ינג'ר עד ריכוך.
+        instructionEn: Melt butter in a wide pot over medium heat. Sauté onion and ginger until soft.
+      - instruction: מוסיפים את התבלינים ומטגנים 30 שניות. מוסיפים לימון, פסאטה ושמנת מתוקה.
+        instructionEn: Add spices and cook 30 seconds. Add lemon juice, passata and cream.
+      - instruction: מביאים לרתיחה, מנמיכים ומצמצמים 30 דקות עד שהרוטב סמיך מאוד.
+        instructionEn: Bring to a boil, reduce heat and simmer 30 minutes until the sauce is very thick.
+        timerMinutes: 30
+      - instruction: מסירים עלי דפנה, טוחנים את הרוטב ומסננים לסיר נקי.
+        instructionEn: Remove bay leaves, blend the sauce and strain back into the pot.
+  - title: סיום
+    titleEn: Finish
+    items:
+      - instruction: מחממים מחבת עם מעט שמן וצורבים את העוף להשחמה משני הצדדים.
+        instructionEn: Heat a pan with a little oil and sear the chicken until browned on both sides.
+      - instruction: מוסיפים את העוף לרוטב החם, מרתיחים 2-3 דקות ומוסיפים עלי כוסברה קצוצים.
+        instructionEn: Add the chicken to the warm sauce, simmer 2-3 minutes and finish with fresh cilantro.
+        timerMinutes: 3
+      - instruction: מגישים עם אורז לבן מאודה.
+        instructionEn: Serve with steamed white rice.
+tips:
+  - ניתן להכין את הרוטב כמה שעות מראש ולחמם לפני ההגשה.
+  - לגרסה כשרה - מחליפים חמאה בשמן קוקוס ושמנת מתוקה בקרם קוקוס.
+tipsEn:
+  - The sauce can be made hours ahead and reheated before serving.
+  - For a dairy-free version, substitute butter with coconut oil and cream with coconut cream.

@@ -1,0 +1,128 @@
+id: chicken-and-vegetable-paella
+title: Chicken and vegetable paella
+titleHe: פאייה עוף וירקות
+description: פאייה עוף וירקות
+descriptionEn: Chicken and vegetable paella
+image: https://assets.tugy.dev/chicken-and-vegetable-paella.jpg
+category: dinner
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - ארוחת ערב
+ingredients:
+  - group: לעוף
+    items:
+      - amount: 3.5
+        unit: pcs
+        name: פרגית, חתוכה לשניים
+        nameEn: A chicken, cut in half
+      - amount: 2
+        unit: tbsp
+        name: שמן זית
+        nameEn: olive oil
+      - amount: 0
+        unit: ""
+        name: עלים מ-3 ענפי טימין
+        nameEn: leaves from 3 thyme sprigs
+      - amount: 0
+        unit: ""
+        name: כפית פפריקה מעושנת
+        nameEn: A teaspoon of smoked paprika
+      - amount: 0
+        unit: ""
+        name: מלח
+        nameEn: salt
+      - amount: 0
+        unit: ""
+        name: פלפל שחור
+        nameEn: Black pepper
+  - group: לפאייה
+    items:
+      - amount: 4
+        unit: tbsp
+        name: שמן זית
+        nameEn: olive oil
+      - amount: 1
+        unit: ""
+        name: בצל, קצוץ או כרישה פרוסה
+        nameEn: Onion, chopped or sliced ​​leek
+      - amount: 3
+        unit: ""
+        name: שיני שום קצוצות
+        nameEn: Chopped garlic cloves
+      - amount: 1
+        unit: pcs
+        name: גזר חתוך לקוביות
+        nameEn: Carrots cut into cubes
+      - amount: 1
+        unit: ""
+        name: פלפל אדום,צהוב או ירוק חתוך לקוביות
+        nameEn: Red, yellow or green pepper cut into cubes
+      - amount: 2
+        unit: ""
+        name: גבעולי סלרי אמריקאי, חתוך לקוביות
+        nameEn: American celery stalks, diced
+      - amount: 1
+        unit: ""
+        name: פלפל צ׳ילי, קצוץ
+        nameEn: Chili pepper, chopped
+      - amount: 1
+        unit: pcs
+        name: עגבנייה, קלופה, מרוקנת מגרעינים וחתוכה לקוביות
+        nameEn: Tomato, peeled, seeded and cut into cubes
+      - amount: 1
+        unit: ""
+        name: קישוא, חתוך לקוביות
+        nameEn: Zucchini, diced
+      - amount: 250
+        unit: g
+        name: שעועית שטוחה, חתוכה לקוביות
+        nameEn: Flat beans, diced
+      - amount: 0
+        unit: ""
+        name: כפית פפריקה מעושנת מתוקה
+        nameEn: A teaspoon of sweet smoked paprika
+      - amount: 0
+        unit: ""
+        name: מלח, פלפל שחור
+        nameEn: Salt, black pepper
+      - amount: 250
+        unit: g
+        name: אורז עגול
+        nameEn: round rice
+      - amount: 0
+        unit: ""
+        name: מעט זעפרן
+        nameEn: A little saffron
+      - amount: 500
+        unit: g
+        name: ציר עוף/ירקות רותח
+        nameEn: Boiling chicken/vegetable stock
+      - amount: 1
+        unit: ""
+        name: לימון פרוס לטריזים
+        nameEn: Lemon sliced ​​into wedges
+      - amount: 0
+        unit: ""
+        name: עלי מיקרו בזיל מתובלים להגשה
+        nameEn: Seasoned micro basil leaves to serve
+steps:
+  - title: ""
+    items:
+      - instruction: מחממים במחבת שטוח ורחב את שמן הזית, מטגנים את הפרגיות להזהבה, מוציאים ושומרים בצד.
+        instructionEn: Heat the olive oil in a wide, flat pan, fry the chicks until golden, remove and keep aside.
+      - instruction: >-
+          לאותה מחבת מוסיפים שמן זית ומוסיפים את הירקות (ללא העגבניות, הקישוא והשעועית) מטגנים להזהבה ומוסיפים תבלינים.
+          מחממים את בציר והזעפרן. מוסיפים את האורז, העגבניות, הקישוא והשעועית, מערבבים היטב, מניחים מעל את הפרגיות
+          הצלויות ומנמיכים את האש.
+        instructionEn: >-
+          Add olive oil to the same pan and add the vegetables (without the tomatoes, zucchini and beans), fry until
+          golden and add spices. Heat the stock and saffron. Add the rice, tomatoes, zucchini and beans, mix well, place
+          the roasted chicks on top and lower the heat.
+      - instruction: מוסיפים את ציר העוף והזעפרן ומבשלים מכוסה כ- 20 דקות.לפני ההגשה מקשטים בלימון ובסלט המיקרו.
+        instructionEn: >-
+          Add the chicken stock and saffron and cook covered for about 20 minutes. Before serving, garnish with lemon
+          and the micro salad.
+tips: []

@@ -1,0 +1,106 @@
+id: chocolate-cake
+title: Chocolate cake
+titleHe: חלת שוקולד
+description: חלת שוקולד
+descriptionEn: Chocolate cake
+image: https://assets.tugy.dev/chocolate-cake.jpg
+category: dessert
+difficulty: medium
+prepTime: 15
+cookTime: 10
+servings: 2
+tags:
+  - קינוח
+  - מתוק
+  - שוקולד
+ingredients:
+  - group: ""
+    items:
+      - amount: 2
+        unit: ""
+        name: חלות     לבצק:½ ק"ג קמח לחם קשה
+        nameEn: "Halut for the dough: ½ kg of hard bread flour"
+      - amount: 180
+        unit: g
+        name: חלב או מים
+        nameEn: milk or water
+      - amount: 16
+        unit: g
+        name: שמרים יבשים
+        nameEn: dry yeast
+      - amount: 80
+        unit: g
+        name: סוכר אינוורטי או דבש
+        nameEn: Invert sugar or honey
+      - amount: 8
+        unit: g
+        name: מלח
+        nameEn: salt
+      - amount: 2
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 60
+        unit: g
+        name: שמן קנולה
+        nameEn: Canola oil
+      - amount: 0
+        unit: ""
+        name: למילוי השוקולד:100 גרם אבקת סוכר
+        nameEn: "For the chocolate filling: 100 grams of powdered sugar"
+      - amount: 75
+        unit: g
+        name: אבקת אגוזי לוז קלויים
+        nameEn: Roasted hazelnut powder
+      - amount: 10
+        unit: g
+        name: קורנפלור
+        nameEn: Cornflour
+      - amount: 90
+        unit: g
+        name: חמאה קרה
+        nameEn: cold butter
+      - amount: 70
+        unit: g
+        name: פרלינה
+        nameEn: Praline
+      - amount: 1
+        unit: ""
+        name: ביצה
+        nameEn: egg
+      - amount: 6
+        unit: g
+        name: רום כהה
+        nameEn: dark rum
+      - amount: 100
+        unit: g
+        name: שוקולד חלב, מומס וקר
+        nameEn: Milk chocolate, melted and cold
+steps:
+  - title: ""
+    items:
+      - instruction: >-
+          הבצק: מכניסים לקערת המיקסר את כל המרכיבים, לשים – 8-10 דקות, עד למבחן חלון הגלוטן – מותחים פיסת בצק בעזרת
+          ידיים מקומחות לעלה דק שאינו נקרע.
+        instructionEn: >-
+          The dough: put all the ingredients in the mixer bowl, put - 8-10 minutes, until the gluten window test -
+          stretch a piece of dough with floured hands into a thin sheet that does not tear.
+      - instruction: מעבירים לקערה משומנת, מכסים ביריעת ניילון נצמד ומתפיחים עד הכפלת הנפח.
+        instructionEn: Transfer to a greased bowl, cover with cling film and let rise until doubled in volume.
+      - instruction: ההרכבה:מחלקים את הבצק ל- 2 חלקים שווים ומניחים למנוחה של 20 דקות מכוסה.
+        instructionEn: "Assembly: divide the dough into 2 equal parts and leave to rest covered for 20 minutes."
+      - instruction: מרדדים כל עלה למלבן, מזלפים 'צינור' מהמילוי וסוגרים לגלילה הדוקה.
+        instructionEn: Roll each leaf into a rectangle, sprinkle a 'tube' of the filling and close into a tight roll.
+      - instruction: מניחים בתבנית מרופדת בנייר אפייה, מברישים בביצה טרופה ומעטרים בברס.
+        instructionEn: Place in a pan lined with baking paper, brush with a beaten egg and garnish with breadcrumbs.
+      - instruction: בעזרת מספריים יוצרים דוגמה בבצק.
+        instructionEn: Using scissors, create a pattern in the dough.
+      - instruction: >-
+          מכסים ומתפיחים עד להתפחה של 80% .אופים כ- 30 דקות בתנור שחומם מראש ל- 160 מעלות.עם הוצאת החלה מהתנור, מברישים
+          מיד בסירופ הסוכר החם.
+        instructionEn: >-
+          Cover and let it rise until it swells to 80%. Bake for about 30 minutes in an oven preheated to 160 degrees.
+          When you take the challah out of the oven, brush it immediately with the hot sugar syrup.
+      - instruction: מגישים.
+        instructionEn: serving
+tips: []

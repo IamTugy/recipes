@@ -1,0 +1,78 @@
+id: vegetarian
+hidden: true
+title: Vegetarian 'Non Carna' lasagna
+titleHe: לזניה ׳נון קארנה׳ צמחונית
+description: לזניה ׳נון קארנה׳ צמחונית
+descriptionEn: Vegetarian 'Non Carna' lasagna
+image: https://assets.tugy.dev/vegetarian.jpg
+category: dinner
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - ארוחת ערב
+ingredients:
+  - group: ""
+    items:
+      - amount: 0
+        unit: ""
+        name: לראגו:1 בצל
+        nameEn: "For ragu: 1 onion"
+      - amount: 4
+        unit: ""
+        name: ענפי סלרי
+        nameEn: Celery branches
+      - amount: 4
+        unit: ""
+        name: שיני שום
+        nameEn: Garlic cloves
+      - amount: 2
+        unit: ""
+        name: גזרים
+        nameEn: carrots
+      - amount: 800
+        unit: g
+        name: פטריות
+        nameEn: Mushrooms
+      - amount: 5
+        unit: tbsp
+        name: שמן זית
+        nameEn: olive oil
+      - amount: 2
+        unit: tbsp
+        name: רכז עגבניות
+        nameEn: Tomato concentrate
+      - amount: 1
+        unit: ""
+        name: פחית פולפה עגבניותעלים מ-2 גבעולי אורגנועלים מ-4 גבעולי טימיןמלח, פלפל שחור
+        nameEn: A can of tomato pulp Leaves from 2 oregano stems Locks from 4 thyme stems Salt, black pepper
+      - amount: 0
+        unit: ""
+        name: לרוטב בשמל-80 גרם חמאה
+        nameEn: For the bechamel sauce - 80 grams of butter
+      - amount: 80
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 0.5
+        unit: l
+        name: חלב
+        nameEn: milk
+      - amount: 250
+        unit: g
+        name: שמנת מתוקהקורט אגוז מוסקטמלח, פלפל שחור
+        nameEn: Sweet cream, pinch of nutmeg, salt, black pepper
+      - amount: 0
+        unit: ""
+        name: לשכבות-250 גרם עלי לזניה
+        nameEn: For layers - 250 grams of lasagna leaves
+      - amount: 300
+        unit: g
+        name: גאודה/מוצרלה מגוררת
+        nameEn: Gouda/grated mozzarella
+steps:
+  - title: ""
+    items:
+      - instruction: ""
+tips: []

@@ -1,0 +1,71 @@
+id: banana-tart-tatin
+title: Banana Tart Tatin
+titleHe: טארט טאטן בננות
+description: טארט טאטן בננות
+descriptionEn: Banana Tart Tatin
+image: https://assets.tugy.dev/banana-tart-tatin.jpg
+category: dessert
+difficulty: medium
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - קינוח
+  - מתוק
+ingredients:
+  - group: ""
+    items:
+      - amount: 0
+        unit: ""
+        name: תבנית
+        nameEn: pattern
+      - amount: 24
+        unit: ""
+        name: ס״מ
+        nameEn: cm
+      - amount: 4
+        unit: ""
+        name: בננות מוצקות
+        nameEn: Solid bananas
+      - amount: 300
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 100
+        unit: ""
+        name: חמאה חתוכה לקוביות
+        nameEn: Butter cut into cubes
+      - amount: 2
+        unit: g
+        name: מלח
+        nameEn: salt
+      - amount: 70
+        unit: g
+        name: מים
+        nameEn: water
+      - amount: 300
+        unit: g
+        name: בצק עלים איכותי, מופשר
+        nameEn: High-quality puff pastry, thawed
+steps:
+  - title: ""
+    items:
+      - instruction: במחבת בקוטר 24 ס"מ מכינים מהסוכר קרמל ענברי.
+        instructionEn: In a pan with a diameter of 24 cm, make an amber caramel from the sugar.
+      - instruction: >-
+          מוסיפים את החמאה והמלח ובוחשים (בשלב זה עלולה להיראות התערובת מעט מפורקת וזה בסדר).קולפים את הבננות וחותכים
+          לשניים.
+        instructionEn: >-
+          Add the butter and salt and stir (at this point the mixture may look a little disintegrated and that's fine).
+          Peel the bananas and cut them in half.
+      - instruction: חוצים כל מחצית לרוחב לשניים.מסדרים את הבננות על שכבת הקרמל שבמחבת בצפיפות.
+        instructionEn: Cut each half crosswise in half. Arrange the bananas densely on the caramel layer in the pan.
+      - instruction: מוזגים את המים.מחממים תנור לחום של 160 מעלות.מרדדים את הבצק לעלה בעובי 1/2 ס"מ ובקוטר של 26 ס"מ.
+        instructionEn: Pour the water. Heat the oven to 160 degrees. Roll the dough into a sheet 1/2 cm thick and 26 cm in diameter.
+      - instruction: מניחים מעל וטוחבים את השוליים פנימה.
+        instructionEn: Place on top and tuck the edges in.
+      - instruction: מבשלים את התכולה מעל להבה בינוינת 10 דקות ומעבירים לתנור לאפייה של 35 דקות.מצננים מעט והופכים על צלחת הגשה.
+        instructionEn: >-
+          Cook the contents over a moderate flame for 10 minutes and transfer to the oven to bake for 35 minutes. Cool
+          slightly and invert onto a serving plate.
+tips: []

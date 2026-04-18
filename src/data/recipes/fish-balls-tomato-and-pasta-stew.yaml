@@ -1,0 +1,162 @@
+id: fish-balls-tomato-and-pasta-stew
+title: Fish balls, tomato and pasta stew
+titleHe: תבשיל כדורי דג, עגבניות ופסטה
+description: תבשיל כדורי דג, עגבניות ופסטה
+descriptionEn: Fish balls, tomato and pasta stew
+image: https://assets.tugy.dev/fish-balls-tomato-and-pasta-stew.jpg
+category: dinner
+difficulty: medium
+prepTime: 15
+cookTime: 10
+servings: 12
+tags:
+  - ארוחת ערב
+ingredients:
+  - group: ""
+    items:
+      - amount: 700
+        unit: g
+        name: פילה דג לבן טחון (ללא עור) - מוסר/לוקוס/קרפיון
+        nameEn: ground white fish fillet (without skin) - musar/locus/carp
+      - amount: 0
+        unit: ""
+        name: עלים מ-10 גבעולי פטרוזיליה, קצוצים
+        nameEn: leaves from 10 parsley stems, chopped
+      - amount: 0
+        unit: ""
+        name: עלים מ-10 גבעולי כוסברה, קצוצים
+        nameEn: leaves from 10 coriander stems, chopped
+      - amount: 1
+        unit: ""
+        name: בצל קלוף ומגורר
+        nameEn: peeled and grated onion
+      - amount: 1
+        unit: ""
+        name: גזר קטן, קלוף ומגורר
+        nameEn: small carrot, peeled and grated
+      - amount: 1
+        unit: ""
+        name: קישוא, קלוף ומגורר
+        nameEn: zucchini, peeled and grated
+      - amount: 6
+        unit: ""
+        name: שיני שום כתושות
+        nameEn: crushed garlic cloves
+      - amount: 1
+        unit: ""
+        name: ביצה
+        nameEn: egg
+      - amount: 5
+        unit: tbsp
+        name: פירורי לחם
+        nameEn: breadcrumbs
+      - amount: 0
+        unit: ""
+        name: מלח, פלפל בנדיבות
+        nameEn: salt, pepper generously
+      - amount: 0.5
+        unit: tsp
+        name: פפריקה חריפה
+        nameEn: hot paprika
+      - amount: 1
+        unit: tsp
+        name: פפריקה מתוקה
+        nameEn: sweet paprika
+      - amount: 0
+        unit: ""
+        name: עלים מ-6 ענפי טימין, קצוצים
+        nameEn: leaves from 6 thyme sprigs, chopped
+      - amount: 1
+        unit: tsp
+        name: אורגנו יבש
+        nameEn: dried oregano
+      - amount: 0
+        unit: ""
+        name: שמן לטיגון
+        nameEn: oil for frying
+  - group: לרוטב
+    groupEn: for the sauce
+    items:
+      - amount: 3
+        unit: tbsp
+        name: שמן זית
+        nameEn: olive oil
+      - amount: 10
+        unit: ""
+        name: שיני שום פרוסות
+        nameEn: sliced garlic cloves
+      - amount: 1
+        unit: kg
+        name: עגבניות שרי, חצויות
+        nameEn: cherry tomatoes, halved
+      - amount: 0
+        unit: ""
+        name: עלים מ-6 ענפי טימין, קצוצים
+        nameEn: leaves from 6 thyme sprigs, chopped
+      - amount: 0
+        unit: ""
+        name: עלים מענף רוזמרין, קצוצים
+        nameEn: leaves from a rosemary branch, chopped
+      - amount: 1
+        unit: l
+        name: פאסאטה עגבניות
+        nameEn: tomato passata
+      - amount: 1
+        unit: l
+        name: ציר דגים
+        nameEn: fish stock
+      - amount: 0
+        unit: ""
+        name: מלח, פלפל שחור בנדיבות
+        nameEn: salt, black pepper generously
+      - amount: 1
+        unit: tsp
+        name: סוכר
+        nameEn: sugar
+      - amount: 0.5
+        unit: tsp
+        name: צ'ילי גרוס
+        nameEn: coarse chili
+      - amount: 300
+        unit: g
+        name: פסטה קצרה (פוזילי, קונצ׳ילי, פרפלה, אורזו)
+        nameEn: short pasta (fusilli, conchiglie, farfalle, orzo)
+  - group: להגשה
+    groupEn: for serving
+    items:
+      - amount: 20
+        unit: ""
+        name: זיתי קלמטה, מגולענים וקצוצים גס
+        nameEn: kalamata olives, pitted and roughly chopped
+      - amount: 0
+        unit: ""
+        name: עלים מ-6 ענפי בזיליקום, חתוכים גס
+        nameEn: leaves from 6 basil sprigs, roughly chopped
+      - amount: 80
+        unit: g
+        name: שקדים פרוסים, קלויים
+        nameEn: sliced almonds, toasted
+steps:
+  - title: ""
+    items:
+      - instruction: לתערובת הדגים- מעבדים את כל המרכיבים, מערבבים היטב ומשהים ל-1/2 שעה לפחות.לרוטב- מחממים בסיר רחב שמן.
+        instructionEn: >-
+          For the fish mixture - process all the ingredients, mix well and leave for at least 1/2 hour. For the sauce -
+          heat oil in a wide pot.
+      - instruction: מוסיפים שום ותבלינים ומטגנים 3 דקות.
+        instructionEn: Add garlic and spices and fry for 3 minutes.
+      - instruction: מוסיפים עגבניות שרי ומטגנים קלות.
+        instructionEn: Add cherry tomatoes and lightly fry.
+      - instruction: מוסיפים מיץ עגבניות וציר ומבשלים 10 דקות על להבה בינונית לצמצום.
+        instructionEn: Add tomato juice and stock and cook for 10 minutes on a medium flame to reduce.
+      - instruction: מתקנים תיבול.יוצרים קציצות מוארכות מתערובת הדגים, מטגנים בשמן להזהבה ומניחים ברוטב.
+        instructionEn: >-
+          Adjust the seasoning. Make oblong meatballs from the fish mixture, fry in oil until golden and place in the
+          sauce.
+      - instruction: מבשלים כ-10 דקות תוך טלטול הסיר מידי פעם.
+        instructionEn: Cook for about 10 minutes while shaking the pot from time to time.
+      - instruction: מוסיפים את הפסטה ומבשלים בערבוב/טלטול עדינים עד לריכוך, כ-12 דקות.לפני ההגשה מוסיפים זיתים, שקדים ובזיליקום.
+        instructionEn: >-
+          Add the pasta and cook with gentle stirring/shaking until softened, about 12 minutes. Before serving, add
+          olives, almonds and basil.
+tips: []

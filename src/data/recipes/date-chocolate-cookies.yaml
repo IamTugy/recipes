@@ -1,0 +1,121 @@
+id: date-chocolate-cookies
+title: Rolled Date & Chocolate Cookies
+titleHe: עוגיות מגולגלות תמרים ושוקולד
+category: dessert
+tags:
+  - עוגיות
+  - תמרים
+  - שוקולד
+  - גלולות
+tagsEn:
+  - cookies
+  - dates
+  - chocolate
+  - rolled
+image: https://assets.tugy.dev/date-chocolate-cookies.jpg
+description: עוגיות פריכות עם מילוי שוקולד-תמרים-טחינה עשיר, חתוכות באלכסון לצורת משולש - מיוחדות ומרשימות.
+descriptionEn: Crisp cookies with a rich chocolate-date-tahini filling, cut diagonally into triangles - unique and impressive.
+prepTime: 40
+cookTime: 22
+servings: 60
+difficulty: medium
+ingredients:
+  - group: בצק
+    groupEn: Pastry
+    items:
+      - amount: 480
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 5
+        unit: g
+        name: אבקת אפייה
+        nameEn: baking powder
+      - amount: 50
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 1
+        unit: tsp
+        name: משחת וניל
+        nameEn: vanilla paste
+      - amount: 200
+        unit: g
+        name: חמאה קרה, קוביות
+        nameEn: cold butter, cubed
+      - amount: 250
+        unit: g
+        name: שמנת מתוקה 38%
+        nameEn: 38% heavy cream
+  - group: מילוי
+    groupEn: Filling
+    items:
+      - amount: 180
+        unit: g
+        name: שוקולד לבן
+        nameEn: white chocolate
+      - amount: 100
+        unit: g
+        name: שוקולד מריר
+        nameEn: dark chocolate
+      - amount: 50
+        unit: g
+        name: שמן קנולה
+        nameEn: canola oil
+      - amount: 100
+        unit: g
+        name: טחינה גולמית
+        nameEn: raw tahini
+      - amount: 35
+        unit: g
+        name: אבקת קקאו
+        nameEn: cocoa powder
+      - amount: 1
+        unit: tsp
+        name: קינמון טחון
+        nameEn: ground cinnamon
+      - amount: 250
+        unit: g
+        name: ממרח תמרים חלק
+        nameEn: smooth date paste
+      - amount: 2
+        unit: tbsp
+        name: אבקת סוכר לאיבוק
+        nameEn: powdered sugar for dusting
+steps:
+  - title: בצק
+    titleEn: Pastry
+    items:
+      - instruction: מניחים חומרים יבשים במעבד מזון עם חמאה וטוחנים לפירורים עדינים. מוסיפים וניל ושמנת ומעבדים לפירורים לחים.
+        instructionEn: >-
+          Put dry ingredients in a food processor with the butter and pulse to fine crumbs. Add vanilla and cream and
+          pulse to moist crumbs.
+      - instruction: מהדקים לגליל, עוטפים וצוננים שעה לפחות.
+        instructionEn: Press into a log, wrap and refrigerate for at least 1 hour.
+        timerMinutes: 60
+  - title: מילוי
+    titleEn: Filling
+    items:
+      - instruction: >-
+          מתיכים שוקולדים, שמן וטחינה גולמית. מוסיפים קקאו וקינמון. מוסיפים ממרח תמרים ומאחדים. מניחים להתייצב בטמפ'
+          החדר.
+        instructionEn: >-
+          Melt chocolates, oil and tahini together. Add cocoa and cinnamon. Stir in date paste until combined. Let set
+          at room temperature.
+  - title: הרכבה
+    titleEn: Assembly
+    items:
+      - instruction: מחלקים בצק ל-4 ומרדדים כל חלק למלבן 20×30 ס"מ. מורחים ¼ מהמילוי ומגלגלים לרולדה הדוקה.
+        instructionEn: >-
+          Divide dough into 4 and roll each piece into a 20×30 cm rectangle. Spread a quarter of the filling and roll
+          into a tight log.
+      - instruction: מעבירים למגש ומניחים לקירור שעה לפחות.
+        instructionEn: Transfer to a tray and refrigerate for at least 30 minutes.
+        timerMinutes: 30
+        tip: קירור הרולדה לפני חיתוך מונע זליגת המילוי באפייה.
+        tipEn: Chilling the log before slicing prevents the filling from leaking during baking.
+      - instruction: חותכים לפרוסות אלכסוניות (משולשים) ומותירים בצורה המקורית כך שפרוסה תומכת בפרוסה.
+        instructionEn: Cut into diagonal slices (triangles) and keep them in the original shape so each slice supports the next.
+      - instruction: אופים ב-180° כ-22 דקות. מצננים ומאבקים באבקת סוכר.
+        instructionEn: Bake at 180°C for about 22 minutes. Cool and dust with powdered sugar.
+        timerMinutes: 22

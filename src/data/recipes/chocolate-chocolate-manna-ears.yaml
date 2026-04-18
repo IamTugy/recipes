@@ -1,0 +1,57 @@
+id: chocolate-chocolate-manna-ears
+hidden: true
+title: Chocolate-chocolate manna ears
+titleHe: אוזני המן שוקולד-שוקולד
+description: אוזני המן שוקולד-שוקולד
+descriptionEn: Chocolate-chocolate manna ears
+image: https://images.unsplash.com/photo-1603532648955-039310d9ed75?w=900&q=80
+category: bread
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 40
+tags:
+  - מאפה
+  - שוקולד
+ingredients:
+  - group: לבצק
+    items:
+      - amount: 450
+        unit: g
+        name: קמח תופח
+        nameEn: raising flour
+      - amount: 60
+        unit: g
+        name: אבקת קקאו
+        nameEn: cocoa powder
+      - amount: 100
+        unit: g
+        name: אבקת סוכר
+        nameEn: icing sugar
+      - amount: 1
+        unit: g
+        name: מלח
+        nameEn: salt
+      - amount: 200
+        unit: g
+        name: חמאה קרה חתוכה לקוביות
+        nameEn: Cold butter cut into cubes
+      - amount: 200
+        unit: g
+        name: שמנת מתוקה 38% שומן
+        nameEn: Sweet cream 38% fat
+  - group: למילוי
+    items:
+      - amount: 350
+        unit: g
+        name: ממרח שוקולד (נוטלה, השחר, פרה וכו׳)
+        nameEn: Chocolate spread (Nutella, Hashahar, Pera, etc.)
+      - amount: 80
+        unit: g
+        name: פירורי עוגיות
+        nameEn: cookie crumbs
+steps:
+  - title: ""
+    items:
+      - instruction: ""
+tips: []

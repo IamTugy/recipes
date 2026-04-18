@@ -1,0 +1,101 @@
+id: viennese-poppy-cake
+title: Viennese poppy cake
+titleHe: עוגת פרג וינאית
+description: עוגת פרג וינאית
+descriptionEn: Viennese poppy cake
+image: https://assets.tugy.dev/viennese-poppy-cake.jpg
+category: dessert
+difficulty: medium
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - קינוח
+  - מתוק
+  - עוגה
+  - פרג
+ingredients:
+  - group: ""
+    items:
+      - amount: 150
+        unit: g
+        name: חמאה רכה
+        nameEn: soft butter
+      - amount: 1
+        unit: tsp
+        name: משחת וניל
+        nameEn: vanilla paste
+      - amount: 1
+        unit: ""
+        name: ביצה
+        nameEn: egg
+      - amount: 300
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 3
+        unit: g
+        name: אבקת אפייה
+        nameEn: baking powder
+      - amount: 0
+        unit: ""
+        name: קורט מלח
+        nameEn: a pinch of salt
+  - group: למילוי
+    items:
+      - amount: 200
+        unit: g
+        name: פרג טחון טרי
+        nameEn: Fresh ground poppy
+      - amount: 150
+        unit: g
+        name: חלב
+        nameEn: milk
+      - amount: 0
+        unit: ""
+        name: זסט מלימון
+        nameEn: lemon zest
+      - amount: 100
+        unit: g
+        name: חמאה
+        nameEn: butter
+      - amount: 100
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 75
+        unit: g
+        name: פירורי עוגיות
+        nameEn: cookie crumbs
+      - amount: 60
+        unit: g
+        name: צימוקים כהים
+        nameEn: dark raisins
+      - amount: 80
+        unit: g
+        name: אגוזי מלך, קצוצים
+        nameEn: Walnuts, chopped
+      - amount: 1
+        unit: ""
+        name: ביצה
+        nameEn: egg
+steps:
+  - title: ""
+    items:
+      - instruction: "הבצק: במיקסר מצויד בוו גיטרה מערבלים את החמאה, אבקת הסוכר והוניל."
+        instructionEn: "The dough: in a mixer equipped with a guitar hook, mix the butter, powdered sugar and vanilla."
+      - instruction: מוסיפים את הביצה ומערבלים לתערובת אחידה.
+        instructionEn: Add the egg and mix to a uniform mixture.
+      - instruction: מוסיפים את הקמח ומערבלים קלות ליצירת פירורים בצק לחים וגדולים.
+        instructionEn: Add the flour and mix lightly to create moist and large dough crumbs.
+      - instruction: מחצית מהבצק מעבירים לתוך תבנית אפייה ומהדקים, ואת המחצית הנותרת מותירים כפירורים ומצננים.
+        instructionEn: Transfer half of the dough into a baking pan and press, and leave the remaining half as crumbs and cool.
+      - instruction: >-
+          ההרכבה, האפייה וההגשה: מורחים את מילוי הפרג על גבי בסיס הבצק ומפזרים מעל את פירורי הבצק באופן שווה.מחממים תנור
+          לחום של 170 מעלות ואופים את העוגה 35-40 דקות, עד להזהבה.
+        instructionEn: >-
+          Assembly, baking and serving: spread the poppy filling on top of the dough base and sprinkle the dough crumbs
+          evenly over it. Heat the oven to 170 degrees and bake the cake for 35-40 minutes, until golden.
+      - instruction: מצננים ומאבקים באבקת סוכר.
+        instructionEn: Cool and dust with powdered sugar.
+tips: []

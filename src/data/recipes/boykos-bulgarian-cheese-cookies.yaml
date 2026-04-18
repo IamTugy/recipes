@@ -1,0 +1,93 @@
+id: boykos-bulgarian-cheese-cookies
+title: Boykos (Bulgarian cheese cookies)
+titleHe: בוּייקוֹס (עוגיות גבינה בולגריות)
+description: בוּייקוֹס (עוגיות גבינה בולגריות)
+descriptionEn: Boykos (Bulgarian cheese cookies)
+image: https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=900&q=80
+category: dessert
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 100
+tags:
+  - קינוח
+  - מתוק
+  - עוגיות
+  - גבינה
+ingredients:
+  - group: ""
+    items:
+      - amount: 350
+        unit: g
+        name: קמח תופח
+        nameEn: raising flour
+      - amount: 200
+        unit: g
+        name: חמאה קרה, חתוכה לקוביות
+        nameEn: Cold butter, cut into cubes
+      - amount: 1
+        unit: tsp
+        name: מלח
+        nameEn: salt
+      - amount: 200
+        unit: g
+        name: גבינת קשקבל, מגוררת
+        nameEn: Kashkabal cheese, grated
+      - amount: 100
+        unit: g
+        name: גבינה בולגרית, מפוררת
+        nameEn: Bulgarian cheese, crumbled
+      - amount: 1
+        unit: ""
+        name: ביצה
+        nameEn: egg
+      - amount: 2
+        unit: ""
+        name: חלמונים
+        nameEn: egg yolks
+  - group: לציפוי
+    items:
+      - amount: 0
+        unit: ""
+        name: ביצה טרופה
+        nameEn: scrambled egg
+      - amount: 0
+        unit: ""
+        name: שומשום
+        nameEn: sesame
+      - amount: 0
+        unit: ""
+        name: פרג
+        nameEn: poppy
+      - amount: 0
+        unit: ""
+        name: קצח
+        nameEn: cut off
+      - amount: 0
+        unit: ""
+        name: זעתר
+        nameEn: Zaatar
+      - amount: 0
+        unit: ""
+        name: פרמזן מגורר
+        nameEn: Grated Parmesan
+steps:
+  - title: ""
+    items:
+      - instruction: מנפים את הקמח והמלח ומניחים במעבד מזון.
+        instructionEn: Sift the flour and salt and place in a food processor.
+      - instruction: מוסיפים את יתרת החומרים ומעבדים לבצק אחיד.
+        instructionEn: Add the rest of the ingredients and process into a uniform dough.
+      - instruction: >-
+          מצננים במקרר שעה לפחות. מרדדים את הבצק על משטח מקומח, לעלה בעובי 1/2 ס"מ. מברישים את הבצק בביצה הטרופה ומפזרים
+          את הציפוי הנבחר. בעזרת כוס או חותכן עוגיות, קורצים מהבצק את הצורה הרצויה, מניחים על תבנית אפייה מרופדת בנייר
+          אפיה.
+        instructionEn: >-
+          Cool in the refrigerator for at least an hour. Roll out the dough on a floured surface, into a sheet 1/2 cm
+          thick. Brush the dough with the beaten egg and sprinkle with the chosen coating. Using a glass or a cookie
+          cutter, cut the desired shape from the dough, place it on a baking sheet lined with baking paper.
+      - instruction: אופים בתנור שחומם ל-160 מעלות, 25-30 דקות.
+        instructionEn: Bake in an oven heated to 160 degrees, 25-30 minutes.
+      - instruction: מצננים ומגישים.
+        instructionEn: Cool and serve.
+tips: []

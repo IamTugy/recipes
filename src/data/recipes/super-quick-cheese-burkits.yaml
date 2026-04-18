@@ -1,0 +1,57 @@
+id: super-quick-cheese-burkits
+hidden: true
+title: Super quick cheese burkits
+titleHe: בורקיטס גבינות סופר מהירים
+description: בורקיטס גבינות סופר מהירים
+descriptionEn: Super quick cheese burkits
+image: https://assets.tugy.dev/super-quick-cheese-burkits.jpg
+category: bread
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 20
+tags:
+  - מאפה
+  - גבינה
+ingredients:
+  - group: ""
+    items:
+      - amount: 120
+        unit: g
+        name: מים רותחים
+        nameEn: boiling water
+      - amount: 10
+        unit: g
+        name: חומץ
+        nameEn: vinegar
+      - amount: 3
+        unit: g
+        name: מלח
+        nameEn: salt
+      - amount: 3
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 280
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 120
+        unit: g
+        name: שמן
+        nameEn: oil
+  - group: למילוי
+    items:
+      - amount: 150
+        unit: g
+        name: גבינת גאודה מגוררת
+        nameEn: Grated Gouda cheese
+      - amount: 150
+        unit: g
+        name: גבינה בולגרית מפוררת
+        nameEn: Crumbled Bulgarian cheese
+steps:
+  - title: ""
+    items:
+      - instruction: ""
+tips: []

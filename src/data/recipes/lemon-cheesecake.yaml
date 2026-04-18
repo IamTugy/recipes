@@ -1,0 +1,89 @@
+id: lemon-cheesecake
+title: Lemon cheesecake
+titleHe: עוגת גבינה לימונית
+description: עוגת גבינה לימונית
+descriptionEn: Lemon cheesecake
+image: https://assets.tugy.dev/lemon-cheesecake.jpg
+category: dessert
+difficulty: medium
+prepTime: 15
+cookTime: 40
+servings: 4
+tags:
+  - קינוח
+  - מתוק
+  - עוגה
+  - גבינה
+ingredients:
+  - group: לעוגה בקוטר 22 ס״מ     לתחתית
+    items:
+      - amount: 150
+        unit: g
+        name: עוגיות חמאה
+        nameEn: Butter cookies
+      - amount: 70
+        unit: g
+        name: חמאה מומסת
+        nameEn: melted butter
+      - amount: 30
+        unit: g
+        name: סוכר
+        nameEn: sugar
+  - group: מילוי
+    items:
+      - amount: 180
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 500
+        unit: g
+        name: גבינת שמנת
+        nameEn: cream cheese
+      - amount: 25
+        unit: g
+        name: קורנפלור
+        nameEn: Cornflour
+      - amount: 120
+        unit: g
+        name: מיץ לימון
+        nameEn: lemon juice
+      - amount: 200
+        unit: g
+        name: שמנת חמוצה
+        nameEn: Sour cream
+  - group: לציפוי
+    items:
+      - amount: 300
+        unit: g
+        name: שמנת חמוצה
+        nameEn: Sour cream
+      - amount: 80
+        unit: g
+        name: סוכר
+        nameEn: sugar
+steps:
+  - title: ""
+    items:
+      - instruction: מחממים תנור לחום של 160 מעלות.מרסקים את פירורי העוגיות עם החמאה והסוכר במעבד מזון.
+        instructionEn: Heat the oven to 160 degrees. Crush the cookie crumbs with the butter and sugar in a food processor.
+      - instruction: מהדקים לתוך תבנית אפייה.מקציפים את הביצים השלמות עם הסוכר והווניל, עד קבלת תערובת אוורירית.
+        instructionEn: Press into a baking dish. Beat the whole eggs with the sugar and vanilla, until you get an airy mixture.
+      - instruction: >-
+          בערך 5 דקות. מערבבים את שאר חומרי המלית לתערובת חלקה. מקפלים בעדינות את הביצים המוקצפות אל שאר חומרי המלית עד
+          לקבלת עיסה אחידה. יוצקים את הבלילה לתבנית המרופדת בפירורי העוגיות. אופים כ-40 דקות (העוגה צריכה להישאר בהירה
+          וללא צבע).
+        instructionEn: >-
+          About 5 minutes. Mix the rest of the stuffing ingredients into a smooth mixture. Gently fold the beaten eggs
+          into the rest of the filling ingredients until a uniform paste is obtained. Pour the batter into the pan lined
+          with cookie crumbs. Bake for about 40 minutes (the cake should remain light and colorless).
+      - instruction: לציפוי- טורפים את החומרים ומוזגים העדינות על העוגה.
+        instructionEn: For the coating - whisk the ingredients and pour the mixture over the cake.
+      - instruction: מחזירים ל-8 דקות לתנור.
+        instructionEn: Return to the oven for 8 minutes.
+      - instruction: מצננים לילה בקירור.מעטרים בפרי טרי.
+        instructionEn: Refrigerate overnight. Garnish with fresh fruit.
+      - instruction: הערה- יכול להיות שכשזמן האפייה תם, העוגה תראה לא אפויה- אבל זה בסדר- היא תתייצב בקירור.
+        instructionEn: >-
+          Note - it is possible that when the baking time is over, the cake will look unbaked - but that's okay - it
+          will stabilize in the refrigerator.
+tips: []

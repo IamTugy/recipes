@@ -1,0 +1,70 @@
+id: patented-oil-free-granola
+hidden: true
+title: Patented oil-free granola
+titleHe: גרנולה פטנט ללא שמן
+description: גרנולה פטנט ללא שמן
+descriptionEn: Patented oil-free granola
+image: https://assets.tugy.dev/patented-oil-free-granola.jpg
+category: breakfast
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - ארוחת בוקר
+ingredients:
+  - group: ""
+    items:
+      - amount: 150
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 50
+        unit: g
+        name: סירופ מייפל טהור
+        nameEn: Pure maple syrup
+      - amount: 70
+        unit: g
+        name: מים
+        nameEn: water
+      - amount: 100
+        unit: g
+        name: שיבולת שועל
+        nameEn: Oatmeal
+      - amount: 20
+        unit: g
+        name: שומשום לבן
+        nameEn: white sesame
+      - amount: 20
+        unit: g
+        name: פשתן שלם
+        nameEn: Whole linen
+      - amount: 20
+        unit: g
+        name: זרעי צ׳יה
+        nameEn: Chia seeds
+      - amount: 20
+        unit: g
+        name: גרעיני דלעת קלופים
+        nameEn: Peeled pumpkin seeds
+      - amount: 20
+        unit: g
+        name: גרעיני חמנייה קלופים
+        nameEn: Shelled sunflower seeds
+      - amount: 20
+        unit: g
+        name: קוקוס טחון
+        nameEn: Ground coconut
+      - amount: 50
+        unit: g
+        name: חמוציות
+        nameEn: cranberries
+      - amount: 100
+        unit: g
+        name: צימוקיםקורט מלח נדיב
+        nameEn: Raisins and a generous pinch of salt
+steps:
+  - title: ""
+    items:
+      - instruction: ""
+tips: []

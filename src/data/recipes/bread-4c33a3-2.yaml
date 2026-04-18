@@ -1,0 +1,91 @@
+id: bread-4c33a3-2
+title: "'Rose' Donuts"
+titleHe: סופגניות ׳שושנים׳
+description: סופגניות ׳שושנים׳
+descriptionEn: "'Rose' Donuts"
+image: https://assets.tugy.dev/bread-4c33a3-2.jpg
+category: bread
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 40
+tags:
+  - מאפה
+ingredients:
+  - group: ""
+    items:
+      - amount: 35
+        unit: pcs
+        name: לבצק שמרים-440 גרם קמח לחם
+        nameEn: For yeast dough - 440 grams of bread flour
+      - amount: 13
+        unit: g
+        name: שמרים יבשיםכ-150 גרם מים
+        nameEn: Dry yeast about 150 grams of water
+      - amount: 65
+        unit: g
+        name: חמאה רכה
+        nameEn: Soft butter
+      - amount: 100
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 2
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 4
+        unit: g
+        name: מלח
+        nameEn: salt
+  - group: למילוי
+    items:
+      - amount: 130
+        unit: g
+        name: חלב
+        nameEn: milk
+      - amount: 50
+        unit: g
+        name: חמאה
+        nameEn: butter
+      - amount: 50
+        unit: g
+        name: סוכרקורט מלח
+        nameEn: Salt sugar
+      - amount: 50
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 100
+        unit: g
+        name: שוקולד מריר, מומס
+        nameEn: Dark chocolate, melted
+      - amount: 1
+        unit: ""
+        name: ביצה
+        nameEn: egg
+      - amount: 80
+        unit: g
+        name: שוקולד חלב, מגורר דק
+        nameEn: Milk chocolate, finely grated
+  - group: המילוי
+    items:
+      - amount: 0
+        unit: ""
+        name: ההרכבה:מחלקים את בצק השמרים לשני חלקים.מרדדים חלק אחד לעלה מלבני בעובי
+        nameEn: "Assembly: Divide the yeast dough into two parts. Roll one part into a thick rectangular sheet"
+      - amount: 150
+        unit: ""
+        name: מעלות ומטגנים את הסופגניות כ-3 דקות מכל צד. מעבירים לנייר סופג.מקשטים בפונדנט.
+        nameEn: Raise and fry the donuts for about 3 minutes on each side. Transfer to absorbent paper. Decorate with fondant.
+steps:
+  - title: ""
+    items:
+      - instruction: >-
+          בצק השמרים: לשים במיקסר את כל חומרי הבצק לישה ממושכת של כ-10 דקות, עד קבלת בצק גמיש.מניחים בקערה ומתפיחים
+          להכפלת נפח, רצוי בקירור ל-6 שעות.
+        instructionEn: >-
+          The yeast dough: put all the dough ingredients in a mixer and knead for about 10 minutes, until you get a
+          flexible dough. Place in a bowl and let it rise until it doubles in volume, preferably in the refrigerator for
+          6 hours.
+tips: []

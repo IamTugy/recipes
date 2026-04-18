@@ -1,0 +1,136 @@
+id: tiramisu
+title: Tiramisu
+titleHe: טירמיסו
+category: dessert
+tags:
+  - איטלקי
+  - קפה
+  - שמנת
+  - ללא אפייה
+tagsEn:
+  - Italian
+  - coffee
+  - cream
+  - no-bake
+cuisine: Italian
+image: https://assets.tugy.dev/tiramisu.jpg
+description: טירמיסו קלאסי עם ביסקוטי בישקוטי תוצרת בית, זביונה אמיתית וקרם מסקרפונה עדין - מושלם.
+descriptionEn: Classic tiramisu with homemade ladyfingers, a real zabaglione and a silky mascarpone cream - perfection.
+prepTime: 45
+cookTime: 15
+servings: 8
+difficulty: medium
+featured: true
+ingredients:
+  - group: ביסקוטי
+    groupEn: Ladyfingers
+    items:
+      - amount: 2
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 80
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 60
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 20
+        unit: g
+        name: קורנפלור
+        nameEn: cornstarch
+      - amount: 2
+        unit: tbsp
+        name: אבקת סוכר לאיבוק
+        nameEn: powdered sugar for dusting
+  - group: זביונה
+    groupEn: Zabaglione
+    items:
+      - amount: 3
+        unit: ""
+        name: חלמונים
+        nameEn: egg yolks
+      - amount: 100
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 50
+        unit: g
+        name: מים
+        nameEn: water
+  - group: קרם מסקרפונה
+    groupEn: Mascarpone Cream
+    items:
+      - amount: 250
+        unit: g
+        name: שמנת מתוקה
+        nameEn: heavy cream
+      - amount: 250
+        unit: g
+        name: מסקרפונה
+        nameEn: mascarpone
+      - amount: 1
+        unit: tsp
+        name: משחת וניל
+        nameEn: vanilla paste
+  - group: סירופ
+    groupEn: Syrup & Finish
+    items:
+      - amount: 300
+        unit: g
+        name: אספרסו חזק וחם
+        nameEn: hot strong espresso
+      - amount: 50
+        unit: g
+        name: ברנדי
+        nameEn: brandy
+      - amount: 50
+        unit: g
+        name: אבקת סוכר
+        nameEn: powdered sugar
+      - amount: 2
+        unit: tbsp
+        name: אבקת קקאו לעיטור
+        nameEn: cocoa powder for dusting
+steps:
+  - title: ביסקוטי
+    titleEn: Ladyfingers
+    items:
+      - instruction: מקציפים ביצים וסוכר כ-5 דקות לקציפה יציבה וסמיכה.
+        instructionEn: Whip eggs and sugar for about 5 minutes until thick and stable.
+        timerMinutes: 5
+      - instruction: מנפים קמח וקורנפלור מעל ומקפלים בעדינות. משטחים על מגש לעובי 5 מ"מ ומאבקים בנדיבות באבקת סוכר.
+        instructionEn: >-
+          Sift flour and cornstarch over and fold gently. Spread on a tray to 5mm thick and dust generously with
+          powdered sugar.
+      - instruction: אופים ב-180° כ-12 דקות. מחלקים לשני חלקים התואמים את כלי ההגשה.
+        instructionEn: Bake at 180°C for about 12 minutes. Cut into two pieces matching your serving dish.
+        timerMinutes: 12
+  - title: זביונה
+    titleEn: Zabaglione
+    items:
+      - instruction: >-
+          מניחים חלמונים, סוכר ומים בקערה מעל סיר מים רותחים (באן מארי) ומקציפים ללא הפסקה כ-5 דקות עד קבלת תערובת תפוחה
+          ואוורירית. מצננים.
+        instructionEn: >-
+          Place egg yolks, sugar and water in a bowl over a pot of simmering water (bain-marie) and whisk constantly for
+          about 5 minutes until fluffy and thick. Cool completely.
+        timerMinutes: 5
+  - title: קרם ורכבה
+    titleEn: Cream & Assembly
+    items:
+      - instruction: מקציפים מסקרפונה, וניל ושמנת לקרם סמיך. מקפלים בעדינות את הזביונה לתוך הקרם.
+        instructionEn: Whip mascarpone, vanilla and cream to a thick cream. Gently fold in the zabaglione.
+      - instruction: מערבבים אספרסו, ברנדי ואבקת סוכר לסירופ. מניחים ביסקוטי בתחתית כלי ההגשה ומספיגים במחצית הסירופ.
+        instructionEn: >-
+          Mix espresso, brandy and powdered sugar into a syrup. Lay the first ladyfinger layer in the dish and soak with
+          half the syrup.
+      - instruction: יוצקים מחצית מהקרם. מניחים ביסקוטי שני, מספיגים ביתרת הסירופ ומורחים יתרת הקרם.
+        instructionEn: Spread half the cream. Add the second ladyfinger layer, soak with remaining syrup and spread remaining cream.
+      - instruction: מאבקים בנדיבות בקקאו. מכסים ומעבירים לקירור לפחות 4 שעות.
+        instructionEn: Dust generously with cocoa. Cover and refrigerate for at least 4 hours.
+        timerMinutes: 240
+        tip: טירמיסו שעמד לילה שלם במקרר טעים פי כמה.
+        tipEn: Tiramisu that rests overnight in the fridge tastes several times better.

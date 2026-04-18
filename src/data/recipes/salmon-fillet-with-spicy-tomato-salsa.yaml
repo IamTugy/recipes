@@ -1,0 +1,64 @@
+id: salmon-fillet-with-spicy-tomato-salsa
+title: Salmon fillet with spicy tomato salsa
+titleHe: פילה סלמון עם סלסה עגבניות פיקנטית
+description: פילה סלמון עם סלסה עגבניות פיקנטית
+descriptionEn: Salmon fillet with spicy tomato salsa
+image: https://assets.tugy.dev/salmon-fillet-with-spicy-tomato-salsa.jpg
+category: dinner
+difficulty: medium
+prepTime: 15
+cookTime: 10
+servings: 2
+tags:
+  - ארוחת ערב
+ingredients:
+  - group: ""
+    items:
+      - amount: 2
+        unit: ""
+        name: מנות
+        nameEn: Dishes
+      - amount: 300
+        unit: g
+        name: פילה סלמוןמלחפלפל שחורשמן זית לטיגון
+        nameEn: Salmon fillet, salt, black pepper, olive oil for frying
+      - amount: 0
+        unit: ""
+        name: לסלסה:3 עגבניות
+        nameEn: "For salsa: 3 tomatoes"
+      - amount: 0.5
+        unit: ""
+        name: בצל סגול
+        nameEn: Purple onion
+      - amount: 2
+        unit: ""
+        name: שיני שום כתושות
+        nameEn: Crushed garlic cloves
+      - amount: 0.25
+        unit: ""
+        name: צרור כוסברה קצוצה
+        nameEn: A bunch of chopped cilantro
+      - amount: 1
+        unit: ""
+        name: פלפל צ'יפוטלה, קצוץ
+        nameEn: Chipotle pepper, chopped
+      - amount: 2
+        unit: tbsp
+        name: חומץמלחפלפל שחור
+        nameEn: vinegar, salt, black pepper
+steps:
+  - title: ""
+    items:
+      - instruction: מנקים את הסלמון וחותכים לפרוסות עבות.
+        instructionEn: Clean the salmon and cut into thick slices.
+      - instruction: מתבלים במלח ופלפל.
+        instructionEn: Season with salt and pepper.
+      - instruction: מערבבים את כל חומרי הסלסה ומשהים ל-1/2 שעה.
+        instructionEn: Mix all the salsa ingredients and leave for 1/2 hour.
+      - instruction: צורבים את הפילה על מחבת משומנת קלות מצד העור בלבד למשך 2-3 דקות.
+        instructionEn: Sear the fillet on a lightly oiled pan on the skin side only for 2-3 minutes.
+      - instruction: מעבירים לתנור וצולים בחום של 200 מעלות למשך 6 דקות.
+        instructionEn: Transfer to the oven and roast at 200 degrees for 6 minutes.
+      - instruction: מגישים מיד על מצע הסלסה.
+        instructionEn: Serve immediately on top of the salsa.
+tips: []

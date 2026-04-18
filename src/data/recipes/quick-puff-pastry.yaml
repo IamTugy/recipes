@@ -1,0 +1,42 @@
+id: quick-puff-pastry
+hidden: true
+title: Quick puff pastry ('bluff')
+titleHe: בצק עלים מהיר הכנה (׳בלוף׳)
+description: בצק עלים מהיר הכנה (׳בלוף׳)
+descriptionEn: Quick puff pastry ('bluff')
+image: https://images.unsplash.com/photo-1509440159596-0249088772ff?w=900&q=80
+category: bread
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - מאפה
+ingredients:
+  - group: ""
+    items:
+      - amount: 300
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 5
+        unit: g
+        name: מלח ים
+        nameEn: sea ​​salt
+      - amount: 20
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 110
+        unit: g
+        name: מים
+        nameEn: water
+      - amount: 200
+        unit: g
+        name: חמאה
+        nameEn: butter
+steps:
+  - title: ""
+    items:
+      - instruction: ""
+tips: []

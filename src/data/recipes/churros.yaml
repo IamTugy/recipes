@@ -1,0 +1,80 @@
+id: churros
+title: Churros
+titleHe: צ׳ורוס
+description: צ׳ורוס
+descriptionEn: Churros
+image: https://assets.tugy.dev/churros.jpg
+category: bread
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - מאפה
+ingredients:
+  - group: ""
+    items:
+      - amount: 80
+        unit: g
+        name: חמאה
+        nameEn: butter
+      - amount: 300
+        unit: g
+        name: מים
+        nameEn: water
+      - amount: 2
+        unit: g
+        name: מלח
+        nameEn: salt
+      - amount: 80
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 175
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 4
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 0
+        unit: ""
+        name: שמן לטיגון עמוק
+        nameEn: Oil for deep frying
+  - group: לציפוי
+    items:
+      - amount: 0
+        unit: ""
+        name: סוכר וקינמון מעורבבים יחדיו
+        nameEn: Sugar and cinnamon are mixed together
+steps:
+  - title: ""
+    items:
+      - instruction: >-
+          שמים בסיר קטן את החמאה, המלח הסוכר והמים ומביאים לרתיחה.מוסיפים את הקמח ומבשלים תוך כדי בחישה עד שהבצק נפרד
+          מדפנות הסיר.
+        instructionEn: >-
+          Put the butter, salt, sugar and water in a small pot and bring to a boil. Add the flour and cook while
+          stirring until the dough separates from the sides of the pot.
+      - instruction: >-
+          מסירים מהאש ומצננים מעט. מעבירים את הבצק למיקסר עם וו גיטרה ומערבלים כ-2 דקות, עד לצינון התערובת. מוסיפים את
+          הביצים אחת אחת ובוחשים היטב אחרי כל הוספה. מחממים שמן לטיגון עמוק לחום של 160 מעלות. ממלאים שק זילוף מציד
+          בצנתר משונן רחב בבצק.
+        instructionEn: >-
+          Remove from heat and cool slightly. Transfer the dough to a mixer with a guitar hook and mix for about 2
+          minutes, until the mixture cools. Add the eggs one by one and stir well after each addition. Heat oil for deep
+          frying to 160 degrees. Fill a piping bag with a wide serrated tube with the dough.
+      - instruction: >-
+          מותחים מעל הסיר חוט שפגאט בין שתי הידיות שלו, על מנת לקבל צ'ורוס אחידים ויפים. מזלפים את הצ'ורוס לתוך השמן החם
+          מהבצק וחותכים בעזרת החוט המתוח. מטגנים עד שהבצק מזהיב.
+        instructionEn: >-
+          Stretch a string over the pot between its two handles, in order to get uniform and beautiful churros. Drizzle
+          the churros into the hot oil from the dough and cut with the stretched string. Fry until the dough is golden.
+      - instruction: >-
+          מטגנים כך את יתר הבצק.מעבירים מיד למגש עם סוכר וקינמון, מגלגלים עד שהצ'ורוס מכוסים ומגישים חם.ניתן להגיש גם עם
+          כוס שוקו סמיך.
+        instructionEn: >-
+          Fry the rest of the dough like this. Immediately transfer to a tray with sugar and cinnamon, roll until the
+          churros are covered and serve hot. You can also serve with a cup of thick chocolate.
+tips: []

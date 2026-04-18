@@ -1,0 +1,122 @@
+id: honey-chocolate-tart
+title: Honey chocolate tart
+titleHe: טארט שוקולד דבש
+description: טארט שוקולד דבש
+descriptionEn: Honey chocolate tart
+image: https://assets.tugy.dev/honey-chocolate-tart.jpg
+category: dessert
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 10
+tags:
+  - קינוח
+  - מתוק
+  - שוקולד
+ingredients:
+  - group: ""
+    items:
+      - amount: 10
+        unit: ""
+        name: מנות     מצרכים לבצק:200 גרם קמח
+        nameEn: "Ingredients for the dough: 200 grams of flour"
+      - amount: 80
+        unit: g
+        name: אבקת שקדים
+        nameEn: almond powder
+      - amount: 60
+        unit: g
+        name: אבקת סוכר
+        nameEn: icing sugar
+      - amount: 110
+        unit: g
+        name: חמאה קרה חתוכה לקוביות
+        nameEn: Cold butter cut into cubes
+      - amount: 1
+        unit: ""
+        name: ביצה
+        nameEn: egg
+      - amount: 0
+        unit: ""
+        name: למילוי טופי:30 גרם דבש
+        nameEn: "To fill toffee: 30 grams of honey"
+      - amount: 200
+        unit: g
+        name: סוכר חום כהה
+        nameEn: dark brown sugar
+      - amount: 10
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 3
+        unit: g
+        name: אבקת אפייה
+        nameEn: baking powder
+      - amount: 50
+        unit: g
+        name: חמאה
+        nameEn: butter
+      - amount: 2
+        unit: g
+        name: מלח
+        nameEn: salt
+      - amount: 100
+        unit: g
+        name: חלב מרוכז ממותק
+        nameEn: Sweetened condensed milk
+  - group: לגנאש
+    items:
+      - amount: 250
+        unit: g
+        name: שוקולד מריר
+        nameEn: dark chocolate
+      - amount: 80
+        unit: g
+        name: שוקולד חלב
+        nameEn: milk chocolate
+      - amount: 200
+        unit: g
+        name: שמנת מתוקה
+        nameEn: sweet cream
+      - amount: 50
+        unit: g
+        name: דבשקורט מלח
+        nameEn: A pinch of salt
+      - amount: 50
+        unit: g
+        name: שמן קנולה
+        nameEn: Canola oil
+steps:
+  - title: ""
+    items:
+      - instruction: >-
+          אופן ההכנת הבצק:במעבד מזון טוחנים חומרים יבשים ואבקת שקדים. מוסיפים חמאה ומעבדים לתערובת פירורית, מוסיפים ביצה
+          ומעבדים עד לקבלת בצק פירורי לח. מהדקים, עוטפים בניילון נצמד ומצננים במקרר במשך חצי שעה לפחות. מחממים תנור לחום
+          של 160 מעלות.
+        instructionEn: >-
+          How to prepare the dough: grind dry ingredients and almond powder in a food processor. Add butter and process
+          to a crumbly mixture, add an egg and process until a moist crumbly dough is obtained. Tighten, wrap in cling
+          film and chill in the fridge for at least half an hour. Heat the oven to 160 degrees.
+      - instruction: >-
+          מרדדים את הבצק על משטח מקומח ומרפדים 12 תבנית טארט אישיות בקוטר 12 ס"מ. מניחים משקולת ומכניסים למקרר לחצי שעה
+          נוספת. אופים אפייה עיוורת 15 דקות, מסירים משקולת ואופים עוד 8 דקות להזהבה מלאה.
+        instructionEn: >-
+          Roll out the dough on a floured surface and line 12 individual tart pans with a diameter of 12 cm. Place a
+          weight and place in the refrigerator for another half hour. Bake blind baking for 15 minutes, remove the
+          weight and bake for another 8 minutes until fully golden.
+      - instruction: >-
+          הכנת הטופי:מניחים את כל החומרים בסיר, מביאים לרתיחה טובה ומסירים מהאש.מצננים מעל ויוצקים שכבה אחידה על כל אחת
+          מהקלתיות.מחזירים לתנור לאפייה קצרה של 8 דקות.מצננים היטב.
+        instructionEn: >-
+          To make the toffee: place all the ingredients in a pot, bring to a good boil and remove from the heat. Cool on
+          top and pour an even layer on each of the cakes. Return to the oven for a short baking of 8 minutes. Cool
+          well.
+      - instruction: >-
+          הכנת הגנאש:מתיכים שוקולדים מעל באן מארי. בנפרד מרתיחים שמנת, מלח ודבש. מחברים את שתי התערובות בשלבים ומוסיפים
+          גם את השמן וטוחנים היטב בעזרת בלנדר מוט. יוצקים מהתערובת על שכבת הטופי שבתבנית ומעבירים לייצב בקירור. מניחים
+          מעל את דיסקיות השוקולד.
+        instructionEn: >-
+          Preparation of the ganache: melt chocolates over a bain marie. Separately boil cream, salt and honey. Combine
+          the two mixtures in stages and also add the oil and grind well with a stick blender. Pour the mixture on the
+          toffee layer in the mold and transfer to stabilize in the refrigerator. Place the chocolate discs on top.
+tips: []

@@ -1,0 +1,91 @@
+id: romias-chocolate-cookies
+title: Romias chocolate cookies
+titleHe: עוגיות רומיאס (romias) שוקולד
+description: עוגיות רומיאס (romias) שוקולד
+descriptionEn: Romias chocolate cookies
+image: https://assets.tugy.dev/romias-chocolate-cookies.jpg
+category: dessert
+difficulty: easy
+prepTime: 15
+cookTime: 12
+servings: 60
+tags:
+  - קינוח
+  - מתוק
+  - שוקולד
+  - עוגיות
+ingredients:
+  - group: ""
+    items:
+      - amount: 80
+        unit: g
+        name: אבקת סוכר
+        nameEn: icing sugar
+      - amount: 200
+        unit: g
+        name: חמאה רכה מאוד
+        nameEn: Very soft butter
+      - amount: 0
+        unit: ""
+        name: קורט מלח
+        nameEn: A pinch of salt
+      - amount: 40
+        unit: g
+        name: קקאו
+        nameEn: cocoa
+      - amount: 35
+        unit: g
+        name: חלבון
+        nameEn: protein
+      - amount: 240
+        unit: g
+        name: קמח
+        nameEn: flour
+  - group: למילוי
+    items:
+      - amount: 50
+        unit: g
+        name: חמאה
+        nameEn: butter
+      - amount: 50
+        unit: g
+        name: שמנת מתוקה
+        nameEn: sweet cream
+      - amount: 50
+        unit: g
+        name: דבש
+        nameEn: honey
+      - amount: 50
+        unit: g
+        name: שקדים קצוצים
+        nameEn: Chopped almonds
+      - amount: 20
+        unit: g
+        name: פולי קקאו גרוסים
+        nameEn: ground cocoa beans
+steps:
+  - title: ""
+    items:
+      - instruction: >-
+          מכינים את הבצק: מקציפים את החמאה הרכה ואבקת הסוכר במיקסר בעל וו גיטרה. מוסיפים את הקקאו, המלח ולבסוף את
+          החלבון. מוסיפים את הקמח בבת אחת ומערבלים לאיחוד.
+        instructionEn: >-
+          Prepare the dough: beat the softened butter and powdered sugar in a mixer with a guitar hook. Add the cocoa,
+          salt and finally the protein. Add the flour all at once and mix to combine.
+      - instruction: "מכינים את המילוי: מניחים את כל מרכיבי המילוי בקלחת (סיר קטן עם ידית אחת) ומרתיחים עד לטמפרטורה של 118 מעלות."
+        instructionEn: >-
+          Prepare the filling: place all the filling ingredients in a cauldron (a small pot with one handle) and boil to
+          a temperature of 118 degrees.
+      - instruction: >-
+          מצננים את המילוי.מעבירים את הבצק לשק זילוף בעל צנתר סולטן sultan (צנתר המיועד לזילוף טבעות בצק) ומזלפים על
+          תבנית מרופדת בנייר אפיה.
+        instructionEn: >-
+          Cool the filling. Transfer the dough to a piping bag with a sultan nozzle (a tube designed for piping dough
+          rings) and pour onto a baking sheet lined with baking paper.
+      - instruction: >-
+          מקפיאים ל-10 דקות.מניחים מעט מתערובת המילוי במרכז כל טבעת בצק.מחממים תנור לחום של 180 מעלות ואופים 12
+          דקות.מצננים היטב על מגש האפייה ומעבירים לכלי אטום.
+        instructionEn: >-
+          Freeze for 10 minutes. Place a little of the filling mixture in the center of each dough ring. Heat the oven
+          to 180 degrees and bake for 12 minutes. Cool well on the baking tray and transfer to an airtight container.
+tips: []

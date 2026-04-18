@@ -1,0 +1,51 @@
+id: lachma-bejin-bread-with-meat
+hidden: true
+title: Lachma Bejin (bread with meat)
+titleHe: לחמא בעג׳ין (לחם עם בשר)
+description: לחמא בעג׳ין (לחם עם בשר)
+descriptionEn: Lachma Bejin (bread with meat)
+image: https://assets.tugy.dev/lachma-bejin-bread-with-meat.jpg
+category: bread
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 20
+tags:
+  - מאפה
+  - לחם
+ingredients:
+  - group: ""
+    items:
+      - amount: 0
+        unit: ""
+        name: לתערובת הבשר-500 גרם בשר בר שמן טחון
+        nameEn: For the meat mixture - 500 grams of minced wild meat
+      - amount: 1
+        unit: ""
+        name: בצל
+        nameEn: onion
+      - amount: 2
+        unit: pcs
+        name: עגבנייהעלים מ-10 גבעולי כוסברהעלים מ-10 גבעולי נענעעלים מ-10 גבעולי פטרוזיליה
+        nameEn: Tomato Leaves from 10 cilantro stems Leaves from 10 mint stems Leaves from 10 parsley stems
+      - amount: 4
+        unit: ""
+        name: שיני שום
+        nameEn: Garlic cloves
+      - amount: 100
+        unit: g
+        name: רכז עגבניותכף גדושה פפריקה מתוקה
+        nameEn: Tomato concentrate, heaping spoonful of sweet paprika
+      - amount: 0.5
+        unit: tsp
+        name: פפריקה חריפהכפית סירירצ׳ה
+        nameEn: Spicy paprika, a spoonful of sriracha
+      - amount: 0.5
+        unit: tsp
+        name: בהרטכפית אורגנו יבשמלח, פלפל שחור טרישמן זית להברשה
+        nameEn: In a bowl of oregano, salt, black pepper, trishman, and an olive for brushing
+steps:
+  - title: ""
+    items:
+      - instruction: ""
+tips: []

@@ -1,0 +1,78 @@
+id: sweet-challah
+title: Sweet challah
+titleHe: חלה מתוקה
+description: חלה מתוקה
+descriptionEn: Sweet challah
+image: https://assets.tugy.dev/sweet-challah.jpg
+category: bread
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 2
+tags:
+  - מאפה
+  - לחם
+ingredients:
+  - group: ""
+    items:
+      - amount: 2
+        unit: ""
+        name: חלות
+        nameEn: apply
+      - amount: 1
+        unit: ""
+        name: קילו קמח לחם
+        nameEn: a kilo of bread flour
+      - amount: 40
+        unit: g
+        name: שמרים יבשים
+        nameEn: dry yeast
+      - amount: 100
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 100
+        unit: g
+        name: דבש
+        nameEn: honey
+      - amount: 200
+        unit: g
+        name: ביצים (כ-3 ביצים גדולות)
+        nameEn: Eggs (about 3 large eggs)
+      - amount: 300
+        unit: g
+        name: מים
+        nameEn: water
+      - amount: 100
+        unit: g
+        name: שמן קנולה
+        nameEn: Canola oil
+      - amount: 20
+        unit: g
+        name: מלח
+        nameEn: salt
+steps:
+  - title: ""
+    items:
+      - instruction: >-
+          שמים את החומרים היבשים בקערת המיקסר ומערבלים היטב. מוסיפים במהירות איטית את הנוזלים ומערבלים כ-10 דקות עד קבלת
+          בצק אחיד וחלק. מניחים להתפחה בכלי מכוסה, להכפלת הנפח, כשעה וחצי. מחממים תנור לחום של 180 מעלות.
+        instructionEn: >-
+          Put the dry ingredients in the mixer bowl and mix well. Slowly add the liquids and mix for about 10 minutes
+          until you get a uniform and smooth dough. Leave to rise in a covered container, to double the volume, for
+          about an hour and a half. Heat an oven to 180 degrees.
+      - instruction: חוצים את הבצק לחצי וכל מחצית מחלקים לחמישה חלקים.
+        instructionEn: Cut the dough in half and divide each half into five parts.
+      - instruction: >-
+          מרדדים כל חלק ומעצבים לגליל. קולעים צמה מכל 5 גלילים באופן הבא:ממספרים את הרצועות משמאל לימין 1-2-3-4-5,
+          מחברים יחד בקצה העליון ואז:מעבירים את 1 מעל 3מעבירים את 2 מעל 3מעבירים את 5 מעל 2וכך הלאה. מניחים על תבנית
+          ומכסים - מתפיחים שוב כ-40 דקות.
+        instructionEn: >-
+          Roll each part and shape into a roll. Make a braid from all 5 rolls as follows: number the strips from left to
+          right 1-2-3-4-5, join together at the top edge and then: move 1 over 3 move 2 over 3 move 5 over 2 and so on.
+          Place on a tray and cover - rise again for about 40 minutes.
+      - instruction: מברישים את החלות בביצה טרופה ומפזרים שומשום ופרג. אופים במשך חצי שעה. נותנים לחלה להתקרר היטב לפני הפריסה.
+        instructionEn: >-
+          Brush the challah with a beaten egg and sprinkle with sesame seeds and poppy seeds. Bake for half an hour.
+          Allow the challah to cool well before serving.
+tips: []

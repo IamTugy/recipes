@@ -1,0 +1,73 @@
+id: airy-orange-cake
+hidden: true
+title: Airy orange cake
+titleHe: עוגת תפוזים אוורירית
+description: עוגת תפוזים אוורירית
+descriptionEn: Airy orange cake
+image: https://assets.tugy.dev/airy-orange-cake.jpg
+category: dessert
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - קינוח
+  - מתוק
+  - עוגה
+  - הדרים
+ingredients:
+  - group: ""
+    items:
+      - amount: 0
+        unit: ""
+        name: חלק
+        nameEn: part
+      - amount: 16
+        unit: ""
+        name: חלמונים
+        nameEn: egg yolks
+      - amount: 100
+        unit: g
+        name: ריבת תפוזים/ קומקוואטכפית משחת ונילזסט מ-2 תפוזים
+        nameEn: Orange jam/ Kumquat teaspoon of vanilla paste from 2 oranges
+      - amount: 200
+        unit: g
+        name: מיץ תפוזים טרי
+        nameEn: Fresh orange juice
+      - amount: 180
+        unit: g
+        name: שמן קנולה
+        nameEn: Canola oil
+      - amount: 0
+        unit: ""
+        name: חלק
+        nameEn: part
+      - amount: 2300
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 50
+        unit: g
+        name: קורנפלור
+        nameEn: Cornflour
+      - amount: 10
+        unit: g
+        name: אבקת אפייה
+        nameEn: baking powder
+      - amount: 0
+        unit: ""
+        name: חלק
+        nameEn: part
+      - amount: 36
+        unit: ""
+        name: חלבונים
+        nameEn: proteins
+      - amount: 200
+        unit: g
+        name: סוכרקורט מלח
+        nameEn: Salt sugar
+steps:
+  - title: ""
+    items:
+      - instruction: ""
+tips: []

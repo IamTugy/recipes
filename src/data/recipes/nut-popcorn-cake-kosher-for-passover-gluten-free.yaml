@@ -1,0 +1,93 @@
+id: nut-popcorn-cake-kosher-for-passover-gluten-free
+hidden: true
+title: Nut Popcorn Cake Kosher for Passover/Gluten Free
+titleHe: עוגת פופקורן אגוזים כשר לפסח/ללא גלוטן
+description: עוגת פופקורן אגוזים כשר לפסח/ללא גלוטן
+descriptionEn: Nut Popcorn Cake Kosher for Passover/Gluten Free
+image: https://assets.tugy.dev/nut-popcorn-cake-kosher-for-passover-gluten-free.jpg
+category: dessert
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - קינוח
+  - מתוק
+  - עוגה
+  - ללא גלוטן
+ingredients:
+  - group: לתערובת עוגת הפופקורן
+    items:
+      - amount: 80
+        unit: g
+        name: פופקורן מוכן
+        nameEn: Popcorn is ready
+      - amount: 80
+        unit: g
+        name: אגוזי לוז קלויים טחונים
+        nameEn: Ground roasted hazelnuts
+      - amount: 50
+        unit: g
+        name: אבקת שקדים
+        nameEn: almond powder
+      - amount: 60
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 0
+        unit: ""
+        name: פחית (397 גרם) חלב מרוכז ממותק
+        nameEn: can (397 grams) sweetened condensed milk
+      - amount: 165
+        unit: g
+        name: ביצים
+        nameEn: eggs
+      - amount: 30
+        unit: g
+        name: קורנפלור
+        nameEn: Cornflour
+      - amount: 1
+        unit: g
+        name: אבקת אפייה
+        nameEn: baking powder
+      - amount: 120
+        unit: g
+        name: חמאה שחומה חמימה
+        nameEn: Warm brown butter
+      - amount: 60
+        unit: g
+        name: חלבון
+        nameEn: protein
+      - amount: 30
+        unit: g
+        name: סוכר אינברטי
+        nameEn: Invert sugar
+  - group: לקרם פופקורן
+    items:
+      - amount: 400
+        unit: g
+        name: שמנת
+        nameEn: cream
+      - amount: 0
+        unit: ""
+        name: כפית משחת וניל
+        nameEn: A teaspoon of vanilla paste
+      - amount: 80
+        unit: g
+        name: פופקורן מוכן
+        nameEn: Popcorn is ready
+      - amount: 100
+        unit: g
+        name: שוקולד לבן
+        nameEn: white chocolate
+  - group: לעוגה
+    items:
+      - amount: 0.5
+        unit: ""
+        name: מגובן.מחממים תנור לחום של
+        nameEn: Protected. Heat an oven to a temperature of
+steps:
+  - title: ""
+    items:
+      - instruction: ""
+tips: []

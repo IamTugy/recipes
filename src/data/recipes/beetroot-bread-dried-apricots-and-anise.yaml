@@ -1,0 +1,84 @@
+id: beetroot-bread-dried-apricots-and-anise
+title: Beetroot bread, dried apricots and anise
+titleHe: לחם סלק, משמשים מיובשים ואניס
+description: לחם סלק, משמשים מיובשים ואניס
+descriptionEn: Beetroot bread, dried apricots and anise
+image: https://assets.tugy.dev/beetroot-bread-dried-apricots-and-anise.jpg
+category: bread
+difficulty: medium
+prepTime: 15
+cookTime: 30
+servings: 4
+tags:
+  - מאפה
+  - לחם
+ingredients:
+  - group: ""
+    items:
+      - amount: 2
+        unit: ""
+        name: כיכרות
+        nameEn: Squares
+      - amount: 300
+        unit: g
+        name: קמח לחם קשה
+        nameEn: Hard bread flour
+      - amount: 200
+        unit: g
+        name: קמח חיטה מלאה
+        nameEn: Whole wheat flour
+      - amount: 10
+        unit: g
+        name: מלח
+        nameEn: salt
+      - amount: 50
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 15
+        unit: g
+        name: שמרים יבשים או
+        nameEn: dry yeast or
+      - amount: 30
+        unit: g
+        name: שמרים טריים
+        nameEn: fresh yeast
+      - amount: 5
+        unit: g
+        name: זרעי אניס שלמים, כתושים קלות
+        nameEn: Whole anise seeds, lightly crushed
+      - amount: 100
+        unit: g
+        name: משמש מיובש, קצוץ
+        nameEn: Dried apricots, chopped
+      - amount: 500
+        unit: g
+        name: סלק מבושל ומרוסק בבלנדר למחית (ניתן להשתמש בסלק הנמכר מבושל בווקום)
+        nameEn: Beetroot boiled and crushed in a blender for puree (you can use the beetroot sold cooked in a vacuum)
+steps:
+  - title: ""
+    items:
+      - instruction: מניחים את כל החומרים, למעט הסלק, והמשמשים, במיקסר מצויד בוו לישה.
+        instructionEn: Place all the ingredients, except the beets, and the apricots, in a mixer fitted with a kneading hook.
+      - instruction: מפעילים את המכשיר ומוזגים את מחית הסלק פנימה ליצירת בצק לח.
+        instructionEn: Turn on the device and pour the beetroot puree in to create a moist dough.
+      - instruction: אם חסרים נוזלים ניתן להוסיף מעט מים.
+        instructionEn: If there is a lack of liquid, you can add a little water.
+      - instruction: לשים במהירות נמוכה כ-10 דקות.
+        instructionEn: put on low speed for about 10 minutes.
+      - instruction: >-
+          מוסיפים את המשמשים ולשים עוד דקה.מעבירים את הבצק לקערה מקומחות קלות, מכסים ומניחים להתפחה להכפלת הנפח.מחלקים
+          את הבצק לשני חלקים, מעצבים כל חלק לכיכר אובאלית מוארכת ומניחים על מגש אפייה.
+        instructionEn: >-
+          Add the apricots and cook for another minute. Transfer the dough to a lightly floured bowl, cover and leave to
+          rise until it doubles in volume. Divide the dough into two parts, shape each part into an elongated oval loaf
+          and place on a baking tray.
+      - instruction: >-
+          מכסים ומניחים להתפחה עד 80% מהנפח המקורי.מחממים תנור לחום של 200 מעלות.מקמחים קלות את הכיכרות וחורצים אותן
+          בעזרת תער ייעודי או סכין חד.
+        instructionEn: >-
+          Cover and allow to rise to 80% of the original volume. Heat an oven to 200 degrees. Lightly flour the loaves
+          and score them using a dedicated razor or a sharp knife.
+      - instruction: אופים 30 דקות.מצננים על גבי רשת צינון.
+        instructionEn: Bake for 30 minutes. Cool on a cooling rack.
+tips: []

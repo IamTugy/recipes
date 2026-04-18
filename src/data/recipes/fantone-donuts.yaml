@@ -1,0 +1,102 @@
+id: fantone-donuts
+title: Fantone donuts
+titleHe: סופגניות פנטונה
+description: סופגניות פנטונה
+descriptionEn: Fantone donuts
+image: https://assets.tugy.dev/fantone-donuts.jpg
+category: bread
+difficulty: medium
+prepTime: 15
+cookTime: 10
+servings: 20
+tags:
+  - מאפה
+ingredients:
+  - group: ""
+    items:
+      - amount: 200
+        unit: g
+        name: חלב בטמפרטורת הגוף
+        nameEn: Milk at body temperature
+      - amount: 10
+        unit: g
+        name: שמרים יבשים
+        nameEn: dry yeast
+      - amount: 450
+        unit: g
+        name: קמח לחם קשהגרידה מלימון אחדגרידה מתפוז אחד
+        nameEn: Hard bread flour, grated from one lemon, grated from one orange
+      - amount: 1
+        unit: tsp
+        name: משחת וניל
+        nameEn: Vanilla paste
+      - amount: 100
+        unit: g
+        name: חמאה רכה
+        nameEn: Soft butter
+      - amount: 5
+        unit: g
+        name: מלח
+        nameEn: salt
+      - amount: 3
+        unit: ""
+        name: חלמונים
+        nameEn: egg yolks
+      - amount: 75
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 70
+        unit: g
+        name: קליפות הדרים מסוכרות קצוצות
+        nameEn: Chopped candied citrus peels
+      - amount: 70
+        unit: g
+        name: צימוקים מושרים במעט רום
+        nameEn: Raisins soaked in a little rum
+steps:
+  - title: ""
+    items:
+      - instruction: >-
+          מכינים בצק: ממיסים בקערה את השמרים בחלב ומניחים לתסיסה של 30 דקות (יוצרים ראש עיסה מהיר לזירוז התרבות השמרים
+          בבצק). מנפים קמח לקערת המיקסר, מוסיפים את הזסטים והווניל ולשים תוך הוספת תערובת החלב והשמרים המותססים.
+        instructionEn: >-
+          Prepare the dough: Dissolve the yeast in the milk in a bowl and let it ferment for 30 minutes (create a quick
+          dough head to speed up the yeast culture in the dough). Sift flour into the mixer bowl, add the zests and
+          vanilla and mix while adding the milk mixture and the fermented yeast.
+      - instruction: >-
+          לשים במשך כ-5 דקות.מוסיפים את החמאה בהדרגה ולשים במשך כ-2 דקות.מוסיפים את הפירות המסוכרים ולשים עד שהם נטמעים
+          בתערובת.מעבירים את הבצק לקערה ומתפיחים עד להכפלת נפח.
+        instructionEn: >-
+          Put for about 5 minutes. Add the butter gradually and put for about 2 minutes. Add the candied fruits and put
+          until they are absorbed in the mixture. Transfer the dough to a bowl and let it rise until it doubles in
+          volume.
+      - instruction: >-
+          מעבירים לקירור של 6 שעות במקרר (אפשר לילה). מחלקים את הבצק הקר לחתיכות במשקל 50 גרם ומכדררים לכדורים עגולים
+          ומתוחים. מניחים כל כדור בצק על ריבוע נייר אפייה גזור לגודל מעט יותר מגודל הסופגניה. מכסים ומניחים להתפחה ל-80%
+          מנפח הסופגניה המקורי.
+        instructionEn: >-
+          Transfer to cool for 6 hours in the refrigerator (perhaps overnight). Divide the cold dough into pieces
+          weighing 50 grams and roll into round, stretched balls. Place each ball of dough on a square of baking paper
+          cut to a size slightly larger than the size of the doughnut. Cover and let rise to 80% of the original donut
+          volume.
+      - instruction: >-
+          מחממים שמן לטיגון עמוק לחום של 150 מעלות (מאוד מומלץ להיעזר במד חום). מרימים את הסופגניה עם נייר האפייה שצמוד
+          לבסיסה ומניחים בעדינות בתוך השמן החם והופכים, כך שכיפתה בתוך השמן. מטגנים במשך 3 דקות והופכים לצידה השני
+          לטיגון דומה והזהבה עמוקה.
+        instructionEn: >-
+          Heat oil for deep frying to a temperature of 150 degrees (it is highly recommended to use a thermometer). Lift
+          the donut with the baking paper attached to its base and gently place it in the hot oil and turn it over so
+          that its dome is in the oil. Fry for 3 minutes and turn to the other side for similar frying and deep golden
+          brown.
+      - instruction: מעבירים לנייר סופג.
+        instructionEn: Transfer to absorbent paper.
+      - instruction: "מכינים סוכר וניל: טוחנים את הסוכר והמקל לתערובת אחידה."
+        instructionEn: "Prepare vanilla sugar: grind the sugar and the stick to a uniform mixture."
+      - instruction: מסננים בכדי להיפטר משיירי קליפה שלא נטחנה ומניחים בקערה.מגלגלים בקערת סוכר הוניל ומצפים את הסופגניה.
+        instructionEn: >-
+          Filter to get rid of the remains of unground shell and place in a bowl. Roll in a bowl of vanilla sugar and
+          coat the donut.
+      - instruction: מגישים מיד.
+        instructionEn: Serve immediately.
+tips: []

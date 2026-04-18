@@ -1,0 +1,85 @@
+id: snowy-chocolate-chocolate-cookies
+title: Snowy chocolate-chocolate cookies
+titleHe: עוגיות שוקולד-שוקולד מושלגות
+description: עוגיות שוקולד-שוקולד מושלגות
+descriptionEn: Snowy chocolate-chocolate cookies
+image: https://assets.tugy.dev/snowy-chocolate-chocolate-cookies.jpg
+category: dessert
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 40
+tags:
+  - קינוח
+  - מתוק
+  - שוקולד
+  - עוגיות
+ingredients:
+  - group: ""
+    items:
+      - amount: 120
+        unit: g
+        name: חמאה רכה
+        nameEn: Soft butter
+      - amount: 100
+        unit: g
+        name: סוכר חום כהה
+        nameEn: dark brown sugar
+      - amount: 20
+        unit: g
+        name: דבש
+        nameEn: honey
+      - amount: 2
+        unit: g
+        name: מלחכפית משחת וניל
+        nameEn: A spoonful of vanilla paste
+      - amount: 2
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 120
+        unit: g
+        name: קמח כוסמין או חיטה מלאה
+        nameEn: Spelled flour or whole wheat
+      - amount: 60
+        unit: g
+        name: אבקת קקאו
+        nameEn: cocoa powder
+      - amount: 10
+        unit: g
+        name: אבקת אפייה
+        nameEn: baking powder
+      - amount: 160
+        unit: g
+        name: שוקולד מריר, קצוץ גס
+        nameEn: Dark chocolate, coarsely chopped
+  - group: לציפוי
+    items:
+      - amount: 100
+        unit: g
+        name: אבקת סוכר
+        nameEn: icing sugar
+steps:
+  - title: ""
+    items:
+      - instruction: במיקסר מצויד בוו גיטרה מקציפים חמאה, סוכרים, מלח ווניל כ-5 דקות.מוסיפים ביצים אחת אחת.
+        instructionEn: >-
+          In a mixer fitted with a guitar hook, beat butter, sugars, salt and vanilla for about 5 minutes. Add eggs one
+          by one.
+      - instruction: מקציפים היטב.מנפים את החומרים היבשים ומוסיפים אל התערובת.
+        instructionEn: Beat well. Sieve the dry ingredients and add to the mixture.
+      - instruction: >-
+          בוחשים לאיחוד. מוסיפים שוקולד מריר ומערבלים. מעבירים את הבצק לקירור של 3 שעות. קורצים מהבצק כדורים במשקל 15-20
+          גרם ומגלגלים באבקת סוכר לציפוי מלא. מניחים על מגש אפייה במרווחים. מחממים תנור לחום של 200 מעלות ואופים את
+          העוגיות 9 דקות.
+        instructionEn: >-
+          Stir to combine. Add dark chocolate and mix. Refrigerate the dough for 3 hours. Pinch the dough into balls
+          weighing 15-20 grams and roll in powdered sugar for a full coating. Place on a baking tray in intervals. Heat
+          an oven to 200 degrees and bake the cookies for 9 minutes.
+      - instruction: >-
+          העוגיות אמורות להישאר רכות בצאתן מהתנור.מניחים לעוגיות להצטנן לחלוטין על גבי מגשי האפייה ומעבירים לאיחסון בכלי
+          אטום.
+        instructionEn: >-
+          The cookies should remain soft when they come out of the oven. Allow the cookies to cool completely on the
+          baking trays and transfer to storage in an airtight container.
+tips: []

@@ -1,0 +1,110 @@
+id: danish-filled-with-milk-chocolate
+title: Danish filled with milk chocolate
+titleHe: דייניש במילוי שוקולד-חלבה
+description: דייניש במילוי שוקולד-חלבה
+descriptionEn: Danish filled with milk chocolate
+image: https://assets.tugy.dev/danish-filled-with-milk-chocolate.jpg
+category: bread
+difficulty: hard
+prepTime: 15
+cookTime: 10
+servings: 30
+tags:
+  - מאפה
+  - שוקולד
+ingredients:
+  - group: ""
+    items:
+      - amount: 30
+        unit: pcs
+        name: לבצק-500 קמח לחם קשה
+        nameEn: For the dough - 500 hard bread flour
+      - amount: 80
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 15
+        unit: g
+        name: מלח
+        nameEn: salt
+      - amount: 30
+        unit: g
+        name: שמן
+        nameEn: oil
+      - amount: 20
+        unit: g
+        name: שמרים יבשים
+        nameEn: dry yeast
+      - amount: 200
+        unit: g
+        name: חלב קרכפית תמצית וניל
+        nameEn: Vanilla extract skimmed milk
+      - amount: 2
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+  - group: למילוי
+    items:
+      - amount: 200
+        unit: g
+        name: שוקולד מריר
+        nameEn: dark chocolate
+      - amount: 100
+        unit: g
+        name: ממרח חלבה
+        nameEn: Halva spread
+      - amount: 50
+        unit: g
+        name: חמאה
+        nameEn: butter
+      - amount: 20
+        unit: g
+        name: קורנפלור
+        nameEn: Cornflour
+steps:
+  - title: ""
+    items:
+      - instruction: לבצק- שמים במיקסר מצויד בוו לישה את כל החומרים ולשים עד לאיחוד הבצק ועוד 3 דקות.
+        instructionEn: >-
+          For the dough - put all the ingredients in a mixer equipped with a kneading hook and mix until the dough comes
+          together and another 3 minutes.
+      - instruction: מכסים את הבצק ומניחים ל-60 דקות התפחה בטמפרטורת החדר.
+        instructionEn: Cover the dough and let rise for 60 minutes at room temperature.
+      - instruction: >-
+          מעבירים לקירור של 3 שעות.חותכים את החמאה לרוחב ל"לוחות" בעובי 1 ס"מ ומניחים אותן אחת לצד השנייה על ניילון
+          נצמד.
+        instructionEn: >-
+          Refrigerate for 3 hours. Cut the butter crosswise into "slabs" 1 cm thick and place them side by side on cling
+          film.
+      - instruction: מכסים ביריעת ניילון נוספת ומרדדים לעלה מלבני אחיד בעובי 1/2 ס"מ.
+        instructionEn: Cover with another plastic sheet and roll into a uniform rectangular sheet 1/2 cm thick.
+      - instruction: >-
+          שומרים בקירור.לקיפול- מרדדים את הבצק למלבן הרחב ב-1/3 מהחמאה, מניחים את החמאה על שני שליש הבצק ומקפלים את כנף
+          הבצק העליונה (הריקה) מעל מחיצת מהחמאה ומעליה מניחים את כנף הבצק התחתונה.
+        instructionEn: >-
+          Keep refrigerated. For folding - roll the dough into a wide rectangle with 1/3 of the butter, place the butter
+          on two thirds of the dough and fold the upper (empty) dough wing over a partition of the butter and place the
+          lower dough wing on top of it.
+      - instruction: ממש כמו מעטפה.
+        instructionEn: Just like an envelope.
+      - instruction: מסובבים את הבצק ב-90 מעלות עם כיוון השעות וחוזרים על פעולה זו שוב.
+        instructionEn: Turn the dough 90 degrees clockwise and repeat this operation again.
+      - instruction: מניחים בקירור לשעה וחוזרים על הקיפול פעם נוספת.
+        instructionEn: Refrigerate for an hour and repeat the folding once more.
+      - instruction: מקררים לשעה.למילוי- ממיסים את השוקולד והחמאה.
+        instructionEn: Refrigerate for an hour. For the filling - melt the chocolate and butter.
+      - instruction: מסירים מהאש ומוסיפים את ממרח החלבה והקורנפלור.
+        instructionEn: Remove from the heat and add the milk and cornflour spread.
+      - instruction: מצננים לטמפ' חדר.מרדדים את הבצק לעלה רחב ודק ומורחים את המילוי על גביו.
+        instructionEn: Cool to room temperature. Roll the dough into a wide, thin sheet and spread the filling on top of it.
+      - instruction: מקפלים אותו לחצי, כך שהמילוי במרכז.
+        instructionEn: Fold it in half, so that the filling is in the center.
+      - instruction: מצננים ל-1/2 שעה וחותכים לאצבעות ארוכות, בעובי 1 ס"מ.מלפפים את האצבעות סביב עצמן לבורג ומגלגלים ל"שבלול".
+        instructionEn: >-
+          Cool for 1/2 hour and cut into long fingers, 1 cm thick. Wrap the fingers around themselves into a screw and
+          roll into a "snail".
+      - instruction: מניחים על מגש אפייה, מכסים ומתפיחים כשעה.מחממים תנור לחום של 170 מעלות ואופים את הדיינישים 12-15 דקות.
+        instructionEn: >-
+          Place on a baking tray, cover and let rise for about an hour. Heat the oven to 170 degrees and bake the
+          danishes for 12-15 minutes.
+tips: []

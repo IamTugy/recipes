@@ -1,0 +1,84 @@
+id: sandwich-cookies-filled-with-cream-cheese-and-va
+title: Sandwich cookies filled with cream cheese and vanilla
+titleHe: עוגיות סנדוויץ במילוי קרם גבינה ווניל
+description: עוגיות סנדוויץ במילוי קרם גבינה ווניל
+descriptionEn: Sandwich cookies filled with cream cheese and vanilla
+image: https://assets.tugy.dev/sandwich-cookies-filled-with-cream-cheese-and-va.jpg
+category: dessert
+difficulty: medium
+prepTime: 15
+cookTime: 10
+servings: 40
+tags:
+  - קינוח
+  - מתוק
+  - וניל
+  - עוגיות
+  - גבינה
+ingredients:
+  - group: לבצק
+    items:
+      - amount: 120
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 50
+        unit: g
+        name: ברס (לוז גרוס מקורמל)
+        nameEn: Bears (caramelized ground hazelnuts)
+      - amount: 50
+        unit: g
+        name: שוקולד מריר קצוץ
+        nameEn: Chopped dark chocolate
+      - amount: 80
+        unit: g
+        name: אבקת סוכר
+        nameEn: icing sugar
+      - amount: 0
+        unit: ""
+        name: קורט מלח
+        nameEn: A pinch of salt
+      - amount: 100
+        unit: g
+        name: חמאה קרה
+        nameEn: cold butter
+  - group: למילוי
+    items:
+      - amount: 200
+        unit: g
+        name: גבינת שמנת 30% שומן
+        nameEn: Cream cheese 30% fat
+      - amount: 0
+        unit: ""
+        name: כפית משחת וניל
+        nameEn: A teaspoon of vanilla paste
+      - amount: 250
+        unit: g
+        name: שוקולד לבן
+        nameEn: white chocolate
+      - amount: 50
+        unit: g
+        name: חמאה
+        nameEn: butter
+steps:
+  - title: ""
+    items:
+      - instruction: מכינים את הבצק- מכניסים חומרים יבשים, שוקולד וברס למעבד מזון וטוחנים לאבקה.
+        instructionEn: Prepare the dough - put dry ingredients, chocolate and rice in a food processor and grind to a powder.
+      - instruction: מוסיפים חמאה קרה ומעבדים לפירורים לחים.
+        instructionEn: Add cold butter and process into moist crumbs.
+      - instruction: מאחדים ומצננים ל-1/2 שעה.
+        instructionEn: Combine and cool for 1/2 hour.
+      - instruction: מחלקים לכדורים במשקל 10 גרם ומניחים בתבנית שקעים מסיליקון (בקוטר 3-4 ס"מ).
+        instructionEn: Divide into balls weighing 10 grams and place in a silicone mold (diameter 3-4 cm).
+      - instruction: אופים בחום של 160 מעלות כ-17 דקות.
+        instructionEn: Bake at 160 degrees for about 17 minutes.
+      - instruction: מצננים.
+        instructionEn: Cool.
+      - instruction: >-
+          מחממים את כל חומרי המילוי מעל באן מארי לתערובת אחידה. מצננים לטמפרטורה של 4 מעלות, לפחות ל-4 שעות ומקציפים
+          קלות להסמכה. מעבירים לשק זילוף ומצמידים כל זוג עוגיות בקרם.
+        instructionEn: >-
+          Heat all the filling ingredients over a bain-marie to a uniform mixture. Cool to 4 degrees for at least 4
+          hours and whip lightly to thicken. Transfer to a piping bag and attach each pair of cookies with cream.
+tips: []

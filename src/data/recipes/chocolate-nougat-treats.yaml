@@ -1,0 +1,79 @@
+id: chocolate-nougat-treats
+title: Chocolate-nougat treats
+titleHe: פינוקי שוקולד-נוגט
+description: פינוקי שוקולד-נוגט
+descriptionEn: Chocolate-nougat treats
+image: https://assets.tugy.dev/chocolate-nougat-treats.jpg
+category: dessert
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 50
+tags:
+  - קינוח
+  - מתוק
+  - שוקולד
+ingredients:
+  - group: ""
+    items:
+      - amount: 250
+        unit: g
+        name: שוקולד מריר 60% מוצקי קקאו
+        nameEn: Dark chocolate 60% cocoa solids
+      - amount: 200
+        unit: g
+        name: חמאה
+        nameEn: butter
+      - amount: 100
+        unit: g
+        name: גלוקוזה (להשיג בחנויות המתמחות)
+        nameEn: Glucose (obtain in specialized stores)
+      - amount: 150
+        unit: g
+        name: אבקת נוגט או מחית פרלינה לוז (להשיג בחנויות המתמחות)
+        nameEn: Nougat powder or hazelnut praline puree (available in specialty stores)
+      - amount: 40
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 4
+        unit: ""
+        name: ביצים בטמפרטורת החדר
+        nameEn: Eggs at room temperature
+      - amount: 60
+        unit: ""
+        name: גר קקאו משובח
+        nameEn: Ger fine cocoa
+      - amount: 50
+        unit: g
+        name: קמח
+        nameEn: flour
+  - group: לקישוט
+    items:
+      - amount: 0
+        unit: ""
+        name: אבקת סוכר או קקאו
+        nameEn: Powdered sugar or cocoa
+steps:
+  - title: ""
+    items:
+      - instruction: מחממים תנור ל-170 מעלות.בקערה מעל סיר עם מים רותחים קלות (בן מארי), ממיסים שוקולד, חמאה וגלוקוזה.
+        instructionEn: >-
+          Heat the oven to 170 degrees. In a bowl over a pot with lightly boiling water (Bain Marie), melt chocolate,
+          butter and glucose.
+      - instruction: >-
+          מוסיפים אבקת נוגט או פרלינה לוז וטורפים היטב לתערובת אחידה. בקערת מיקסר עם בלון הקצפה מקציפים ביצים וסוכר
+          לתערובת אחידה ותפוחה מאוד. בזרם דק מוסיפים את תערובת השוקולד לתערובת הביצים, תוך ערבוב רצוף.
+        instructionEn: >-
+          Add nougat powder or hazelnut praline and beat well to a uniform mixture. In the bowl of a mixer with the
+          whisk attachment, beat eggs and sugar to a very uniform and fluffy mixture. In a thin stream, add the
+          chocolate mixture to the egg mixture, stirring continuously.
+      - instruction: >-
+          מנפים פנימה קקאו וקמח ומוסיפים לתערובת בתנועות קיפול. מעבירים את הבלילה לתבניות השקעים, וממלאים עד ל-3/4
+          מהגובה. אופים במשך כ-10 דקות או עד אשר שהמאפים מתרוממים ומתייצבים. מצננים מעט על רשת, הופכים על צלחת הגשה,
+          מקשטים באבקת סוכר או קקאו ומגישים.
+        instructionEn: >-
+          Sift in cocoa and flour and add to the mixture with folding movements. Transfer the batter to the socket
+          molds, and fill up to 3/4 of the height. Bake for about 10 minutes or until the pastries rise and stabilize.
+          Cool slightly on a wire rack, invert onto a serving plate, garnish with powdered sugar or cocoa and serve.
+tips: []

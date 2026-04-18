@@ -1,0 +1,64 @@
+id: nougat-sandwich-cookies
+title: Nougat sandwich cookies
+titleHe: עוגיות סנדוויץ' נוגט
+description: עוגיות סנדוויץ' נוגט
+descriptionEn: Nougat sandwich cookies
+image: https://assets.tugy.dev/nougat-sandwich-cookies.jpg
+category: dessert
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 40
+tags:
+  - קינוח
+  - מתוק
+  - עוגיות
+ingredients:
+  - group: ""
+    items:
+      - amount: 300
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 100
+        unit: g
+        name: אבקת נוגט
+        nameEn: Nougat powder
+      - amount: 50
+        unit: g
+        name: אבקת סוכר
+        nameEn: icing sugar
+      - amount: 200
+        unit: g
+        name: חמאה קרה, חתוכה לקוביות
+        nameEn: Cold butter, cut into cubes
+      - amount: 0.25
+        unit: tsp
+        name: קינמון
+        nameEn: cinnamon
+      - amount: 30
+        unit: g
+        name: חלבון
+        nameEn: protein
+  - group: למילוי
+    items:
+      - amount: 200
+        unit: g
+        name: פרלינה (מחית נוגט) או 180 גרם אבקת נוגט מעורבבת עם 20 גרם שמן קנולה
+        nameEn: Praline (nougat puree) or 180 grams of nougat powder mixed with 20 grams of canola oil
+steps:
+  - title: ""
+    items:
+      - instruction: מרדדים את הבצק לעובי 4 מ"מ ומקפיאים.
+        instructionEn: Roll the dough to 4mm thick and freeze.
+      - instruction: קורצים את הבצק לצורה הרצויה (עיגול, פרח, מרובע) ויוצרים במחצית העוגיות חור קטן במרכזן.
+        instructionEn: >-
+          Cut into the desired shape (circle, flower, or square) and make a small hole in the center of half the
+          cookies.
+      - instruction: אופים בחום של 150 מעלות ל-22 דקות עד הזהבה עדינה ומצננים.
+        instructionEn: Bake at 150°C for 22 minutes until lightly golden. Cool.
+      - instruction: מצמידים כל זוג עוגיות עם פרלינה, כך שחלקה העליון של העוגייה מחורר.
+        instructionEn: Attach each pair of cookies with praline, perforated side up.
+      - instruction: מאבקים קלות באבקת סוכר.
+        instructionEn: Dust lightly with powdered sugar.
+tips: []

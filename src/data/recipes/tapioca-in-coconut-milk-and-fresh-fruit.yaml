@@ -1,0 +1,64 @@
+id: tapioca-in-coconut-milk-and-fresh-fruit
+title: Tapioca in coconut milk and fresh fruit
+titleHe: טפיוקה בחלב קוקוס ופירות טריים
+description: טפיוקה בחלב קוקוס ופירות טריים
+descriptionEn: Tapioca in coconut milk and fresh fruit
+image: https://assets.tugy.dev/tapioca-in-coconut-milk-and-fresh-fruit.jpg
+category: breakfast
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 10
+tags:
+  - ארוחת בוקר
+ingredients:
+  - group: ""
+    items:
+      - amount: 40
+        unit: g
+        name: פניני טפיוקה
+        nameEn: tapioca pearls
+      - amount: 240
+        unit: ml
+        name: מים
+        nameEn: water
+      - amount: 100
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 140
+        unit: ml
+        name: קרם קוקוס
+        nameEn: coconut cream
+      - amount: 0
+        unit: ""
+        name: זסט מתפוז
+        nameEn: orange zest
+      - amount: 250
+        unit: g
+        name: פירות חתוכים לקוביות (פירות העונה)
+        nameEn: diced seasonal fruit
+      - amount: 0
+        unit: ""
+        name: מעט סוכר
+        nameEn: a little sugar
+      - amount: 0
+        unit: ""
+        name: שלוק ליקר פירות
+        nameEn: a splash of fruit liqueur
+      - amount: 0
+        unit: ""
+        name: נענע לקישוט
+        nameEn: mint for decoration
+steps:
+  - title: ""
+    items:
+      - instruction: מערבבים את הפירות עם סוכר ומקררים היטב.מבשלים טפיוקה עם מים על אש בינונית במשך כ-20 דקות ומוסיפים סוכר.
+        instructionEn: >-
+          Mix the fruits with sugar and refrigerate well. Cook tapioca with water over medium heat for about 20 minutes
+          and add sugar.
+      - instruction: מערבבים היטב ומצננים מעט, מוסיפים קרם קוקוס וזסט, מערבבים ומוזגים לכלים אישיים.
+        instructionEn: Mix well and cool slightly, add coconut cream and zest, mix and pour into personal containers.
+      - instruction: מצננים היטב.מפזרים את הטפיוקה מעל פירות, מעטרים בנענע וקוקוס מקורמל ומגישים קר.
+        instructionEn: Cool well. Sprinkle the tapioca over fruit, garnish with mint and caramelized coconut and serve cold.
+tips: []

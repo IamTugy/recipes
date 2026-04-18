@@ -1,0 +1,103 @@
+id: baked-cheesecake-and-crumbs
+title: Baked cheesecake and crumbs
+titleHe: עוגת גבינה ופירורים אפויה
+description: עוגת גבינה ופירורים אפויה
+descriptionEn: Baked cheesecake and crumbs
+image: https://assets.tugy.dev/baked-cheesecake-and-crumbs.jpg
+category: dessert
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - קינוח
+  - מתוק
+  - עוגה
+  - גבינה
+ingredients:
+  - group: ""
+    items:
+      - amount: 0
+        unit: ""
+        name: תבנית
+        nameEn: pattern
+      - amount: 20
+        unit: ""
+        name: "x20 ס״מ     לבצק:"
+        nameEn: "x20 cm for the dough:"
+      - amount: 300
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 100
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 200
+        unit: g
+        name: חמאה קרה, חתוכה לקוביות
+        nameEn: Cold butter, cut into cubes
+      - amount: 5
+        unit: g
+        name: אבקת אפייה
+        nameEn: baking powder
+      - amount: 1
+        unit: ""
+        name: ביצה
+        nameEn: egg
+  - group: למילוי
+    items:
+      - amount: 200
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 3
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 300
+        unit: g
+        name: גבינה לבנה
+        nameEn: curds
+      - amount: 5
+        unit: ""
+        name: "% שומן"
+        nameEn: "% fat"
+      - amount: 200
+        unit: g
+        name: שמנת חמוצה
+        nameEn: Sour cream
+      - amount: 30
+        unit: g
+        name: קורנפלור
+        nameEn: Cornflour
+      - amount: 80
+        unit: g
+        name: צימוקים בהירים כפית משחת וניל
+        nameEn: Light raisins a teaspoon of vanilla paste
+steps:
+  - title: ""
+    items:
+      - instruction: >-
+          לבצק: מניחים את כל החומרים למעט הביצה במעבד מזון ומעבדים לקבלת פירורים דקים.מוסיפים ביצה ומעבדים לקבלת פירורי
+          בצק לחים.מחלקים את הבצק לשני חלקים: 1/3+2/3.
+        instructionEn: >-
+          For the dough: Place all the ingredients except the egg in a food processor and process to obtain fine crumbs.
+          Add an egg and process to obtain moist dough crumbs. Divide the dough into two parts: 1/3+2/3.
+      - instruction: >-
+          עוטפים כל אחד מהם ומניחים בקירור לשעה. מחממים תנור לחום של 180 מעלות. מרדדים את 2/3 הבצק לעלה שיכסה את בסיס
+          התבנית ומניחים אותו בתוכה. מחוררים את הבצק ואופים אותו 17 דקות, עד הזהבה. מוציאים ומורידים את חום התנור ל-150
+          מעלות.
+        instructionEn: >-
+          Wrap each of them and refrigerate for an hour. Heat an oven to 180 degrees. Roll out 2/3 of the dough into a
+          leaf that will cover the base of the mold and place it inside. Pierce the dough and bake it for 17 minutes,
+          until golden. Take out and lower the oven heat to 150 degrees.
+      - instruction: >-
+          למילוי: בקערה רחבה מערבבים סוכר וביצים לתערובת אחידה. מוסיפים את שאר החומרים ומערבבים לתערובת אחידה. יוצקים אל
+          תבנית האפייה, על הבצק האפוי, ומגררים/מפוררים את 1/3 הבצק הנותר מעל, לכיסוי מלא. מחזירים את העוגה לאפייה של 30
+          דקות או התייצבות. מצננים.
+        instructionEn: >-
+          For the filling: in a wide bowl, mix sugar and eggs to a uniform mixture. Add the rest of the ingredients and
+          mix to a uniform mixture. Pour into the baking pan, on the baked dough, and grate/crumble the remaining 1/3 of
+          the dough on top, to cover completely. Return the cake to bake for 30 minutes or to set. cooling
+tips: []

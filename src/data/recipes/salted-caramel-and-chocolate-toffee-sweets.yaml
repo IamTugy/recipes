@@ -1,0 +1,88 @@
+id: salted-caramel-and-chocolate-toffee-sweets
+title: Salted caramel and chocolate toffee sweets
+titleHe: ממתקי טופי קרמל מלוח ושוקולד
+description: ממתקי טופי קרמל מלוח ושוקולד
+descriptionEn: Salted caramel and chocolate toffee sweets
+image: https://assets.tugy.dev/salted-caramel-and-chocolate-toffee-sweets.jpg
+category: dessert
+difficulty: hard
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - קינוח
+  - מתוק
+  - שוקולד
+ingredients:
+  - group: ""
+    items:
+      - amount: 0
+        unit: ""
+        name: תבנית תבנית
+        nameEn: template template
+      - amount: 12
+        unit: ""
+        name: x20 ס״מ
+        nameEn: x20 cm
+      - amount: 130
+        unit: g
+        name: שמנת מתוקה
+        nameEn: sweet cream
+      - amount: 125
+        unit: g
+        name: חמאה חתוכה לקוביות
+        nameEn: Butter cut into cubes
+      - amount: 50
+        unit: g
+        name: מים
+        nameEn: water
+      - amount: 220
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 65
+        unit: g
+        name: גלוקוזה
+        nameEn: glucose
+      - amount: 100
+        unit: g
+        name: שוקולד מריר
+        nameEn: dark chocolate
+      - amount: 66
+        unit: ""
+        name: "% מוצקי קקאו"
+        nameEn: "% cocoa solids"
+      - amount: 3
+        unit: g
+        name: מלח ים אטלנטי
+        nameEn: Atlantic sea salt
+steps:
+  - title: ""
+    items:
+      - instruction: מניחים בקלחת שמנת מתוקה וחמאה ומביאים לסף רתיחה.
+        instructionEn: Place sweet cream and butter in a cauldron and bring to the boil.
+      - instruction: מסירים מהאש.
+        instructionEn: Remove from the heat.
+      - instruction: במקביל, בקלחת נוספת, מניחים מים, סוכר וגלוקוזה ומבשלים לקרמל ענברי בטמפרטורה של 190 מעלות.
+        instructionEn: >-
+          At the same time, in another cauldron, place water, sugar and glucose and cook to an amber caramel at a
+          temperature of 190 degrees.
+      - instruction: מקפידים לא לבחוש את התערובת אלא רק לטלטל את הסיר.
+        instructionEn: Make sure not to stir the mixture but just shake the pot.
+      - instruction: מסירים את קלחת הקרמל מהלהבה ומוזגים בהדרגה את השמנת והחמאה החמים, תוך כדי טלטול הסיר ובחישה עדינה.
+        instructionEn: >-
+          Remove the caramel cauldron from the flame and gradually pour in the hot cream and butter, while shaking the
+          pot and gently stirring.
+      - instruction: מחזירים אל הלהבה ומבשלים לטמפרטורה של 126 מעלות.
+        instructionEn: Return to the flame and cook to a temperature of 126 degrees.
+      - instruction: מסירים מהאש ומוסיפים שוקולד מריר ומלח.
+        instructionEn: Remove from heat and add dark chocolate and salt.
+      - instruction: ממתינים 1/2 דקה וטורפים היטב.
+        instructionEn: Wait 1/2 minute and beat well.
+      - instruction: מעבירים מיד אל התבנית ומצננים היטב בטמפרטורת החדר ל-3-4 שעות או עד התייצבות מלאה.
+        instructionEn: Immediately transfer to the mold and cool well at room temperature for 3-4 hours or until completely set.
+      - instruction: חותכים למנות ועוטפים בנייר פרגמנט.
+        instructionEn: Cut into portions and wrap in parchment paper.
+      - instruction: שומרים בכלי אטום.
+        instructionEn: Keep in an airtight container.
+tips: []

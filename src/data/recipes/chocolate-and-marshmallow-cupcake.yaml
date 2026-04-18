@@ -1,0 +1,93 @@
+id: chocolate-and-marshmallow-cupcake
+title: Chocolate and marshmallow cupcake
+titleHe: קאפקייק שוקולד ומרשמלו
+description: קאפקייק שוקולד ומרשמלו
+descriptionEn: Chocolate and marshmallow cupcake
+image: https://images.unsplash.com/photo-1603532648955-039310d9ed75?w=900&q=80
+category: dessert
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 20
+tags:
+  - קינוח
+  - מתוק
+  - שוקולד
+ingredients:
+  - group: ""
+    items:
+      - amount: 20
+        unit: ""
+        name: עטרות אלומיניום או כוסות אספרסו חד פעמיות
+        nameEn: Aluminum crowns or disposable espresso cups
+      - amount: 150
+        unit: g
+        name: שוקולד מריר
+        nameEn: dark chocolate
+      - amount: 150
+        unit: g
+        name: שוקולד חלב
+        nameEn: milk chocolate
+      - amount: 150
+        unit: g
+        name: חמאה
+        nameEn: butter
+      - amount: 150
+        unit: g
+        name: שמן קנולה
+        nameEn: Canola oil
+      - amount: 5
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 300
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 120
+        unit: g
+        name: קמח תופח
+        nameEn: raising flour
+      - amount: 12
+        unit: pcs
+        name: מרשמלו, קצוץ גס
+        nameEn: Marshmallow, coarsely chopped
+  - group: לקרם
+    items:
+      - amount: 500
+        unit: g
+        name: שמנת מתוקה
+        nameEn: sweet cream
+      - amount: 500
+        unit: g
+        name: שוקולד מריר
+        nameEn: dark chocolate
+  - group: לקישוט
+    items:
+      - amount: 0
+        unit: ""
+        name: פניני שוקולד מריר ולבן
+        nameEn: Dark and white chocolate pearls
+steps:
+  - title: ""
+    items:
+      - instruction: >-
+          ממיסים את השוקולד, השמן והחמאה בשיטת בן-מארי (מניחים על הכיריים סיר גדול ללא מכסה עם מים רותחים, מעליו מניחים
+          סיר קטן עם המצרכים ומערבבים עד המסה)מערבבים את הביצים והסוכר בקערה עד קבלת תערובת חלקה, מוסיפים את תערובת
+          השוקולד. מוסיפים את הקמח, מערבבים.
+        instructionEn: >-
+          Melt the chocolate, oil and butter using the bain-marie method (place a large lidless pot with boiling water
+          on the stove, place a small pot with the ingredients on top of it and mix until smooth) mix the eggs and sugar
+          in a bowl until a smooth mixture is obtained, add the chocolate mixture. Add the flour, mix.
+      - instruction: >-
+          מוסיפים את המרשמלו.מעבירים לתבניות, ואופים בחום של 170 מעלות 20 דקות או עד שקיסם הננעץ בעוגה יוצא עם פירורים
+          לחים.לציפוי:מניחים את השוקולד בקערה.מחממים שמנת לסף רתיחה ויוצקים אל השוקולד.
+        instructionEn: >-
+          Add the marshmallows. Transfer to pans, and bake at 170 degrees for 20 minutes or until a toothpick inserted
+          into the cake comes out with moist crumbs. For the coating: place the chocolate in a bowl. Heat the cream to
+          the point of boiling and pour into the chocolate.
+      - instruction: מערבבים להמסה ומצננים 4 שעות.מעבירים לקערת מיקסר ומקציפים לקרם יציב.
+        instructionEn: Stir to melt and cool for 4 hours. Transfer to a mixer bowl and whip to a firm cream.
+      - instruction: מזלפים על גבי הקאפקייק הצוננים, מעטרים בפניני שוקולד.מצננים ומגישים.
+        instructionEn: Drizzle on top of the cooled cupcakes, decorate with chocolate pearls. Cool and serve.
+tips: []

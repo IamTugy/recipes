@@ -1,0 +1,122 @@
+id: asian-melon-salad
+title: Asian melon salad
+titleHe: סלט מלון אסיאתי
+description: סלט מלון אסיאתי
+descriptionEn: Asian melon salad
+image: https://assets.tugy.dev/asian-melon-salad.jpg
+category: salad
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 8
+tags:
+  - סלט
+ingredients:
+  - group: ""
+    items:
+      - amount: 8
+        unit: ""
+        name: מנות
+        nameEn: Dishes
+      - amount: 2
+        unit: ml
+        name: פפונים
+        nameEn: Popons
+      - amount: 0.5
+        unit: ""
+        name: כרוב לבן
+        nameEn: White cabbage
+      - amount: 0.5
+        unit: ml
+        name: ון קטן, קלוף ומגולען
+        nameEn: Ven is small, peeled and pitted
+      - amount: 300
+        unit: g
+        name: עגבניות שרי, חצויות
+        nameEn: Cherry tomatoes, halved
+      - amount: 100
+        unit: g
+        name: אפונת שלג, חתוכה למקטעים בגודל של
+        nameEn: Snow peas, cut into segments the size of
+      - amount: 1
+        unit: ""
+        name: ס״מ
+        nameEn: cm
+      - amount: 100
+        unit: g
+        name: פטריות שימאג׳י, מופרדות
+        nameEn: Shimaji mushrooms, separated
+      - amount: 100
+        unit: g
+        name: נבטי שעועית עבים
+        nameEn: Bean sprouts are thick
+      - amount: 1
+        unit: ""
+        name: פלפל צ׳ילי אדום, קצוץ
+        nameEn: Red chili pepper, chopped
+      - amount: 0
+        unit: ""
+        name: גרגרים מרימון אחד
+        nameEn: Berries from one pomegranate
+      - amount: 100
+        unit: g
+        name: אפונת ווסאבי כתושה
+        nameEn: Crushed wasabi peas
+      - amount: 1
+        unit: ""
+        name: צרור עלי בזיליקום, קרועים
+        nameEn: A bunch of basil leaves, torn
+      - amount: 0.5
+        unit: ""
+        name: צרור כוסברה, קרועים
+        nameEn: Bunch of cilantro, torn
+  - group: לרוטב
+    items:
+      - amount: 2
+        unit: ""
+        name: שיני שום קלופות
+        nameEn: Peeled garlic cloves
+      - amount: 200
+        unit: g
+        name: מיץ ליים
+        nameEn: Lime juice
+      - amount: 1
+        unit: tbsp
+        name: סוכר דקלים
+        nameEn: palm sugar
+      - amount: 2
+        unit: tbsp
+        name: רוטב דגים (נאם פלא)
+        nameEn: Fish sauce (Nam Pla)
+      - amount: 2
+        unit: tbsp
+        name: שמן שומשום כהה
+        nameEn: Dark sesame oil
+      - amount: 1
+        unit: tbsp
+        name: שמן צ׳ילי אדום
+        nameEn: Red chili oil
+      - amount: 2
+        unit: tbsp
+        name: יוזו
+        nameEn: Yuzu
+      - amount: 2
+        unit: tbsp
+        name: שמן זית
+        nameEn: olive oil
+      - amount: 0
+        unit: ""
+        name: מלח לפי טעם
+        nameEn: salt to taste
+steps:
+  - title: ""
+    items:
+      - instruction: >-
+          חותכים את המלפפון, הכרוב והמלון לז׳וליין ומניחים בקערה עם יתרת חומרי הסלט.לרוטב- מניחים את כל החומרים בקנקן
+          וטוחנים למרקם חלק.
+        instructionEn: >-
+          Cut the cucumber, cabbage and melon into julienne and place in a bowl with the rest of the salad ingredients.
+          For the sauce - place all the ingredients in a jar and grind to a smooth texture.
+      - instruction: טועמים ומתקנים תיבול.מערבבים את החומרים עם הרוטב ומגישים מיד.
+        instructionEn: Taste and adjust seasoning. Mix the ingredients with the sauce and serve immediately.
+tips: []

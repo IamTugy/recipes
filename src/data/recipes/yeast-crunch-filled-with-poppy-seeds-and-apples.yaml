@@ -1,0 +1,118 @@
+id: yeast-crunch-filled-with-poppy-seeds-and-apples
+title: Yeast crunch filled with poppy seeds and apples
+titleHe: קראנצ שמרים במילוי פרג ותפוחים
+description: קראנצ שמרים במילוי פרג ותפוחים
+descriptionEn: Yeast crunch filled with poppy seeds and apples
+image: https://assets.tugy.dev/yeast-crunch-filled-with-poppy-seeds-and-apples.jpg
+category: dessert
+difficulty: hard
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - קינוח
+  - מתוק
+  - פרג
+ingredients:
+  - group: ""
+    items:
+      - amount: 0
+        unit: ""
+        name: לשתי תבניות בגודל
+        nameEn: For two sized molds
+      - amount: 22
+        unit: cm
+        name: לבצק-400 גרם קמח
+        nameEn: For the dough - 400 grams of flour
+      - amount: 200
+        unit: g
+        name: חלב
+        nameEn: milk
+      - amount: 15
+        unit: g
+        name: שמרים יבשים
+        nameEn: dry yeast
+      - amount: 80
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 5
+        unit: g
+        name: מלח
+        nameEn: salt
+      - amount: 2
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 0.5
+        unit: tsp
+        name: משחת וניל
+        nameEn: Vanilla paste
+      - amount: 150
+        unit: g
+        name: חמאה רכה
+        nameEn: Soft butter
+      - amount: 0
+        unit: ""
+        name: למילוי פרג-תפוח-200 גרם פרג טחון טרי
+        nameEn: For poppy-apple filling - 200 grams of freshly ground poppy
+      - amount: 100
+        unit: g
+        name: שקדים טחונים
+        nameEn: Ground almonds
+      - amount: 200
+        unit: g
+        name: חלב
+        nameEn: milk
+      - amount: 1
+        unit: ""
+        name: תפוח עץ מגורר גס
+        nameEn: Coarsely grated apple
+      - amount: 100
+        unit: g
+        name: חמאה
+        nameEn: butter
+      - amount: 100
+        unit: g
+        name: סוכרכפית משחת ונילקליפה מגוררת מלימון אחד
+        nameEn: Sugar teaspoon vanilla paste Grated rind from one lemon
+      - amount: 100
+        unit: g
+        name: פירורי עוגיות
+        nameEn: cookie crumbs
+steps:
+  - title: ""
+    items:
+      - instruction: >-
+          להכנת הבצק - מכניסים לקערת המיקסר את כל המרכיבים, למעט החמאה, ולשים 5 דקות, מוסיפים את החמאה וממשיכים ללוש עוד
+          3 דקות.
+        instructionEn: >-
+          To make the dough - put all the ingredients in the mixer bowl, except the butter, and knead for 5 minutes, add
+          the butter and continue kneading for another 3 minutes.
+      - instruction: מעבירים לקערה ומתפיחים להכפלת נפח (עדיף להכין יום קודם ולהתפיח בקירור).
+        instructionEn: >-
+          Transfer to a bowl and let it rise until it doubles in volume (it's better to make it the day before and let
+          it rise in the refrigerator).
+      - instruction: להכנת המילוי - מניחים את כל החומרים בסיר ומביאים לסף רתיחה.
+        instructionEn: To prepare the filling - place all the ingredients in a pot and bring to the boil.
+      - instruction: מסירים מהאש ומוסיפים פירורי עוגיות.
+        instructionEn: Remove from heat and add cookie crumbs.
+      - instruction: מצננים.הרכבה - מרדדים 1/2 מהבצק למלבן רחב ומורחים עליו מחצית מהמילוי.
+        instructionEn: Cool. Assembly - roll 1/2 of the dough into a wide rectangle and spread half of the filling on it.
+      - instruction: מגלגלים לגלילה ופורסים אותה לאורכה.
+        instructionEn: Roll into a roll and slice it lengthwise.
+      - instruction: קולעים את שתי פיסות הגלילה לצמה, מותחים ומסובבים את הצמה סביב עצמה ליצירת זר.
+        instructionEn: Braid the two pieces of the roll into a braid, stretch and twist the braid around itself to create a wreath.
+      - instruction: מעבירים לתבנית עגולה ומשומנת ומניחים להתפחה ל-80%.
+        instructionEn: Transfer to a greased round pan and let rise to 80%.
+      - instruction: חוזרים על הפעולה עם מחצית הבצק והמילוי הנותרים.
+        instructionEn: Repeat with half the dough and the remaining filling.
+      - instruction: אפייה - מחממים תנור ל-180 מעלות.
+        instructionEn: Baking - heat the oven to 180 degrees.
+      - instruction: מברישים את העוגות בביצה ומפזרים מעליהם את הסוכר הגבישי.
+        instructionEn: Brush the cakes with egg and sprinkle the granulated sugar over them.
+      - instruction: אופים 30-35 עד שהעוגה מזהיבה ונאפית לחלוטין.
+        instructionEn: Bake for 30-35 minutes until the cake is golden and fully baked.
+      - instruction: בתום האפייה ניתן להבריש בסירופ סוכר או בנפאז' (חומר מבריק לזיגוג) למראה מלוטש יותר.
+        instructionEn: At the end of baking, you can brush with sugar syrup or Nafage (glossy glaze) for a more polished look.
+tips: []

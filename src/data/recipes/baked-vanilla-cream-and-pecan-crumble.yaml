@@ -1,0 +1,91 @@
+id: baked-vanilla-cream-and-pecan-crumble
+title: Baked vanilla cream and pecan crumble
+titleHe: קרם וניל אפוי וקראמבל פקאן
+description: קרם וניל אפוי וקראמבל פקאן
+descriptionEn: Baked vanilla cream and pecan crumble
+image: https://assets.tugy.dev/baked-vanilla-cream-and-pecan-crumble.jpg
+category: dessert
+difficulty: medium
+prepTime: 15
+cookTime: 60
+servings: 12
+tags:
+  - קינוח
+  - מתוק
+  - וניל
+ingredients:
+  - group: ""
+    items:
+      - amount: 12
+        unit: ""
+        name: מנות     לקרם-250 גרם שמנת מתוקה
+        nameEn: Portions for the cream - 250 grams of sweet cream
+      - amount: 250
+        unit: g
+        name: חלב
+        nameEn: milk
+      - amount: 150
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 6
+        unit: ""
+        name: חלמונים
+        nameEn: egg yolks
+      - amount: 2
+        unit: tsp
+        name: משחת וניל או מקל וניל חצוי
+        nameEn: Vanilla paste or halved vanilla stick
+  - group: לקראמבל
+    items:
+      - amount: 100
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 80
+        unit: g
+        name: פקאן
+        nameEn: Pecan
+      - amount: 80
+        unit: g
+        name: חמאה
+        nameEn: butter
+      - amount: 60
+        unit: g
+        name: סוכרקורט מלח
+        nameEn: Salt sugar
+steps:
+  - title: ""
+    items:
+      - instruction: לקרם וניל- מביאים לרתיחה את החלב, שמנת, ווניל.
+        instructionEn: For the vanilla cream - bring the milk, cream, and vanilla to a boil.
+      - instruction: בכלי נפרד טורפים היטב את החלמונים והסוכר.
+        instructionEn: In a separate vessel, beat the egg yolks and sugar well.
+      - instruction: יוצקים מעט מהנוזל החם אל החלמונים וטורפים היטב.
+        instructionEn: Pour a little of the hot liquid into the egg yolks and whisk well.
+      - instruction: מוסיפים את יתרת הנוזל ומערבבים.
+        instructionEn: Add the rest of the liquid and mix.
+      - instruction: >-
+          מסננים ומעבירים את התערובת לקנקן.מחממים תנור לחום של 120 מעלות.מסדרים את כוסות ההגשה על מגש אפייה ויוצקים
+          לתוכן את המילוי, 2/3 מגובהן.
+        instructionEn: >-
+          Filter and transfer the mixture to a pitcher. Heat an oven to 120 degrees. Arrange the serving cups on a
+          baking tray and pour the filling into them, 2/3 of their height.
+      - instruction: >-
+          אופים 45-60 דקות לייצוב (התערובת תיראה מעט רוטטת- וזה בסדר).מצננים היטב (עדיף ל-6 שעות).לקראמבל- מניחים את
+          הקמח והאגוזים במעבד מזון וטוחנים לאבקה אחידה.
+        instructionEn: >-
+          Bake for 45-60 minutes to stabilize (the mixture will seem a little vibrating - which is fine). Cool well
+          (better for 6 hours). For the crumble - place the flour and nuts in a food processor and grind to a uniform
+          powder.
+      - instruction: מוסיפים חמאה וסוכר וטוחנים לקבלת פירורים.
+        instructionEn: Add butter and sugar and grind to obtain crumbs.
+      - instruction: אופים בחום של 180 מעלות 15-17 דקות.
+        instructionEn: Bake at 180 degrees for 15-17 minutes.
+      - instruction: מצננים וטוחנים.הרכבה- מפזרים על גבי הקרם מהקראמבל בשכבה אחידה ומזלפים מעל את הקצפת.
+        instructionEn: >-
+          Cool and grind. Assembly - sprinkle the cream from the crumble on top in an even layer and pour the whipped
+          cream on top.
+      - instruction: מעטרים בפטל ומגישים.
+        instructionEn: Garnish with raspberries and serve.
+tips: []

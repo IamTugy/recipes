@@ -1,0 +1,67 @@
+id: benitza-cheese-pastry-and-filo-balkani
+hidden: true
+title: Benitza - cheese pastry and filo balkani
+titleHe: בניצה- מאפה גבינות ופילו בלקני
+description: בניצה- מאפה גבינות ופילו בלקני
+descriptionEn: Benitza - cheese pastry and filo balkani
+image: https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=900&q=80
+category: dinner
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - ארוחת ערב
+  - גבינה
+ingredients:
+  - group: ""
+    items:
+      - amount: 0
+        unit: ""
+        name: למאפה
+        nameEn: for pastry
+      - amount: 1
+        unit: ""
+        name: חבילת דפי פילו (מומלץ שמרית)
+        nameEn: A pack of phyllo sheets (yeast is recommended)
+      - amount: 100
+        unit: g
+        name: חמאה מותכת
+        nameEn: melted butter
+      - amount: 0
+        unit: ""
+        name: למילוי
+        nameEn: to fill
+      - amount: 4
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 5
+        unit: g
+        name: סודה לשתייה
+        nameEn: baking soda
+      - amount: 500
+        unit: g
+        name: יוגורט
+        nameEn: yogurt
+      - amount: 3
+        unit: g
+        name: מלח
+        nameEn: salt
+      - amount: 50
+        unit: g
+        name: שמן זית
+        nameEn: olive oil
+      - amount: 150
+        unit: g
+        name: גבינה בולגרית או פטה מפוררת לפירורים
+        nameEn: Bulgarian cheese or feta crumbled into crumbs
+      - amount: 150
+        unit: g
+        name: קשקבל מגורר
+        nameEn: grated kashkabal
+steps:
+  - title: ""
+    items:
+      - instruction: ""
+tips: []

@@ -1,0 +1,134 @@
+id: harira-soup
+title: Harira Soup
+titleHe: מרק חרירה
+category: soup
+tags:
+  - מרוקאי
+  - חומוס
+  - עדשים
+  - עשבי תיבול
+tagsEn:
+  - Moroccan
+  - chickpeas
+  - lentils
+  - herbs
+cuisine: Moroccan
+image: https://assets.tugy.dev/harira-soup.jpg
+description: מרק חרירה מרוקאי עשיר עם חומוס, עדשים שחורות ועשבי תיבול טריים - נשמה של ארוחת ערב.
+descriptionEn: A rich Moroccan harira with chickpeas, black lentils and fresh herbs - the soul of a proper evening meal.
+prepTime: 30
+cookTime: 75
+servings: 16
+difficulty: easy
+ingredients:
+  - items:
+      - amount: 2
+        unit: ""
+        name: בצלים סגולים, פרוסים לטבעות
+        nameEn: red onions, sliced into rings
+      - amount: 2
+        unit: cloves
+        name: שום כתושות
+        nameEn: garlic, crushed
+      - amount: 1
+        unit: ""
+        name: כרישה, פרוסה לטבעות
+        nameEn: leek, sliced into rings
+      - amount: 1
+        unit: ""
+        name: גזר, חצאי טבעות
+        nameEn: carrot, half-moons
+      - amount: 1
+        unit: ""
+        name: שורש סלרי, קוביות
+        nameEn: celeriac root, cubed
+      - amount: 1
+        unit: ""
+        name: שורש פטרוזיליה, קוביות
+        nameEn: parsley root, cubed
+      - amount: 2
+        unit: tsp
+        name: כורכום
+        nameEn: turmeric
+      - amount: 1
+        unit: tsp
+        name: פלפל שחור
+        nameEn: black pepper
+      - amount: 1
+        unit: tsp
+        name: קינמון
+        nameEn: cinnamon
+      - amount: 2
+        unit: tsp
+        name: חוואיג' למרק
+        nameEn: hawaij spice blend
+      - amount: 3
+        unit: ""
+        name: עגבניות טריות, קוביות
+        nameEn: fresh tomatoes, diced
+      - amount: 200
+        unit: g
+        name: גרגרי חומוס, מושרים 12 שעות ומבושלים
+        nameEn: chickpeas, soaked 12 hours and cooked
+      - amount: 150
+        unit: g
+        name: עדשים שחורות, מושרות 20 דקות
+        nameEn: black lentils, soaked 20 minutes
+      - amount: 3
+        unit: liters
+        name: מים
+        nameEn: water
+      - amount: 2
+        unit: ""
+        name: תפוחי אדמה, קוביות
+        nameEn: potatoes, cubed
+      - amount: 30
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 100
+        unit: g
+        name: אטריות דקות
+        nameEn: thin noodles (vermicelli)
+      - amount: 1
+        unit: bunch
+        name: פטרוזיליה, קצוצה
+        nameEn: parsley, chopped
+      - amount: 1
+        unit: bunch
+        name: כוסברה, קצוצה
+        nameEn: cilantro, chopped
+      - amount: 2
+        unit: tsp
+        name: מלח
+        nameEn: salt
+      - amount: 3
+        unit: ""
+        name: לימונים, סחוטים
+        nameEn: lemons, juiced
+steps:
+  - items:
+      - instruction: בסיר גדול מחממים שמן ומטגנים בצל, שום, כרישה ושורשים עד להזהבה.
+        instructionEn: In a large pot, heat oil and sauté onion, garlic, leek and roots until golden.
+      - instruction: מוסיפים תבלינים, מערבבים ומטגנים 3 דקות. מוסיפים עגבניות ומבשלים 2 דקות.
+        instructionEn: Add spices, stir and fry for 3 minutes. Add tomatoes and cook 2 more minutes.
+      - instruction: מוסיפים חומוס, עדשים, מים ותפוח אדמה - מביאים לרתיחה. מבשלים על להבה נמוכה כ-30 דקות.
+        instructionEn: Add chickpeas, lentils, water and potato - bring to a boil. Simmer on low heat for about 30 minutes.
+        timerMinutes: 30
+      - instruction: מדללים קמח בכוס מים ובוחשים לתוך המרק. מבשלים 10 דקות ומערבבים מדי פעם.
+        instructionEn: Dissolve flour in a cup of water and stir into the soup. Cook 10 minutes, stirring occasionally.
+        timerMinutes: 10
+        tip: הסמכה עם קמח נמצ היא הסוד לגוף המרק המאפיין את החרירה.
+        tipEn: The flour thickening is the secret to the characteristic body of harira.
+      - instruction: מוסיפים עשבי תיבול, אטריות ומלח - מבשלים 10 דקות.
+        instructionEn: Add herbs, noodles and salt - cook 10 minutes.
+        timerMinutes: 10
+      - instruction: מוסיפים מיץ לימון ומבשלים 5 דקות. טועמים ומתקנים תיבול.
+        instructionEn: Add lemon juice and cook 5 minutes. Taste and adjust seasoning.
+        timerMinutes: 5
+tips:
+  - ניתן להוסיף נתחי פרגית לגרסה עם בשר.
+  - מתאחר בזמן - המרק רק מתעצם בטעמו ביום שאחרי.
+tipsEn:
+  - Add chicken thigh pieces for a meat version.
+  - Better the next day - the flavors deepen overnight.

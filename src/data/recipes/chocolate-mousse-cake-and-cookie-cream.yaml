@@ -1,0 +1,143 @@
+id: chocolate-mousse-cake-and-cookie-cream
+title: Chocolate mousse cake and cookie cream
+titleHe: עוגת מוס שוקולד וקרם עוגיות
+description: עוגת מוס שוקולד וקרם עוגיות
+descriptionEn: Chocolate mousse cake and cookie cream
+image: https://assets.tugy.dev/chocolate-mousse-cake-and-cookie-cream.jpg
+category: dessert
+difficulty: hard
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - קינוח
+  - מתוק
+  - שוקולד
+  - עוגיות
+  - עוגה
+ingredients:
+  - group: לבסיס
+    items:
+      - amount: 100
+        unit: g
+        name: חמאה קרה
+        nameEn: cold butter
+      - amount: 150
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 50
+        unit: g
+        name: ממרח עוגיות לוטוס
+        nameEn: Lotus cookie spread
+      - amount: 20
+        unit: g
+        name: אבקת סוכר
+        nameEn: icing sugar
+      - amount: 1
+        unit: ""
+        name: חלמון
+        nameEn: yolk
+      - amount: 0
+        unit: ""
+        name: קורט מלח
+        nameEn: A pinch of salt
+  - group: למוס שוקולד
+    items:
+      - amount: 250
+        unit: g
+        name: שוקולד מריר 63% מוצקי קקאו, קצוץ
+        nameEn: Dark chocolate 63% cocoa solids, chopped
+      - amount: 20
+        unit: g
+        name: גלוקוזה
+        nameEn: glucose
+      - amount: 140
+        unit: g
+        name: מים
+        nameEn: water
+      - amount: 250
+        unit: g
+        name: שמנת מתוקה, מוקצפת
+        nameEn: Sweet, whipped cream
+  - group: למוס קרם עוגיות
+    items:
+      - amount: 250
+        unit: g
+        name: שוקולד לבן, קצוץ
+        nameEn: White chocolate, chopped
+      - amount: 20
+        unit: g
+        name: גלוקוזה
+        nameEn: glucose
+      - amount: 140
+        unit: g
+        name: מים
+        nameEn: water
+      - amount: 120
+        unit: g
+        name: ממרח עוגיות לוטוס
+        nameEn: Lotus cookie spread
+      - amount: 7
+        unit: g
+        name: ג'לטין, שרוי ב-35 גרם מים קרים
+        nameEn: Gelatin, soaked in 35 grams of cold water
+      - amount: 250
+        unit: g
+        name: שמנת מתוקה, מוקצפת
+        nameEn: Sweet, whipped cream
+  - group: לציפוי
+    items:
+      - amount: 200
+        unit: g
+        name: שוקולד מריר
+        nameEn: dark chocolate
+      - amount: 180
+        unit: g
+        name: שמנת מתוקה
+        nameEn: sweet cream
+      - amount: 30
+        unit: g
+        name: גלוקוזה
+        nameEn: glucose
+steps:
+  - title: ""
+    items:
+      - instruction: "לבסיס: מכינים בצק פריך - במעבד מזון מעבדים את החומרים היבשים, חמאה קרה וממרח עוגיות לתערובת פירורית."
+        instructionEn: >-
+          For the base: prepare a crispy dough - in a food processor process the dry ingredients, cold butter and cookie
+          spread into a crumbly mixture.
+      - instruction: מוסיפים חלמון ומעבדים לבצק ומצננים.
+        instructionEn: Add egg yolk and process into a dough and cool.
+      - instruction: >-
+          מרדדים למלבן בקוטר או אורך התבנית, קורצים את מידת שפת התבנית, אופים ב-180 מעלות כ-15 דקות עד להזהבה, מעבירים
+          למקרר לצינון מוחלט.למוס שוקולד (שכבה ראשונה): מרתיחים מים וגלוקוזה לסירופ.
+        instructionEn: >-
+          Roll into a rectangle the diameter or length of the mold, mark the size of the rim of the mold, bake at 180
+          degrees for about 15 minutes until golden, transfer to the refrigerator to cool completely. Chocolate mousse
+          (first layer): Boil water and glucose for syrup.
+      - instruction: שופכים את הסירופ החם על השוקולד המריר מניחים לדקותיים ומערבבים להמסה.
+        instructionEn: Pour the hot syrup over the dark chocolate, leave for two minutes and stir to melt.
+      - instruction: מצננים לטמפרטורת גוף ומקפלים את השמנת המוקצפת לתוך תערובת השוקולד.
+        instructionEn: Cool to body temperature and fold the whipped cream into the chocolate mixture.
+      - instruction: >-
+          מעבירים את המוס אל התבנית, ומקפיאים.למוס קרם עוגיות (שכבה שניה): מרתיחים מים וגלוקוזה לסירופ, מוסיפים ג'לטין
+          מרוכך וממיסים.
+        instructionEn: >-
+          Transfer the mousse to the mold, and freeze. For the cookie cream mousse (second layer): boil water and
+          glucose into a syrup, add softened gelatin and dissolve.
+      - instruction: שופכים את הסירופ החם על השוקולד הלבן מניחים לדקותיים ומערבבים להמסה.
+        instructionEn: Pour the hot syrup over the white chocolate, leave for two minutes and stir to melt.
+      - instruction: מוסיפים ממרח עוגיות ומערבבים.
+        instructionEn: Add cookie spread and mix.
+      - instruction: מצננים לטמפרטורת גוף ומקפלים את השמנת המוקצפת לתוך תערובת השוקולד הלבן.
+        instructionEn: Cool to body temperature and fold the whipped cream into the white chocolate mixture.
+      - instruction: >-
+          יוצקים בתבנית מעל מוס השוקולד, מניחים מעל את בסיס העוגה שהכנו מראש, ומקפיאים שוב.לזיגוג: ממיסים את כל החומרים
+          מעל באן מארי ומוזגים על גבי העוגה הקפואה.
+        instructionEn: >-
+          Pour in a mold over the chocolate mousse, place the cake base that we prepared in advance on top, and freeze
+          again. For the glaze: melt all the ingredients over a bain marie and pour on top of the frozen cake.
+      - instruction: מניחים לייצוב ומעבירים לאיחסון בקירור עד להגשה.
+        instructionEn: Leave to stabilize and transfer to refrigerated storage until serving.
+tips: []

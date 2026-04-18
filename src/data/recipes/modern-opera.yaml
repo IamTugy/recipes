@@ -1,0 +1,157 @@
+id: modern-opera
+title: Modern opera
+titleHe: אופרה מודרנית
+description: אופרה מודרנית
+descriptionEn: Modern opera
+image: https://assets.tugy.dev/modern-opera.jpg
+category: dessert
+difficulty: hard
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - קינוח
+  - מתוק
+ingredients:
+  - group: ""
+    items:
+      - amount: 160
+        unit: g
+        name: ביצים
+        nameEn: eggs
+      - amount: 50
+        unit: g
+        name: סוכר אינברטי
+        nameEn: Invert sugar
+      - amount: 70
+        unit: g
+        name: סוכר לבן
+        nameEn: white sugar
+      - amount: 60
+        unit: g
+        name: אבקת לוז גרוס
+        nameEn: Ground hazelnut powder
+      - amount: 0
+        unit: ""
+        name: כפית נס קפה
+        nameEn: A teaspoon of coffee miracle
+      - amount: 65
+        unit: g
+        name: שמנת מתוקה
+        nameEn: sweet cream
+      - amount: 65
+        unit: g
+        name: קמח לבן
+        nameEn: white flour
+      - amount: 2
+        unit: g
+        name: מלח
+        nameEn: salt
+      - amount: 4
+        unit: g
+        name: אבקת אפייה
+        nameEn: baking powder
+      - amount: 50
+        unit: g
+        name: חמאה מומסת
+        nameEn: melted butter
+  - group: קראמבל
+    items:
+      - amount: 125
+        unit: g
+        name: חמאה
+        nameEn: butter
+      - amount: 120
+        unit: g
+        name: אבקת סוכר
+        nameEn: icing sugar
+      - amount: 150
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 75
+        unit: g
+        name: אבקת שקדים
+        nameEn: almond powder
+      - amount: 50
+        unit: g
+        name: שוקולד מריר 70% מוצקי קקאו
+        nameEn: Dark chocolate 70% cocoa solids
+      - amount: 1
+        unit: g
+        name: מלח ים טחון
+        nameEn: Ground sea salt
+      - amount: 200
+        unit: g
+        name: קראמבל טחון (מתכון לעיל)
+        nameEn: ground crumble (recipe above)
+  - group: גנאש
+    items:
+      - amount: 130
+        unit: g
+        name: שמנת מתוקה
+        nameEn: sweet cream
+      - amount: 130
+        unit: g
+        name: שוקולד מריר 53% מוצקי קקאו
+        nameEn: Dark chocolate 53% cocoa solids
+  - group: קרם קפה
+    items:
+      - amount: 200
+        unit: g
+        name: חליטת קפה (150 גרם שמנת מתוקה+ 20 גרם פולי קפה שלמים)
+        nameEn: Coffee infusion (150 grams of sweet cream + 20 grams of whole coffee beans)
+      - amount: 40
+        unit: g
+        name: חלמונים
+        nameEn: egg yolks
+      - amount: 0
+        unit: ""
+        name: גרם מסת ג'לטין
+        nameEn: gram mass of gelatin
+      - amount: 200
+        unit: g
+        name: שמנת מוקצפת 80%
+        nameEn: whipped cream 80%
+steps:
+  - title: ""
+    items:
+      - instruction: ביסקוויט לוז-קפה טוחנים את כל החומרים במעבד מזון .
+        instructionEn: Hazelnut-coffee biscuit Grind all the ingredients in a food processor.
+      - instruction: משטחים על משטח סיליקון משומן, עם שוליים ואופים בחום של 150 מעלות כ-15 דקות.
+        instructionEn: Spread on a greased silicone surface, with edges and bake at 150 degrees for about 15 minutes.
+      - instruction: לגוון בהיר.
+        instructionEn: to a light shade.
+      - instruction: קראמבלמאחדים את כל החומרים לתערובת פירורית ואופים בחום של 155 מעלות לכ-8 דקות.
+        instructionEn: Crumble Combine all the ingredients into a crumbly mixture and bake at 155 degrees for about 8 minutes.
+      - instruction: מצננים טוחנים ומסננים דרך נפה עבה.
+        instructionEn: Cool, grind and filter through a thick sieve.
+      - instruction: פריך קריספי משוחזר שוקולד מתיכים את השוקולד.
+        instructionEn: Crispy crispy reconstituted chocolate melts the chocolate.
+      - instruction: מוסיפים את פירורי הקראמבל והמלח, מערבבים ומורחים על הביסקוויט החם.
+        instructionEn: Add the crumble crumbs and salt, mix and spread on the hot biscuit.
+      - instruction: אופים בחום 155 מעלות 8 דקות.
+        instructionEn: Bake at 155 degrees for 8 minutes.
+      - instruction: מקפיאים.
+        instructionEn: Freezers.
+      - instruction: גנאשמחממים שמנת מתוקה ויוצקים מעל השוקולד.
+        instructionEn: Ganesh, heat sweet cream and pour over the chocolate.
+      - instruction: טוחנים לגנאש אמולסיבי.
+        instructionEn: Grind into emulsifying ganache.
+      - instruction: יוצקים על הבסיס.
+        instructionEn: Pour on the base.
+      - instruction: מקפיאים.
+        instructionEn: Freezers.
+      - instruction: קרם קפהמכינים קרם אנגלייז ישיר עם החליטה והחלמונים.
+        instructionEn: Creme de coffee Prepare a direct crème anglaise with the brew and the egg yolks.
+      - instruction: יוצקים על השוקולד והג'לטין.
+        instructionEn: Pour over the chocolate and gelatin.
+      - instruction: טוחנים ומצננים ל-30 מעלות, מקפלים קצפת ויוצקים מעל שכבת הגנאש.
+        instructionEn: Grind and cool to 30 degrees, fold in whipped cream and pour over the ganache layer.
+      - instruction: מקפיאים.
+        instructionEn: Freezers.
+      - instruction: הרכבהמזגגים את העוגה, ממתינים מספר דקות לייצוב וחותכים למנות.
+        instructionEn: Assembly Glaze the cake, wait a few minutes for stabilization and cut into portions.
+      - instruction: מקשטים בזהב.
+        instructionEn: Decorate with gold.
+tips: []

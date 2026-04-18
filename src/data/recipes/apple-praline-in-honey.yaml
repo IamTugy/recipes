@@ -1,0 +1,118 @@
+id: apple-praline-in-honey
+title: Apple praline in honey
+titleHe: פרלין תפוח בדבש
+description: פרלין תפוח בדבש
+descriptionEn: Apple praline in honey
+image: https://assets.tugy.dev/apple-praline-in-honey.jpg
+category: dessert
+difficulty: hard
+prepTime: 15
+cookTime: 10
+servings: 36
+tags:
+  - קינוח
+  - מתוק
+ingredients:
+  - group: ג׳לה תפוח ויין לבן
+    groupEn: apple and white wine jelly
+    items:
+      - amount: 60
+        unit: g
+        name: מים
+        nameEn: water
+      - amount: 50
+        unit: g
+        name: יין לבן
+        nameEn: white wine
+      - amount: 90
+        unit: g
+        name: מחית תפוח ירוק
+        nameEn: green apple puree
+      - amount: 25
+        unit: g
+        name: מיץ ליים
+        nameEn: lime juice
+      - amount: 170
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 4
+        unit: g
+        name: פקטין צהוב
+        nameEn: yellow pectin
+  - group: גנאש דבש
+    groupEn: honey ganache
+    items:
+      - amount: 200
+        unit: g
+        name: שוקולד לבן
+        nameEn: white chocolate
+      - amount: 50
+        unit: g
+        name: דבש
+        nameEn: honey
+      - amount: 65
+        unit: g
+        name: שמנת מתוקה
+        nameEn: sweet cream
+      - amount: 40
+        unit: g
+        name: חמאה רכה
+        nameEn: soft butter
+      - amount: 0
+        unit: ""
+        name: קורט מלח
+        nameEn: a pinch of salt
+  - group: לציפוי
+    groupEn: for coating
+    items:
+      - amount: 1
+        unit: kg
+        name: שוקולד לבן
+        nameEn: white chocolate
+      - amount: 0.5
+        unit: tsp
+        name: טיטניום דיאוקסיד
+        nameEn: titanium dioxide
+steps:
+  - title: ""
+    items:
+      - instruction: "גנאש: מתיכים את השוקולד. מרתיחים שמנת ודבש. מחברים בהדרגה את החומרים וטוחנים בעזרת מוט בלנדר. מוסיפים מלח."
+        instructionEn: >-
+          Ganache: melt the chocolate. Boil cream and honey. Gradually combine the ingredients and blend with an
+          immersion blender. Add salt.
+      - instruction: ג׳לה- מחממים ל-40 מעלות את המים, היין הלבן, מחית התפוח הירוק והליים.
+        instructionEn: Jelly - heat the water, white wine, green apple puree and lime to 40 degrees.
+      - instruction: מערבבים על יבש את הסוכר והפקטין.
+        instructionEn: Dry mix the sugar and pectin.
+      - instruction: מזריעים לתוך תערובת הנוזל החמימה.
+        instructionEn: Sprinkle into the warm liquid mixture.
+      - instruction: מביאים לרתיחה ומבשלים ל-104 מעלות.
+        instructionEn: Bring to a boil and cook to 104 degrees.
+      - instruction: משטחים על תבנית ומניחים לייצוב.
+        instructionEn: Spread on a tray and leave to stabilize.
+      - instruction: טוחנים בעזרת מוט בלנדר למרקם חלק.
+        instructionEn: Grind with a blender rod to a smooth texture.
+      - instruction: טמפר- מחממים 80% מהשוקולד ל-45 מעלות (t1).
+        instructionEn: Temper - heat 80% of the chocolate to 45 degrees (t1).
+      - instruction: מוסיפים את יתרת השוקולד הקר בהזרעה אל השוקולד המותך ומצננים אותו בהדרגה ל-29 מעלות (t3).
+        instructionEn: Add the rest of the cold seeded chocolate to the melted chocolate and gradually cool it to 29 degrees (t3).
+      - instruction: כשהתערובת מגיעה ל-35 מעלות, מפסיקים להוסיף אליה שוקולד ורק בוחשים לקירור.
+        instructionEn: When the mixture reaches 35 degrees, stop adding chocolate to it and just stir to cool.
+      - instruction: מעבירים לשק זילוף.
+        instructionEn: Transfer to a piping bag.
+      - instruction: הרכבה- ממלאים את שקעי התבנית בשוקולד והופכים להוצאת עודפי שוקולד.
+        instructionEn: Assembly - fill the sockets of the mold with chocolate and turn to remove excess chocolate.
+      - instruction: מנקים את שפת התבנית בעזרת שפכטל רחב.
+        instructionEn: Clean the rim of the mold with a wide spatula.
+      - instruction: מניחים במהופך להתגבשות.ממלאים את השקעים בשכבת ג׳לה ומעליה שכבת גנאש.
+        instructionEn: >-
+          Place upside down for crystallization. Fill the recesses with a layer of jelly and on top of that a layer of
+          ganache.
+      - instruction: סוגרים את השקעים עם שוקולד מטומפרר ומשטחים את השוקולד בעזרת שפכטל רחב.
+        instructionEn: Close the sockets with tempered chocolate and flatten the chocolate with a wide spatula.
+      - instruction: מניחים לגיבוש מלא של 10-12 שעות בטמפרטורה של 18 מעלות או ל-10-15 דקות בקירור.
+        instructionEn: Allow to fully set for 10-12 hours at a temperature of 18 degrees or for 10-15 minutes in the refrigerator.
+      - instruction: הופכים בזהירות את התבנית ומשחררים את הפרלינים.
+        instructionEn: Carefully turn the mold over and release the pralines.
+tips: []

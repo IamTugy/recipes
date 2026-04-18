@@ -1,0 +1,124 @@
+id: hazelnut-and-white-chocolate-cake-in-a-bowl
+title: Hazelnut and white chocolate cake in a bowl
+titleHe: עוגת אגוזי לוז ושוקולד לבן בחושה
+description: עוגת אגוזי לוז ושוקולד לבן בחושה
+descriptionEn: Hazelnut and white chocolate cake in a bowl
+image: https://assets.tugy.dev/hazelnut-and-white-chocolate-cake-in-a-bowl.jpg
+category: dessert
+difficulty: medium
+prepTime: 15
+cookTime: 55
+servings: 4
+tags:
+  - קינוח
+  - מתוק
+  - שוקולד
+  - עוגה
+ingredients:
+  - group: ""
+    items:
+      - amount: 100
+        unit: g
+        name: חמאה רכה
+        nameEn: Soft butter
+      - amount: 100
+        unit: g
+        name: שמן קנולה
+        nameEn: Canola oil
+      - amount: 140
+        unit: g
+        name: סוכר לבן
+        nameEn: white sugar
+      - amount: 100
+        unit: g
+        name: סוכר חום כהה
+        nameEn: dark brown sugar
+      - amount: 0
+        unit: ""
+        name: קורט מלח
+        nameEn: A pinch of salt
+      - amount: 4
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 150
+        unit: g
+        name: רוויון
+        nameEn: satiety
+      - amount: 100
+        unit: g
+        name: אגוזי לוז, קלויים וקלופים
+        nameEn: Hazelnuts, roasted and peeled
+      - amount: 200
+        unit: g
+        name: קמח תופח
+        nameEn: raising flour
+      - amount: 6
+        unit: g
+        name: אבקת סודה לשתייה
+        nameEn: Baking soda powder
+      - amount: 20
+        unit: g
+        name: קורנפלור
+        nameEn: Cornflour
+      - amount: 50
+        unit: g
+        name: אבקת נוגט
+        nameEn: Nougat powder
+      - amount: 100
+        unit: g
+        name: שוקולד לבן
+        nameEn: white chocolate
+  - group: לציפוי
+    items:
+      - amount: 150
+        unit: g
+        name: פונדנט (להשיג בחנויות אפיה מתמחות)
+        nameEn: Fondant (obtain in specialized baking stores)
+      - amount: 0
+        unit: ""
+        name: כפית אבקת נס קפה
+        nameEn: A teaspoon of coffee miracle powder
+  - group: לקישוט
+    items:
+      - amount: 0
+        unit: ""
+        name: פולי קקאו גרוסים
+        nameEn: ground cocoa beans
+      - amount: 0
+        unit: ""
+        name: אגוזי לוז שבורים
+        nameEn: Cracked hazelnuts
+      - amount: 0
+        unit: ""
+        name: פרחי בצק סוכר
+        nameEn: Sugar dough flowers
+steps:
+  - title: ""
+    items:
+      - instruction: >-
+          מחממים תנור לחום של 160 מעלות. משמנים ומקמים את תבנית האפייה. במיקסר מצויד בוו גיטרה מקציפים היטב חמאה, שמן,
+          סוכרים ומלח כ-5 דקות. במקביל, מניחים את כל החומרים היבשים עם השוקולד והאגוזים במעבד מזון וטוחנים לאבקה אחידה
+          ודקה.
+        instructionEn: >-
+          Heat the oven to 160 degrees. Grease and place the baking pan. In a mixer fitted with a guitar hook, beat
+          butter, oil, sugars and salt well for about 5 minutes. At the same time, place all the dry ingredients with
+          the chocolate and nuts in a food processor and grind to a uniform and fine powder.
+      - instruction: >-
+          שומרים בצד. מוסיפים לתערובת החמאה את הביצים בהדרגה, ביצה אחת כל 3 דקות הקצפה. מוסיפים את הרוויון ואת תערובת
+          היבשים לערבוב קצר ולפיזור מלא בתערובת. מוזגים את בלילת העוגה לתבנית ואופים 45-55 דקות או עד שקיסם הננעץ בעוגה
+          יוצא עם פירורים לחים עליו.
+        instructionEn: >-
+          Keep aside. Add the eggs to the butter mixture gradually, one egg every 3 minutes of whipping. Add the
+          saturation and the dry mixture to mix briefly and fully distribute in the mixture. Pour the cake batter into
+          the pan and bake for 45-55 minutes or until a toothpick inserted into the cake comes out with moist crumbs on
+          it.
+      - instruction: >-
+          מצננים היטב ומשחררים את העוגה. לציפוי- מחממים את הפונדנט והקפה מעל באן מארי לחום שפתיים ומוזגים על חלקה העליון
+          של העוגה, כך שחלקו ייזל בין בליטות העוגה.
+        instructionEn: >-
+          Cool well and release the cake. For the coating - heat the fondant and coffee over a bain-marie to lip heat
+          and pour over the top of the cake, so that some of it drips between the bumps of the cake.
+      - instruction: מקשטים ומניחים לייצוב של שעה בטמפ' החדר.
+        instructionEn: Decorate and leave to stabilize for an hour at room temperature.
+tips: []

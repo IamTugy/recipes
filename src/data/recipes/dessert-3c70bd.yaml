@@ -1,0 +1,99 @@
+id: dessert-3c70bd
+title: "'Divine' - cheesecake with a chocolate heart"
+titleHe: ׳האלוהית׳- עוגת גבינה עם לב שוקולד
+description: ׳האלוהית׳- עוגת גבינה עם לב שוקולד
+descriptionEn: "'Divine' - cheesecake with a chocolate heart"
+image: https://assets.tugy.dev/dessert-3c70bd.jpg
+category: dessert
+difficulty: medium
+prepTime: 15
+cookTime: 40
+servings: 4
+tags:
+  - קינוח
+  - מתוק
+  - שוקולד
+  - עוגה
+  - גבינה
+ingredients:
+  - group: ""
+    items:
+      - amount: 8
+        unit: ""
+        name: רינגים בקוטר
+        nameEn: rings in diameter
+      - amount: 7
+        unit: ""
+        name: ס״מ     לטראפלס:150 גרם שוקולד מריר
+        nameEn: "cm for truffles: 150 grams of dark chocolate"
+      - amount: 200
+        unit: ml
+        name: שמנת מתוקה
+        nameEn: sweet cream
+      - amount: 50
+        unit: g
+        name: פרלינה לוז
+        nameEn: Pralina Luz
+  - group: לתחתית
+    items:
+      - amount: 200
+        unit: g
+        name: עוגיות חמאה מפוררות
+        nameEn: Crumbled butter cookies
+      - amount: 70
+        unit: g
+        name: חמאה מומסת
+        nameEn: melted butter
+      - amount: 25
+        unit: g
+        name: קקאו
+        nameEn: cocoa
+  - group: מילוי
+    items:
+      - amount: 500
+        unit: g
+        name: גבינת שמנת
+        nameEn: cream cheese
+      - amount: 3
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 30
+        unit: g
+        name: קורנפלור כפית משחת וניל
+        nameEn: Cornflour, a teaspoon of vanilla paste
+      - amount: 200
+        unit: ml
+        name: שמנת חמוצה
+        nameEn: Sour cream
+      - amount: 230
+        unit: g
+        name: סוכר
+        nameEn: sugar
+steps:
+  - title: ""
+    items:
+      - instruction: לטראפלס- מעל באן מארי מחממים שמנת ושוקולד.
+        instructionEn: For truffles - heat cream and chocolate over a bain-marie.
+      - instruction: מערבבים פנימה פרלינה ויוצקים לקערה.
+        instructionEn: Mix in praline and pour into a bowl.
+      - instruction: >-
+          מצננים לייצוב ויוצרים כדורים בקוטר 3 ס״מ.משמנים רינגים לאפיה בקוטר 7 ס"מ.לבסיס- במעבד מזון מעבדים את פירורי
+          העוגיות עם החמאה והקקאו.
+        instructionEn: >-
+          Cool to stabilize and form balls with a diameter of 3 cm. Grease baking rings with a diameter of 7 cm. For the
+          base - process the cookie crumbs with the butter and cocoa in a food processor.
+      - instruction: מרדדים בין שני ניירות אפיה ומקפיאים.
+        instructionEn: Roll out between two baking papers and freeze.
+      - instruction: >-
+          קורצים בסיסים עם הרינגים ומעבירים למגש אפיה. לעוגה- מערבבים את כל חומרי המלית עד לקבלת עיסה אחידה. יוצקים את
+          הבלילה עד 1/3 מגובה התבנית, מניחים את כדור הטראפל'ס ויוצקים מעל את יתרת התערובת, כך שתגיע ל-2/3 מגובה הרינג.
+        instructionEn: >-
+          Chop the bases with herrings and transfer to a baking tray. For the cake - mix all the filling ingredients
+          until a uniform paste is obtained. Pour the batter up to 1/3 of the height of the mold, place the truffle's
+          ball and pour the rest of the mixture on top, so that it reaches 2/3 of the height of the herring.
+      - instruction: אופים כ-30-40 דקות בחום של 130 מעלות להתייצבות.
+        instructionEn: Bake for about 30-40 minutes at 130 degrees to stabilize.
+      - instruction: מצננים היטב ומגישים עם כדור טראפל'ס נוסף מעל.
+        instructionEn: Cool well and serve with another truffle ball on top.
+tips: []

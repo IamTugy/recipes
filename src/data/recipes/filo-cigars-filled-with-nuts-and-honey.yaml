@@ -1,0 +1,81 @@
+id: filo-cigars-filled-with-nuts-and-honey
+title: Filo cigars filled with nuts and honey
+titleHe: סיגרים של פילו במילוי אגוזים ודבש
+description: סיגרים של פילו במילוי אגוזים ודבש
+descriptionEn: Filo cigars filled with nuts and honey
+image: https://assets.tugy.dev/filo-cigars-filled-with-nuts-and-honey.jpg
+category: bread
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 30
+tags:
+  - מאפה
+ingredients:
+  - group: למילוי
+    items:
+      - amount: 100
+        unit: g
+        name: פיסטוקים קלופים, קלויים
+        nameEn: Peeled, roasted pistachios
+      - amount: 100
+        unit: g
+        name: אגוזי לוז מולבנים, קלויים
+        nameEn: Blanched, roasted hazelnuts
+      - amount: 200
+        unit: g
+        name: שקדים מולבנים, קלויים
+        nameEn: Blanched almonds, roasted
+      - amount: 100
+        unit: g
+        name: אגוזי פקאן, קלויים
+        nameEn: Pecans, roasted
+      - amount: 40
+        unit: g
+        name: חמאה מותכת
+        nameEn: melted butter
+      - amount: 80
+        unit: g
+        name: דבש
+        nameEn: honey
+      - amount: 1
+        unit: tsp
+        name: משחת  וניל
+        nameEn: Vanilla paste
+      - amount: 1
+        unit: ""
+        name: ביצהכף מי ורדיםקליפה מגוררת מלימון אחד
+        nameEn: An egg, a spoonful of rose water, grated rind from one lemon
+  - group: סירופ
+    items:
+      - amount: 200
+        unit: g
+        name: דבש
+        nameEn: honey
+      - amount: 100
+        unit: g
+        name: מיםמיץ וקליפה מגוררת מלימון אחדמקל קינמון
+        nameEn: Water, juice and grated rind from one lemon and a cinnamon stick
+      - amount: 2
+        unit: ""
+        name: תרמילי הל כתושים
+        nameEn: Crushed cardamom pods
+steps:
+  - title: ""
+    items:
+      - instruction: לסירופ- מביאים את החומרים לתרתיחה ומבשלים כ-3 דקות.
+        instructionEn: For the syrup - bring the ingredients to a boil and cook for about 3 minutes.
+      - instruction: >-
+          שומרים חם. למילוי- טוחנים יחד במעבד מזון את כל החומרים לתערובת פירורית גסה. יוצרים צורת גלילים בידיים רטובות.
+          פורשיםעלה פילו, מברישים בחמאה מותכת וחוצים לאורך לשנייםץ מניחים בבסיס כל עלה גליל אגוזים ומגלגלים.
+        instructionEn: >-
+          Keep warm. For the filling - grind all the ingredients together in a food processor into a coarse crumbly
+          mixture. Form into rolls with wet hands. Spread a sheet of phyllo, brush with melted butter and cut lengthwise
+          in half. Place a walnut roll at the base of each sheet and roll.
+      - instruction: >-
+          מניחים את הגלילים על מגש אפייה ומברישים בחמאה מותכת.אופים בחום של 180 מעלות כ-10 דקות או עד הזהבה.טובלים
+          בסירופ החם ומצננים.
+        instructionEn: >-
+          Place the rolls on a baking tray and brush with melted butter. Bake at 180 degrees for about 10 minutes or
+          until golden. Dip in the hot syrup and cool.
+tips: []

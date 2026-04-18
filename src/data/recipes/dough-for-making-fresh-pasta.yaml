@@ -1,0 +1,66 @@
+id: dough-for-making-fresh-pasta
+title: Dough for making fresh pasta
+titleHe: בצק להכנת פסטה טרייה
+description: בצק להכנת פסטה טרייה
+descriptionEn: Dough for making fresh pasta
+image: https://assets.tugy.dev/dough-for-making-fresh-pasta.jpg
+category: bread
+difficulty: medium
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - מאפה
+ingredients:
+  - group: ""
+    items:
+      - amount: 250
+        unit: ""
+        name: גר' קמח דורום
+        nameEn: Gr. durum flour
+      - amount: 250
+        unit: g
+        name: קמח לחם
+        nameEn: Bread flour
+      - amount: 4
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 1
+        unit: tbsp
+        name: שמן זית
+        nameEn: olive oil
+      - amount: 0.5
+        unit: tsp
+        name: מלח
+        nameEn: salt
+      - amount: 0
+        unit: ""
+        name: מים קרים, לפי הצורך
+        nameEn: cold water, as needed
+steps:
+  - title: ""
+    items:
+      - instruction: "במעבד מזון : שמים קמח, מלח ושמן (ותוספת טעם או צבע רצויים)."
+        instructionEn: "In a food processor: put flour, salt and oil (and add desired flavor or color)."
+      - instruction: מערבלים לאיחוד.
+        instructionEn: Stir to combine.
+      - instruction: מוסיפים ביצים ומעבדים לבצק, אם צריך, מוסיפים מים קרים.
+        instructionEn: Add eggs and process to a dough, if necessary, add cold water.
+      - instruction: >-
+          מרקם הבצק אמור להיות סמיך, דמוי מרציפן.בהכנה ידנית: מנפים את הקמח והמלח על משטח העבודה, יוצרים גומה ושופכים
+          נוזלים לתוכה.
+        instructionEn: >-
+          The texture of the dough should be thick, marzipan-like. In manual preparation: sift the flour and salt on the
+          work surface, make a hole and pour liquids into it.
+      - instruction: מעבדים לבצק.אם הבצק יבש ואינו מתגבש- מוסיפים כף מים.
+        instructionEn: Process into a dough. If the dough is dry and does not form, add a tablespoon of water.
+      - instruction: אם מתקבל דביק, מקמחים.עוטפים בניילון נצמד, ומניחים כחצי שעה למנוחה.מרדדים במכונת פסטה לצורה רצויה.
+        instructionEn: >-
+          If it is sticky, flour it. Wrap it in cling film, and let it rest for about half an hour. Roll it out in a
+          pasta machine to the desired shape.
+      - instruction: חותכים.מבשלים פסטה טרייה במים רותחים מומלחים ל-2-3 דקות, לפי היחס הבא:1 ליטר מים-100 גרם פסטה-1 כפית מלח.
+        instructionEn: >-
+          Cut. Cook fresh pasta in boiling salted water for 2-3 minutes, according to the following ratio: 1 liter of
+          water - 100 grams of pasta - 1 teaspoon of salt.
+tips: []

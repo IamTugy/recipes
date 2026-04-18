@@ -1,0 +1,98 @@
+id: juicy-chocolate-and-nougat-cake-kosher-for-passo
+title: Juicy chocolate and nougat cake kosher for Passover
+titleHe: עוגת שוקולד ונוגט עסיסית כשר לפסח
+description: עוגת שוקולד ונוגט עסיסית כשר לפסח
+descriptionEn: Juicy chocolate and nougat cake kosher for Passover
+image: https://assets.tugy.dev/juicy-chocolate-and-nougat-cake-kosher-for-passo.jpg
+category: dessert
+difficulty: medium
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - קינוח
+  - מתוק
+  - שוקולד
+  - עוגה
+  - ללא גלוטן
+ingredients:
+  - group: ""
+    items:
+      - amount: 0
+        unit: ""
+        name: תבנית משולש באורך
+        nameEn: Long triangle pattern
+      - amount: 100
+        unit: g
+        name: שוקולד מריר
+        nameEn: dark chocolate
+      - amount: 100
+        unit: g
+        name: חמאה
+        nameEn: butter
+      - amount: 50
+        unit: g
+        name: פרלינה לוז
+        nameEn: Pralina Luz
+      - amount: 4
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 100
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 25
+        unit: g
+        name: קורנפלור
+        nameEn: Cornflour
+      - amount: 30
+        unit: g
+        name: אגוז לוז קלוי וטחון
+        nameEn: Roasted and ground hazelnut
+      - amount: 0
+        unit: ""
+        name: לזיגוג:150  גרם שוקולד מריר
+        nameEn: "For the glaze: 150 grams of dark chocolate"
+      - amount: 80
+        unit: g
+        name: שמנת מתוקה
+        nameEn: sweet cream
+      - amount: 20
+        unit: g
+        name: גלוקוזה
+        nameEn: glucose
+      - amount: 20
+        unit: g
+        name: שמן קנולה
+        nameEn: Canola oil
+      - amount: 60
+        unit: g
+        name: שקדים קלויים פרוסים וקצוצים
+        nameEn: Sliced ​​and chopped roasted almonds
+steps:
+  - title: ""
+    items:
+      - instruction: מחממים תנור ל-170 מעלות.
+        instructionEn: Heat the oven to 170 degrees.
+      - instruction: ממיסים את השוקולד והחמאה בסיר אדים כפול.
+        instructionEn: Melt the chocolate and butter in a double boiler.
+      - instruction: מוסיפים פרלינה לוז.
+        instructionEn: Add hazelnut praline.
+      - instruction: במיקסר מצויד בבלון הקצפה מקציפים את הביצים והסוכר לקצף תפוח ואוורירי, כ-5 דקות.
+        instructionEn: >-
+          In a mixer equipped with the whisk balloon, beat the eggs and sugar to a fluffy and fluffy foam, about 5
+          minutes.
+      - instruction: מוסיפים את תערובת השוקולד.
+        instructionEn: Add the chocolate mixture.
+      - instruction: מוסיפים את הקורנפלור והלוז הטחון, מערבבים לאיחוד.
+        instructionEn: Add the cornflour and ground hazelnuts, mix to combine.
+      - instruction: מעבירים לתבנית משומנת ומקומחת, ואופים ב- 170 מעלות 45 דקות.
+        instructionEn: Transfer to a greased and floured pan, and bake at 170 degrees for 45 minutes.
+      - instruction: מצננים.
+        instructionEn: cooling
+      - instruction: "לזיגוג: ממיסים את כל החומרים ללא השקדים מעל באן מארי."
+        instructionEn: "For the glaze: melt all the ingredients without the almonds over a bain-marie."
+      - instruction: מצננים לטמפרטורה של 40 מעלות, מוסיפים שקדים ומזגגים את העוגה.
+        instructionEn: Cool to a temperature of 40 degrees, add almonds and glaze the cake.
+tips: []

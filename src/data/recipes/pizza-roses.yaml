@@ -1,0 +1,103 @@
+id: pizza-roses
+title: Pizza roses
+titleHe: שושני פיצה
+description: שושני פיצה
+descriptionEn: Pizza roses
+image: https://images.unsplash.com/photo-1603532648955-039310d9ed75?w=900&q=80
+category: bread
+difficulty: easy
+prepTime: 15
+cookTime: 30
+servings: 20
+tags:
+  - מאפה
+ingredients:
+  - group: לבצק
+    items:
+      - amount: 300
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 3
+        unit: g
+        name: אבקת אפייה
+        nameEn: baking powder
+      - amount: 6
+        unit: g
+        name: מלח
+        nameEn: salt
+      - amount: 150
+        unit: g
+        name: חמאה קרה, חתוכה לקביות
+        nameEn: Cold butter, cut into cubes
+      - amount: 120
+        unit: g
+        name: גבינה לבנה
+        nameEn: curds
+      - amount: 1
+        unit: ""
+        name: ביצה
+        nameEn: egg
+      - amount: 30
+        unit: g
+        name: מים
+        nameEn: water
+  - group: למילוי
+    items:
+      - amount: 150
+        unit: g
+        name: גבינה קשה (פרמזן, קשקבל, עמק), מגוררת
+        nameEn: Hard cheese (Parmesan, Kashkabal, Emek), grated
+      - amount: 70
+        unit: g
+        name: רסק עגבניות
+        nameEn: Tomato paste
+      - amount: 0
+        unit: ""
+        name: כפית אורגנו
+        nameEn: A teaspoon of oregano
+      - amount: 2
+        unit: ""
+        name: שיני שום כתושות
+        nameEn: Crushed garlic cloves
+      - amount: 0
+        unit: ""
+        name: צרור עלי בזיליקום טריים, קצוצים
+        nameEn: A bunch of fresh basil leaves, chopped
+      - amount: 2
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 100
+        unit: g
+        name: זיתים מגולענים, קצוצים
+        nameEn: Pitted olives, chopped
+      - amount: 40
+        unit: g
+        name: פירורי לחם
+        nameEn: bread crumbs
+steps:
+  - title: ""
+    items:
+      - instruction: >-
+          מכניסים את הקמח, אבקת האפייה, המלח והחמאה למעבד מזון וטוחנים לפירורים דקים.מוסיפים את שאר חומרי הבצק ומעבדים
+          עד קבלת בצק.
+        instructionEn: >-
+          Put the flour, baking powder, salt and butter in a food processor and grind to fine crumbs. Add the rest of
+          the dough ingredients and process until you get a dough.
+      - instruction: "עוטפים ומניחים בקירור לשלוש שעות.המילוי:"
+        instructionEn: "Wrap and refrigerate for three hours. The filling:"
+      - instruction: >-
+          מחממים תנור לחום של 170 מעלות. מערבבים את כל החומרים לתערובת אחידה ומניחים בקירור לחצי שעה. מרדדים את הבצק
+          לעלה בעובי 2 מ"מ. מניחים את המילוי על גבי הבצק ומגלגלים לרולדה הדוקה.
+        instructionEn: >-
+          Heat the oven to 170 degrees. Mix all the ingredients to a uniform mixture and refrigerate for half an hour.
+          Roll the dough into a sheet with a thickness of 2 mm. Place the filling on top of the dough and roll into a
+          tight roll.
+      - instruction: >-
+          בעזרת סכין משור פורסים את הרולדה ל-16 שושנים ומניחים על תבנית אפיה מרופדת בנייר אפייה. אופים 30 דקות או עד
+          הזהבה.
+        instructionEn: >-
+          Using a serrated knife, slice the roulade into 16 roses and place on a baking sheet lined with baking paper.
+          Bake for 30 minutes or until golden.
+tips: []

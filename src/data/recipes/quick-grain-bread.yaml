@@ -1,0 +1,81 @@
+id: quick-grain-bread
+hidden: true
+title: Quick grain bread
+titleHe: לחם גרעינים מהיר
+description: לחם גרעינים מהיר
+descriptionEn: Quick grain bread
+image: https://assets.tugy.dev/quick-grain-bread.jpg
+category: bread
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - מאפה
+  - לחם
+ingredients:
+  - group: ""
+    items:
+      - amount: 0
+        unit: ""
+        name: לגרעינים-20 גרם גרעיני דלעת קלופים
+        nameEn: For the seeds - 20 grams of peeled pumpkin seeds
+      - amount: 20
+        unit: g
+        name: צ׳יה
+        nameEn: Chia
+      - amount: 35
+        unit: g
+        name: זגעי פשתן
+        nameEn: Linen rugs
+      - amount: 35
+        unit: g
+        name: גרעיני חמנייה קלופים
+        nameEn: Shelled sunflower seeds
+      - amount: 45
+        unit: g
+        name: שומשום לבן
+        nameEn: white sesame
+  - group: לבצק
+    items:
+      - amount: 300
+        unit: g
+        name: קמח לחם לבן
+        nameEn: White bread flour
+      - amount: 100
+        unit: g
+        name: קמח שיפון מלא
+        nameEn: Whole rye flour
+      - amount: 12
+        unit: g
+        name: שמרים יבשים
+        nameEn: dry yeast
+      - amount: 7
+        unit: g
+        name: מלח ים
+        nameEn: sea ​​salt
+      - amount: 50
+        unit: g
+        name: סילאן
+        nameEn: Silan
+      - amount: 15
+        unit: g
+        name: דבש
+        nameEn: honey
+      - amount: 50
+        unit: g
+        name: שמן זית
+        nameEn: olive oil
+      - amount: 400
+        unit: g
+        name: מים
+        nameEn: water
+      - amount: 0
+        unit: ""
+        name: לסיום-50 גרם שמן זית
+        nameEn: To finish - 50 grams of olive oil
+steps:
+  - title: ""
+    items:
+      - instruction: ""
+tips: []

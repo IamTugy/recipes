@@ -1,0 +1,96 @@
+id: meat-stuffed-meatloaf
+hidden: true
+title: Meat-stuffed meatloaf
+titleHe: מלפוף ממולא בשרים
+description: מלפוף ממולא בשרים
+descriptionEn: Meat-stuffed meatloaf
+image: https://assets.tugy.dev/meat-stuffed-meatloaf.jpg
+category: dinner
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 12
+tags:
+  - ארוחת ערב
+ingredients:
+  - group: ""
+    items:
+      - amount: 1
+        unit: pc
+        name: כרוב (עדיפות לכרוב שטוח)
+        nameEn: Cabbage (preferably flat cabbage)
+      - amount: 700
+        unit: g
+        name: בשר בקר/טלה טחון (25% שומן, עדיפות לצוואר/מכסה אנטריקוט)
+        nameEn: Ground beef/lamb (25% fat, preference for the neck/entrecote cover)
+      - amount: 10
+        unit: ""
+        name: גבעולי כוסברה
+        nameEn: Coriander stalks
+      - amount: 10
+        unit: ""
+        name: גבעולי נענע (עלים בלבד)
+        nameEn: Mint stems (leaves only)
+      - amount: 1
+        unit: ""
+        name: בצל גדול, קלוף
+        nameEn: A large onion, peeled
+      - amount: 5
+        unit: ""
+        name: שיני שום קלופות
+        nameEn: Peeled garlic cloves
+      - amount: 1
+        unit: tsp
+        name: פלפל שחור גרוס
+        nameEn: ground black pepper
+      - amount: 1
+        unit: tsp
+        name: גרגרי כמון, קלויים וכתושים
+        nameEn: Cumin seeds, roasted and crushed
+      - amount: 2
+        unit: tsp
+        name: פפריקה מתוקה (או חריפה לפי העדפה)
+        nameEn: sweet paprika (or spicy according to preference)
+      - amount: 1
+        unit: tsp
+        name: כורכום
+        nameEn: turmeric
+      - amount: 1
+        unit: tsp
+        name: בהרט
+        nameEn: Bharat
+      - amount: 2
+        unit: tsp
+        name: מלח
+        nameEn: salt
+  - group: לרוטב
+    items:
+      - amount: 100
+        unit: g
+        name: רכז עגבניות איכותי (mutti)
+        nameEn: High-quality tomato concentrate (mutti)
+      - amount: 100
+        unit: g
+        name: שמן זית
+        nameEn: olive oil
+      - amount: 3
+        unit: ""
+        name: לימונים (מיץ)
+        nameEn: lemons (juice)
+      - amount: 50
+        unit: g
+        name: סילאן
+        nameEn: Silan
+      - amount: 0.5
+        unit: l
+        name: ציר ירקות/עוף/מים
+        nameEn: vegetable/chicken/water stock
+      - amount: 1
+        unit: tsp
+        name: כורכום
+        nameEn: turmeric
+steps:
+  - title: ""
+    items:
+      - instruction: ""
+tips: []

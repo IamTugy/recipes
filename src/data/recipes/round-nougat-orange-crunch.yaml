@@ -1,0 +1,92 @@
+id: round-nougat-orange-crunch
+title: Round nougat-orange crunch
+titleHe: קראנצ נוגט-תפוז עגול
+description: קראנצ נוגט-תפוז עגול
+descriptionEn: Round nougat-orange crunch
+image: https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?w=900&q=80
+category: dessert
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - קינוח
+  - מתוק
+  - הדרים
+ingredients:
+  - group: לבצק
+    items:
+      - amount: 400
+        unit: g
+        name: קמח לחם קשה
+        nameEn: Hard bread flour
+      - amount: 80
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 5
+        unit: g
+        name: מלח
+        nameEn: salt
+      - amount: 15
+        unit: g
+        name: שמרים יבשים או 30 גרם שמרים טריים
+        nameEn: dry yeast or 30 grams of fresh yeast
+      - amount: 0
+        unit: ""
+        name: קליפה מלימון אחד, מגוררת
+        nameEn: Zest from one lemon, grated
+      - amount: 1
+        unit: ""
+        name: ביצה
+        nameEn: egg
+      - amount: 1
+        unit: ""
+        name: חלמון
+        nameEn: yolk
+      - amount: 120
+        unit: g
+        name: שמנת חמוצה
+        nameEn: Sour cream
+      - amount: 80
+        unit: g
+        name: חמאה רכה
+        nameEn: Soft butter
+  - group: למילוי
+    items:
+      - amount: 100
+        unit: g
+        name: חמאה רכה
+        nameEn: Soft butter
+      - amount: 100
+        unit: g
+        name: אבקת נוגט
+        nameEn: Nougat powder
+      - amount: 20
+        unit: g
+        name: קורנפלור
+        nameEn: Cornflour
+      - amount: 150
+        unit: g
+        name: קונפיטורת תפוזים
+        nameEn: Orange jam
+      - amount: 0
+        unit: ""
+        name: אבקת סוכר לקישוט
+        nameEn: Powdered sugar for decoration
+steps:
+  - title: ""
+    items:
+      - instruction: מתפיחים את הבצק לפחות 6 שעות.
+        instructionEn: Let the dough rise for at least 6 hours.
+      - instruction: "למילוי: מערבבים היטב את כל החומרים לתערובת אחידה."
+        instructionEn: "For the filling: mix all the ingredients well into a uniform mixture."
+      - instruction: "הרכבה: מרדדים את הבצק לעלה מלבני רחב."
+        instructionEn: "Assembly: roll the dough into a wide rectangular sheet."
+      - instruction: מתפיחים ל-80% מהנפח המקורי.
+        instructionEn: Let rise to 80% of the original volume.
+      - instruction: מחממים תנור ל-160 מעלות ואופים 40 דקות.
+        instructionEn: Heat oven to 160°C and bake for 40 minutes.
+      - instruction: מצננים ומאבקים באבקת סוכר.
+        instructionEn: Cool and dust with powdered sugar.
+tips: []

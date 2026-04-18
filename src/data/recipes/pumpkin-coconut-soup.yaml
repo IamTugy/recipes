@@ -1,0 +1,115 @@
+id: pumpkin-coconut-soup
+title: Pumpkin Coconut Soup with Falafel
+titleHe: מרק קרם דלעת וקוקוס עם פלאפל בריאות
+category: soup
+tags:
+  - דלעת
+  - קוקוס
+  - פלאפל
+  - טבעוני
+tagsEn:
+  - pumpkin
+  - coconut
+  - falafel
+  - vegan
+image: https://assets.tugy.dev/pumpkin-coconut-soup.jpg
+description: מרק דלעת קטיפתי עם חלב קוקוס וכדורי פלאפל בריא של קטניות מעורבות - ארוחה שלמה בקערה.
+descriptionEn: Silky pumpkin soup with coconut milk and mixed-legume health falafel balls - a complete meal in a bowl.
+prepTime: 30
+cookTime: 35
+servings: 8
+difficulty: easy
+ingredients:
+  - group: מרק
+    groupEn: Soup
+    items:
+      - amount: 2
+        unit: ""
+        name: בצלים, חתוכים גס
+        nameEn: onions, roughly chopped
+      - amount: 3
+        unit: cloves
+        name: שום קלופות
+        nameEn: garlic cloves, peeled
+      - amount: 2
+        unit: tbsp
+        name: ג'ינג'ר כבוש
+        nameEn: pickled ginger
+      - amount: 2
+        unit: kg
+        name: דלעת קלופה, קוביות גסות
+        nameEn: butternut squash, peeled and roughly cubed
+      - amount: 1.5
+        unit: liters
+        name: מים או ציר ירקות
+        nameEn: water or vegetable stock
+      - amount: 400
+        unit: ml
+        name: חלב קוקוס
+        nameEn: coconut milk
+      - amount: 1
+        unit: tsp
+        name: מלח ים
+        nameEn: sea salt
+  - group: פלאפל
+    groupEn: Health Falafel
+    items:
+      - amount: 2
+        unit: cups
+        name: קטניות מעורבות (חומוס, שעועית שחורה, עדשים) - מושרות לילה
+        nameEn: mixed legumes (chickpeas, black beans, lentils) - soaked overnight
+      - amount: 1
+        unit: bunch
+        name: כוסברה טרייה
+        nameEn: fresh cilantro
+      - amount: 1
+        unit: bunch
+        name: שמיר טרי
+        nameEn: fresh dill
+      - amount: 1
+        unit: tsp
+        name: כוסברה יבשה
+        nameEn: ground coriander
+      - amount: 1
+        unit: tsp
+        name: כמון
+        nameEn: cumin
+      - amount: 2
+        unit: cloves
+        name: שום
+        nameEn: garlic
+      - amount: 5
+        unit: g
+        name: אבקת אפייה
+        nameEn: baking powder
+      - amount: 1
+        unit: liter
+        name: שמן לטיגון עמוק
+        nameEn: oil for deep frying
+steps:
+  - title: מרק
+    titleEn: Soup
+    items:
+      - instruction: מכניסים דלעת, בצלים, שום, ג'ינג'ר ומים לסיר - מביאים לרתיחה. מנמיכים ומבשלים עד שהדלעת רכה.
+        instructionEn: >-
+          Put squash, onions, garlic, ginger and water in a pot - bring to a boil. Reduce heat and cook until squash is
+          tender.
+        timerMinutes: 25
+      - instruction: מרסקים לחלק. מחזירים לסיר עם חלב קוקוס, מביאים לרתיחה ומתבלים. מבשלים עוד 10 דקות.
+        instructionEn: Blend until smooth. Return to pot with coconut milk, bring to a simmer, season and cook 10 more minutes.
+        timerMinutes: 10
+  - title: פלאפל
+    titleEn: Health Falafel
+    items:
+      - instruction: מסננים קטניות ומרסקים במעבד מזון עם שאר החומרים לעיסה. מאחסנים שעה בקירור.
+        instructionEn: >-
+          Drain legumes and pulse in a food processor with remaining ingredients to a paste. Rest in the fridge for 1
+          hour.
+        timerMinutes: 60
+      - instruction: מחממים שמן לטיגון. מעצבים כדורים ומטגנים עד הזהבה.
+        instructionEn: Heat oil for frying. Shape into balls and fry until golden.
+        timerMinutes: 5
+        tip: כדורים רטובים שידיים - הפלאפל לא יתפרק.
+        tipEn: Wet hands when shaping - the falafel won't fall apart.
+      - instruction: מוזגים מרק לצלחות ומניחים כדור פלאפל במרכז.
+        instructionEn: Ladle soup into bowls and place a falafel ball in the center.

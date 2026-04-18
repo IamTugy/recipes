@@ -1,0 +1,82 @@
+id: bread-of-dried-fruits-and-rosemary
+title: Bread of dried fruits and rosemary
+titleHe: לחם של פירות מיובשים ורוזמרין
+description: לחם של פירות מיובשים ורוזמרין
+descriptionEn: Bread of dried fruits and rosemary
+image: https://assets.tugy.dev/bread-of-dried-fruits-and-rosemary.jpg
+category: bread
+difficulty: easy
+prepTime: 15
+cookTime: 30
+servings: 4
+tags:
+  - מאפה
+  - לחם
+ingredients:
+  - group: ""
+    items:
+      - amount: 4
+        unit: ""
+        name: כיכרות
+        nameEn: Squares
+      - amount: 1
+        unit: kg
+        name: קמח לחם מנופה
+        nameEn: Sifted bread flour
+      - amount: 30
+        unit: g
+        name: שמרים יבשיםעלים מ-2 ענפי רוזמרין קצוצים
+        nameEn: Dry yeast leaves from 2 chopped rosemary sprigs
+      - amount: 20
+        unit: g
+        name: אבקת חלב
+        nameEn: milk powder
+      - amount: 100
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 20
+        unit: g
+        name: מלח
+        nameEn: salt
+      - amount: 100
+        unit: g
+        name: שמן זיתכ-300 גרם מים פושרים
+        nameEn: Olive oil-300 grams lukewarm water
+      - amount: 4
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 350
+        unit: g
+        name: תערובת פירות מיובשים (משמשים, צימוקים, דבלים, חמוציות), קצוצים
+        nameEn: A mixture of dried fruits (apricots, raisins, cranberries, cranberries), chopped
+steps:
+  - title: ""
+    items:
+      - instruction: >-
+          במיקסר מצויד בוו לישה, מכניסים את כל החומרים היבשים, למעט המים, הביצים והפירות המיובשים ומערבלים.מוסיפים
+          בהדרגה את הביצים והנוזלים וממשיכים ללוש במהירות בינונית 8-10 דקות.
+        instructionEn: >-
+          In a mixer equipped with a kneading hook, add all the dry ingredients, except the water, the eggs and the
+          dried fruits and mix. Gradually add the eggs and liquids and continue kneading at medium speed for 8-10
+          minutes.
+      - instruction: הבצק המתקבל אמור להיות רך מאוד ולא דביק (לבצק יש נטייה לספוג הרבה קמח, לא להתפתות ולקמח יותר מדי!).
+        instructionEn: >-
+          The resulting dough should be very soft and not sticky (the dough has a tendency to absorb a lot of flour,
+          don't be tempted to add too much flour!).
+      - instruction: >-
+          מוסיפים את הפירות המיובשים בלישה ידנית.משמנים קלות את הבצק, מכסים ומניחים בקערה רחבה מכוסה להתפחה עד הכפלת
+          הנפח.מחממים תנור לחום של 180 מעלות.מחלקים את הבצק ל-4 חלקים ויוצרים מכל אחד כיכר לחם מוארכת.
+        instructionEn: >-
+          Add the dried fruits by hand kneading. Lightly oil the dough, cover and place in a wide, covered bowl to rise
+          until it doubles in volume. Heat the oven to 180 degrees. Divide the dough into 4 parts and form each into an
+          oblong loaf of bread.
+      - instruction: >-
+          מניחים על תבניות תנור מרופדות בנייר אפיה, מכסים ומתפיחים שוב ל-80% מהנפח המקורי.אופים כ-30 דקות ומצננים
+          היטב.ניתן בתום האפיה להבריש את הכיכרות בחמאה רכה לגלגל בסוכר.
+        instructionEn: >-
+          Place on oven trays lined with baking paper, cover and rise again to 80% of the original volume. Bake for
+          about 30 minutes and cool well. At the end of baking, you can brush the loaves with soft butter and roll in
+          sugar.
+tips: []

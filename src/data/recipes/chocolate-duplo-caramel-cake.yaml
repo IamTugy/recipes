@@ -1,0 +1,165 @@
+id: chocolate-duplo-caramel-cake
+title: Chocolate-duplo caramel cake
+titleHe: עוגת שוקולד-דופלו קרמל
+description: עוגת שוקולד-דופלו קרמל
+descriptionEn: Chocolate-duplo caramel cake
+image: https://assets.tugy.dev/chocolate-duplo-caramel-cake.jpg
+category: dessert
+difficulty: hard
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - קינוח
+  - מתוק
+  - שוקולד
+  - עוגה
+ingredients:
+  - group: לתחתית
+    items:
+      - amount: 60
+        unit: g
+        name: חמאה רכה
+        nameEn: Soft butter
+      - amount: 50
+        unit: g
+        name: אבקת סוכר
+        nameEn: icing sugar
+      - amount: 80
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 20
+        unit: g
+        name: קקאו
+        nameEn: cocoa
+  - group: שכבת פאדג' שוקולד
+    items:
+      - amount: 50
+        unit: g
+        name: חמאה
+        nameEn: butter
+      - amount: 60
+        unit: g
+        name: שוקולד מריר
+        nameEn: dark chocolate
+      - amount: 60
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 1
+        unit: ""
+        name: ביצה
+        nameEn: egg
+      - amount: 80
+        unit: g
+        name: חלב
+        nameEn: milk
+      - amount: 30
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 40
+        unit: g
+        name: פרלינה לוז
+        nameEn: Pralina Luz
+      - amount: 0
+        unit: ""
+        name: קורט מלח
+        nameEn: A pinch of salt
+  - group: לגנאש
+    items:
+      - amount: 150
+        unit: g
+        name: שוקולד מריר
+        nameEn: dark chocolate
+      - amount: 50
+        unit: g
+        name: שוקולד חלב
+        nameEn: milk chocolate
+      - amount: 200
+        unit: g
+        name: שמנת מתוקה
+        nameEn: sweet cream
+      - amount: 20
+        unit: g
+        name: גלוקוזה
+        nameEn: glucose
+      - amount: 0
+        unit: ""
+        name: קורט מלח
+        nameEn: A pinch of salt
+  - group: לזיגוג
+    items:
+      - amount: 100
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 100
+        unit: g
+        name: חלב
+        nameEn: milk
+      - amount: 250
+        unit: g
+        name: שמנת מתוקה
+        nameEn: sweet cream
+      - amount: 70
+        unit: g
+        name: שוקולד לבן
+        nameEn: white chocolate
+      - amount: 5
+        unit: g
+        name: ג'לטין שרוי ב-25 גרם מים קרים
+        nameEn: Gelatin soaked in 25 grams of cold water
+steps:
+  - title: ""
+    items:
+      - instruction: לבצק תחתית- מניחים את כל החומרים במיקסר מצויד בוו גיטרה ומעבדים עד קבלת בצק אחיד.
+        instructionEn: >-
+          For the bottom dough - place all the ingredients in a mixer equipped with a guitar hook and process until you
+          get a uniform dough.
+      - instruction: מרדדים בין שני ניירות אפייה לעלה בעובי 1/2 ס"מ ומקפיאים ל-20 דקות.
+        instructionEn: Roll out between two sheets of baking paper to a 1/2 cm thick sheet and freeze for 20 minutes.
+      - instruction: >-
+          קורצים עם תבנית האפיה ומעבירים איתה לאפייה בתנור שחומם ל-150 מעלות ל-17 דקות.לשכבת הפאדג'- מעל באן מארי מתיכים
+          חמאה ושוקלד.
+        instructionEn: >-
+          Wink with the baking pan and bake with it in an oven heated to 150 degrees for 17 minutes. For the fudge layer
+          - melt butter and chocolate on top of a bain marie.
+      - instruction: בקערה נפרדת טורפים סוכר וביצה.
+        instructionEn: In a separate bowl, beat sugar and egg.
+      - instruction: מוסיפים חלב ואת תערובת השוקולד.
+        instructionEn: Add milk and the chocolate mixture.
+      - instruction: מוסיפים את יתרת החומרים ובוחשים לאיחוד.
+        instructionEn: Add the rest of the ingredients and stir to combine.
+      - instruction: יוצקים מעל התחתית האפויה ומחזירים לתנור לעוד 30 דקות אפייה.
+        instructionEn: Pour over the baked bottom and return to the oven for another 30 minutes of baking.
+      - instruction: באותו החום.
+        instructionEn: in the same heat.
+      - instruction: מצננים.לגנאש- מתיכים שוקולדים מעל באן מארי.
+        instructionEn: Cool. For ganache - melt chocolates over a bain marie.
+      - instruction: בנפרד מרתיחים שמנת וגלוקוזה.
+        instructionEn: Separately boil cream and glucose.
+      - instruction: מחברים את שתי התערובות בשלבים וטוחנים היטב בעזרת בלנדר מוט.
+        instructionEn: Combine the two mixtures in stages and grind well with a stick blender.
+      - instruction: יוצקים 2/3 מהתערובת על שכבת הפאדג' שבתבנית ומעבירים להקפאה של 3 שעות.
+        instructionEn: Pour 2/3 of the mixture on the fudge layer in the mold and freeze for 3 hours.
+      - instruction: את יתרת התערובת מצננים ויוצרים ממנה, לאחר התייצבות, כדורי טראפלס במגוון גדלים.
+        instructionEn: The rest of the mixture is cooled and, after stabilization, truffle balls of various sizes are formed from it.
+      - instruction: מקפיאים.לציפוי- בסיר על להבה גבוהה מכינים מהסוכר קרמל ענברי.
+        instructionEn: Freeze. For the coating - in a pot on a high flame, make an amber caramel from the sugar.
+      - instruction: בנפרד מביאים לרתיחה את השמנת והחלב.
+        instructionEn: Separately, bring the cream and milk to a boil.
+      - instruction: בזהירות יוצקים את השמנת והחלב על הקרמל ובוחשים להמסה.
+        instructionEn: Carefully pour the cream and milk over the caramel and stir to melt.
+      - instruction: יוצקים על השוקולד והג'לטין המרוכך ומסננים.
+        instructionEn: Pour over the chocolate and the softened gelatin and filter.
+      - instruction: >-
+          מצננים לחום של 35 מעלות (קרוב לחום הגוף).משחררים את העוגה הקפואה מהתבנית, מניחים מעל את כדורי הטאפלס ומעבירים
+          אל רשת ומזגגים.
+        instructionEn: >-
+          Cool to a temperature of 35 degrees (close to body temperature). Release the frozen cake from the mold, place
+          the taffle balls on top and transfer to a wire rack and glaze.
+      - instruction: מניחים לייצוב קל ומעבירים לצלחת הגשה ומפשירים באיטיות בקירור.
+        instructionEn: Allow to stabilize slightly and transfer to a serving plate and thaw slowly in the refrigerator.
+tips: []

@@ -1,0 +1,67 @@
+id: a-quick-date-and-honey-cake
+title: A quick date and honey cake
+titleHe: עוגת תמרים ודבש מהירה
+description: עוגת תמרים ודבש מהירה
+descriptionEn: A quick date and honey cake
+image: https://assets.tugy.dev/a-quick-date-and-honey-cake.jpg
+category: dessert
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - קינוח
+  - מתוק
+  - עוגה
+ingredients:
+  - group: ""
+    items:
+      - amount: 150
+        unit: g
+        name: ממרח תמרים
+        nameEn: Date spread
+      - amount: 50
+        unit: g
+        name: אגוזים קצוצים
+        nameEn: chopped nuts
+      - amount: 200
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 100
+        unit: g
+        name: דבש
+        nameEn: honey
+      - amount: 8
+        unit: g
+        name: אבקת סודה לשתייה
+        nameEn: Baking soda powder
+      - amount: 380
+        unit: g
+        name: מים רותחים
+        nameEn: boiling water
+      - amount: 125
+        unit: g
+        name: שמן קנולה
+        nameEn: Canola oil
+      - amount: 2
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 280
+        unit: g
+        name: קמח תופח
+        nameEn: raising flour
+steps:
+  - title: ""
+    items:
+      - instruction: מערבבים בקערה תמרים, אגוזים, סוכר, דבש, אבקת סודה ומים רותחים.
+        instructionEn: Mix dates, nuts, sugar, honey, soda powder and boiling water in a bowl.
+      - instruction: >-
+          משהים בצד ל-15 דקות.מוסיפים את יתרת החומרים, מערבבים לתערובת אחידה.מעברים לתבניות משומנות ומקומחות.אופים בחום
+          של 160 מעלות כ-45 דקות, או עד שקיסם הננעץ בעוגה יוצא עם מעט פירורים עליו.מצננים.
+        instructionEn: >-
+          Set aside for 15 minutes. Add the rest of the ingredients, mix to a uniform mixture. Transfer to greased and
+          floured pans. Bake at 160 degrees for about 45 minutes, or until a toothpick inserted into the cake comes out
+          with a few crumbs on it. Cool.
+tips: []

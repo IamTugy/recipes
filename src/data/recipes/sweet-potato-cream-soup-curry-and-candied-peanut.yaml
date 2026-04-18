@@ -1,0 +1,73 @@
+id: sweet-potato-cream-soup-curry-and-candied-peanut
+title: Sweet potato cream soup, curry and candied peanuts
+titleHe: מרק קרם בטטה, קארי ובוטנים מסוכרים
+description: מרק קרם בטטה, קארי ובוטנים מסוכרים
+descriptionEn: Sweet potato cream soup, curry and candied peanuts
+image: https://assets.tugy.dev/sweet-potato-cream-soup-curry-and-candied-peanut.jpg
+category: soup
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 10
+tags:
+  - מרק
+ingredients:
+  - group: ""
+    items:
+      - amount: 10
+        unit: ""
+        name: מנות
+        nameEn: Dishes
+      - amount: 2
+        unit: ""
+        name: בצלים קלופים וחתוכים גס
+        nameEn: Peeled and roughly chopped onions
+      - amount: 5
+        unit: ""
+        name: שיני שום קלופות
+        nameEn: Peeled garlic cloves
+      - amount: 1
+        unit: cm
+        name: שורש ג'ינג'ר מגורר כף משחת קארי
+        nameEn: grated ginger root a tablespoon of curry paste
+      - amount: 1
+        unit: kg
+        name: בטטה קלופה וחתוכה לקוביות גסות
+        nameEn: Sweet potato is peeled and cut into rough cubes
+      - amount: 1
+        unit: l
+        name: מים/ציר עוף
+        nameEn: water/chicken stock
+      - amount: 1
+        unit: l
+        name: חלב/קרם קוקוס
+        nameEn: Coconut milk/cream
+      - amount: 100
+        unit: g
+        name: חמאת בוטנים חלקה מלח, פלפל שחור גרוס טרי
+        nameEn: Smooth peanut butter, salt, freshly ground black pepper
+      - amount: 0
+        unit: ""
+        name: לקישוט צרור בצל ירוק, חתוך לאלכסונים
+        nameEn: For garnish, a bunch of green onions, cut diagonally
+      - amount: 30
+        unit: g
+        name: בוטנים, מטוגנים בשמן עמוק ומתובלים במלח, פלפל, פפריקה חריפה ומעט כמון, קצוצים
+        nameEn: Peanuts, fried in deep oil and seasoned with salt, pepper, hot paprika and a little cumin, chopped
+steps:
+  - title: ""
+    items:
+      - instruction: מכניסים את הבטטה, הבצלים, השום, הג'ינג'ר, הקארי והציר לסיר רחב ומביאים לרתיחה.
+        instructionEn: Put the sweet potato, onions, garlic, ginger, curry and stock in a wide pot and bring to a boil.
+      - instruction: >-
+          מנמיכים את הלהבה ומבשלים עד אשר הבטטה רכה.מרסקים את המרק בבלנדר או מעבד מזון למרקם אחיד וחלק.מחזירים את המרק
+          לסיר, מוסיפים את חלב/קרם הקוקוס וחמאת הבוטנים ומביאים לרתיחה.
+        instructionEn: >-
+          Lower the flame and cook until the sweet potato is soft. Puree the soup in a blender or food processor to a
+          uniform and smooth texture. Return the soup to the pot, add the coconut milk/cream and the peanut butter and
+          bring to a boil.
+      - instruction: מתבלים במלח ופלפל לפי הטעם.מבשלים עוד כ-10 דקות ומגישים חם בעיטור בצל ירוק ובוטנים.
+        instructionEn: >-
+          Season with salt and pepper to taste. Cook for another 10 minutes and serve hot garnished with green onions
+          and peanuts.
+tips: []

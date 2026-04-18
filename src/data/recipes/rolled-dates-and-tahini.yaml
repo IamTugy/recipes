@@ -1,0 +1,92 @@
+id: rolled-dates-and-tahini
+title: Rolled dates and tahini
+titleHe: מגולגלות תמרים וטחינה
+description: מגולגלות תמרים וטחינה
+descriptionEn: Rolled dates and tahini
+image: https://assets.tugy.dev/rolled-dates-and-tahini.jpg
+category: dessert
+difficulty: medium
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - קינוח
+  - מתוק
+ingredients:
+  - group: ""
+    items:
+      - amount: 4
+        unit: ""
+        name: רולדות     לבצק
+        nameEn: Dough rolls
+      - amount: 400
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 100
+        unit: g
+        name: שמן קנולה
+        nameEn: Canola oil
+      - amount: 100
+        unit: g
+        name: חמאה
+        nameEn: butter
+      - amount: 10
+        unit: g
+        name: אבקת אפיה
+        nameEn: baking powder
+      - amount: 110
+        unit: g
+        name: מים
+        nameEn: water
+      - amount: 60
+        unit: g
+        name: אבקת סוכר
+        nameEn: icing sugar
+      - amount: 0
+        unit: ""
+        name: למילוי
+        nameEn: to fill
+      - amount: 300
+        unit: g
+        name: ממרח תמרים
+        nameEn: Date spread
+      - amount: 200
+        unit: g
+        name: טחינה גולמית
+        nameEn: Raw tahini
+      - amount: 100
+        unit: g
+        name: שקדים טחוניםמעט קינמון
+        nameEn: Ground almonds, a little cinnamon
+steps:
+  - title: ""
+    items:
+      - instruction: "הבצק: מניחים את כל החומרים במיקסר מצויד בוו גיטרה."
+        instructionEn: "The dough: Place all the ingredients in a mixer fitted with a guitar hook."
+      - instruction: מערבלים לבצק אחיד.
+        instructionEn: Mix to a uniform dough.
+      - instruction: >-
+          מחלקים ל-4 חלקים, עוטפים בניילון נצמד ומצננים לשלוש-ארבע שעות.על משטח מקומח, מרדדים כל חלק לעלה בצורת מלבן
+          בעובי 3 מ"מ.
+        instructionEn: >-
+          Divide into 4 parts, wrap in cling film and refrigerate for three to four hours. On a floured surface, roll
+          each part into a 3 mm thick rectangle.
+      - instruction: מורחים 1/4 מכמות ממרח התמרים ומעל 1/4 מכמות החינה הגולמית.
+        instructionEn: Spread 1/4 of the amount of date paste and over 1/4 of the amount of raw henna.
+      - instruction: מפזרים שקדים טחונים וקינמון ומגלגלים לרולדה.
+        instructionEn: Sprinkle ground almonds and cinnamon and roll into a roulade.
+      - instruction: >-
+          חוזרים על פעולה זו עם יתרת הבצק והמילוי. מעבירים את הרולדות לתבנית מרופדת ומסמנים חתכים לרוחב בגודל הרצוי על
+          כל רולדה. אופים בתנור שחומם מראש לחום של 170 מעלות כ-25 דקות.
+        instructionEn: >-
+          Repeat this operation with the remaining dough and filling. Transfer the roulades to a lined pan and mark
+          cross-sections of the desired size on each roulade. Bake in an oven preheated to 170 degrees for about 25
+          minutes.
+      - instruction: >-
+          מיד עם צאתן מהתנור, חתכים את הרולדות לעוגיות על בסיס הסימונים ומאבקים בנדיבות באבקת סוכר. מצננים היטב ומאחסנים
+          בכלי אטום.
+        instructionEn: >-
+          As soon as they come out of the oven, cut the roulades into cookies based on the markings and sprinkle
+          generously with powdered sugar. Cool well and store in an airtight container.
+tips: []

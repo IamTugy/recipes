@@ -1,0 +1,79 @@
+id: chocolate-nougat-fondant
+title: Chocolate-nougat fondant
+titleHe: פונדנט שוקולד-נוגט
+description: פונדנט שוקולד-נוגט
+descriptionEn: Chocolate-nougat fondant
+image: https://assets.tugy.dev/chocolate-nougat-fondant.jpg
+category: dessert
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 25
+tags:
+  - קינוח
+  - מתוק
+  - שוקולד
+ingredients:
+  - group: ""
+    items:
+      - amount: 500
+        unit: g
+        name: שוקולד מריר איכותי, 55% מוצקי קקאו
+        nameEn: High-quality dark chocolate, 55% cocoa solids
+      - amount: 100
+        unit: g
+        name: שמנת מתוקה
+        nameEn: sweet cream
+      - amount: 200
+        unit: g
+        name: חמאה
+        nameEn: butter
+      - amount: 130
+        unit: g
+        name: אבקת נוגט
+        nameEn: Nougat powder
+      - amount: 7
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 420
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 50
+        unit: g
+        name: קקאו (רצוי הולנדי או בלגי)
+        nameEn: Cocoa (preferably Dutch or Belgian)
+      - amount: 35
+        unit: g
+        name: קורנפלור
+        nameEn: Cornflour
+      - amount: 25
+        unit: g
+        name: רום
+        nameEn: rum
+  - group: לקישוט
+    items:
+      - amount: 0
+        unit: ""
+        name: אבקת סוכר
+        nameEn: icing sugar
+steps:
+  - title: ""
+    items:
+      - instruction: בקערה מעל סיר עם מים רותחים קלות (בן מארי), מתיכים שוקולד, שמנת מתוקה וחמאה.
+        instructionEn: In a bowl over a pot with lightly boiling water (Bain Marie), melt chocolate, sweet cream and butter.
+      - instruction: >-
+          מוסיפים אבקת נוגט. בקערה נפרדת, או במיקסר, מקציפים ביצים וסוכר לתערובת אחידה אך לא תפוחה מידי. בזרם דק,
+          למוסיפים את תערובת השוקולד לתערובת הביצים, תוך הקצפה. מנפים חומרים יבשים, ומוסיפים בתנועות קיפול לתערובת.
+        instructionEn: >-
+          Add nougat powder. In a separate bowl, or in a mixer, beat eggs and sugar to a uniform mixture but not too
+          swollen. In a thin stream, add the chocolate mixture to the egg mixture, while whisking. Sieve dry
+          ingredients, and add with folding movements to the mixture.
+      - instruction: >-
+          מוסיפים רום.מעבירים לכלי ההגשה וממלאים ¾ מגובהם.אופים בחום בינוני 170 מעלות כ- 5 דקות, עד אשר הפונדנט מתרומם
+          ומתייצב.מאבקים באבקת סוכר.
+        instructionEn: >-
+          Add rum. Transfer to serving dishes and fill ¾ of their height. Bake at medium heat 170 degrees for about 5
+          minutes, until the fondant rises and stabilizes. Dust with powdered sugar.
+tips: []

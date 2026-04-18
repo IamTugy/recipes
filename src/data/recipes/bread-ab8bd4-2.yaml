@@ -1,0 +1,54 @@
+id: bread-ab8bd4-2
+hidden: true
+title: "\"Pyrah\" buns for a hamburger"
+titleHe: לחמניות ׳פירה׳ להמבורגר
+description: לחמניות ׳פירה׳ להמבורגר
+descriptionEn: "\"Pyrah\" buns for a hamburger"
+image: https://assets.tugy.dev/bread-ab8bd4-2.jpg
+category: bread
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 12
+tags:
+  - מאפה
+ingredients:
+  - group: ""
+    items:
+      - amount: 500
+        unit: g
+        name: קמח לחם לבן
+        nameEn: White bread flour
+      - amount: 200
+        unit: g
+        name: פירה תפוחי אדמה מבושל
+        nameEn: Boiled mashed potatoes
+      - amount: 12
+        unit: g
+        name: שמרים יבשים
+        nameEn: dry yeast
+      - amount: 12
+        unit: g
+        name: מלח ים
+        nameEn: sea ​​salt
+      - amount: 30
+        unit: g
+        name: דבש
+        nameEn: honey
+      - amount: 70
+        unit: g
+        name: שמן זית
+        nameEn: olive oil
+      - amount: 1
+        unit: ""
+        name: חלמון
+        nameEn: yolk
+      - amount: 200
+        unit: g
+        name: מים קרים
+        nameEn: cold water
+steps:
+  - title: ""
+    items:
+      - instruction: ""
+tips: []

@@ -1,0 +1,104 @@
+id: cauliflower-and-broccoli-surprise-meatballs
+hidden: true
+title: Cauliflower and broccoli surprise meatballs
+titleHe: קציצות הפתעה כרובית וברוקולי
+description: קציצות הפתעה כרובית וברוקולי
+descriptionEn: Cauliflower and broccoli surprise meatballs
+image: https://assets.tugy.dev/cauliflower-and-broccoli-surprise-meatballs.jpg
+category: dinner
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 12
+tags:
+  - ארוחת ערב
+ingredients:
+  - group: ""
+    items:
+      - amount: 500
+        unit: g
+        name: בשר בקר טחון
+        nameEn: Ground beef
+      - amount: 1
+        unit: ""
+        name: צרור עלי כוסברה
+        nameEn: Bunch of coriander leaves
+      - amount: 1
+        unit: ""
+        name: בצל
+        nameEn: onion
+      - amount: 4
+        unit: ""
+        name: שיני שום
+        nameEn: Garlic cloves
+      - amount: 1
+        unit: tbsp
+        name: פפריקה מתוקה
+        nameEn: Sweet paprika
+      - amount: 2
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 0
+        unit: ""
+        name: מלח, פלפל שחור גרוס טרי
+        nameEn: Salt, freshly ground black pepper
+      - amount: 150
+        unit: g
+        name: פירורי לחם
+        nameEn: bread crumbs
+      - amount: 400
+        unit: g
+        name: גבעולים וענפים מכרובית וברוקולי (התפרחות שמורות למילוי ולרוטב)
+        nameEn: Stems and branches from cauliflower and broccoli (inflorescences reserved for filling and sauce)
+  - group: לטיגון-2 ביציםקמחמלחפלפל שחור
+    items:
+      - amount: 0
+        unit: ""
+        name: לרוטב
+        nameEn: for the sauce
+      - amount: 50
+        unit: g
+        name: שמן זית
+        nameEn: olive oil
+      - amount: 1
+        unit: ""
+        name: בצל, חצוי ופרוס דק
+        nameEn: Onion, halved and thinly sliced
+      - amount: 4
+        unit: ""
+        name: שיני שום פרוסות
+        nameEn: Sliced ​​garlic cloves
+      - amount: 10
+        unit: ""
+        name: ענפי כוסברה, קצוצים
+        nameEn: Coriander sprigs, chopped
+      - amount: 3
+        unit: ""
+        name: גבעולי סלרי אמריקאי, פרוסים דק
+        nameEn: American celery stalks, thinly sliced
+      - amount: 100
+        unit: g
+        name: רכז עגבניות
+        nameEn: Tomato concentrate
+      - amount: 2
+        unit: ""
+        name: ס״מ שורש ג׳ינג׳ר מגורר
+        nameEn: cm grated ginger root
+      - amount: 80
+        unit: g
+        name: תמרינדי
+        nameEn: tamarind
+      - amount: 50
+        unit: g
+        name: רוטב סויה
+        nameEn: soy sauce
+      - amount: 70
+        unit: g
+        name: דבשמלח, פלפל שחור
+        nameEn: Honey, salt, black pepper
+steps:
+  - title: ""
+    items:
+      - instruction: ""
+tips: []

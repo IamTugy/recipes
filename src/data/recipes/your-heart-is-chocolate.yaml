@@ -1,0 +1,96 @@
+id: your-heart-is-chocolate
+title: Your heart is chocolate
+titleHe: רוגעלך שוקולד
+description: רוגעלך שוקולד
+descriptionEn: Your heart is chocolate
+image: https://images.unsplash.com/photo-1603532648955-039310d9ed75?w=900&q=80
+category: dessert
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 40
+tags:
+  - קינוח
+  - מתוק
+  - שוקולד
+ingredients:
+  - group: לבצק
+    items:
+      - amount: 0.5
+        unit: ""
+        name: קילו קמח
+        nameEn: a kilo of flour
+      - amount: 160
+        unit: g
+        name: חלב
+        nameEn: milk
+      - amount: 20
+        unit: g
+        name: שמרים יבשים
+        nameEn: dry yeast
+      - amount: 80
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 5
+        unit: g
+        name: מלח
+        nameEn: salt
+      - amount: 2
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 100
+        unit: g
+        name: חמאה רכה
+        nameEn: Soft butter
+  - group: למילוי
+    items:
+      - amount: 80
+        unit: g
+        name: קקאו
+        nameEn: cocoa
+      - amount: 150
+        unit: g
+        name: סוכר חום
+        nameEn: brown sugar
+      - amount: 150
+        unit: g
+        name: חמאה מומסת
+        nameEn: melted butter
+      - amount: 0
+        unit: ""
+        name: מעט קינמון
+        nameEn: A little cinnamon
+  - group: לסירופ
+    items:
+      - amount: 300
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 150
+        unit: g
+        name: מים
+        nameEn: water
+steps:
+  - title: ""
+    items:
+      - instruction: מכניסים לקערת המיקסר את כל מרכיבי הבצק, למעט החמאה, ולשים 5 דקות.
+        instructionEn: Put all the dough ingredients except the butter into the mixer bowl and knead for 5 minutes.
+      - instruction: מוסיפים את החמאה וממשיכים ללוש עוד 3 דקות.
+        instructionEn: Add the butter and continue kneading for 3 more minutes.
+      - instruction: מעבירים לקערה ומתפיחים להכפלת נפח (שעה בטמפרטורת החדר ועוד לפחות 5 שעות בקירור).
+        instructionEn: >-
+          Transfer to a bowl and let rise until doubled (1 hour at room temperature then at least 5 hours in the
+          fridge).
+      - instruction: "המילוי: מערבבים את כל החומרים ומצננים למרקם משחתי."
+        instructionEn: "The filling: mix all the ingredients and cool to a paste texture."
+      - instruction: מרדדים רבע מהבצק למלבן רחב ומורחים את המילוי.
+        instructionEn: Roll out 1/4 of the dough into a wide rectangle and spread the filling.
+      - instruction: אופים ב-180 מעלות כ-12 דקות.
+        instructionEn: Bake at 180°C for about 12 minutes.
+      - instruction: "הסירופ: מרתיחים יחד את הסוכר והמים. מזגגים את הרוגלעך מיד עם יציאתם מהתנור בסירופ החם."
+        instructionEn: >-
+          The syrup: boil the sugar and water together. Glaze the rolls immediately after they come out of the oven in
+          the hot syrup.
+tips: []

@@ -1,0 +1,90 @@
+id: milk-jam-rolls
+title: Milk jam rolls
+titleHe: לחמניות ריבת חלב
+description: לחמניות ריבת חלב
+descriptionEn: Milk jam rolls
+image: https://assets.tugy.dev/milk-jam-rolls.jpg
+category: bread
+difficulty: medium
+prepTime: 15
+cookTime: 10
+servings: 16
+tags:
+  - מאפה
+ingredients:
+  - group: ""
+    items:
+      - amount: 0
+        unit: ""
+        name: ל-16 לחמניות בתבנית
+        nameEn: For 16 rolls in a pan
+      - amount: 20
+        unit: ""
+        name: x20 ס״מ     לבצק-350 גרם קמח לחם קשה
+        nameEn: x20 cm for the dough - 350 grams of hard bread flour
+      - amount: 13
+        unit: g
+        name: שמרים יבשים
+        nameEn: dry yeast
+      - amount: 50
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 8
+        unit: g
+        name: מלח
+        nameEn: salt
+      - amount: 1
+        unit: ""
+        name: ביצה בגודל L40 גרם ריבת חלב
+        nameEn: Egg size L40 grams milk jam
+      - amount: 50
+        unit: g
+        name: שמן
+        nameEn: oil
+      - amount: 120
+        unit: g
+        name: חלב
+        nameEn: milk
+  - group: לציפוי
+    items:
+      - amount: 40
+        unit: g
+        name: ריבת חלב
+        nameEn: milk jam
+      - amount: 100
+        unit: g
+        name: חלב מרוכז ממותק
+        nameEn: Sweetened condensed milk
+      - amount: 60
+        unit: g
+        name: חלבקורט מלח
+        nameEn: A pinch of salt
+steps:
+  - title: ""
+    items:
+      - instruction: לבצק- מניחים בקערת המיקסר את כל החומרים למעט החלב ומתחילים ללוש במהירות נמוכה בעזרת וו לישה.
+        instructionEn: >-
+          For the dough - place all the ingredients except the milk in the mixer bowl and start kneading at low speed
+          with a kneading hook.
+      - instruction: מוסיפים את החלב בזרם דק ואחיד אל הבצק.
+        instructionEn: Add the milk in a thin and even stream to the dough.
+      - instruction: >-
+          ממשיכים ללוש כ-10 דקות עד קבלת בצק אחיד, חלק ואלסטי. משמנים את הבצק ואת קערת ההתפחה, מותחים את הבצק לכדור
+          ומניחים להתפחה עד להכפלת הנפח בכלי עטוף ביריעת ניילון נצמד. מחלקים את הבצק ל-16 מנות בנות 40 גרם כל אחת.
+        instructionEn: >-
+          Continue kneading for about 10 minutes until you get a uniform, smooth and elastic dough. Oil the dough and
+          the rising bowl, stretch the dough into a ball and leave to rise until doubled in volume in a vessel wrapped
+          in cling film. Divide the dough into 16 portions of 40 grams each.
+      - instruction: מותחים ומכדררים כל פיסה ומניחים בתבנית האפייה.
+        instructionEn: Stretch and roll out each piece and place in the baking dish.
+      - instruction: >-
+          מכסים ומתפיחים שוב להכפלת הנפח.מחממים תנור לחום של 160 מעלות.מכינים את הציפוי- מערבבים את כל החומרים.אופים את
+          הלחמניות 5 דקות, מוציאים מהתנור ומיד מוזגים בעדינות מעל את תערובת הציפוי.
+        instructionEn: >-
+          Cover and rise again to double the volume. Heat the oven to 160 degrees. Prepare the coating - mix all the
+          ingredients. Bake the buns for 5 minutes, remove from the oven and immediately pour the coating mixture gently
+          over the top.
+      - instruction: מחזירים אל התנור להמשך האפיה של עוד כ-15 דקות.מצננים ומשחררים מהתבנית.
+        instructionEn: Return to the oven to continue baking for another 15 minutes. Cool and release from the mold.
+tips: []

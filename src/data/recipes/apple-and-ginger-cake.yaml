@@ -1,0 +1,90 @@
+id: apple-and-ginger-cake
+title: Apple and ginger cake
+titleHe: עוגת תפוחי עץ וג'ינג'ר
+description: עוגת תפוחי עץ וג'ינג'ר
+descriptionEn: Apple and ginger cake
+image: https://assets.tugy.dev/apple-and-ginger-cake.jpg
+category: dessert
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - קינוח
+  - מתוק
+  - עוגה
+ingredients:
+  - group: ""
+    items:
+      - amount: 4
+        unit: ""
+        name: תפוחי עץ מזן גרני סמית, קלופים, מגורענים וחתוכים לקוביות של כ-1 ס"מ
+        nameEn: Granny Smith apples, peeled, cored and cut into cubes of about 1 cm
+      - amount: 50
+        unit: g
+        name: חמאה
+        nameEn: butter
+      - amount: 150
+        unit: g
+        name: חמאה רכה
+        nameEn: Soft butter
+      - amount: 220
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 0
+        unit: ""
+        name: זסט ומיץ מלימון אחד
+        nameEn: Zest and juice of one lemon
+      - amount: 1
+        unit: tsp
+        name: משחת וניל
+        nameEn: Vanilla paste
+      - amount: 2
+        unit: ""
+        name: ביצים
+        nameEn: eggs
+      - amount: 250
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 5
+        unit: g
+        name: אבקת אפייה
+        nameEn: baking powder
+      - amount: 200
+        unit: ml
+        name: שמנת מתוקה
+        nameEn: sweet cream
+      - amount: 100
+        unit: g
+        name: ג'ינג'ר מסוכר, קצוץ
+        nameEn: Candied ginger, chopped
+steps:
+  - title: ""
+    items:
+      - instruction: >-
+          מחממים תנור לחום של 160 מעלות. מטגנים את קוביות התפוחים במחבת עם 50 גרם חמאה כ- 5 דקות, ומניחים לצינון. בקערת
+          מערבל עם וו הגיטרה מקציפים את החמאה עם הסוכר, קליפת הלימון והווניל במהירות בינונית - גבוהה במשך כ- 10 דקות עד
+          קבלת תערובת אוורירית.
+        instructionEn: >-
+          Heat the oven to 160 degrees. Fry the apple cubes in a pan with 50 grams of butter for about 5 minutes, and
+          leave to cool. In the bowl of a mixer with the guitar hook, beat the butter with the sugar, lemon peel and
+          vanilla at medium-high speed for about 10 minutes until you get an airy mixture.
+      - instruction: >-
+          מוסיפים את הביצים אחת אחת וממתינים בין ביצה לביצה. מנפים קמח ואבקת אפיה יחד ומוסיפים מחצית לתוך תערובת החמאה
+          ומערבלים היטב. מוסיפים את השמנת ושארית הקמח שנותרה ומערבבים לאיחוד.
+        instructionEn: >-
+          Add the eggs one by one and wait between each egg. Sift flour and baking powder together and add half to the
+          butter mixture and mix well. Add the cream and the rest of the remaining flour and mix to combine.
+      - instruction: >-
+          באופן ידני מוסיפים את קוביות התפוחים והג'ינג'ר הקצוץ לתוך התערובת בתנועות קיפול עדינות. יוצקים את התערובת לתוך
+          התבנית ואופים במשך כ- 40 דקות עד הזהבה ועד שקיסם הננעץ פנימה יוצא עם פירורים מעט לחים. מצננים את העוגה מעל
+          לרשת במשך כ- 10 דקות.
+        instructionEn: >-
+          Manually add the diced apples and chopped ginger into the mixture with gentle folding movements. Pour the
+          mixture into the mold and bake for about 40 minutes until golden and until a toothpick inserted comes out with
+          slightly moist crumbs. Cool the cake on a wire rack for about 10 minutes.
+      - instruction: אח"כ הופכים את העוגה, מסירים את התבנית ומניחים לצינון מלא מעל הרשת.
+        instructionEn: Then turn the cake over, remove the pan and leave to cool completely on the wire rack.
+tips: []

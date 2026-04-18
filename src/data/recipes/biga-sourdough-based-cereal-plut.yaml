@@ -1,0 +1,105 @@
+id: biga-sourdough-based-cereal-plut
+title: Biga Sourdough-based Cereal Plut
+titleHe: פלוט דגנים על בסיס מחמצת ביגה
+description: פלוט דגנים על בסיס מחמצת ביגה
+descriptionEn: Biga Sourdough-based Cereal Plut
+image: https://images.unsplash.com/photo-1586444248902-2f64eddc8f64?w=900&q=80
+category: bread
+difficulty: medium
+prepTime: 15
+cookTime: 18
+servings: 4
+tags:
+  - מאפה
+ingredients:
+  - group: לביגה
+    items:
+      - amount: 330
+        unit: g
+        name: קמח לחם
+        nameEn: Bread flour
+      - amount: 200
+        unit: g
+        name: מים קרים
+        nameEn: cold water
+      - amount: 2
+        unit: g
+        name: שמרים
+        nameEn: yeast
+  - group: לבצק
+    items:
+      - amount: 0
+        unit: ""
+        name: הביגה לעיל
+        nameEn: The biga above
+      - amount: 350
+        unit: g
+        name: קמח רב דגנים
+        nameEn: Multigrain flour
+      - amount: 15
+        unit: g
+        name: מלח
+        nameEn: salt
+      - amount: 3
+        unit: g
+        name: שמרים יבשים
+        nameEn: dry yeast
+      - amount: 250
+        unit: g
+        name: מים
+        nameEn: water
+  - group: לציפוי
+    items:
+      - amount: 100
+        unit: g
+        name: שומשום
+        nameEn: sesame
+      - amount: 100
+        unit: g
+        name: פרג שלם
+        nameEn: Whole poppy
+      - amount: 80
+        unit: g
+        name: גרעיני דלעת
+        nameEn: Pumpkin seeds
+      - amount: 80
+        unit: g
+        name: גרעיני חמנייה
+        nameEn: Sunflower seeds
+      - amount: 50
+        unit: g
+        name: דוחן שלם
+        nameEn: Whole millet
+      - amount: 0
+        unit: ""
+        name: מעט חלבון
+        nameEn: little protein
+steps:
+  - title: ""
+    items:
+      - instruction: >-
+          יום קודם מכינים את הביגה: מערבבים את מרכיבי הביגה בקערה עד לקבלת בצק אחיד, מעבירים לקערה גדולה, מכסים ומניחים
+          בטמפ' החדר ל-24 שעות. מכינים את הבצק- מערבבים בקערת המיקסר את הביגה עם שאר המרכיבים, לשים במיקסר כ-8 דקות עד
+          לקבלת בצק חלק ואחיד ומעט דביק.
+        instructionEn: >-
+          Prepare the biga the day before: mix the ingredients of the biga in a bowl until a uniform dough is obtained,
+          transfer to a large bowl, cover and leave at room temperature for 24 hours. Prepare the dough - mix the biga
+          with the rest of the ingredients in the mixer bowl, put in the mixer for about 8 minutes until you get a
+          smooth and uniform and slightly sticky dough.
+      - instruction: >-
+          מעבירים את הבצק לקערה ומניחים להתפחה עד להכפלת הנפח. מערבבים את כל הזרעים ומניחים בתבנית ארוכה. מעבירים את
+          הבצק למשטח מקומח ומשטחים בעדינות לעלה מלבני.
+        instructionEn: >-
+          Transfer the dough to a bowl and let it rise until it doubles in size. Mix all the seeds and place in a long
+          pan. Transfer the dough to a floured surface and gently flatten it into a rectangular sheet.
+      - instruction: חותכים את הבצק לאצבעות ברוחב 4 ס"מ.
+        instructionEn: Cut the dough into 4 cm wide fingers.
+      - instruction: מברישים את האצבעות בחלבון ביצה וטובלים בתערובת הזרעים, כך שתכסה את כל הפלוט.
+        instructionEn: Brush your fingers with egg white and dip in the seed mixture, so that it covers the entire plut.
+      - instruction: מניחים על מגש אפייה.
+        instructionEn: Place on a baking tray.
+      - instruction: מתפיחים ל-3/4 התפחה.מחממים תנור לחום של 240 מעלות.אופים כ-15-18 דקות או עד הזהבה.
+        instructionEn: Let rise to 3/4 of the rise. Heat oven to 240 degrees. Bake for about 15-18 minutes or until golden.
+      - instruction: מצננים על רשת.
+        instructionEn: Cool on a wire rack.
+tips: []

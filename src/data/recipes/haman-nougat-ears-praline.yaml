@@ -1,0 +1,98 @@
+id: haman-nougat-ears-praline
+title: Haman nougat ears (praline)
+titleHe: אוזני המן נוגט (פרלינה)
+description: אוזני המן נוגט (פרלינה)
+descriptionEn: Haman nougat ears (praline)
+image: https://images.unsplash.com/photo-1586444248902-2f64eddc8f64?w=900&q=80
+category: bread
+difficulty: easy
+prepTime: 15
+cookTime: 20
+servings: 40
+tags:
+  - מאפה
+ingredients:
+  - group: לבצק
+    items:
+      - amount: 180
+        unit: g
+        name: חמאה
+        nameEn: butter
+      - amount: 40
+        unit: g
+        name: אבקת סוכר
+        nameEn: icing sugar
+      - amount: 300
+        unit: g
+        name: קמח לבן
+        nameEn: white flour
+      - amount: 60
+        unit: g
+        name: פרלינה לוז
+        nameEn: Pralina Luz
+      - amount: 30
+        unit: g
+        name: פרג טחון
+        nameEn: Ground poppy
+      - amount: 2
+        unit: g
+        name: אבקת אפייה
+        nameEn: baking powder
+      - amount: 0
+        unit: ""
+        name: ביצה
+        nameEn: egg
+  - group: למילוי
+    items:
+      - amount: 150
+        unit: g
+        name: שוקולד מריר
+        nameEn: dark chocolate
+      - amount: 100
+        unit: g
+        name: שוקולד חלב
+        nameEn: milk chocolate
+      - amount: 70
+        unit: g
+        name: חמאה רכה
+        nameEn: Soft butter
+      - amount: 60
+        unit: g
+        name: שמנת מתוקה
+        nameEn: sweet cream
+      - amount: 60
+        unit: g
+        name: פרלינה לוז
+        nameEn: Pralina Luz
+      - amount: 50
+        unit: g
+        name: ברס
+        nameEn: Bears
+      - amount: 20
+        unit: g
+        name: קורנפלור
+        nameEn: Cornflour
+      - amount: 0
+        unit: ""
+        name: אבקת סוכר לקישוט
+        nameEn: Powdered sugar for decoration
+steps:
+  - title: ""
+    items:
+      - instruction: >-
+          מתיכים שוקולדים, חמאה ושמנת לתערובת אחידה. מערבבים עם שאר חומרי המילוי. מצננים למרקם משחתי סמיך ומעבירים לשק
+          זילוף.
+        instructionEn: >-
+          Melt chocolates, butter and cream to a uniform mixture. Mix with the rest of the filling ingredients. Cool to
+          a thick paste texture and transfer to a piping bag.
+      - instruction: להרכבה ואפייה- מחממים תנור לחום של 170 מעלות.
+        instructionEn: For assembly and baking - heat the oven to 170 degrees.
+      - instruction: מרדדים את הבצק על משטח מקומח לעלה דק.
+        instructionEn: Roll out the dough on a floured surface into a thin sheet.
+      - instruction: קורצים עיגולים, מזלפים מהמלוי ומקפלים לצורת אוזן המן.
+        instructionEn: Draw circles, sprinkle with the filling and fold into the shape of a manna ear.
+      - instruction: מעבירים לתבנית מרופדת בנייר אפייה ואופים כ-15-20 דקות עד להזהבה קלה.
+        instructionEn: Transfer to a pan lined with baking paper and bake for about 15-20 minutes until lightly golden.
+      - instruction: מוציאיםמהתנור, מצננים ומאבקים באבקת סוכר.
+        instructionEn: Remove from the oven, cool and dust with powdered sugar.
+tips: []

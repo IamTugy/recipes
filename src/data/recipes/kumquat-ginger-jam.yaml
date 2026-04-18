@@ -1,0 +1,46 @@
+id: kumquat-ginger-jam
+hidden: true
+title: Kumquat-ginger jam
+titleHe: ריבת קומקוואט-ג׳ינג׳ר
+description: ריבת קומקוואט-ג׳ינג׳ר
+descriptionEn: Kumquat-ginger jam
+image: https://assets.tugy.dev/kumquat-ginger-jam.jpg
+category: sauce
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - רוטב
+ingredients:
+  - group: ""
+    items:
+      - amount: 1.5
+        unit: ""
+        name: ק״ג קומקוואט
+        nameEn: Kg Kumquat
+      - amount: 750
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 100
+        unit: g
+        name: מיץ תפוזים
+        nameEn: orange juice
+      - amount: 50
+        unit: g
+        name: מיץ לימון
+        nameEn: lemon juice
+      - amount: 2
+        unit: tsp
+        name: משחת וניל
+        nameEn: Vanilla paste
+      - amount: 40
+        unit: g
+        name: ג׳ינג׳ר טרי מגורר
+        nameEn: Fresh grated ginger
+steps:
+  - title: ""
+    items:
+      - instruction: ""
+tips: []

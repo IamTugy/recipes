@@ -1,0 +1,122 @@
+id: florentine-tart-pistachio-chocolate
+title: Florentine tart - pistachio-chocolate
+titleHe: טארט פלורנטין- פיסטוק-שוקולד
+description: טארט פלורנטין- פיסטוק-שוקולד
+descriptionEn: Florentine tart - pistachio-chocolate
+image: https://assets.tugy.dev/florentine-tart-pistachio-chocolate.jpg
+category: dessert
+difficulty: hard
+prepTime: 15
+cookTime: 10
+servings: 4
+tags:
+  - קינוח
+  - מתוק
+  - שוקולד
+ingredients:
+  - group: ""
+    items:
+      - amount: 0
+        unit: ""
+        name: תבנית בקוטר
+        nameEn: pattern in diameter
+      - amount: 22
+        unit: cm
+        name: לבצק-220 גרם קמח
+        nameEn: For the dough - 220 grams of flour
+      - amount: 60
+        unit: g
+        name: אבקת סוכר
+        nameEn: icing sugar
+      - amount: 120
+        unit: g
+        name: חמאה קרה חתוכה לקוביות
+        nameEn: Cold butter cut into cubes
+      - amount: 1
+        unit: ""
+        name: חלבון
+        nameEn: protein
+      - amount: 0
+        unit: ""
+        name: למילוי פלורנטין-40 גרם שמנת מתוקה
+        nameEn: For filling Florentin - 40 grams of sweet cream
+      - amount: 50
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 40
+        unit: g
+        name: חמאה
+        nameEn: butter
+      - amount: 50
+        unit: g
+        name: דבש
+        nameEn: honey
+      - amount: 20
+        unit: g
+        name: גלוקוזה
+        nameEn: glucose
+      - amount: 60
+        unit: g
+        name: שקדים גרוסים
+        nameEn: ground almonds
+      - amount: 0
+        unit: ""
+        name: לקרם פיסטוק-150 גרם שוקולד לבן
+        nameEn: For the pistachio cream - 150 grams of white chocolate
+      - amount: 150
+        unit: g
+        name: שמנת מתוקה
+        nameEn: sweet cream
+      - amount: 10
+        unit: g
+        name: מחית פיסטוק
+        nameEn: Pistachio puree
+      - amount: 0
+        unit: ""
+        name: לקרם שוקולד חלב-תפוז-200 גרם שוקולד חלב
+        nameEn: For the milk chocolate-orange cream - 200 grams of milk chocolate
+      - amount: 200
+        unit: g
+        name: שמנת מתוקהזסט מתפוז אחד
+        nameEn: Sweetened cream from one orange
+steps:
+  - title: ""
+    items:
+      - instruction: לבצק- מערבלים במעבד מזון את כל החומרים היבשים לקבלת תערובת פירורית.
+        instructionEn: For the dough - mix all the dry ingredients in a food processor to get a crumbly mixture.
+      - instruction: מוסיפים חלבון ומעבדים עד קבלת פירורי בצק לחים.
+        instructionEn: Add protein and process until you get moist dough crumbs.
+      - instruction: עוטפים ומצננים לשעה.
+        instructionEn: Wrap and chill for an hour.
+      - instruction: מרדדים את הבצק לעלה בעובי 3 מ"מ ומרפדים תבנית טארט.
+        instructionEn: Roll the dough into a 3 mm thick sheet and line a tart pan.
+      - instruction: מניחים מעל משקול ואופים אפייה עיוורת של 15 דקות ב-160 מעלות.
+        instructionEn: Place a weight on top and bake blind for 15 minutes at 160 degrees.
+      - instruction: מסירים את המשקולת ואופים עוד 15 דקות להזהבה מלאה.
+        instructionEn: Remove the weight and bake for another 15 minutes until fully golden.
+      - instruction: >-
+          מצננים.לתערובת הפלורנטין- שמים בסיר סוכר, חמאה, שמנת, גלוקוזה ודבש, מביאים לרתיחה ומבשלים לטמפרטורה של 118
+          מעלות צלסיוס (כדור רך, soft ball).
+        instructionEn: >-
+          Cool. For the Florentine mixture - put sugar, butter, cream, glucose and honey in a saucepan, bring to a boil
+          and cook to a temperature of 118 degrees Celsius (soft ball).
+      - instruction: מוסיפים את השקדים, מערבבים היטב ויוצקים אל הטארט.
+        instructionEn: Add the almonds, mix well and pour into the tart.
+      - instruction: אופים ב-160 מעלות כ-17 דקות.
+        instructionEn: Bake at 160 degrees for about 17 minutes.
+      - instruction: מצננים.לקרם פיסטוק- מתיכים את השוקולד, השמנת והפיסטוק.
+        instructionEn: Cool. For the pistachio cream - melt the chocolate, cream and pistachios.
+      - instruction: מצננים ל-6 שעות ומקציפים לקרם חלק ויציב.
+        instructionEn: Cool for 6 hours and whip into a smooth and stable cream.
+      - instruction: ממלאים את הטארט בשכבה אחידה.לקרם שוקולד חלב-תפוז- מתיכים את השוקולד, שמנת וזסט תפוז.
+        instructionEn: >-
+          Fill the tart in an even layer. For the milk chocolate-orange cream, melt the chocolate, cream and orange
+          zest.
+      - instruction: מצננים ל-6 שעות ומקציפים לקרם חלק ויציב.
+        instructionEn: Cool for 6 hours and whip into a smooth and stable cream.
+      - instruction: מעבירים לשק זילוף מצויד בצנתר חלק מספר 8 מזלפים מעל הטארט.
+        instructionEn: Transfer to a piping bag equipped with a part number 8 nozzle and sprinkle over the tart.
+      - instruction: מאבקים קלות באבקת קקאו ומצננים ל-5 שעות לפני ההגשה.
+        instructionEn: Dust lightly with cocoa powder and chill for 5 hours before serving.
+tips: []

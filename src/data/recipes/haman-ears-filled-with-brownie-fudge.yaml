@@ -1,0 +1,76 @@
+id: haman-ears-filled-with-brownie-fudge
+hidden: true
+title: Haman ears filled with brownie fudge
+titleHe: אוזני המן במילוי פאדג׳ בראוני
+description: אוזני המן במילוי פאדג׳ בראוני
+descriptionEn: Haman ears filled with brownie fudge
+image: https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=900&q=80
+category: bread
+difficulty: easy
+prepTime: 15
+cookTime: 10
+servings: 40
+tags:
+  - מאפה
+ingredients:
+  - group: לבצק
+    items:
+      - amount: 450
+        unit: g
+        name: קמח לבן
+        nameEn: white flour
+      - amount: 100
+        unit: g
+        name: אבקת סוכר
+        nameEn: icing sugar
+      - amount: 150
+        unit: g
+        name: חמאה קרה חתוכה לקוביות
+        nameEn: Cold butter cut into cubes
+      - amount: 30
+        unit: g
+        name: שמן קנולה
+        nameEn: Canola oil
+  - group: למילוי
+    items:
+      - amount: 200
+        unit: g
+        name: חמאה
+        nameEn: butter
+      - amount: 200
+        unit: g
+        name: שוקולד מריר
+        nameEn: dark chocolate
+      - amount: 240
+        unit: g
+        name: סוכר
+        nameEn: sugar
+      - amount: 2
+        unit: ""
+        name: ביצים L
+        nameEn: Eggs L
+      - amount: 15
+        unit: g
+        name: קמח
+        nameEn: flour
+      - amount: 50
+        unit: g
+        name: קורנפלור
+        nameEn: Cornflour
+      - amount: 2
+        unit: g
+        name: אבקת נסקפה
+        nameEn: Nescafe powder
+      - amount: 1
+        unit: tsp
+        name: משחת וניל
+        nameEn: Vanilla paste
+      - amount: 2
+        unit: g
+        name: מלח מלדון
+        nameEn: Maldon salt
+steps:
+  - title: ""
+    items:
+      - instruction: ""
+tips: []

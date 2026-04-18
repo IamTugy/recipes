@@ -1,0 +1,62 @@
+id: lamb-shoulder-stuffed-with-greens-in-a-long-roas
+title: Lamb shoulder stuffed with greens in a long roast
+titleHe: כתף טלה ממולאת ירוקים בצלייה ארוכה
+description: כתף טלה ממולאת ירוקים בצלייה ארוכה
+descriptionEn: Lamb shoulder stuffed with greens in a long roast
+image: https://assets.tugy.dev/lamb-shoulder-stuffed-with-greens-in-a-long-roas.jpg
+category: dinner
+difficulty: medium
+prepTime: 15
+cookTime: 10
+servings: 10
+tags:
+  - ארוחת ערב
+ingredients:
+  - group: למילוי
+    items:
+      - amount: 60
+        unit: g
+        name: שמן זית
+        nameEn: olive oil
+      - amount: 200
+        unit: g
+        name: עלי תרד, קצוצים גסצרור עלי רוקטצרור עלי כוסברהצרור עלי נענע
+        nameEn: Spinach leaves, chopped Bunch of rocket leaves Bunch of coriander leaves Bunch of mint leaves
+      - amount: 12
+        unit: ""
+        name: שיני שום קלופותמלח, פלפל שחור
+        nameEn: Peeled garlic cloves, salt, black pepper
+      - amount: 0
+        unit: ""
+        name: למצע הצלייה-1 ק״ג גזר, קלוף וחתוך לרבעיםשיניים מ-3 ראשי שום
+        nameEn: For the grilling base - 1 kg carrot, peeled and cut into quarter cloves from 3 heads of garlic
+      - amount: 4
+        unit: ""
+        name: גבעולי נענעמלח ופלפל שחורכף גרגרי כוסברה שלמיםכפית קינמון טחון
+        nameEn: Mint stalks, salt and black pepper, a spoonful of whole coriander seeds, a spoonful of ground cinnamon
+      - amount: 300
+        unit: g
+        name: יין לבן
+        nameEn: white wine
+      - amount: 200
+        unit: g
+        name: מים
+        nameEn: water
+steps:
+  - title: ""
+    items:
+      - instruction: למילוי- מערבבים היטב את כל החומרים במעבד מזון, בפולסים.
+        instructionEn: For the filling - mix all the ingredients well in a food processor, in pulses.
+      - instruction: מתקנים תיבול.לטלה- מעסים את הנתח ומתבלים אותו משני צידיו.
+        instructionEn: Adjust seasoning. For lamb - massage the piece and season it on both sides.
+      - instruction: ממלאים וקושרים.
+        instructionEn: Fill and tie.
+      - instruction: מעבירים את הכתף לתבנית צלייה עמוקה וצולים אותה להזהבה בחום מקסימלי.
+        instructionEn: Transfer the shoulder to a deep roasting pan and roast it until golden at maximum heat.
+      - instruction: מוציאים את התבנית מהתנור ומניחים לתוכה את הגזר, השום, הנענע, היין, המים והתיבול.
+        instructionEn: Take the pan out of the oven and place the carrot, garlic, mint, wine, water and seasoning in it.
+      - instruction: מערבבים לתיבול מלא.
+        instructionEn: Stir to fully season.
+      - instruction: מכסים בצורה אטומה ומחזירים לצלייה איטית בחום של 150 מעלות ל-3.5 שעות לפחות.
+        instructionEn: Cover tightly and return to slow roasting at 150 degrees for at least 3.5 hours.
+tips: []
