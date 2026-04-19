@@ -231,7 +231,7 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
                         const itemName = lang === 'he' ? item.name : (item.nameEn ?? item.name)
                         const itemNote = lang === 'he' ? item.note : (item.noteEn ?? item.note)
                         return (
-                          <li key={ii} className={`flex gap-2 text-sm ${lang === 'he' ? 'flex-row-reverse' : ''}`}>
+                          <li key={ii} className="flex gap-2 text-sm" dir={lang === 'he' ? 'rtl' : 'ltr'}>
                             <span className="font-semibold text-cream/90 shrink-0 w-14 text-right" dir="ltr">
                               {(() => {
                                 if (!item.amount) return null
@@ -242,7 +242,7 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
                                 return `${amt} ${unit}`
                               })()}
                             </span>
-                            <span className="text-cream/70" dir={lang === 'he' ? 'rtl' : 'ltr'}>
+                            <span className="text-cream/70">
                               {itemName}
                               {itemNote && <span className="text-cream/40 italic"> ({itemNote})</span>}
                             </span>
