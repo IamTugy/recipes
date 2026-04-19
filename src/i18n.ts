@@ -4,6 +4,7 @@ import type { Category, Difficulty } from './types'
 const heUnitForms: Record<string, [string, string]> = {
   g:      ['גרם',    'גרם'],
   kg:     ['ק"ג',   'ק"ג'],
+  קילו:   ['קילו',  'קילו'],
   cup:    ['כוס',   'כוסות'],
   cups:   ['כוס',   'כוסות'],
   tbsp:   ['כף',    'כפות'],

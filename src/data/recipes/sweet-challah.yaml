@@ -20,9 +20,9 @@ ingredients:
         name: חלות
         nameEn: apply
       - amount: 1
-        unit: ""
-        name: קילו קמח לחם
-        nameEn: a kilo of bread flour
+        unit: קילו
+        name: קמח לחם
+        nameEn: bread flour
       - amount: 40
         unit: g
         name: שמרים יבשים

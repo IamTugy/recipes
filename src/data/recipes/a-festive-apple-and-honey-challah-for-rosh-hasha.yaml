@@ -20,9 +20,9 @@ ingredients:
         name: חלה אחת גדולה
         nameEn: One big challah
       - amount: 0.5
-        unit: ""
-        name: קילו קמח
-        nameEn: a kilo of flour
+        unit: קילו
+        name: קמח
+        nameEn: flour
       - amount: 180
         unit: g
         name: מים

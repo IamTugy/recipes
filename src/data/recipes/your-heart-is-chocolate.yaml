@@ -17,9 +17,9 @@ ingredients:
   - group: לבצק
     items:
       - amount: 0.5
-        unit: ""
-        name: קילו קמח
-        nameEn: a kilo of flour
+        unit: קילו
+        name: קמח
+        nameEn: flour
       - amount: 160
         unit: g
         name: חלב
