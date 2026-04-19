@@ -232,7 +232,7 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
                         const itemNote = lang === 'he' ? item.note : (item.noteEn ?? item.note)
                         return (
                           <li key={ii} className="flex gap-2 text-sm" dir={lang === 'he' ? 'rtl' : 'ltr'}>
-                            <span className="font-semibold text-cream/90 shrink-0 w-14 text-right" dir="ltr">
+                            <span className="font-semibold text-cream/90 shrink-0 w-14 text-right" dir={lang === 'he' ? 'rtl' : 'ltr'}>
                               {(() => {
                                 if (!item.amount) return null
                                 const scaled = item.amount * multiplier
