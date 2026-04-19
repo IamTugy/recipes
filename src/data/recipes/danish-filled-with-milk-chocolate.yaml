@@ -68,14 +68,17 @@ steps:
         instructionEn: >-
           For the dough - put all the ingredients in a mixer equipped with a kneading hook and mix until the dough comes
           together and another 3 minutes.
+        timerMinutes: 3
       - instruction: מכסים את הבצק ומניחים ל-60 דקות התפחה בטמפרטורת החדר.
         instructionEn: Cover the dough and let rise for 60 minutes at room temperature.
+        timerMinutes: 60
       - instruction: >-
           מעבירים לקירור של 3 שעות.חותכים את החמאה לרוחב ל"לוחות" בעובי 1 ס"מ ומניחים אותן אחת לצד השנייה על ניילון
           נצמד.
         instructionEn: >-
           Refrigerate for 3 hours. Cut the butter crosswise into "slabs" 1 cm thick and place them side by side on cling
           film.
+        timerMinutes: 180
       - instruction: מכסים ביריעת ניילון נוספת ומרדדים לעלה מלבני אחיד בעובי 1/2 ס"מ.
         instructionEn: Cover with another plastic sheet and roll into a uniform rectangular sheet 1/2 cm thick.
       - instruction: >-
@@ -103,8 +106,10 @@ steps:
         instructionEn: >-
           Cool for 1/2 hour and cut into long fingers, 1 cm thick. Wrap the fingers around themselves into a screw and
           roll into a "snail".
+        timerMinutes: 120
       - instruction: מניחים על מגש אפייה, מכסים ומתפיחים כשעה.מחממים תנור לחום של 170 מעלות ואופים את הדיינישים 12-15 דקות.
         instructionEn: >-
           Place on a baking tray, cover and let rise for about an hour. Heat the oven to 170 degrees and bake the
           danishes for 12-15 minutes.
+        timerMinutes: 15
 tips: []

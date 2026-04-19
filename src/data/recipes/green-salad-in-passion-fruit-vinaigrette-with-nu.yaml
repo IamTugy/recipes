@@ -83,6 +83,7 @@ steps:
         instructionEn: >-
           Wash and dry the edible leaves well. For the nougatine: in a preheated oven to low heat (160 degrees) toast
           all the seeds for 10 minutes. Pour the water, sugar and silane into a pot and bring to a boil.
+        timerMinutes: 10
       - instruction: מבשלים עד לקבלת קרמל בהיר.
         instructionEn: Cook until you get a light caramel.
       - instruction: מוסיפים את הזרעים שקלינו והתבלינים ומערבבים בזריזות.

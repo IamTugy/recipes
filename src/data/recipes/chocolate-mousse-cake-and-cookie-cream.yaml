@@ -116,6 +116,7 @@ steps:
           Roll into a rectangle the diameter or length of the mold, mark the size of the rim of the mold, bake at 180
           degrees for about 15 minutes until golden, transfer to the refrigerator to cool completely. Chocolate mousse
           (first layer): Boil water and glucose for syrup.
+        timerMinutes: 15
       - instruction: שופכים את הסירופ החם על השוקולד המריר מניחים לדקותיים ומערבבים להמסה.
         instructionEn: Pour the hot syrup over the dark chocolate, leave for two minutes and stir to melt.
       - instruction: מצננים לטמפרטורת גוף ומקפלים את השמנת המוקצפת לתוך תערובת השוקולד.

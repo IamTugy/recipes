@@ -61,6 +61,7 @@ steps:
           Put the dry ingredients in the mixer bowl and mix well. Slowly add the liquids and mix for about 10 minutes
           until you get a uniform and smooth dough. Leave to rise in a covered container, to double the volume, for
           about an hour and a half. Heat an oven to 180 degrees.
+        timerMinutes: 10
       - instruction: חוצים את הבצק לחצי וכל מחצית מחלקים לחמישה חלקים.
         instructionEn: Cut the dough in half and divide each half into five parts.
       - instruction: >-
@@ -71,6 +72,7 @@ steps:
           Roll each part and shape into a roll. Make a braid from all 5 rolls as follows: number the strips from left to
           right 1-2-3-4-5, join together at the top edge and then: move 1 over 3 move 2 over 3 move 5 over 2 and so on.
           Place on a tray and cover - rise again for about 40 minutes.
+        timerMinutes: 40
       - instruction: מברישים את החלות בביצה טרופה ומפזרים שומשום ופרג. אופים במשך חצי שעה. נותנים לחלה להתקרר היטב לפני הפריסה.
         instructionEn: >-
           Brush the challah with a beaten egg and sprinkle with sesame seeds and poppy seeds. Bake for half an hour.

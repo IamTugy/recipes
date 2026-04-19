@@ -104,15 +104,18 @@ steps:
           Heat the oven to 160 degrees. Grease and place the baking pan. In a mixer fitted with a guitar hook, beat
           butter, oil, sugars and salt well for about 5 minutes. At the same time, place all the dry ingredients with
           the chocolate and nuts in a food processor and grind to a uniform and fine powder.
+        timerMinutes: 5
+      - instruction: שומרים בצד. מוסיפים לתערובת החמאה את הביצים בהדרגה, ביצה אחת כל 3 דקות הקצפה.
+        instructionEn: Keep aside. Add the eggs to the butter mixture gradually, one egg every 3 minutes of whipping.
+        timerMinutes: 3
       - instruction: >-
-          שומרים בצד. מוסיפים לתערובת החמאה את הביצים בהדרגה, ביצה אחת כל 3 דקות הקצפה. מוסיפים את הרוויון ואת תערובת
-          היבשים לערבוב קצר ולפיזור מלא בתערובת. מוזגים את בלילת העוגה לתבנית ואופים 45-55 דקות או עד שקיסם הננעץ בעוגה
-          יוצא עם פירורים לחים עליו.
+          מוסיפים את הרוויון ואת תערובת היבשים לערבוב קצר ולפיזור מלא בתערובת. מוזגים את בלילת העוגה לתבנית ואופים 45-55
+          דקות או עד שקיסם הננעץ בעוגה יוצא עם פירורים לחים עליו.
         instructionEn: >-
-          Keep aside. Add the eggs to the butter mixture gradually, one egg every 3 minutes of whipping. Add the
-          saturation and the dry mixture to mix briefly and fully distribute in the mixture. Pour the cake batter into
-          the pan and bake for 45-55 minutes or until a toothpick inserted into the cake comes out with moist crumbs on
-          it.
+          Add the saturation and the dry mixture to mix briefly and fully distribute in the mixture. Pour the cake
+          batter into the pan and bake for 45-55 minutes or until a toothpick inserted into the cake comes out with
+          moist crumbs on it.
+        timerMinutes: 55
       - instruction: >-
           מצננים היטב ומשחררים את העוגה. לציפוי- מחממים את הפונדנט והקפה מעל באן מארי לחום שפתיים ומוזגים על חלקה העליון
           של העוגה, כך שחלקו ייזל בין בליטות העוגה.

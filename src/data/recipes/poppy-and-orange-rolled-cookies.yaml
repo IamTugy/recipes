@@ -103,6 +103,7 @@ steps:
           Repeat this operation with the remaining dough and filling. Transfer to a pan lined with baking paper and mark
           cuts on top of the roulade, which will make it easier to spread after baking. Bake at 160 degrees for about 30
           minutes, until golden, remove from the oven and cut into slices.
+        timerMinutes: 30
       - instruction: מצננים ומגישים.
         instructionEn: Cool and serve.
 tips: []

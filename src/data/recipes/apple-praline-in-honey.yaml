@@ -113,6 +113,7 @@ steps:
         instructionEn: Close the sockets with tempered chocolate and flatten the chocolate with a wide spatula.
       - instruction: מניחים לגיבוש מלא של 10-12 שעות בטמפרטורה של 18 מעלות או ל-10-15 דקות בקירור.
         instructionEn: Allow to fully set for 10-12 hours at a temperature of 18 degrees or for 10-15 minutes in the refrigerator.
+        timerMinutes: 15
       - instruction: הופכים בזהירות את התבנית ומשחררים את הפרלינים.
         instructionEn: Carefully turn the mold over and release the pralines.
 tips: []

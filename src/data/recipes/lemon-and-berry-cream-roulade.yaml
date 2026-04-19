@@ -89,10 +89,12 @@ steps:
           uniform mixture, about 5 minutes. Separately, whip the egg whites and invert sugar into a flexible meringue
           and fold into the almond mixture. Spread the mixture on a baking tray lined with greased baking paper in a
           thin layer.
+        timerMinutes: 5
       - instruction: אופים 6-7 דקות בחום גבוה של 220 מעלות. מצננים ומאבקים באבקת סוכר, מיישרים שוליים.
         instructionEn: >-
           Bake for 6-7 minutes at a high temperature of 220 degrees. Cool and dust with powdered sugar, straighten
           edges.
+        timerMinutes: 7
       - instruction: "מצננים.הקרם:"
         instructionEn: "Cool. The cream:"
       - instruction: >-
@@ -107,6 +109,7 @@ steps:
         instructionEn: Transfer to cool in a mixer fitted with a guitar hook and cool to body temperature. Fold in the sweet cream.
       - instruction: "מצננים 4 שעות.ההרכבה וההגשה:"
         instructionEn: "Refrigerate for 4 hours. Assembly and serving:"
+        timerMinutes: 240
       - instruction: מורחים את הקרם הצונן על בצק הרולדה בשכבה אחידה ומגלגלים לרולדה.
         instructionEn: Spread the cooled cream on the roulade dough in an even layer and roll into a roulade.
       - instruction: מצננים בקירור שעתיים.מעבירים את יתרת הקרם לשק זילוף ומזלפים מעל הרולדה.

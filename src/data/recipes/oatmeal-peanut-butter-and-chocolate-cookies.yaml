@@ -90,4 +90,5 @@ steps:
         instructionEn: >-
           Bake for about 15-17 minutes until golden and be careful not to overbake. Cool well and keep in an airtight
           container.
+        timerMinutes: 17
 tips: []

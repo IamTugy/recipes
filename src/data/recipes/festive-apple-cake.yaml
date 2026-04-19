@@ -104,6 +104,7 @@ steps:
           Leave to cool in the syrup. Line the pan with baking paper and arrange the apple slices on top in an
           overlapping manner. For the cake - in a mixer fitted with the whisk balloon, beat the sugars, eggs and zest
           for about 10 minutes, to obtain a very puffy mixture.
+        timerMinutes: 10
       - instruction: מזרזפים את השמן בזרם דק.
         instructionEn: Pour the oil in a thin stream.
       - instruction: >-
@@ -113,4 +114,5 @@ steps:
           Gently mix the grated apples, sift the dry ingredients and gently mix in. Transfer to the pan and bake at 160
           degrees for about 45 minutes. Cool and release the cake. Can be brushed with hot nefage and crowned with
           coconut and gold powder.
+        timerMinutes: 45
 tips: []

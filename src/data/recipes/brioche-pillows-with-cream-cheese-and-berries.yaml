@@ -91,12 +91,15 @@ steps:
           dough. (the liquids gradually).
       - instruction: לשים 3 דקות.
         instructionEn: put 3 minutes.
+        timerMinutes: 3
       - instruction: מוסיפים את החמאה בחתיכות קטנות, תוך לישה.
         instructionEn: Add the butter in small pieces, while kneading.
       - instruction: לשים כ-6 דקות.
         instructionEn: put for about 6 minutes.
+        timerMinutes: 6
       - instruction: מתפיחים מעט בחוץ ומעבירים להתפחה של 4 שעות לפחות בקירור.
         instructionEn: Leave to rise a little outside and leave to rise for at least 4 hours in the refrigerator.
+        timerMinutes: 240
       - instruction: הרכבה- מרדדים את הבצק לעלה בעובי 3-4 מ״מ.
         instructionEn: Assembly - roll the dough into a 3-4 mm thick sheet.
       - instruction: חותכים לריבועים בגודל של 7x7 ס״מ (ניתן לאחר הרידוד להקפיא מעט את הבצק על מנת להקל על החיתוך).
@@ -111,4 +114,5 @@ steps:
         instructionEn: Cover and swell to 80% of the original volume.
       - instruction: אופים בחום של 170 מעלות כ-15 דקות או עד הזהבה.
         instructionEn: Bake at 170 degrees for about 15 minutes or until golden.
+        timerMinutes: 15
 tips: []

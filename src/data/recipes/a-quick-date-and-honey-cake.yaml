@@ -57,11 +57,16 @@ steps:
     items:
       - instruction: מערבבים בקערה תמרים, אגוזים, סוכר, דבש, אבקת סודה ומים רותחים.
         instructionEn: Mix dates, nuts, sugar, honey, soda powder and boiling water in a bowl.
+      - instruction: משהים בצד ל-15 דקות.
+        instructionEn: Set aside for 15 minutes.
+        timerMinutes: 15
       - instruction: >-
-          משהים בצד ל-15 דקות.מוסיפים את יתרת החומרים, מערבבים לתערובת אחידה.מעברים לתבניות משומנות ומקומחות.אופים בחום
-          של 160 מעלות כ-45 דקות, או עד שקיסם הננעץ בעוגה יוצא עם מעט פירורים עליו.מצננים.
+          מוסיפים את יתרת החומרים, מערבבים לתערובת אחידה.מעברים לתבניות משומנות ומקומחות.אופים בחום של 160 מעלות כ-45
+          דקות, או עד שקיסם הננעץ בעוגה יוצא עם מעט פירורים עליו.
         instructionEn: >-
-          Set aside for 15 minutes. Add the rest of the ingredients, mix to a uniform mixture. Transfer to greased and
-          floured pans. Bake at 160 degrees for about 45 minutes, or until a toothpick inserted into the cake comes out
-          with a few crumbs on it. Cool.
+          Add the rest of the ingredients, mix to a uniform mixture. Transfer to greased and floured pans. Bake at 160
+          degrees for about 45 minutes, or until a toothpick inserted into the cake comes out with a few crumbs on it.
+        timerMinutes: 45
+      - instruction: מצננים.
+        instructionEn: Cool.
 tips: []

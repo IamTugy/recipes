@@ -88,6 +88,7 @@ steps:
         instructionEn: Prepare the onions - heat the oven to 220 degrees.
       - instruction: מתבלים את הבצלים ומסדרים על מגש האפייה וצולים 25 דקות להזהבה.
         instructionEn: Season the onions and arrange on the baking tray and roast for 25 minutes until golden.
+        timerMinutes: 25
       - instruction: מצננים מעט.מכינים את התבשיל- מחממים שמן זית בסיר שטוח ורחב, מתבלים את השוקיים ומטגנים להזהבה.
         instructionEn: Cool a little. Prepare the stew - heat olive oil in a flat, wide pot, season the shanks and fry until golden.
       - instruction: מוציאים ובאותו סיר מטגנים קלות את השום ותיבול.

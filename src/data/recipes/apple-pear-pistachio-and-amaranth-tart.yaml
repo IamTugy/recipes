@@ -17,8 +17,8 @@ ingredients:
     items:
       - amount: 0
         unit: ""
-        name: "תבנית טארט 20x14 ס״מ"
-        nameEn: "20x14 cm tart pan"
+        name: תבנית טארט 20x14 ס״מ
+        nameEn: 20x14 cm tart pan
       - amount: 180
         unit: g
         name: קמח
@@ -116,12 +116,15 @@ steps:
         instructionEn: >-
           Place a weight for blind baking (arrange heat-resistant cling film or aluminum foil on top of it and put
           legumes as a weight).
-      - instruction: מצננים 20 דקות בצורה זו ומחממים תנור ל-170 מעלות.אופים את הקלתית אפייה עיוורת במשך כ-15 דקות.
-        instructionEn: >-
-          Cool for 20 minutes in this way and heat the oven to 170 degrees. Bake the cheese blind baking for about 15
-          minutes.
+      - instruction: מצננים 20 דקות בצורה זו ומחממים תנור ל-170 מעלות.
+        instructionEn: Cool for 20 minutes in this way and heat the oven to 170 degrees.
+        timerMinutes: 20
+      - instruction: אופים את הקלתית אפייה עיוורת במשך כ-15 דקות.
+        instructionEn: Bake the cheese blind baking for about 15 minutes.
+        timerMinutes: 15
       - instruction: מסירים את המשקולת ואופים 5 דקות נוספות לייבוש הבסיס.
         instructionEn: Remove the weight and bake another 5 minutes to dry the base.
+        timerMinutes: 5
       - instruction: "מצננים קלות.מכינים קרם פיסטוק: טוחנים שקדים, אבקת סוכר וקמח במעבד מזון."
         instructionEn: "Cool slightly. Make pistachio cream: grind almonds, powdered sugar and flour in a food processor."
       - instruction: >-
@@ -131,6 +134,7 @@ steps:
           Add butter, egg, pistachio paste and Amaranth and process until a uniform cream is obtained. Spread the cream
           on the cold dough and arrange the fruits on top in the shape of a fan. Bake for 35-45 minutes, until the
           surface of the tart is golden and firm to the touch.
+        timerMinutes: 45
       - instruction: מזגגים את הקרם בנפאז' ומעטרים בפיסטוק, אמרנה ואבקת סוכר.
         instructionEn: Glaze the cream with Nafage and garnish with pistachios, amaranth and powdered sugar.
       - instruction: בלוג  טיפים לאירוח המוני בחג

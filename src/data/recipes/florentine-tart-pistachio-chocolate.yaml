@@ -93,8 +93,10 @@ steps:
         instructionEn: Roll the dough into a 3 mm thick sheet and line a tart pan.
       - instruction: מניחים מעל משקול ואופים אפייה עיוורת של 15 דקות ב-160 מעלות.
         instructionEn: Place a weight on top and bake blind for 15 minutes at 160 degrees.
+        timerMinutes: 15
       - instruction: מסירים את המשקולת ואופים עוד 15 דקות להזהבה מלאה.
         instructionEn: Remove the weight and bake for another 15 minutes until fully golden.
+        timerMinutes: 15
       - instruction: >-
           מצננים.לתערובת הפלורנטין- שמים בסיר סוכר, חמאה, שמנת, גלוקוזה ודבש, מביאים לרתיחה ומבשלים לטמפרטורה של 118
           מעלות צלסיוס (כדור רך, soft ball).
@@ -105,18 +107,22 @@ steps:
         instructionEn: Add the almonds, mix well and pour into the tart.
       - instruction: אופים ב-160 מעלות כ-17 דקות.
         instructionEn: Bake at 160 degrees for about 17 minutes.
+        timerMinutes: 17
       - instruction: מצננים.לקרם פיסטוק- מתיכים את השוקולד, השמנת והפיסטוק.
         instructionEn: Cool. For the pistachio cream - melt the chocolate, cream and pistachios.
       - instruction: מצננים ל-6 שעות ומקציפים לקרם חלק ויציב.
         instructionEn: Cool for 6 hours and whip into a smooth and stable cream.
+        timerMinutes: 360
       - instruction: ממלאים את הטארט בשכבה אחידה.לקרם שוקולד חלב-תפוז- מתיכים את השוקולד, שמנת וזסט תפוז.
         instructionEn: >-
           Fill the tart in an even layer. For the milk chocolate-orange cream, melt the chocolate, cream and orange
           zest.
       - instruction: מצננים ל-6 שעות ומקציפים לקרם חלק ויציב.
         instructionEn: Cool for 6 hours and whip into a smooth and stable cream.
+        timerMinutes: 360
       - instruction: מעבירים לשק זילוף מצויד בצנתר חלק מספר 8 מזלפים מעל הטארט.
         instructionEn: Transfer to a piping bag equipped with a part number 8 nozzle and sprinkle over the tart.
       - instruction: מאבקים קלות באבקת קקאו ומצננים ל-5 שעות לפני ההגשה.
         instructionEn: Dust lightly with cocoa powder and chill for 5 hours before serving.
+        timerMinutes: 300
 tips: []

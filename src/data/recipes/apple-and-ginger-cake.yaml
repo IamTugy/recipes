@@ -63,14 +63,18 @@ ingredients:
 steps:
   - title: ""
     items:
-      - instruction: >-
-          מחממים תנור לחום של 160 מעלות. מטגנים את קוביות התפוחים במחבת עם 50 גרם חמאה כ- 5 דקות, ומניחים לצינון. בקערת
-          מערבל עם וו הגיטרה מקציפים את החמאה עם הסוכר, קליפת הלימון והווניל במהירות בינונית - גבוהה במשך כ- 10 דקות עד
-          קבלת תערובת אוורירית.
+      - instruction: מחממים תנור לחום של 160 מעלות. מטגנים את קוביות התפוחים במחבת עם 50 גרם חמאה כ- 5 דקות, ומניחים לצינון.
         instructionEn: >-
           Heat the oven to 160 degrees. Fry the apple cubes in a pan with 50 grams of butter for about 5 minutes, and
-          leave to cool. In the bowl of a mixer with the guitar hook, beat the butter with the sugar, lemon peel and
-          vanilla at medium-high speed for about 10 minutes until you get an airy mixture.
+          leave to cool.
+        timerMinutes: 5
+      - instruction: >-
+          בקערת מערבל עם וו הגיטרה מקציפים את החמאה עם הסוכר, קליפת הלימון והווניל במהירות בינונית - גבוהה במשך כ- 10
+          דקות עד קבלת תערובת אוורירית.
+        instructionEn: >-
+          In the bowl of a mixer with the guitar hook, beat the butter with the sugar, lemon peel and vanilla at
+          medium-high speed for about 10 minutes until you get an airy mixture.
+        timerMinutes: 10
       - instruction: >-
           מוסיפים את הביצים אחת אחת וממתינים בין ביצה לביצה. מנפים קמח ואבקת אפיה יחד ומוסיפים מחצית לתוך תערובת החמאה
           ומערבלים היטב. מוסיפים את השמנת ושארית הקמח שנותרה ומערבבים לאיחוד.
@@ -79,12 +83,15 @@ steps:
           butter mixture and mix well. Add the cream and the rest of the remaining flour and mix to combine.
       - instruction: >-
           באופן ידני מוסיפים את קוביות התפוחים והג'ינג'ר הקצוץ לתוך התערובת בתנועות קיפול עדינות. יוצקים את התערובת לתוך
-          התבנית ואופים במשך כ- 40 דקות עד הזהבה ועד שקיסם הננעץ פנימה יוצא עם פירורים מעט לחים. מצננים את העוגה מעל
-          לרשת במשך כ- 10 דקות.
+          התבנית ואופים במשך כ- 40 דקות עד הזהבה ועד שקיסם הננעץ פנימה יוצא עם פירורים מעט לחים.
         instructionEn: >-
           Manually add the diced apples and chopped ginger into the mixture with gentle folding movements. Pour the
           mixture into the mold and bake for about 40 minutes until golden and until a toothpick inserted comes out with
-          slightly moist crumbs. Cool the cake on a wire rack for about 10 minutes.
+          slightly moist crumbs.
+        timerMinutes: 40
+      - instruction: מצננים את העוגה מעל לרשת במשך כ- 10 דקות.
+        instructionEn: Cool the cake on a wire rack for about 10 minutes.
+        timerMinutes: 10
       - instruction: אח"כ הופכים את העוגה, מסירים את התבנית ומניחים לצינון מלא מעל הרשת.
         instructionEn: Then turn the cake over, remove the pan and leave to cool completely on the wire rack.
 tips: []

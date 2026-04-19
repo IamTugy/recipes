@@ -88,6 +88,7 @@ steps:
           cutter, cut the desired shape from the dough, place it on a baking sheet lined with baking paper.
       - instruction: אופים בתנור שחומם ל-160 מעלות, 25-30 דקות.
         instructionEn: Bake in an oven heated to 160 degrees, 25-30 minutes.
+        timerMinutes: 30
       - instruction: מצננים ומגישים.
         instructionEn: Cool and serve.
 tips: []

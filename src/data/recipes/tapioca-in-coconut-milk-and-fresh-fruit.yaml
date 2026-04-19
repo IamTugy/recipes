@@ -57,6 +57,7 @@ steps:
         instructionEn: >-
           Mix the fruits with sugar and refrigerate well. Cook tapioca with water over medium heat for about 20 minutes
           and add sugar.
+        timerMinutes: 20
       - instruction: מערבבים היטב ומצננים מעט, מוסיפים קרם קוקוס וזסט, מערבבים ומוזגים לכלים אישיים.
         instructionEn: Mix well and cool slightly, add coconut cream and zest, mix and pour into personal containers.
       - instruction: מצננים היטב.מפזרים את הטפיוקה מעל פירות, מעטרים בנענע וקוקוס מקורמל ומגישים קר.

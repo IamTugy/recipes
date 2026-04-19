@@ -119,6 +119,7 @@ steps:
           baking sheet.
       - instruction: מחממים תנור לחום גבוה (220 מעלות) וצולים את הדג כ־12 דקות, עד לקבלת גוון זהוב.
         instructionEn: Heat an oven to high heat (220 degrees) and roast the fish for about 12 minutes, until golden.
+        timerMinutes: 12
       - instruction: מגישים על מצע הקונפי.
         instructionEn: Serve on the bed of confit.
 tips: []

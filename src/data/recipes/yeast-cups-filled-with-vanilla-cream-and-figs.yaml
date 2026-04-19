@@ -75,18 +75,21 @@ steps:
         instructionEn: >-
           For the dough - put all the ingredients, except the butter, into the bowl of the mixer equipped with a
           kneading hook, and leave for 5 minutes.
+        timerMinutes: 5
       - instruction: >-
           מחליפים לוו גיטרה ומוסיפים את החמאה וממשיכים ללוש במהירות גבוהה עוד 3-5 דקות, עד להתנתקות הבצק מהקערה ואיסופו
           סביב וו הגיטרה.
         instructionEn: >-
           Change to a guitar hook and add the butter and continue kneading at high speed for another 3-5 minutes, until
           the dough separates from the bowl and gathers around the guitar hook.
+        timerMinutes: 5
       - instruction: מעבירים לקערה ומתפיחים 80%.
         instructionEn: Transfer to a bowl and swell 80%.
       - instruction: מעבירים לצינון של 6 שעות בקירור.לקרם וניל- מביאים לרתיחה את החלב והווניל.
         instructionEn: >-
           Transfer to cool for 6 hours in the refrigerator. For the vanilla cream - bring the milk and vanilla to a
           boil.
+        timerMinutes: 360
       - instruction: בנפרד טורפים היטב חלמונים וסוכר.
         instructionEn: Beat egg yolks and sugar separately.
       - instruction: מוסיפים את העמילנים וטורפים לתערובת אחידה.
@@ -112,6 +115,7 @@ steps:
           Repeat this operation with the rest of the dough. Cover and allow to rise to a level of 80% of the initial
           pastry volume. Heat the oven to 180 degrees. Brush the edges of the dough with a beaten egg and sprinkle a
           little sugar on top. Bake for 17 minutes until deep golden.
+        timerMinutes: 17
       - instruction: מצננים ומאבקים באבקת סוכר.
         instructionEn: Cool and dust with powdered sugar.
 tips: []

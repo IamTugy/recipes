@@ -108,10 +108,14 @@ steps:
         instructionEn: Keep refrigerated or frozen.
       - instruction: הרכבה- משמנים ומקמחים את התבנית ומעבירים את הבלילה לתוכה.
         instructionEn: Assembly - grease and flour the mold and transfer the batter into it.
+      - instruction: ממתינים 15 דקות לספיגה.
+        instructionEn: Wait 15 minutes for absorption.
+        timerMinutes: 15
       - instruction: >-
-          ממתינים 15 דקות לספיגה.מפזרים מעל את השטרויזל.מחממים תנור לחום של 165 מעלות ואופים כ-40 דקות, עד לנעיצת קיסם
-          היוצא עם מעט פירורים לחים.
+          מפזרים מעל את השטרויזל.מחממים תנור לחום של 165 מעלות ואופים כ-40 דקות, עד לנעיצת קיסם היוצא עם מעט פירורים
+          לחים.
         instructionEn: >-
-          Wait 15 minutes for absorption. Sprinkle the streusel on top. Heat the oven to 165 degrees and bake for about
-          40 minutes, until a toothpick comes out with a few moist crumbs.
+          Sprinkle the streusel on top. Heat the oven to 165 degrees and bake for about 40 minutes, until a toothpick
+          comes out with a few moist crumbs.
+        timerMinutes: 40
 tips: []

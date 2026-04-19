@@ -53,6 +53,7 @@ steps:
         instructionEn: >-
           In a mixer equipped with a kneading hook, mix the dry ingredients, gradually add the water and knead into a
           uniform dough, 10 minutes.
+        timerMinutes: 10
       - instruction: מניחים בקערה משומנת קלו ומכסים בניילון נצמד.
         instructionEn: Place in a lightly oiled bowl and cover with plastic wrap.
       - instruction: מתפיחים עד להכפלת הנפח.מחלקים את הבצק למנות במשקל 70 גרם ומעצבים כל אחד מהן ללחמניות מואורכות.
@@ -68,11 +69,16 @@ steps:
           side and immediately transfer to the immersion in ice water to stop the cooking.
       - instruction: >-
           מניחים על גבי מגש האפייה, חורצים חתכים אלכסוניים מעל כל אחת מהלחמניות ואופים בחום של 200 מעלות כ-15-17 דקות,
-          עד קבלת גוון זהוב. בינתיים מכינים את הציפוי- מרתיחים את המים והסוכר 3 דקות ומברישים את הלחמניות בעודן חמות.
+          עד קבלת גוון זהוב.
         instructionEn: >-
           Place on the baking tray, make diagonal cuts above each of the buns and bake at 200 degrees for about 15-17
-          minutes, until golden. In the meantime prepare the coating - boil the water and sugar for 3 minutes and brush
-          the buns while they are still hot.
+          minutes, until golden.
+        timerMinutes: 17
+      - instruction: בינתיים מכינים את הציפוי- מרתיחים את המים והסוכר 3 דקות ומברישים את הלחמניות בעודן חמות.
+        instructionEn: >-
+          In the meantime prepare the coating - boil the water and sugar for 3 minutes and brush the buns while they are
+          still hot.
+        timerMinutes: 3
       - instruction: מפזרים שפע של סוכר גבישי מעל ומגישים.
         instructionEn: Sprinkle plenty of granulated sugar on top and serve.
 tips: []

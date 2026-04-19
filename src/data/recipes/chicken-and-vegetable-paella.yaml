@@ -125,4 +125,5 @@ steps:
         instructionEn: >-
           Add the chicken stock and saffron and cook covered for about 20 minutes. Before serving, garnish with lemon
           and the micro salad.
+        timerMinutes: 20
 tips: []

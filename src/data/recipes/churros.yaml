@@ -65,6 +65,7 @@ steps:
           Remove from heat and cool slightly. Transfer the dough to a mixer with a guitar hook and mix for about 2
           minutes, until the mixture cools. Add the eggs one by one and stir well after each addition. Heat oil for deep
           frying to 160 degrees. Fill a piping bag with a wide serrated tube with the dough.
+        timerMinutes: 2
       - instruction: >-
           מותחים מעל הסיר חוט שפגאט בין שתי הידיות שלו, על מנת לקבל צ'ורוס אחידים ויפים. מזלפים את הצ'ורוס לתוך השמן החם
           מהבצק וחותכים בעזרת החוט המתוח. מטגנים עד שהבצק מזהיב.

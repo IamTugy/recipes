@@ -86,12 +86,14 @@ steps:
         instructionEn: Transfer to a work surface and press into a uniform dough.
       - instruction: מרדדים את הבצק בין שני דפי גיטרה או ניירות אפייה לעלה בעובי 4-5 מ״מ ומקפיאים ל-30 דקות.
         instructionEn: Roll the dough between two guitar sheets or baking papers into a 4-5 mm thick sheet and freeze for 30 minutes.
+        timerMinutes: 30
       - instruction: >-
           קורצים מהבסיס הקפוא עיגולים בקוטר 4-5 ס״מ ומניחים על משטח אפייה.מחממים תנור לחום נמוך של 140 מעלות ואופים את
           הבסיסים 25 דקות.
         instructionEn: >-
           Cut circles of 4-5 cm in diameter from the frozen base and place on a baking surface. Heat the oven to a low
           temperature of 140 degrees and bake the bases for 25 minutes.
+        timerMinutes: 25
       - instruction: מצננים.מכינים את המרנג האיטלקי- מניחים את החלבון במיקסר מצויד בבלון ההקצפה.
         instructionEn: Cool. Prepare the Italian meringue - place the protein in a mixer equipped with the whisk balloon.
       - instruction: מניחים בקלחת את המים והלימון.
@@ -118,8 +120,10 @@ steps:
           Beat at medium speed for about 8 minutes or until the meringue reaches body temperature. Transfer the meringue
           to a piping bag fitted with a 10 mm diameter smooth nozzle and pour high piles of cream on the bases of the
           baked dough.
+        timerMinutes: 8
       - instruction: מניחים בקירור או בהקפאה ל-10 דקותמכינים את הציפוי- ממיסים שוקולד ומערבבים עד להמסה.
         instructionEn: Refrigerate or freeze for 10 minutes. Prepare the coating - melt chocolate and stir until melted.
+        timerMinutes: 10
       - instruction: מוסיפים שמן.
         instructionEn: Add oil.
       - instruction: >-

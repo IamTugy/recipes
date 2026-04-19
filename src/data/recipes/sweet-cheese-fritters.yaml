@@ -50,11 +50,14 @@ ingredients:
 steps:
   - title: ""
     items:
-      - instruction: >-
-          מערבבים את כל המרכיבים בקערה, מניחים למנוחה לכ-30 דקות. מחממים שמן לטיגון עמוק לחום של 160 מעלות. צרים לביבות
-          עגולות בעזרת ידיים משומנות ומטגנים בעדינות כ-2 דקות. מעבירים לנייר סופג ומגישים עם שמנת חמוצה.
+      - instruction: מערבבים את כל המרכיבים בקערה, מניחים למנוחה לכ-30 דקות.
+        instructionEn: Mix all the ingredients in a bowl, leave to rest for about 30 minutes.
+        timerMinutes: 30
+      - instruction: מחממים שמן לטיגון עמוק לחום של 160 מעלות. צרים לביבות עגולות בעזרת ידיים משומנות ומטגנים בעדינות כ-2 דקות.
         instructionEn: >-
-          Mix all the ingredients in a bowl, leave to rest for about 30 minutes. Heat oil for deep frying to 160
-          degrees. Roll into round pancakes with oiled hands and fry gently for about 2 minutes. Transfer to absorbent
-          paper and serve with sour cream.
+          Heat oil for deep frying to 160 degrees. Roll into round pancakes with oiled hands and fry gently for about 2
+          minutes.
+        timerMinutes: 2
+      - instruction: מעבירים לנייר סופג ומגישים עם שמנת חמוצה.
+        instructionEn: Transfer to absorbent paper and serve with sour cream.
 tips: []

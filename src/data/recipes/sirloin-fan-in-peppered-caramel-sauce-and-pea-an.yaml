@@ -110,6 +110,7 @@ steps:
         instructionEn: >-
           Before serving, roast the meat to the desired degree of doneness in an oven heated to 220 degrees, remove and
           place in a warm place for 10 minutes.
+        timerMinutes: 10
       - instruction: פורסים לפרוסות דקות.מניחים פירה על צלחת הגשה, מעל את הסינטה ומעטרים עם הרוטב סביב.
         instructionEn: >-
           Slice into thin slices. Place mashed potatoes on a serving plate, top with the sirloin and garnish with the

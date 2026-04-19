@@ -118,12 +118,15 @@ steps:
         instructionEn: >-
           Place a sheet of cling film or baking paper, place a weight on top (legumes for example) and bake at 160
           degrees for 20 minutes.
+        timerMinutes: 20
       - instruction: מסירים את המשקולת ואופים עוד 8 דקות.
         instructionEn: Remove the dumbbell and bake for another 8 minutes.
+        timerMinutes: 8
       - instruction: מצננים.למילוי- מאדים את הבצל בחמאה, מוסיפים את הפטריות הקצוצות ומאדים.
         instructionEn: Cool. For the filling - steam the onion in butter, add the chopped mushrooms and steam.
       - instruction: מוסיפים יים ועגבניות מובשות ומרתיחים 5 דקות.
         instructionEn: Add tomatoes and dried tomatoes and boil for 5 minutes.
+        timerMinutes: 5
       - instruction: מתבלים ומצננים מעט.
         instructionEn: Season and cool slightly.
       - instruction: >-
@@ -132,6 +135,8 @@ steps:
         instructionEn: >-
           Sprinkle over the dough crust and sprinkle over mozzarella. Mix the royal ingredients, pour over the mushrooms
           inside the quiche crust and bake for about 30 minutes, until golden.
+        timerMinutes: 30
       - instruction: מניחים לעמוד 15 דק' לאחר האפייה, פורסים ונהנים לצד סלט עלים ירוקים רענן.
         instructionEn: Allow to stand for 15 minutes after baking, slice and enjoy alongside a fresh green salad.
+        timerMinutes: 15
 tips: []

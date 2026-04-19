@@ -86,8 +86,10 @@ steps:
           Add the marshmallows. Transfer to pans, and bake at 170 degrees for 20 minutes or until a toothpick inserted
           into the cake comes out with moist crumbs. For the coating: place the chocolate in a bowl. Heat the cream to
           the point of boiling and pour into the chocolate.
+        timerMinutes: 20
       - instruction: מערבבים להמסה ומצננים 4 שעות.מעבירים לקערת מיקסר ומקציפים לקרם יציב.
         instructionEn: Stir to melt and cool for 4 hours. Transfer to a mixer bowl and whip to a firm cream.
+        timerMinutes: 240
       - instruction: מזלפים על גבי הקאפקייק הצוננים, מעטרים בפניני שוקולד.מצננים ומגישים.
         instructionEn: Drizzle on top of the cooled cupcakes, decorate with chocolate pearls. Cool and serve.
 tips: []

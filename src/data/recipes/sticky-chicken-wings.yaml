@@ -83,9 +83,12 @@ steps:
         instructionEn: >-
           In a wide pot, make a dark caramel from the sugar. Add vinegar then the remaining sauce ingredients and bring
           to a boil.
-      - instruction: מוסיפים כנפיים ומבשלים על להבה בינונית-נמוכה 20 דקות, הופכים וממשיכים עוד 20 דקות.
-        instructionEn: Add wings and cook over medium-low heat for 20 minutes, flip, then cook 20 more minutes.
-        timerMinutes: 40
+      - instruction: מוסיפים כנפיים ומבשלים על להבה בינונית-נמוכה 20 דקות.
+        instructionEn: Add wings and cook over medium-low heat for 20 minutes.
+        timerMinutes: 20
+      - instruction: הופכים וממשיכים עוד 20 דקות.
+        instructionEn: Flip, then cook 20 more minutes.
+        timerMinutes: 20
       - instruction: מוציאים את הכנפיים ומצמצמים את הרוטב לסירופ.
         instructionEn: Remove the wings and reduce the sauce to a syrup.
       - instruction: מסדרים כנפיים בשכבה אחת על תבנית ויוצקים רוטב מעל. צולים בתנור 220° כ-15 דקות עד לצריבה.

@@ -76,6 +76,7 @@ steps:
         instructionEn: >-
           Put the dough ingredients in the bowl of a mixer equipped with a guitar hook and mix for about 8 minutes at
           medium speed.
+        timerMinutes: 8
       - instruction: הבצק שמתקבל אמור להיראות דביק ונוזלי וזה בסדר.
         instructionEn: The resulting dough should look sticky and runny and that's fine.
       - instruction: מכסים ומתפיחים עד הכפלת הנפח.מעבירים את הבצק לשק זילוף עם פיה חלקה בקוטר 12 מ"מ.
@@ -86,10 +87,12 @@ steps:
         instructionEn: Pour into Sabrina molds (about two thirds of their height).
       - instruction: מכסים ומתפיחים בשנית עד אשר הבצק מגיע לשפת התבניות.מחממים תנור לחום של 180 מעלות.
         instructionEn: Cover and rise again until the dough reaches the edge of the molds. Heat the oven to 180 degrees.
-      - instruction: "אופים כ-20 דקות בתנור ומצננים על רשת.הסירופ: מרתיחים את כל החומרים, למעט הלימונצ'לו כ-5 דקות."
-        instructionEn: >-
-          Bake for about 20 minutes in the oven and cool on a wire rack. The syrup: boil all the ingredients, except for
-          the limoncello, for about 5 minutes.
+      - instruction: אופים כ-20 דקות בתנור ומצננים על רשת.
+        instructionEn: Bake for about 20 minutes in the oven and cool on a wire rack.
+        timerMinutes: 20
+      - instruction: "הסירופ: מרתיחים את כל החומרים, למעט הלימונצ'לו כ-5 דקות."
+        instructionEn: "The syrup: boil all the ingredients, except for the limoncello, for about 5 minutes."
+        timerMinutes: 5
       - instruction: מוסיפים את הלימונצ'לו.משרים את הסברינות בסירופ למספר שניות ומעבירים לצלחת או תבנית.
         instructionEn: Add the limoncello. Soak the Sabrinas in the syrup for a few seconds and transfer to a plate or mold.
       - instruction: מצננים היטב.ממלאים בקצפת ומעטרים בפירות.

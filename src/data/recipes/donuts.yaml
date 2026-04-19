@@ -49,15 +49,18 @@ ingredients:
 steps:
   - title: ""
     items:
-      - instruction: >-
-          מכניסים את כל מרכיבי הבצק למעט החמאה למיקסר, ולשים כ-7 דקות. מוסיפים את החמאה ולשים עוד 3-4 דקות לקבלת בצק רך
-          אך לא דביק. מכסים ומתפיחים להכפלת נפח, רצוי בקירור למשך 6 שעות. משטחים את הבצק לעלה מלבני עבה (1 ס"מ) ומקפיאים
-          ל-30 דקות.
-        instructionEn: >-
-          Put all the ingredients of the dough except the butter into the mixer, and put for about 7 minutes. Add the
-          butter and knead for another 3-4 minutes to obtain a soft but not sticky dough. Cover and let rise until
-          doubled in volume, preferably refrigerated for 6 hours. Roll out the dough into a thick rectangular sheet (1
-          cm) and freeze for 30 minutes.
+      - instruction: מכניסים את כל מרכיבי הבצק למעט החמאה למיקסר, ולשים כ-7 דקות.
+        instructionEn: Put all the ingredients of the dough except the butter into the mixer, and put for about 7 minutes.
+        timerMinutes: 7
+      - instruction: מוסיפים את החמאה ולשים עוד 3-4 דקות לקבלת בצק רך אך לא דביק.
+        instructionEn: Add the butter and knead for another 3-4 minutes to obtain a soft but not sticky dough.
+        timerMinutes: 4
+      - instruction: מכסים ומתפיחים להכפלת נפח, רצוי בקירור למשך 6 שעות.
+        instructionEn: Cover and let rise until doubled in volume, preferably refrigerated for 6 hours.
+        timerMinutes: 360
+      - instruction: משטחים את הבצק לעלה מלבני עבה (1 ס"מ) ומקפיאים ל-30 דקות.
+        instructionEn: Roll out the dough into a thick rectangular sheet (1 cm) and freeze for 30 minutes.
+        timerMinutes: 30
       - instruction: >-
           קורצים עיגולים בקוטר 8 ס"מ ועיגולים פנימיים בקוטר 3 ס"מ. מניחים כל טבעת על ריבוע נייר אפייה המונח על תבנית
           משומנת, מכסים ומתפיחים עד הכפלת נפח.
@@ -70,6 +73,7 @@ steps:
         instructionEn: >-
           Heat oil for deep frying to a temperature of 150 degrees and fry the donuts for about 3 minutes on each side
           (pick up the puffed dough with the baking paper and carefully turn it into the oil).
+        timerMinutes: 3
       - instruction: מעבירים לנייר סופג.מצפים בציפוי הנבחר.
         instructionEn: Transfer to absorbent paper. Cover with the chosen coating.
 tips: []

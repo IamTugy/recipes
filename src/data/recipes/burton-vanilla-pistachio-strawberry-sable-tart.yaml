@@ -18,8 +18,8 @@ ingredients:
     items:
       - amount: 2
         unit: ""
-        name: "תבניות 6x24 ס״מ"
-        nameEn: "two 6x24 cm tart molds"
+        name: תבניות 6x24 ס״מ
+        nameEn: two 6x24 cm tart molds
       - amount: 60
         unit: g
         name: חלמונים
@@ -67,12 +67,14 @@ steps:
         instructionEn: For the dough - in a mixer equipped with a guitar hook, beat egg yolks and sugar to a light mixture.
       - instruction: מוסיפים חמאה רכה וממשיכים להקציף 5 דקות.
         instructionEn: Add soft butter and continue whipping for 5 minutes.
+        timerMinutes: 5
       - instruction: מוסיפים את יתרת החומרים היבשים ומאחדים.
         instructionEn: Add the rest of the dry ingredients and combine.
       - instruction: מרדדים בין שני ניירות אפייה לעלה בעובי 8 מ"מ ומקפיאים ל-10 דקות.מחממים תנור לחום של 150 מעלות.
         instructionEn: >-
           Roll out between two pieces of baking paper into an 8 mm thick sheet and freeze for 10 minutes. Heat the oven
           to 150 degrees.
+        timerMinutes: 10
       - instruction: משמנים את תבניות האפייה בחמאה רכה ומפזרים סוכר על דפנותיהם.מוצאים את הבצק מהמקפיא וקורצים אותו בעזרת התבנית.
         instructionEn: >-
           Grease the baking pans with soft butter and sprinkle sugar on their sides. Find the dough from the freezer and
@@ -81,6 +83,7 @@ steps:
         instructionEn: >-
           Leave the dough inside the mold and transfer to a baking tray. Bake for 25 minutes and immediately pull the
           mold out of the dough.
+        timerMinutes: 25
       - instruction: מצננים היטב.לקרם- מניחים במיקסר מצויד בבלון את כל חומרי הקרם ומקציפים לקצפת יציבה.
         instructionEn: >-
           Cool well. For the cream - place all the ingredients for the cream in a mixer equipped with a balloon and whip

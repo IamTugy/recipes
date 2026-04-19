@@ -94,6 +94,7 @@ steps:
         instructionEn: "How to prepare the preliminary dough (polishing): mix all the ingredients to a uniform mixture."
       - instruction: מכסים ומניחים לתסוס בטמפרטורת החדר במשך 24 שעות.
         instructionEn: Cover and leave to ferment at room temperature for 24 hours.
+        timerMinutes: 1440
       - instruction: להכנת הבצק הסופי:במיקסר מצויד בוו לישה מניחים את כל החומרים למעט הדגנים, המים והשמן.
         instructionEn: >-
           To prepare the final dough: In a mixer equipped with a kneading hook, place all the ingredients except for the
@@ -104,6 +105,7 @@ steps:
         instructionEn: If the dough is dry, add a little water, if it is sticky, add a little flour.
       - instruction: לשים את הבצק 10 דקות במהירות נמוכה.
         instructionEn: Knead the dough for 10 minutes at low speed.
+        timerMinutes: 10
       - instruction: הבצק אמור להתקבל חלק, משי ומעט דביק.
         instructionEn: The dough should be smooth, silky and slightly sticky.
       - instruction: מוסיפים את הדגנים ומטמיעים אותם בבצק (אפשר גם בלישה ידנית).
@@ -124,6 +126,7 @@ steps:
           little flour and score them with a sharp knife.
       - instruction: אופים את הכיכרות במשך 35-40 דקות.
         instructionEn: Bake the loaves for 35-40 minutes.
+        timerMinutes: 40
       - instruction: מוציאים ומניחים לצינון מלא מעל רשת צינון.
         instructionEn: Remove and leave to cool completely on a cooling rack.
 tips: []

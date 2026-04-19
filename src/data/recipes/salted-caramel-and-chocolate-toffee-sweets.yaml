@@ -18,8 +18,8 @@ ingredients:
     items:
       - amount: 0
         unit: ""
-        name: "תבנית 12x20 ס״מ"
-        nameEn: "12x20 cm baking pan"
+        name: תבנית 12x20 ס״מ
+        nameEn: 12x20 cm baking pan
       - amount: 130
         unit: g
         name: שמנת מתוקה
@@ -75,8 +75,10 @@ steps:
         instructionEn: Remove from heat and add dark chocolate and salt.
       - instruction: ממתינים 1/2 דקה וטורפים היטב.
         instructionEn: Wait 1/2 minute and beat well.
+        timerMinutes: 2
       - instruction: מעבירים מיד אל התבנית ומצננים היטב בטמפרטורת החדר ל-3-4 שעות או עד התייצבות מלאה.
         instructionEn: Immediately transfer to the mold and cool well at room temperature for 3-4 hours or until completely set.
+        timerMinutes: 240
       - instruction: חותכים למנות ועוטפים בנייר פרגמנט.
         instructionEn: Cut into portions and wrap in parchment paper.
       - instruction: שומרים בכלי אטום.

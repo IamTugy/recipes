@@ -81,11 +81,12 @@ ingredients:
 steps:
   - title: ""
     items:
-      - instruction: >-
-          בצק השמרים: לשים במיקסר את כל חומרי הבצק לישה ממושכת של כ-10 דקות, עד קבלת בצק גמיש.מניחים בקערה ומתפיחים
-          להכפלת נפח, רצוי בקירור ל-6 שעות.
+      - instruction: "בצק השמרים: לשים במיקסר את כל חומרי הבצק לישה ממושכת של כ-10 דקות, עד קבלת בצק גמיש."
         instructionEn: >-
           The yeast dough: put all the dough ingredients in a mixer and knead for about 10 minutes, until you get a
-          flexible dough. Place in a bowl and let it rise until it doubles in volume, preferably in the refrigerator for
-          6 hours.
+          flexible dough.
+        timerMinutes: 10
+      - instruction: מניחים בקערה ומתפיחים להכפלת נפח, רצוי בקירור ל-6 שעות.
+        instructionEn: Place in a bowl and let it rise until it doubles in volume, preferably in the refrigerator for 6 hours.
+        timerMinutes: 360
 tips: []

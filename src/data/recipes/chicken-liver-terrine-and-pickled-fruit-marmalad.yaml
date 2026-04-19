@@ -83,6 +83,7 @@ steps:
         instructionEn: Heat a pot of water to boiling point.
       - instruction: מוסיפים את הכבדים ומבשלים על סף רתיחה כ-3-5 דקות (לדרגת מידיום).
         instructionEn: Add the livers and cook on the verge of boiling for about 3-5 minutes (to medium level).
+        timerMinutes: 5
       - instruction: מעבירים מיד לקערה עם מי קרח.
         instructionEn: Immediately transfer to a bowl of ice water.
       - instruction: מייבשים.
@@ -105,6 +106,7 @@ steps:
         instructionEn: >-
           Transfer the terrine to a storage container, individual glasses or an English cake pan lined with plastic
           wrap, wrap in cling film and refrigerate for at least 5 hours, preferably overnight.
+        timerMinutes: 300
       - instruction: מגישים פרוסה מהטרין (במידה ונעשה בתבנית) או מעבירים אותו לשק זילוף ומזלפים על צנים או טוסט.
         instructionEn: >-
           Serve a slice of the terrine (if made in a pan) or transfer it to a sprinkling bag and sprinkle it on toast or
@@ -113,6 +115,7 @@ steps:
         instructionEn: Serve alongside the marmalade.
       - instruction: למרמלדה- מכניסים את כל המרכיבים, למעט הקורנפלור לסיר, מרתיחים ומבשלים 30 דקות.
         instructionEn: For the marmalade - put all the ingredients, except the cornflour, in a pot, boil and cook for 30 minutes.
+        timerMinutes: 30
       - instruction: מוסיפים את הקורנפלור המדולל ומביאים לרתיחה טובה.
         instructionEn: Add the diluted cornflour and bring to a good boil.
       - instruction: מצננים.

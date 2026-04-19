@@ -79,6 +79,7 @@ steps:
     items:
       - instruction: מתפיחים את הבצק לפחות 6 שעות.
         instructionEn: Let the dough rise for at least 6 hours.
+        timerMinutes: 360
       - instruction: "למילוי: מערבבים היטב את כל החומרים לתערובת אחידה."
         instructionEn: "For the filling: mix all the ingredients well into a uniform mixture."
       - instruction: "הרכבה: מרדדים את הבצק לעלה מלבני רחב."
@@ -87,6 +88,7 @@ steps:
         instructionEn: Let rise to 80% of the original volume.
       - instruction: מחממים תנור ל-160 מעלות ואופים 40 דקות.
         instructionEn: Heat oven to 160°C and bake for 40 minutes.
+        timerMinutes: 40
       - instruction: מצננים ומאבקים באבקת סוכר.
         instructionEn: Cool and dust with powdered sugar.
 tips: []

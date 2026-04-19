@@ -99,11 +99,15 @@ steps:
           film and chill in the fridge for at least half an hour. Heat the oven to 160 degrees.
       - instruction: >-
           מרדדים את הבצק על משטח מקומח ומרפדים 12 תבנית טארט אישיות בקוטר 12 ס"מ. מניחים משקולת ומכניסים למקרר לחצי שעה
-          נוספת. אופים אפייה עיוורת 15 דקות, מסירים משקולת ואופים עוד 8 דקות להזהבה מלאה.
+          נוספת. אופים אפייה עיוורת 15 דקות, מסירים משקולת
         instructionEn: >-
           Roll out the dough on a floured surface and line 12 individual tart pans with a diameter of 12 cm. Place a
           weight and place in the refrigerator for another half hour. Bake blind baking for 15 minutes, remove the
-          weight and bake for another 8 minutes until fully golden.
+          weight
+        timerMinutes: 15
+      - instruction: ואופים עוד 8 דקות להזהבה מלאה.
+        instructionEn: and bake for another 8 minutes until fully golden.
+        timerMinutes: 8
       - instruction: >-
           הכנת הטופי:מניחים את כל החומרים בסיר, מביאים לרתיחה טובה ומסירים מהאש.מצננים מעל ויוצקים שכבה אחידה על כל אחת
           מהקלתיות.מחזירים לתנור לאפייה קצרה של 8 דקות.מצננים היטב.
@@ -111,6 +115,7 @@ steps:
           To make the toffee: place all the ingredients in a pot, bring to a good boil and remove from the heat. Cool on
           top and pour an even layer on each of the cakes. Return to the oven for a short baking of 8 minutes. Cool
           well.
+        timerMinutes: 8
       - instruction: >-
           הכנת הגנאש:מתיכים שוקולדים מעל באן מארי. בנפרד מרתיחים שמנת, מלח ודבש. מחברים את שתי התערובות בשלבים ומוסיפים
           גם את השמן וטוחנים היטב בעזרת בלנדר מוט. יוצקים מהתערובת על שכבת הטופי שבתבנית ומעבירים לייצב בקירור. מניחים

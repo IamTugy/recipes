@@ -72,19 +72,24 @@ ingredients:
 steps:
   - title: ""
     items:
-      - instruction: >-
-          מכניסים את כל מרכיבי הבצק למיקסר מצויד בוו גיטרה ולשים לבצק רך וחלק, כ-8 דקות. עוטפים ומצננים 4 שעות. מערבבים
-          את כל מרכיבי המילוי לתערובת אחידה ובצקית. מחלקים את הבצק לשני חלקים. מרדדים כל חלק לעלה מלבני מדויק ודק,
-          מורחים את המילוי ומגלגלים.
+      - instruction: מכניסים את כל מרכיבי הבצק למיקסר מצויד בוו גיטרה ולשים לבצק רך וחלק, כ-8 דקות.
         instructionEn: >-
           Put all the ingredients of the dough into a mixer equipped with a guitar hook and knead into a soft and smooth
-          dough, about 8 minutes. Wrap and chill for 4 hours. Mix all the filling ingredients into a uniform and doughy
-          mixture. Divide the dough into two parts. Roll each part into a precise and thin rectangular sheet, spread the
-          filling and roll.
+          dough, about 8 minutes.
+        timerMinutes: 8
+      - instruction: עוטפים ומצננים 4 שעות.
+        instructionEn: Wrap and chill for 4 hours.
+        timerMinutes: 240
       - instruction: >-
-          מניחים על תבנית מרופדת, מברישים בביצה, מתפיחים 30 דקות ומברישים שוב."שורטים" במזלג ודוקרים בעזרת קיסם לאורך
-          הגלילה. אופים כ-20-25 דקות בחום של 180 מעלות.
+          מערבבים את כל מרכיבי המילוי לתערובת אחידה ובצקית. מחלקים את הבצק לשני חלקים. מרדדים כל חלק לעלה מלבני מדויק
+          ודק, מורחים את המילוי ומגלגלים.
         instructionEn: >-
-          Place on a lined baking sheet, brush with egg, let rise for 30 minutes and brush again. Bake for about 20-25
-          minutes at 180 degrees.
+          Mix all the filling ingredients into a uniform and doughy mixture. Divide the dough into two parts. Roll each
+          part into a precise and thin rectangular sheet, spread the filling and roll.
+      - instruction: מניחים על תבנית מרופדת, מברישים בביצה, מתפיחים 30 דקות ומברישים שוב.
+        instructionEn: Place on a lined baking sheet, brush with egg, let rise for 30 minutes and brush again.
+        timerMinutes: 30
+      - instruction: "\"שורטים\" במזלג ודוקרים בעזרת קיסם לאורך הגלילה. אופים כ-20-25 דקות בחום של 180 מעלות."
+        instructionEn: Bake for about 20-25 minutes at 180 degrees.
+        timerMinutes: 25
 tips: []

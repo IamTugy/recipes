@@ -111,8 +111,10 @@ steps:
         instructionEn: Season and add olive oil.
       - instruction: מייבשים בחום של 130 מעלות כ-20 דקות.לאפייה- מניחים את מרכיבי האפייה בתבנית צלייה, מתבלים.
         instructionEn: Dry at 130 degrees for about 20 minutes. For baking - place the baking ingredients in a roasting pan, season.
+        timerMinutes: 20
       - instruction: מניחים מעל את הדג ומצפים בקראסט.מלהיטים תנור לחום של 220 מעלות וצולים את הדג כ-20-25 דקות.מגישים מיד.
         instructionEn: >-
           Place the fish on top and cover with the crust. Heat the oven to 220 degrees and roast the fish for about
           20-25 minutes. Serve immediately.
+        timerMinutes: 25
 tips: []

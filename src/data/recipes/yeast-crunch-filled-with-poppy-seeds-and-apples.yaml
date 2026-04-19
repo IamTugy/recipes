@@ -18,8 +18,8 @@ ingredients:
     items:
       - amount: 2
         unit: ""
-        name: "תבניות 22 ס״מ"
-        nameEn: "two 22 cm pans"
+        name: תבניות 22 ס״מ
+        nameEn: two 22 cm pans
       - amount: 400
         unit: g
         name: קמח
@@ -83,12 +83,14 @@ ingredients:
 steps:
   - title: ""
     items:
-      - instruction: >-
-          להכנת הבצק - מכניסים לקערת המיקסר את כל המרכיבים, למעט החמאה, ולשים 5 דקות, מוסיפים את החמאה וממשיכים ללוש עוד
-          3 דקות.
+      - instruction: להכנת הבצק - מכניסים לקערת המיקסר את כל המרכיבים, למעט החמאה, ולשים 5 דקות, מוסיפים את החמאה
         instructionEn: >-
           To make the dough - put all the ingredients in the mixer bowl, except the butter, and knead for 5 minutes, add
-          the butter and continue kneading for another 3 minutes.
+          the butter
+        timerMinutes: 5
+      - instruction: וממשיכים ללוש עוד 3 דקות.
+        instructionEn: and continue kneading for another 3 minutes.
+        timerMinutes: 3
       - instruction: מעבירים לקערה ומתפיחים להכפלת נפח (עדיף להכין יום קודם ולהתפיח בקירור).
         instructionEn: >-
           Transfer to a bowl and let it rise until it doubles in volume (it's better to make it the day before and let
@@ -113,6 +115,7 @@ steps:
         instructionEn: Brush the cakes with egg and sprinkle the granulated sugar over them.
       - instruction: אופים 30-35 עד שהעוגה מזהיבה ונאפית לחלוטין.
         instructionEn: Bake for 30-35 minutes until the cake is golden and fully baked.
+        timerMinutes: 35
       - instruction: בתום האפייה ניתן להבריש בסירופ סוכר או בנפאז' (חומר מבריק לזיגוג) למראה מלוטש יותר.
         instructionEn: At the end of baking, you can brush with sugar syrup or Nafage (glossy glaze) for a more polished look.
 tips: []

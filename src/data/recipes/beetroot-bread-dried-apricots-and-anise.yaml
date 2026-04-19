@@ -66,6 +66,7 @@ steps:
         instructionEn: If there is a lack of liquid, you can add a little water.
       - instruction: לשים במהירות נמוכה כ-10 דקות.
         instructionEn: put on low speed for about 10 minutes.
+        timerMinutes: 10
       - instruction: >-
           מוסיפים את המשמשים ולשים עוד דקה.מעבירים את הבצק לקערה מקומחות קלות, מכסים ומניחים להתפחה להכפלת הנפח.מחלקים
           את הבצק לשני חלקים, מעצבים כל חלק לכיכר אובאלית מוארכת ומניחים על מגש אפייה.
@@ -81,4 +82,5 @@ steps:
           and score them using a dedicated razor or a sharp knife.
       - instruction: אופים 30 דקות.מצננים על גבי רשת צינון.
         instructionEn: Bake for 30 minutes. Cool on a cooling rack.
+        timerMinutes: 30
 tips: []

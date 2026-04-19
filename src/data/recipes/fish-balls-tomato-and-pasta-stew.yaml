@@ -143,20 +143,25 @@ steps:
         instructionEn: >-
           For the fish mixture - process all the ingredients, mix well and leave for at least 1/2 hour. For the sauce -
           heat oil in a wide pot.
+        timerMinutes: 120
       - instruction: מוסיפים שום ותבלינים ומטגנים 3 דקות.
         instructionEn: Add garlic and spices and fry for 3 minutes.
+        timerMinutes: 3
       - instruction: מוסיפים עגבניות שרי ומטגנים קלות.
         instructionEn: Add cherry tomatoes and lightly fry.
       - instruction: מוסיפים מיץ עגבניות וציר ומבשלים 10 דקות על להבה בינונית לצמצום.
         instructionEn: Add tomato juice and stock and cook for 10 minutes on a medium flame to reduce.
+        timerMinutes: 10
       - instruction: מתקנים תיבול.יוצרים קציצות מוארכות מתערובת הדגים, מטגנים בשמן להזהבה ומניחים ברוטב.
         instructionEn: >-
           Adjust the seasoning. Make oblong meatballs from the fish mixture, fry in oil until golden and place in the
           sauce.
       - instruction: מבשלים כ-10 דקות תוך טלטול הסיר מידי פעם.
         instructionEn: Cook for about 10 minutes while shaking the pot from time to time.
+        timerMinutes: 10
       - instruction: מוסיפים את הפסטה ומבשלים בערבוב/טלטול עדינים עד לריכוך, כ-12 דקות.לפני ההגשה מוסיפים זיתים, שקדים ובזיליקום.
         instructionEn: >-
           Add the pasta and cook with gentle stirring/shaking until softened, about 12 minutes. Before serving, add
           olives, almonds and basil.
+        timerMinutes: 12
 tips: []

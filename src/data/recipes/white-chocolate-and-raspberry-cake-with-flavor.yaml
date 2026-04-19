@@ -70,10 +70,12 @@ steps:
           Grease and flour the mold. In a mixer with a guitar hook, beat butter, sugar, vanilla, lemon peel and salt
           well for about 5 minutes. Add the eggs one by one, waiting until one egg is swallowed before adding the next
           egg. Alternately add the flour and yogurt and mix until fully combined.
+        timerMinutes: 5
       - instruction: >-
           מוסיפים את השוקולד והפטל בתנועת עטיפה ידנית בעזרת לקקן. אופים במשך 50-60 דקות, או עד שקיסם הננעץ בעוגה יוצא עם
           מעט פירורים לחים עליו.
         instructionEn: >-
           Add the chocolate and raspberry in a manual wrapping motion with the help of a spatula. Bake for 50-60
           minutes, or until a toothpick inserted into the cake comes out with a few moist crumbs on it.
+        timerMinutes: 60
 tips: []

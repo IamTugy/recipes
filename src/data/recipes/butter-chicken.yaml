@@ -135,6 +135,7 @@ steps:
         instructionEn: Melt butter in a wide pot over medium heat. Sauté onion and ginger until soft.
       - instruction: מוסיפים את התבלינים ומטגנים 30 שניות. מוסיפים לימון, פסאטה ושמנת מתוקה.
         instructionEn: Add spices and cook 30 seconds. Add lemon juice, passata and cream.
+        timerMinutes: 1
       - instruction: מביאים לרתיחה, מנמיכים ומצמצמים 30 דקות עד שהרוטב סמיך מאוד.
         instructionEn: Bring to a boil, reduce heat and simmer 30 minutes until the sauce is very thick.
         timerMinutes: 30
