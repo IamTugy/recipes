@@ -18,12 +18,12 @@ ingredients:
     items:
       - amount: 2
         unit: ""
-        name: תבניות
-        nameEn: templates
-      - amount: 18
-        unit: ""
-        name: ס״מ     לבסיס פקאן-קוקוס:80 גרם חמאה
-        nameEn: "cm for the pecan-coconut base: 80 grams of butter"
+        name: "תבניות 18 ס״מ"
+        nameEn: "two 18 cm pans"
+      - amount: 80
+        unit: g
+        name: חמאה
+        nameEn: butter
       - amount: 80
         unit: g
         name: סוכר

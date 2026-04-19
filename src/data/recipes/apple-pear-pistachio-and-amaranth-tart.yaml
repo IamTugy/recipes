@@ -17,12 +17,12 @@ ingredients:
     items:
       - amount: 0
         unit: ""
-        name: תבנית טארט
-        nameEn: Tart mold
-      - amount: 20
-        unit: ""
-        name: x14 ס״מ     לבצק פריך:180 גרם קמח
-        nameEn: "x14 cm for crispy dough: 180 grams of flour"
+        name: "תבנית טארט 20x14 ס״מ"
+        nameEn: "20x14 cm tart pan"
+      - amount: 180
+        unit: g
+        name: קמח
+        nameEn: flour
       - amount: 50
         unit: g
         name: אבקת שקדים מולבנים

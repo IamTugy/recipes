@@ -19,12 +19,8 @@ ingredients:
     items:
       - amount: 0
         unit: ""
-        name: תבנית
-        nameEn: pattern
-      - amount: 20
-        unit: ""
-        name: "x20 ס״מ     לבצק:"
-        nameEn: "x20 cm for the dough:"
+        name: "תבנית 20x20 ס״מ"
+        nameEn: "20x20 cm baking pan"
       - amount: 300
         unit: g
         name: קמח

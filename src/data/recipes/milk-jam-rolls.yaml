@@ -16,12 +16,12 @@ ingredients:
     items:
       - amount: 0
         unit: ""
-        name: ל-16 לחמניות בתבנית
-        nameEn: For 16 rolls in a pan
-      - amount: 20
-        unit: ""
-        name: x20 ס״מ     לבצק-350 גרם קמח לחם קשה
-        nameEn: x20 cm for the dough - 350 grams of hard bread flour
+        name: "תבנית 20x20 ס״מ (ל-16 לחמניות)"
+        nameEn: "20x20 cm pan (for 16 rolls)"
+      - amount: 350
+        unit: g
+        name: קמח לחם קשה
+        nameEn: hard bread flour
       - amount: 13
         unit: g
         name: שמרים יבשים

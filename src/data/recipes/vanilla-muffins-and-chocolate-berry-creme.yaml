@@ -17,14 +17,14 @@ tags:
 ingredients:
   - group: ""
     items:
-      - amount: 0
+      - amount: 2
         unit: ""
-        name: לשתי תבניות בגודל
-        nameEn: For two sized molds
-      - amount: 6
-        unit: ""
-        name: X24 ס"מ     למאפינס-60 גרם ביצים
-        nameEn: X24 cm for muffins-60 grams of eggs
+        name: "תבניות מאפינס 6x24 ס״מ"
+        nameEn: "two 6x24 cm muffin trays"
+      - amount: 60
+        unit: g
+        name: ביצים
+        nameEn: eggs
       - amount: 150
         unit: g
         name: סוכרכפית משחת וניל

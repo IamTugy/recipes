@@ -15,14 +15,10 @@ tags:
 ingredients:
   - group: ""
     items:
-      - amount: 0
-        unit: ""
-        name: תבנית
-        nameEn: pattern
       - amount: 24
-        unit: ""
-        name: ס״מ
-        nameEn: cm
+        unit: cm
+        name: תבנית
+        nameEn: 24 cm pan
       - amount: 4
         unit: ""
         name: בננות מוצקות

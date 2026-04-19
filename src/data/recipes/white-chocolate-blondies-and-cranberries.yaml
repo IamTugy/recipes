@@ -16,14 +16,10 @@ tags:
 ingredients:
   - group: ""
     items:
-      - amount: 16
-        unit: pcs
-        name: (תבנית
-        nameEn: (pattern
-      - amount: 20
+      - amount: 0
         unit: ""
-        name: X20 ס״מ)
-        nameEn: x20 cm)
+        name: "תבנית 20x20 ס״מ"
+        nameEn: "20x20 cm baking pan"
       - amount: 100
         unit: g
         name: שוקולד לבן

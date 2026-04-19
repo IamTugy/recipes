@@ -16,14 +16,14 @@ tags:
 ingredients:
   - group: ""
     items:
-      - amount: 0
-        unit: ""
-        name: תבנית בקוטר
-        nameEn: pattern in diameter
       - amount: 22
         unit: cm
-        name: לבצק-220 גרם קמח
-        nameEn: For the dough - 220 grams of flour
+        name: תבנית עגולה
+        nameEn: 22 cm round tart pan
+      - amount: 220
+        unit: g
+        name: קמח
+        nameEn: flour
       - amount: 60
         unit: g
         name: אבקת סוכר

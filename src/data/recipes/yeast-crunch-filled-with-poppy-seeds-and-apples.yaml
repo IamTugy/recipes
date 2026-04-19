@@ -16,14 +16,14 @@ tags:
 ingredients:
   - group: ""
     items:
-      - amount: 0
+      - amount: 2
         unit: ""
-        name: לשתי תבניות בגודל
-        nameEn: For two sized molds
-      - amount: 22
-        unit: cm
-        name: לבצק-400 גרם קמח
-        nameEn: For the dough - 400 grams of flour
+        name: "תבניות 22 ס״מ"
+        nameEn: "two 22 cm pans"
+      - amount: 400
+        unit: g
+        name: קמח
+        nameEn: flour
       - amount: 200
         unit: g
         name: חלב

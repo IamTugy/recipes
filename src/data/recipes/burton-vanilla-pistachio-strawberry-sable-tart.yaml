@@ -16,14 +16,10 @@ tags:
 ingredients:
   - group: ""
     items:
-      - amount: 0
+      - amount: 2
         unit: ""
-        name: לשתי תבניות בגודל
-        nameEn: For two sized molds
-      - amount: 6
-        unit: ""
-        name: X24 ס"מ     לבצק סבלה ברטון
-        nameEn: X24 cm for the barton sable dough
+        name: "תבניות 6x24 ס״מ"
+        nameEn: "two 6x24 cm tart molds"
       - amount: 60
         unit: g
         name: חלמונים

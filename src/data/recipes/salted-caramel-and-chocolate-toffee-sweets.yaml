@@ -18,12 +18,8 @@ ingredients:
     items:
       - amount: 0
         unit: ""
-        name: תבנית תבנית
-        nameEn: template template
-      - amount: 12
-        unit: ""
-        name: x20 ס״מ
-        nameEn: x20 cm
+        name: "תבנית 12x20 ס״מ"
+        nameEn: "12x20 cm baking pan"
       - amount: 130
         unit: g
         name: שמנת מתוקה

@@ -16,14 +16,10 @@ tags:
 ingredients:
   - group: ""
     items:
-      - amount: 0
-        unit: ""
-        name: תבנית אינגליש קייק
-        nameEn: English cake pattern
       - amount: 25
-        unit: ""
-        name: ס״מ     לבצק
-        nameEn: cm for the dough
+        unit: cm
+        name: תבנית אינגליש קייק
+        nameEn: 25 cm loaf pan
       - amount: 125
         unit: g
         name: חמאה רכה

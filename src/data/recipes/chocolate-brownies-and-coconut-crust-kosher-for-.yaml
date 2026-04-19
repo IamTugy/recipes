@@ -19,12 +19,8 @@ ingredients:
     items:
       - amount: 0
         unit: ""
-        name: תבנית
-        nameEn: pattern
-      - amount: 20
-        unit: ""
-        name: x20 ס״מ
-        nameEn: x20 cm
+        name: "תבנית 20x20 ס״מ"
+        nameEn: "20x20 cm baking pan"
       - amount: 50
         unit: g
         name: קמח לא גלוטן (׳קמח קונדיטור׳)קורט מלח
