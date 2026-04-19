@@ -33,7 +33,7 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
   })
 
   // Scroll to top when recipe opens
-  useEffect(() => { window.scrollTo(0, 0) }, [id])
+  useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }) }, [id])
 
   if (!recipe) {
     return (

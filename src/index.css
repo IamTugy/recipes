@@ -32,7 +32,7 @@
 
 @layer base {
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
+  html { scroll-behavior: auto; }
   body {
     background-color: rgb(var(--color-bg));
     color: rgb(var(--color-cream));
