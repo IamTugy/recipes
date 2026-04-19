@@ -122,7 +122,7 @@ steps:
         instructionEn: Cover with lids. Place the pumpkins in the pan with the sauce.
       - instruction: מכסים ואופים 1/2 שעה.
         instructionEn: Cover and bake for 1/2 hour.
-        timerMinutes: 120
+        timerMinutes: 30
       - instruction: מסירים את הכיסוי ואופים עוד 15 דקות, להזהבה.
         instructionEn: Remove the cover and bake for another 15 minutes, until golden.
         timerMinutes: 15
