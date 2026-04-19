@@ -68,14 +68,17 @@ steps:
         instructionEn: Add cold butter and process into moist crumbs.
       - instruction: מאחדים ומצננים ל-1/2 שעה.
         instructionEn: Combine and cool for 1/2 hour.
+        timerMinutes: 120
       - instruction: מחלקים לכדורים במשקל 10 גרם ומניחים בתבנית שקעים מסיליקון (בקוטר 3-4 ס"מ).
         instructionEn: Divide into balls weighing 10 grams and place in a silicone mold (diameter 3-4 cm).
       - instruction: אופים בחום של 160 מעלות כ-17 דקות.
         instructionEn: Bake at 160 degrees for about 17 minutes.
+        timerMinutes: 17
       - instruction: מצננים.למילוי- מחממים את כל החומרים מעל באן מאיר לתערובת אחידה.
         instructionEn: Cool. For the filling - heat all the ingredients over a bain-marie to a uniform mixture.
       - instruction: מצננים לטמפרטורה של 4 מעלות, לפחות ל-4 שעות, ומקציפים קלות להסמכה.
         instructionEn: Cool to a temperature of 4 degrees, for at least 4 hours, and whip lightly until thickened.
+        timerMinutes: 240
       - instruction: מעבירים לשק זילוף ומצמידים על זוג עוגיות בקרם.
         instructionEn: Transfer to a piping bag and press onto a pair of cream cookies.
 tips: []

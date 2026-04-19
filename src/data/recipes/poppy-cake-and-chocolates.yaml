@@ -107,6 +107,7 @@ steps:
         instructionEn: >-
           Add the eggs gradually and beat for another 3 minutes. Grind the chocolates and flour in a food processor to a
           coarse powdery mixture. Manually fold in the dry ingredients, alternating with the filling and the apples.
+        timerMinutes: 3
       - instruction: >-
           מעבירים לתבנית משומנת ומקומחת ואופים כ- 40-45 דקות עד להזהבה, או עד ששיפוד עץ שנועצים בעוגה יוצא עם מעט
           פירורים לחים. משחררים מהתבנית ומעבירים לצינון מלא מעל רשת. להכנת הציפוי, מחממים את השמנת והנפאז' עד לסף רתיחה
@@ -116,6 +117,7 @@ steps:
           inserted into the cake comes out with a few moist crumbs. Release from the mold and transfer to cool
           completely on a wire rack. To prepare the coating, heat the cream and the nafage until it boils and the nafage
           is completely dissolved.
+        timerMinutes: 45
       - instruction: >-
           יוצקים אל השוקולד, מכסים את הקערה וממתינים דקה.בוחשים בעזרת מטרפה לתערובת חלקה ואחידה.משתמשים מיד או מצננים
           בכלי אטום עד שבוע בקירור ועד חודשיים בהקפאה.

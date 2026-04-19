@@ -63,13 +63,16 @@ steps:
     items:
       - instruction: עוטפים את החצילים בנייר כסף ושורפים על להבה חשופה או בתנור.
         instructionEn: Wrap the eggplants in foil and burn over an open flame or in the oven.
-      - instruction: >-
-          מצננים ומוציאים את התוכן. מאדים בצל ושום בשמן זית וחמאה, מוסיפים את תוכן החצילים, יין לבן ומאדים 5 דקות.
-          מוסיפים חלב ותיבול ומבשלים 15 דקות. מוסיפים שמנת מתוקה ומרסקים את המרק למרקם אחיד וחלק.
+      - instruction: מצננים ומוציאים את התוכן. מאדים בצל ושום בשמן זית וחמאה, מוסיפים את תוכן החצילים, יין לבן ומאדים 5 דקות.
         instructionEn: >-
           Cool and remove the contents. Saute the onion and garlic in olive oil and butter, add the contents of the
-          eggplants, white wine and saute for 5 minutes. Add milk and seasoning and cook for 15 minutes. Add sweet cream
-          and mash the soup to a uniform and smooth texture.
+          eggplants, white wine and saute for 5 minutes.
+        timerMinutes: 5
+      - instruction: מוסיפים חלב ותיבול ומבשלים 15 דקות.
+        instructionEn: Add milk and seasoning and cook for 15 minutes.
+        timerMinutes: 15
+      - instruction: מוסיפים שמנת מתוקה ומרסקים את המרק למרקם אחיד וחלק.
+        instructionEn: Add sweet cream and mash the soup to a uniform and smooth texture.
       - instruction: >-
           מסננים את המרק לסיר ומביאים לרתיחה, מתבלים במלח ופלפל לפי הטעם. לקציפה: מקציפים את השמנת עם התבלינים לקצפת
           רכה. מוזגים מהמרק החם לכוסות הגשה ומעטרים בקציפה.

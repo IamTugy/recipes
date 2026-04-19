@@ -68,18 +68,22 @@ steps:
         instructionEn: Heat the oven to 160 degrees. Crush the cookie crumbs with the butter and sugar in a food processor.
       - instruction: מהדקים לתוך תבנית אפייה.מקציפים את הביצים השלמות עם הסוכר והווניל, עד קבלת תערובת אוורירית.
         instructionEn: Press into a baking dish. Beat the whole eggs with the sugar and vanilla, until you get an airy mixture.
+      - instruction: בערך 5 דקות.
+        instructionEn: About 5 minutes.
+        timerMinutes: 5
       - instruction: >-
-          בערך 5 דקות. מערבבים את שאר חומרי המלית לתערובת חלקה. מקפלים בעדינות את הביצים המוקצפות אל שאר חומרי המלית עד
-          לקבלת עיסה אחידה. יוצקים את הבלילה לתבנית המרופדת בפירורי העוגיות. אופים כ-40 דקות (העוגה צריכה להישאר בהירה
-          וללא צבע).
+          מערבבים את שאר חומרי המלית לתערובת חלקה. מקפלים בעדינות את הביצים המוקצפות אל שאר חומרי המלית עד לקבלת עיסה
+          אחידה. יוצקים את הבלילה לתבנית המרופדת בפירורי העוגיות. אופים כ-40 דקות (העוגה צריכה להישאר בהירה וללא צבע).
         instructionEn: >-
-          About 5 minutes. Mix the rest of the stuffing ingredients into a smooth mixture. Gently fold the beaten eggs
-          into the rest of the filling ingredients until a uniform paste is obtained. Pour the batter into the pan lined
-          with cookie crumbs. Bake for about 40 minutes (the cake should remain light and colorless).
+          Mix the rest of the stuffing ingredients into a smooth mixture. Gently fold the beaten eggs into the rest of
+          the filling ingredients until a uniform paste is obtained. Pour the batter into the pan lined with cookie
+          crumbs. Bake for about 40 minutes (the cake should remain light and colorless).
+        timerMinutes: 40
       - instruction: לציפוי- טורפים את החומרים ומוזגים העדינות על העוגה.
         instructionEn: For the coating - whisk the ingredients and pour the mixture over the cake.
       - instruction: מחזירים ל-8 דקות לתנור.
         instructionEn: Return to the oven for 8 minutes.
+        timerMinutes: 8
       - instruction: מצננים לילה בקירור.מעטרים בפרי טרי.
         instructionEn: Refrigerate overnight. Garnish with fresh fruit.
       - instruction: הערה- יכול להיות שכשזמן האפייה תם, העוגה תראה לא אפויה- אבל זה בסדר- היא תתייצב בקירור.

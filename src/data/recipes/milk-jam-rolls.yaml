@@ -16,8 +16,8 @@ ingredients:
     items:
       - amount: 0
         unit: ""
-        name: "תבנית 20x20 ס״מ (ל-16 לחמניות)"
-        nameEn: "20x20 cm pan (for 16 rolls)"
+        name: תבנית 20x20 ס״מ (ל-16 לחמניות)
+        nameEn: 20x20 cm pan (for 16 rolls)
       - amount: 350
         unit: g
         name: קמח לחם קשה
@@ -76,6 +76,7 @@ steps:
           Continue kneading for about 10 minutes until you get a uniform, smooth and elastic dough. Oil the dough and
           the rising bowl, stretch the dough into a ball and leave to rise until doubled in volume in a vessel wrapped
           in cling film. Divide the dough into 16 portions of 40 grams each.
+        timerMinutes: 10
       - instruction: מותחים ומכדררים כל פיסה ומניחים בתבנית האפייה.
         instructionEn: Stretch and roll out each piece and place in the baking dish.
       - instruction: >-
@@ -85,6 +86,8 @@ steps:
           Cover and rise again to double the volume. Heat the oven to 160 degrees. Prepare the coating - mix all the
           ingredients. Bake the buns for 5 minutes, remove from the oven and immediately pour the coating mixture gently
           over the top.
+        timerMinutes: 5
       - instruction: מחזירים אל התנור להמשך האפיה של עוד כ-15 דקות.מצננים ומשחררים מהתבנית.
         instructionEn: Return to the oven to continue baking for another 15 minutes. Cool and release from the mold.
+        timerMinutes: 15
 tips: []

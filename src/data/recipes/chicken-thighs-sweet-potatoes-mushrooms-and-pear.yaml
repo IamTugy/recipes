@@ -81,8 +81,10 @@ steps:
         instructionEn: >-
           Add the soy and return the chicken and onions. Add chicken stock, season, boil and cook on a low flame for 15
           minutes.
+        timerMinutes: 15
       - instruction: מידי פעם מטלטלים את הסיר.מוסיפים את הבטטות והפטריות וממשיכים לבשל עוד 30 דקות.
         instructionEn: Occasionally shake the pot. Add the sweet potatoes and mushrooms and continue cooking for another 30 minutes.
+        timerMinutes: 30
       - instruction: >-
           לקראת סוף הבישול ניתן לפתוח את המכסה לצמצום הרוטב, או להעביר לתנור להשחמה.להגשה- מתקנים תיבול, מפזרים את הבצל
           הקצוץ, מטלטלים מעט ומגישים.

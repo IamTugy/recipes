@@ -104,10 +104,15 @@ steps:
         instructionEn: Roll the dough into a 3 mm thick sheet and line the tart pans.
       - instruction: מרפדים בניילון נצמד או נייר אפיה ומניחים משקולת (קטניות, אורז) מעל.
         instructionEn: Line with plastic wrap or baking paper and place a weight (beans, rice) on top.
-      - instruction: מצננים שוב ל-15 דקות ואופים 15 דקות.
-        instructionEn: Cool again for 15 minutes and bake for 15 minutes.
+      - instruction: מצננים שוב ל-15 דקות
+        instructionEn: Cool again for 15 minutes
+        timerMinutes: 15
+      - instruction: ואופים 15 דקות.
+        instructionEn: and bake for 15 minutes.
+        timerMinutes: 15
       - instruction: מוציאים את המשקולות ומחזירים לעוד 8 דקות אפיה.
         instructionEn: Take out the weights and return to baking for another 8 minutes.
+        timerMinutes: 8
       - instruction: מצננים.
         instructionEn: cooling
       - instruction: מורידים את חום התנור ל-150 מעלות.
@@ -122,6 +127,7 @@ steps:
         instructionEn: Place 5-6 Amaranth cherries on top.
       - instruction: אופים 8 דקות.
         instructionEn: Bake for 8 minutes.
+        timerMinutes: 8
       - instruction: מצננים.
         instructionEn: cooling
       - instruction: מנפים אבקת שקדים, אבקת סוכר וקורנפלור.
@@ -130,6 +136,7 @@ steps:
         instructionEn: >-
           In a mixer equipped with the whisk balloon, beat egg whites, color and sugar for 10 minutes, for a very stable
           meringue.
+        timerMinutes: 10
       - instruction: מקפלים את היבשים לתוך המרנג בתנועות מהירות ומעבדים בתנועות קיפול עד שהתערובת אחידה, חלקה ומבריקה.
         instructionEn: >-
           Fold the dry ingredients into the meringue with quick movements and process with folding movements until the
@@ -138,6 +145,7 @@ steps:
         instructionEn: Sprinkle the macaron mixture over the tarts, so that the mixture covers the entire filling.
       - instruction: אופים בחום של 150 מעלות כ-15-17 דקות.
         instructionEn: Bake at 150 degrees for about 15-17 minutes.
+        timerMinutes: 17
       - instruction: מצננים היטב.
         instructionEn: Cool well.
 tips: []

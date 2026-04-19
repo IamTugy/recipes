@@ -53,13 +53,17 @@ steps:
         instructionEn: Put all the dry dough ingredients into a mixer equipped with a kneading hook.
       - instruction: מפעילים על מהירות נמוכה ומסיפים את הנוזלים והביצים בהדרגה.
         instructionEn: Turn on low speed and add the liquids and eggs gradually.
-      - instruction: >-
-          ממשיכים כ-7 דקות. מוסיפים את קוביות החמאה ולשים עוד 3-4 דקות להטמעות מלאה של החמאה ולקבלת בצק רך אך לא דביק.
-          מכסים ומתפיחים להכפלת נפח, רצוי בקירור למשך 6 שעות.
+      - instruction: ממשיכים כ-7 דקות.
+        instructionEn: Continue for about 7 minutes.
+        timerMinutes: 7
+      - instruction: מוסיפים את קוביות החמאה ולשים עוד 3-4 דקות להטמעות מלאה של החמאה ולקבלת בצק רך אך לא דביק.
         instructionEn: >-
-          Continue for about 7 minutes. Add the cubes of butter and leave for another 3-4 minutes to fully absorb the
-          butter and to obtain a soft but not sticky dough. Cover and let rise until doubled in volume, preferably
-          refrigerated for 6 hours.
+          Add the cubes of butter and leave for another 3-4 minutes to fully absorb the butter and to obtain a soft but
+          not sticky dough.
+        timerMinutes: 4
+      - instruction: מכסים ומתפיחים להכפלת נפח, רצוי בקירור למשך 6 שעות.
+        instructionEn: Cover and let rise until doubled in volume, preferably refrigerated for 6 hours.
+        timerMinutes: 360
       - instruction: >-
           מחלקים את הבצק למנות במשקל 40 גרם, מכדררים לכדור מתוח וחלק ומניחים על ריבוע נייר אפייה המונח על תבנית, מכסים
           ומתפיחים עד הכפלת נפח.
@@ -72,6 +76,7 @@ steps:
         instructionEn: >-
           Heat oil for deep frying to a temperature of 150 degrees and fry for about 3 minutes on each side (pick up the
           puffed dough with baking paper and carefully turn it into the oil).
+        timerMinutes: 3
       - instruction: מעבירים לנייר סופג.
         instructionEn: Transfer to absorbent paper.
       - instruction: מצננים מעט וממלאים בקונפיטורה.

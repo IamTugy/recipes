@@ -18,8 +18,8 @@ ingredients:
     items:
       - amount: 2
         unit: ""
-        name: "תבניות 18 ס״מ"
-        nameEn: "two 18 cm pans"
+        name: תבניות 18 ס״מ
+        nameEn: two 18 cm pans
       - amount: 80
         unit: g
         name: חמאה
@@ -135,6 +135,7 @@ steps:
           Prepare a pecan and coconut base: heat the oven to 160 degrees and line an oven tray with baking paper. In a
           mixer with a guitar hook, process all the ingredients into a dough. Roll the dough into a rectangle about 3 mm
           thick and cool a little in the freezer. Bake the base for about 16 minutes until golden.
+        timerMinutes: 16
       - instruction: >-
           מיד כשמוציאים מהתנור קורצים 2 בסיסים בקוטר 16 ס"מ. מכינים דקואז פיסטוק: מגבירים את חום התנור ל-180 מעלות.
           מקציפים חלבונים עם סוכר אינברטי ומנפים את אבקת הסוכר, הקמח והפיסטוקים הטחונים. מקפלים את האבקות לתוך הקציפה
@@ -149,6 +150,7 @@ steps:
         instructionEn: >-
           Sprinkle the decoase over the crispy pecan bases and bake for about 15 minutes. Cool and release from the
           molds. Prepare the mousse: boil the fruit juices.
+        timerMinutes: 15
       - instruction: >-
           בקערה טורפים יחד חלמונים, סוכר וקורנפלור.יוצקים ממיץ הפירות הרותח אל תוך תערובת החלמונים בהדרגה, תוך כדי
           טריפה.
@@ -170,6 +172,7 @@ steps:
           Pour the mousse between the two molds (diameter 18). Place the baked cake bases on top of the mousse, pressing
           lightly, so that the cake base is adjusted to the height of the mousse. Freeze the cakes for at least 6 hours.
           Prepare glaze: boil passion fruit juice, water and sugar.
+        timerMinutes: 360
       - instruction: מסירים מהאש ומוסיפים שוקולד לבן וג'לטין.
         instructionEn: Remove from heat and add white chocolate and gelatin.
       - instruction: >-

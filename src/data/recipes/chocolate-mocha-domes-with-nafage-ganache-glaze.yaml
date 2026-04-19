@@ -100,6 +100,7 @@ steps:
         instructionEn: Sift all the dry ingredients into a bowl.
       - instruction: מקציפים חמאה וסוכר בקערת מיקסר עם וו גיטרה כ-3 דקות לתערובת חלקה ואווירירית.
         instructionEn: Beat butter and sugar in a mixer bowl with a guitar hook for about 3 minutes to a smooth and airy mixture.
+        timerMinutes: 3
       - instruction: מוסיפים ביצים בהדרגה ותוך כדי הקצפה.
         instructionEn: Add eggs gradually while whisking.
       - instruction: מנמיכים את מהירות המיקסר ומוסיפים שמנת חמוצה ושמנת מתוקה לסירוגין עם תערובת הקמח.
@@ -118,6 +119,7 @@ steps:
           sockets only, because the cake will shrink during baking
       - instruction: אופים כ-25-20 דקות עד שקיסם הננעץ במרכז העוגה יוצא עם פירורים לחים.
         instructionEn: Bake for about 20-25 minutes until a toothpick inserted in the center of the cake comes out with moist crumbs.
+        timerMinutes: 20
       - instruction: מצננים.
         instructionEn: cooling
       - instruction: מצפיםמעמידים רשת על תבנית גדולה.

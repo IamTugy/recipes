@@ -65,6 +65,7 @@ steps:
         instructionEn: >-
           Cut cookies from the dough with a diameter of 4 cm (you can give the dough a short freeze of 15 minutes before
           cutting).
+        timerMinutes: 15
       - instruction: >-
           מניחים על משטח אפייה (על מנת לקבל את דוגמת הטקסטורה היפה שיש על בסיס העוגיות, השתמשו במשטח אפייה ייעודי
           מסיליקון שחור הנקרא silpain).
@@ -73,4 +74,5 @@ steps:
           dedicated black silicone baking surface called silpain).
       - instruction: נועצים על כל עוגייה שקד מולבן.אופים כ-18 דקות ומצננים.
         instructionEn: Press on each cookie a blanched almond. Bake for about 18 minutes and cool.
+        timerMinutes: 18
 tips: []

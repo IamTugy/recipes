@@ -77,18 +77,23 @@ steps:
     items:
       - instruction: מכניסים לקערת המיקסר את כל מרכיבי הבצק, למעט החמאה, ולשים 5 דקות.
         instructionEn: Put all the dough ingredients except the butter into the mixer bowl and knead for 5 minutes.
+        timerMinutes: 5
       - instruction: מוסיפים את החמאה וממשיכים ללוש עוד 3 דקות.
         instructionEn: Add the butter and continue kneading for 3 more minutes.
-      - instruction: מעבירים לקערה ומתפיחים להכפלת נפח (שעה בטמפרטורת החדר ועוד לפחות 5 שעות בקירור).
-        instructionEn: >-
-          Transfer to a bowl and let rise until doubled (1 hour at room temperature then at least 5 hours in the
-          fridge).
+        timerMinutes: 3
+      - instruction: מעבירים לקערה ומתפיחים להכפלת נפח בטמפרטורת החדר (כשעה).
+        instructionEn: Transfer to a bowl and let rise until doubled at room temperature (about 1 hour).
+        timerMinutes: 60
+      - instruction: ממשיכים להתפחה בקירור לפחות 5 שעות.
+        instructionEn: Continue rising in the fridge for at least 5 hours.
+        timerMinutes: 300
       - instruction: "המילוי: מערבבים את כל החומרים ומצננים למרקם משחתי."
         instructionEn: "The filling: mix all the ingredients and cool to a paste texture."
       - instruction: מרדדים רבע מהבצק למלבן רחב ומורחים את המילוי.
         instructionEn: Roll out 1/4 of the dough into a wide rectangle and spread the filling.
       - instruction: אופים ב-180 מעלות כ-12 דקות.
         instructionEn: Bake at 180°C for about 12 minutes.
+        timerMinutes: 12
       - instruction: "הסירופ: מרתיחים יחד את הסוכר והמים. מזגגים את הרוגלעך מיד עם יציאתם מהתנור בסירופ החם."
         instructionEn: >-
           The syrup: boil the sugar and water together. Glaze the rolls immediately after they come out of the oven in

@@ -69,11 +69,13 @@ ingredients:
 steps:
   - title: ""
     items:
-      - instruction: >-
-          מערבבים את כל המרכיבים לעיסה חלקה, אחידה וגמישה, כ-3 דקותמכינים קציצות עגולות או מאורכות ומשהים כ-30 דקות
-          בקירור.צורבים על גריל פחמים או מחבת גריל לוהטת כ-2 דקות מכל צד ומגישים עם לימונים טריים.
-        instructionEn: >-
-          Mix all the ingredients into a smooth, uniform and flexible paste, about 3 minutes. Make round or oblong
-          meatballs and refrigerate for about 30 minutes. Burn on a charcoal grill or a hot grill pan for about 2
-          minutes on each side and serve with fresh lemons.
+      - instruction: מערבבים את כל המרכיבים לעיסה חלקה, אחידה וגמישה, כ-3 דקותמכינים קציצות עגולות או מאורכות
+        instructionEn: Mix all the ingredients into a smooth, uniform and flexible paste, about 3 minutes.
+        timerMinutes: 3
+      - instruction: ומשהים כ-30 דקות בקירור.
+        instructionEn: Make round or oblong meatballs and refrigerate for about 30 minutes.
+        timerMinutes: 30
+      - instruction: צורבים על גריל פחמים או מחבת גריל לוהטת כ-2 דקות מכל צד ומגישים עם לימונים טריים.
+        instructionEn: Burn on a charcoal grill or a hot grill pan for about 2 minutes on each side and serve with fresh lemons.
+        timerMinutes: 2
 tips: []

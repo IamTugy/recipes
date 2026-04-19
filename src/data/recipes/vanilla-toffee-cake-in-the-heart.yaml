@@ -80,13 +80,17 @@ steps:
           bring to a boil.
       - instruction: מבשלים תוך כדי ערבוב במשך 5-8 דקות, עד שמתקבלת תערובת סמיכה וריחנית.
         instructionEn: Cook while stirring for 5-8 minutes, until a thick and fragrant mixture is obtained.
+        timerMinutes: 8
       - instruction: >-
           מצננים את התערובת לטמפרטורת החדר. מחממים תנור ל-160 מעלות. מכינים את העוגה: במיקסר עם וו גיטרה מקציפים חמאה,
-          סוכר ווניל במשך 5 דקות במהירות גבוהה. מוסיפים את הביצים בהדרגה (ביצה אחת בכל פעם) ומקציפים 3 דקות נוספות.
+          סוכר ווניל במשך 5 דקות במהירות גבוהה.
         instructionEn: >-
           Cool the mixture to room temperature. Heat the oven to 160 degrees. Prepare the cake: in a mixer with a guitar
-          hook, beat butter, sugar and vanilla for 5 minutes at high speed. Add the eggs gradually (one egg at a time)
-          and beat for another 3 minutes.
+          hook, beat butter, sugar and vanilla for 5 minutes at high speed.
+        timerMinutes: 5
+      - instruction: מוסיפים את הביצים בהדרגה (ביצה אחת בכל פעם) ומקציפים 3 דקות נוספות.
+        instructionEn: Add the eggs gradually (one egg at a time) and beat for another 3 minutes.
+        timerMinutes: 3
       - instruction: >-
           מוסיפים לתוך התערובת שבמיקסר את הקמח והשמנת החמוצה לסירוגין וממשיכים לערבב רק עד שהתערובת חלקה. מחלקים את
           הבלילה לשני חלקים.
@@ -95,12 +99,15 @@ steps:
           mixture is smooth. Divide the batter into two parts.
       - instruction: >-
           מוסיפים את תערובת הטופי לחלק אחד ומערבבים היטב. מניחים את הבלילה בתבנית לסירוגין ובעזרת סכין יוצרים אפקט שיש.
-          אופים במשך כ-40-45 דקות, או עד שקיסם הננעץ בעוגה יוצא עם פירורים לחים. כשהעוגה מוכנה, מוציאים מהתנור ומצננים
-          בטמפרטורת החדר במשך 10 דקות.
+          אופים במשך כ-40-45 דקות, או עד שקיסם הננעץ בעוגה יוצא עם פירורים לחים.
         instructionEn: >-
           Add the toffee mixture to one part and mix well. Place the batter in the pan alternately and with a knife
           create a marble effect. Bake for about 40-45 minutes, or until a toothpick inserted into the cake comes out
-          with moist crumbs. When the cake is ready, remove from the oven and cool at room temperature for 10 minutes.
+          with moist crumbs.
+        timerMinutes: 45
+      - instruction: כשהעוגה מוכנה, מוציאים מהתנור ומצננים בטמפרטורת החדר במשך 10 דקות.
+        instructionEn: When the cake is ready, remove from the oven and cool at room temperature for 10 minutes.
+        timerMinutes: 10
       - instruction: הופכים את העוגה, מצננים על רשת לחלוטין ומקשטים באבקת סוכר.
         instructionEn: Turn the cake over, cool completely on a wire rack and decorate with powdered sugar.
 tips: []

@@ -83,6 +83,7 @@ steps:
           Repeat this operation with the remaining dough and filling. Transfer the roulades to a lined pan and mark
           cross-sections of the desired size on each roulade. Bake in an oven preheated to 170 degrees for about 25
           minutes.
+        timerMinutes: 25
       - instruction: >-
           מיד עם צאתן מהתנור, חתכים את הרולדות לעוגיות על בסיס הסימונים ומאבקים בנדיבות באבקת סוכר. מצננים היטב ומאחסנים
           בכלי אטום.

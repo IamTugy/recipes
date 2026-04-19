@@ -89,6 +89,7 @@ steps:
         instructionEn: Add spices and bring to a boil.
       - instruction: מנמיכים את הלהבה ומבשלים מכוסה 25 דקות בדיוק.
         instructionEn: Lower the flame and cook covered for exactly 25 minutes.
+        timerMinutes: 25
       - instruction: "מצננים היטב.מכינים את העוף: חוצים את חזה העוף לרוחב, כדי ליצור 2 משטחים דקים, וחותכים לרצועות בעובי 2 ס\"מ."
         instructionEn: >-
           Cool well. Prepare the chicken: cut the chicken breast across, to create 2 thin surfaces, and cut into strips
@@ -119,6 +120,7 @@ steps:
         instructionEn: >-
           In a separate vessel, mix breadcrumbs with dry herbs. Dip the rolls in beaten egg, coat with breadcrumbs and
           fry in the hot oil for about 3 minutes until deep golden.
+        timerMinutes: 3
       - instruction: מעבירים לנייר סופג.פורסים את הרולים למנות ומגישים לצד הרוטב.
         instructionEn: Transfer to absorbent paper. Slice the rolls into portions and serve alongside the sauce.
 tips: []

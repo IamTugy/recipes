@@ -171,6 +171,7 @@ steps:
           and grind to a uniform puree.
       - instruction: מעבירים לקערה, מוסיפים את העוף ופירורי הלחם, מערבבים היטב ומשהים ל1/2 שעה.
         instructionEn: Transfer to a bowl, add the chicken and bread crumbs, mix well and leave for 1/2 hour.
+        timerMinutes: 120
       - instruction: אם התערובת רכה מידי לאחר המנוחה ניתן להוסיף עוד מעט פירורי לחם.
         instructionEn: If the mixture is too soft after resting, you can add a little more breadcrumbs.
       - instruction: יוצרים מהתערובת כדורי במשקל 25 גרם.
@@ -181,6 +182,7 @@ steps:
         instructionEn: >-
           To serve - heat oil for deep frying, coat the chicken balls with the seed mixture and fry until golden for
           about 2 minutes.
+        timerMinutes: 2
       - instruction: מעבירים לנייר סופג.
         instructionEn: Transfer to absorbent paper.
       - instruction: מערבבים את החומרי הסלט עם הרוטב, עורמים על צלחת, מניחים מעל את כדורי העוף ומגישים מיד.

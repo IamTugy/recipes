@@ -120,10 +120,12 @@ steps:
         instructionEn: Hazelnut-coffee biscuit Grind all the ingredients in a food processor.
       - instruction: משטחים על משטח סיליקון משומן, עם שוליים ואופים בחום של 150 מעלות כ-15 דקות.
         instructionEn: Spread on a greased silicone surface, with edges and bake at 150 degrees for about 15 minutes.
+        timerMinutes: 15
       - instruction: לגוון בהיר.
         instructionEn: to a light shade.
       - instruction: קראמבלמאחדים את כל החומרים לתערובת פירורית ואופים בחום של 155 מעלות לכ-8 דקות.
         instructionEn: Crumble Combine all the ingredients into a crumbly mixture and bake at 155 degrees for about 8 minutes.
+        timerMinutes: 8
       - instruction: מצננים טוחנים ומסננים דרך נפה עבה.
         instructionEn: Cool, grind and filter through a thick sieve.
       - instruction: פריך קריספי משוחזר שוקולד מתיכים את השוקולד.
@@ -132,6 +134,7 @@ steps:
         instructionEn: Add the crumble crumbs and salt, mix and spread on the hot biscuit.
       - instruction: אופים בחום 155 מעלות 8 דקות.
         instructionEn: Bake at 155 degrees for 8 minutes.
+        timerMinutes: 8
       - instruction: מקפיאים.
         instructionEn: Freezers.
       - instruction: גנאשמחממים שמנת מתוקה ויוצקים מעל השוקולד.

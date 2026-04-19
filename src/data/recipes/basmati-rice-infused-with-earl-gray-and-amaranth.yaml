@@ -21,16 +21,17 @@ steps:
         instructionEn: In a wide pot, heat oil and fry the onion and crushed garlic until lightly golden.
       - instruction: מוסיפים את האורז והתבלינים ומטגנים 3-5 דקות, עד אשר האורז חם למגע.
         instructionEn: Add the rice and spices and fry for 3-5 minutes, until the rice is hot to the touch.
+        timerMinutes: 5
       - instruction: מוסיפים את הציר המתובל והרותח לאורז, מוסיפים גם את האמרטו, מביאים שוב לרתיחה, מתבלים ומכסים.
         instructionEn: >-
           Add the seasoned and boiling stock to the rice, add the amaretto as well, bring to a boil again, season and
           cover.
-      - instruction: >-
-          מנמיכים את הלהבה ומבשלים 18 דקות על להבה נמוכה מאוד. (יש להקפיד לא לפתוח את הסיר במהלך הבישול) מכבים את הלהבה
-          משאירים מכוסה 10 דקות.
-        instructionEn: >-
-          Lower the flame and cook for 18 minutes on a very low flame. (Make sure not to open the pot during cooking)
-          Turn off the flame and leave covered for 10 minutes.
+      - instruction: מנמיכים את הלהבה ומבשלים 18 דקות על להבה נמוכה מאוד.
+        instructionEn: Lower the flame and cook for 18 minutes on a very low flame.
+        timerMinutes: 18
+      - instruction: (יש להקפיד לא לפתוח את הסיר במהלך הבישול) מכבים את הלהבה משאירים מכוסה 10 דקות.
+        instructionEn: (Make sure not to open the pot during cooking) Turn off the flame and leave covered for 10 minutes.
+        timerMinutes: 10
       - instruction: פותחים את המכסה ומפזרים את התפוחים.
         instructionEn: Open the lid and scatter the apples.
       - instruction: מערבבים בעדינות בעזרת מזלג ומגישים עם נוגטין מעל.
@@ -39,6 +40,7 @@ steps:
         instructionEn: For nougatine - mix all the ingredients and spread on a baking tray lined with baking paper.
       - instruction: אופים כ-15-20 דקות ב-180 מעלות.
         instructionEn: Bake for about 15-20 minutes at 180 degrees.
+        timerMinutes: 20
       - instruction: מצננים ושוברים לפיסות קטנות.
         instructionEn: Cool and break into small pieces.
       - instruction: שומרים בקופסה אטומה.

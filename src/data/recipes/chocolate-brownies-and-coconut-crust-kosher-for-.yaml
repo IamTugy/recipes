@@ -19,8 +19,8 @@ ingredients:
     items:
       - amount: 0
         unit: ""
-        name: "תבנית 20x20 ס״מ"
-        nameEn: "20x20 cm baking pan"
+        name: תבנית 20x20 ס״מ
+        nameEn: 20x20 cm baking pan
       - amount: 50
         unit: g
         name: קמח לא גלוטן (׳קמח קונדיטור׳)קורט מלח
@@ -76,12 +76,14 @@ steps:
           melted chocolate and eggs and fold in the flour and coffee, until you get a smooth paste.
       - instruction: יוצקים את העיסה לתבנית ואופים 12 דקות.
         instructionEn: Pour the dough into the mold and bake for 12 minutes.
+        timerMinutes: 12
       - instruction: לשכבת הקוקוס- מערבבים את כל החומרים.מוציאים את התבנית מהתנור ובזריזות יוצקים מעליה את שכבת הקוקוס.
         instructionEn: >-
           For the coconut layer - mix all the ingredients. Remove the pan from the oven and quickly pour the coconut
           layer over it.
       - instruction: מחזירים לתנור לאפיה של עוד כ-20 דקות או עד הזהבה.
         instructionEn: Return to the oven to bake for another 20 minutes or until golden.
+        timerMinutes: 20
       - instruction: מצננים היטב וחותכים למנות.
         instructionEn: Cool well and cut into portions.
 tips: []

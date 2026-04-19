@@ -84,6 +84,7 @@ steps:
         instructionEn: Roll each dough into a rectangular sheet and spread the filling.
       - instruction: אופים 20 דקות עד הזהבה קלה.
         instructionEn: Bake for 20 minutes until lightly golden.
+        timerMinutes: 20
       - instruction: מוציאים מהתנור ומאבקים מיד באבקת סוכר. מצננים ומגישים.
         instructionEn: Remove from the oven and immediately dust with powdered sugar. Cool and serve.
 tips: []

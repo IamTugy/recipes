@@ -85,10 +85,12 @@ steps:
         instructionEn: >-
           The dough: put all the ingredients in the mixer bowl, put - 8-10 minutes, until the gluten window test -
           stretch a piece of dough with floured hands into a thin sheet that does not tear.
+        timerMinutes: 10
       - instruction: מעבירים לקערה משומנת, מכסים ביריעת ניילון נצמד ומתפיחים עד הכפלת הנפח.
         instructionEn: Transfer to a greased bowl, cover with cling film and let rise until doubled in volume.
       - instruction: ההרכבה:מחלקים את הבצק ל- 2 חלקים שווים ומניחים למנוחה של 20 דקות מכוסה.
         instructionEn: "Assembly: divide the dough into 2 equal parts and leave to rest covered for 20 minutes."
+        timerMinutes: 20
       - instruction: מרדדים כל עלה למלבן, מזלפים 'צינור' מהמילוי וסוגרים לגלילה הדוקה.
         instructionEn: Roll each leaf into a rectangle, sprinkle a 'tube' of the filling and close into a tight roll.
       - instruction: מניחים בתבנית מרופדת בנייר אפייה, מברישים בביצה טרופה ומעטרים בברס.
@@ -101,6 +103,7 @@ steps:
         instructionEn: >-
           Cover and let it rise until it swells to 80%. Bake for about 30 minutes in an oven preheated to 160 degrees.
           When you take the challah out of the oven, brush it immediately with the hot sugar syrup.
+        timerMinutes: 30
       - instruction: מגישים.
         instructionEn: serving
 tips: []

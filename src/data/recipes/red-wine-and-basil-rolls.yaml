@@ -60,6 +60,7 @@ steps:
           Leave for about 10 minutes. Transfer to a proofing bowl and let it rise until it doubles in volume, covered.
           Divide the dough into pieces weighing 60 grams. Form each portion into a smooth ball, flatten each ball and
           place on a baking sheet floured with cornmeal at equal intervals.
+        timerMinutes: 10
       - instruction: >-
           מכסים רופף בניילון נצמד ומתפיחים עד הכפלת הנפח.מחממים תנור לחום 200 מעלות.בעזרת מספרי מטבח, "גוזרים" כל לחמניה
           בצידיה בחמישה חתכים, כמעט עד למרכז, לצורת פרח.אופים עד הזהבה 18-20 דקות.
@@ -67,4 +68,5 @@ steps:
           Cover loosely with plastic wrap and let rise until doubled in volume. Heat oven to 200 degrees. Using kitchen
           scissors, "cut" each bun on its sides in five cuts, almost to the center, into a flower shape. Bake until
           golden, 18-20 minutes.
+        timerMinutes: 20
 tips: []

@@ -121,6 +121,7 @@ steps:
         instructionEn: >-
           Cook up to 110 degrees. Spread on a silicone surface, place another sheet of silicone on top and roll into a
           very thin sheet. Remove the top layer of silicone and bake at 180 degrees for 8-10 minutes.
+        timerMinutes: 10
       - instruction: "מצננים ושומרים בכלי אטום.להגשה: מוזגים מעט מרק מוקה, מניחים קוביית טראפלס ונועצים טוויל מעל."
         instructionEn: >-
           Cool and store in an airtight container. To serve: pour a little mocha soup, place a cube of truffles and

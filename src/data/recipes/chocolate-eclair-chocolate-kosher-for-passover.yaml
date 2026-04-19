@@ -89,6 +89,7 @@ steps:
         instructionEn: Remove from heat and add dark chocolate.
       - instruction: מערבבים היטב ומצננים ל-4 שעות.
         instructionEn: Mix well and refrigerate for 4 hours.
+        timerMinutes: 240
       - instruction: >-
           מכינים כך גם את קרם השוקולד הלבן, את קליפת התפוז מוסיפים לשמנת). מקציפים בזהירות את הקרמים למרקם יציב ומעבירים
           לשק זילוף.

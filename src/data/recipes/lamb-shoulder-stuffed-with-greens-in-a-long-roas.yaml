@@ -59,4 +59,5 @@ steps:
         instructionEn: Stir to fully season.
       - instruction: מכסים בצורה אטומה ומחזירים לצלייה איטית בחום של 150 מעלות ל-3.5 שעות לפחות.
         instructionEn: Cover tightly and return to slow roasting at 150 degrees for at least 3.5 hours.
+        timerMinutes: 300
 tips: []

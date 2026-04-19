@@ -72,6 +72,7 @@ steps:
           Wrap and refrigerate for three hours. For the filling - prepare antipasti: slice the vegetables thinly on a
           mandoline, season with salt, black pepper and olive oil and bake under a barbell (another pan above) at 220
           degrees for about 30 minutes.
+        timerMinutes: 30
       - instruction: >-
           מצננים.הרכבה- מרדדים את הבצק לעלה בעובי 1/2 ס"מ מורחים את תערובת הגבינה, מסדרים מעל את הירקות בצפיפות
           ומגלגלים.
@@ -85,4 +86,5 @@ steps:
           If necessary, cool or slightly freeze the roll before rolling out. Using a paring knife, slice the roll into
           20 pieces and place on a baking sheet lined with baking paper. Heat the oven to 170 degrees and bake for 30
           minutes or until golden.
+        timerMinutes: 30
 tips: []

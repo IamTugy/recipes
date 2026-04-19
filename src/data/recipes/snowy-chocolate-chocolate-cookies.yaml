@@ -66,16 +66,19 @@ steps:
         instructionEn: >-
           In a mixer fitted with a guitar hook, beat butter, sugars, salt and vanilla for about 5 minutes. Add eggs one
           by one.
+        timerMinutes: 5
       - instruction: מקציפים היטב.מנפים את החומרים היבשים ומוסיפים אל התערובת.
         instructionEn: Beat well. Sieve the dry ingredients and add to the mixture.
+      - instruction: בוחשים לאיחוד. מוסיפים שוקולד מריר ומערבלים. מעבירים את הבצק לקירור של 3 שעות.
+        instructionEn: Stir to combine. Add dark chocolate and mix. Refrigerate the dough for 3 hours.
+        timerMinutes: 180
       - instruction: >-
-          בוחשים לאיחוד. מוסיפים שוקולד מריר ומערבלים. מעבירים את הבצק לקירור של 3 שעות. קורצים מהבצק כדורים במשקל 15-20
-          גרם ומגלגלים באבקת סוכר לציפוי מלא. מניחים על מגש אפייה במרווחים. מחממים תנור לחום של 200 מעלות ואופים את
-          העוגיות 9 דקות.
+          קורצים מהבצק כדורים במשקל 15-20 גרם ומגלגלים באבקת סוכר לציפוי מלא. מניחים על מגש אפייה במרווחים. מחממים תנור
+          לחום של 200 מעלות ואופים את העוגיות 9 דקות.
         instructionEn: >-
-          Stir to combine. Add dark chocolate and mix. Refrigerate the dough for 3 hours. Pinch the dough into balls
-          weighing 15-20 grams and roll in powdered sugar for a full coating. Place on a baking tray in intervals. Heat
-          an oven to 200 degrees and bake the cookies for 9 minutes.
+          Pinch the dough into balls weighing 15-20 grams and roll in powdered sugar for a full coating. Place on a
+          baking tray in intervals. Heat an oven to 200 degrees and bake the cookies for 9 minutes.
+        timerMinutes: 9
       - instruction: >-
           העוגיות אמורות להישאר רכות בצאתן מהתנור.מניחים לעוגיות להצטנן לחלוטין על גבי מגשי האפייה ומעבירים לאיחסון בכלי
           אטום.

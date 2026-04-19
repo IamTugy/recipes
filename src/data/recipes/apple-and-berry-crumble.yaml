@@ -76,10 +76,12 @@ steps:
           processor.
       - instruction: מוסיפים סוכר וחמאה ומעבדים בפולסים לקבלת פירורים לחים.
         instructionEn: Add sugar and butter and process in pulses to obtain moist crumbs.
-      - instruction: >-
-          מקפיאים 10 דקות ומפזרים את הפירורים מעל הפירות.· מכניסים לאפיה בחום של 180 מעלות כ- 20 דקות או עד שהפירורים
-          מזהיבים.· מקשטים באבקת סוכר ותלולית קצפת.
-        instructionEn: >-
-          Freeze for 10 minutes and sprinkle the crumbs over the fruit. Put in the oven at 180 degrees for about 20
-          minutes or until the crumbs are golden. Decorate with powdered sugar and a mound of whipped cream.
+      - instruction: מקפיאים 10 דקות ומפזרים את הפירורים מעל הפירות.
+        instructionEn: Freeze for 10 minutes and sprinkle the crumbs over the fruit.
+        timerMinutes: 10
+      - instruction: · מכניסים לאפיה בחום של 180 מעלות כ- 20 דקות או עד שהפירורים מזהיבים.
+        instructionEn: Put in the oven at 180 degrees for about 20 minutes or until the crumbs are golden.
+        timerMinutes: 20
+      - instruction: · מקשטים באבקת סוכר ותלולית קצפת.
+        instructionEn: Decorate with powdered sugar and a mound of whipped cream.
 tips: []

@@ -71,17 +71,19 @@ steps:
         instructionEn: >-
           Filter and transfer the mixture to a pitcher. Heat an oven to 120 degrees. Arrange the serving cups on a
           baking tray and pour the filling into them, 2/3 of their height.
-      - instruction: >-
-          אופים 45-60 דקות לייצוב (התערובת תיראה מעט רוטטת- וזה בסדר).מצננים היטב (עדיף ל-6 שעות).לקראמבל- מניחים את
-          הקמח והאגוזים במעבד מזון וטוחנים לאבקה אחידה.
-        instructionEn: >-
-          Bake for 45-60 minutes to stabilize (the mixture will seem a little vibrating - which is fine). Cool well
-          (better for 6 hours). For the crumble - place the flour and nuts in a food processor and grind to a uniform
-          powder.
+      - instruction: אופים 45-60 דקות לייצוב (התערובת תיראה מעט רוטטת- וזה בסדר).
+        instructionEn: Bake for 45-60 minutes to stabilize (the mixture will seem a little vibrating - which is fine).
+        timerMinutes: 60
+      - instruction: מצננים היטב (עדיף ל-6 שעות).
+        instructionEn: Cool well (better for 6 hours).
+        timerMinutes: 360
+      - instruction: לקראמבל- מניחים את הקמח והאגוזים במעבד מזון וטוחנים לאבקה אחידה.
+        instructionEn: For the crumble - place the flour and nuts in a food processor and grind to a uniform powder.
       - instruction: מוסיפים חמאה וסוכר וטוחנים לקבלת פירורים.
         instructionEn: Add butter and sugar and grind to obtain crumbs.
       - instruction: אופים בחום של 180 מעלות 15-17 דקות.
         instructionEn: Bake at 180 degrees for 15-17 minutes.
+        timerMinutes: 17
       - instruction: מצננים וטוחנים.הרכבה- מפזרים על גבי הקרם מהקראמבל בשכבה אחידה ומזלפים מעל את הקצפת.
         instructionEn: >-
           Cool and grind. Assembly - sprinkle the cream from the crumble on top in an even layer and pour the whipped

@@ -19,8 +19,8 @@ ingredients:
     items:
       - amount: 0
         unit: ""
-        name: "תבנית 20x20 ס״מ"
-        nameEn: "20x20 cm baking pan"
+        name: תבנית 20x20 ס״מ
+        nameEn: 20x20 cm baking pan
       - amount: 300
         unit: g
         name: קמח
@@ -88,6 +88,7 @@ steps:
           Wrap each of them and refrigerate for an hour. Heat an oven to 180 degrees. Roll out 2/3 of the dough into a
           leaf that will cover the base of the mold and place it inside. Pierce the dough and bake it for 17 minutes,
           until golden. Take out and lower the oven heat to 150 degrees.
+        timerMinutes: 17
       - instruction: >-
           למילוי: בקערה רחבה מערבבים סוכר וביצים לתערובת אחידה. מוסיפים את שאר החומרים ומערבבים לתערובת אחידה. יוצקים אל
           תבנית האפייה, על הבצק האפוי, ומגררים/מפוררים את 1/3 הבצק הנותר מעל, לכיסוי מלא. מחזירים את העוגה לאפייה של 30
@@ -96,4 +97,5 @@ steps:
           For the filling: in a wide bowl, mix sugar and eggs to a uniform mixture. Add the rest of the ingredients and
           mix to a uniform mixture. Pour into the baking pan, on the baked dough, and grate/crumble the remaining 1/3 of
           the dough on top, to cover completely. Return the cake to bake for 30 minutes or to set. cooling
+        timerMinutes: 30
 tips: []

@@ -94,6 +94,7 @@ steps:
           Freezers. Cut the dough into circles with a diameter of 3-4 cm. If while working with the dough it warms up
           and softens, transfer to a quick cooling in the freezer. Place the cookies on baking sheets lined with paper,
           bake for about 8 minutes until they are firm and still very light in color.
+        timerMinutes: 8
       - instruction: >-
           מצננים.מזלפים ריבת חלב על מחצית מהעוגיות ומצמידים כל זוג ליצירת עוגיות סנדוויץ'.מורחים גם את שולי העוגייה.שמים
           את הקוקוס בקערה בינונית ומגלגלים כמו גלגל את השוליים הדביקים בתוך שבבי הקוקוס.

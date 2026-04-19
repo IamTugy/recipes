@@ -109,6 +109,7 @@ steps:
         instructionEn: >-
           Put in the oven and bake for 45-55 minutes or until a toothpick inserted into the cake comes out with crumbs
           on it.
+        timerMinutes: 55
       - instruction: מוציאים ומצננים.לציפוי- מתיכים את כל החומרים מעל באן מארי, מצננים לום גוף ומצפים את העוגה.
         instructionEn: >-
           Take out and cool. For the coating - melt all the ingredients over a bain-marie, cool slightly and cover the

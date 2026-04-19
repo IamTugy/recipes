@@ -19,8 +19,8 @@ ingredients:
     items:
       - amount: 2
         unit: ""
-        name: "תבניות מאפינס 6x24 ס״מ"
-        nameEn: "two 6x24 cm muffin trays"
+        name: תבניות מאפינס 6x24 ס״מ
+        nameEn: two 6x24 cm muffin trays
       - amount: 60
         unit: g
         name: ביצים
@@ -106,6 +106,7 @@ steps:
         instructionEn: For muffins - heat the oven to 165 degrees.
       - instruction: במיקסר מצויד בבלון הקצפה מקציפים 5 דקות ביצים, סוכר ווניל.
         instructionEn: In a mixer fitted with a whisk, beat eggs, sugar and vanilla for 5 minutes.
+        timerMinutes: 5
       - instruction: מוסיפים בזרם דק את השמן.
         instructionEn: Add the oil in a thin stream.
       - instruction: מנפים את החומרים היבשים ומוסיפים אל התערובת לסירוגין עם הנוזלים.
@@ -114,6 +115,7 @@ steps:
         instructionEn: >-
           Transfer to greased muffin tins and bake for 20 minutes, until a toothpick inserted into the cake comes out
           with moist crumbs.
+        timerMinutes: 20
       - instruction: מצננים.לקרמו- מרתיחים שמנת מתוקה ומחית פרי.
         instructionEn: Cool. For cream - boil sweet cream and fruit puree.
       - instruction: בנפרד טורפים חלמונים וסוכר.

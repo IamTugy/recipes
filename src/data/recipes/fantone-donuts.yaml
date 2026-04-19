@@ -64,13 +64,17 @@ steps:
           Prepare the dough: Dissolve the yeast in the milk in a bowl and let it ferment for 30 minutes (create a quick
           dough head to speed up the yeast culture in the dough). Sift flour into the mixer bowl, add the zests and
           vanilla and mix while adding the milk mixture and the fermented yeast.
-      - instruction: >-
-          לשים במשך כ-5 דקות.מוסיפים את החמאה בהדרגה ולשים במשך כ-2 דקות.מוסיפים את הפירות המסוכרים ולשים עד שהם נטמעים
-          בתערובת.מעבירים את הבצק לקערה ומתפיחים עד להכפלת נפח.
+        timerMinutes: 30
+      - instruction: לשים במשך כ-5 דקות.
+        instructionEn: Put for about 5 minutes.
+        timerMinutes: 5
+      - instruction: מוסיפים את החמאה בהדרגה ולשים במשך כ-2 דקות.
+        instructionEn: Add the butter gradually and put for about 2 minutes.
+        timerMinutes: 2
+      - instruction: מוסיפים את הפירות המסוכרים ולשים עד שהם נטמעים בתערובת.מעבירים את הבצק לקערה ומתפיחים עד להכפלת נפח.
         instructionEn: >-
-          Put for about 5 minutes. Add the butter gradually and put for about 2 minutes. Add the candied fruits and put
-          until they are absorbed in the mixture. Transfer the dough to a bowl and let it rise until it doubles in
-          volume.
+          Add the candied fruits and put until they are absorbed in the mixture. Transfer the dough to a bowl and let it
+          rise until it doubles in volume.
       - instruction: >-
           מעבירים לקירור של 6 שעות במקרר (אפשר לילה). מחלקים את הבצק הקר לחתיכות במשקל 50 גרם ומכדררים לכדורים עגולים
           ומתוחים. מניחים כל כדור בצק על ריבוע נייר אפייה גזור לגודל מעט יותר מגודל הסופגניה. מכסים ומניחים להתפחה ל-80%
@@ -80,6 +84,7 @@ steps:
           weighing 50 grams and roll into round, stretched balls. Place each ball of dough on a square of baking paper
           cut to a size slightly larger than the size of the doughnut. Cover and let rise to 80% of the original donut
           volume.
+        timerMinutes: 360
       - instruction: >-
           מחממים שמן לטיגון עמוק לחום של 150 מעלות (מאוד מומלץ להיעזר במד חום). מרימים את הסופגניה עם נייר האפייה שצמוד
           לבסיסה ומניחים בעדינות בתוך השמן החם והופכים, כך שכיפתה בתוך השמן. מטגנים במשך 3 דקות והופכים לצידה השני
@@ -89,6 +94,7 @@ steps:
           the donut with the baking paper attached to its base and gently place it in the hot oil and turn it over so
           that its dome is in the oil. Fry for 3 minutes and turn to the other side for similar frying and deep golden
           brown.
+        timerMinutes: 3
       - instruction: מעבירים לנייר סופג.
         instructionEn: Transfer to absorbent paper.
       - instruction: "מכינים סוכר וניל: טוחנים את הסוכר והמקל לתערובת אחידה."

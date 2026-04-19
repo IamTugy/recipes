@@ -57,6 +57,7 @@ steps:
           cookies.
       - instruction: אופים בחום של 150 מעלות ל-22 דקות עד הזהבה עדינה ומצננים.
         instructionEn: Bake at 150°C for 22 minutes until lightly golden. Cool.
+        timerMinutes: 22
       - instruction: מצמידים כל זוג עוגיות עם פרלינה, כך שחלקה העליון של העוגייה מחורר.
         instructionEn: Attach each pair of cookies with praline, perforated side up.
       - instruction: מאבקים קלות באבקת סוכר.

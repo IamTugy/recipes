@@ -61,6 +61,7 @@ steps:
           In a mixer equipped with a kneading hook, add all the dry ingredients, except the water, the eggs and the
           dried fruits and mix. Gradually add the eggs and liquids and continue kneading at medium speed for 8-10
           minutes.
+        timerMinutes: 10
       - instruction: הבצק המתקבל אמור להיות רך מאוד ולא דביק (לבצק יש נטייה לספוג הרבה קמח, לא להתפתות ולקמח יותר מדי!).
         instructionEn: >-
           The resulting dough should be very soft and not sticky (the dough has a tendency to absorb a lot of flour,
@@ -79,4 +80,5 @@ steps:
           Place on oven trays lined with baking paper, cover and rise again to 80% of the original volume. Bake for
           about 30 minutes and cool well. At the end of baking, you can brush the loaves with soft butter and roll in
           sugar.
+        timerMinutes: 30
 tips: []

@@ -87,10 +87,12 @@ steps:
         instructionEn: Add rice and spices and fry for about five minutes. Separately, boil stock and add to the rice.
       - instruction: מתבלים ומכסים.מעבירים לתנור שחומם מראש ל-180 מעלות ואופים 22 דקות.
         instructionEn: Season and cover. Transfer to an oven preheated to 180 degrees and bake for 22 minutes.
+        timerMinutes: 22
       - instruction: מוציאים מהתנור ומניחים מכוסה לעוד 10 דקות.לפני ההגשה, מוסיפים בצל ירוק, פירות מיובשים ומערבבים בעדינות.
         instructionEn: >-
           Remove from the oven and leave covered for another 10 minutes. Before serving, add green onions, dried fruits
           and mix gently.
+        timerMinutes: 10
       - instruction: מגישים מיד.
         instructionEn: Serve immediately.
 tips: []

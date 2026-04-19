@@ -87,10 +87,13 @@ steps:
         instructionEn: For rice - heat oil and fry onion and garlic.
       - instruction: מוסיפים את האורז והתבלינים ומטגנים 5 דקות.
         instructionEn: Add the rice and spices and fry for 5 minutes.
+        timerMinutes: 5
       - instruction: מוסיפים ציר רותח ומבשלים מכוסה על להבה נמוכה מאוד 18 דקות.
         instructionEn: Add boiling stock and cook covered on a very low flame for 18 minutes.
+        timerMinutes: 18
       - instruction: מכבים את הלהבה וממתינים עןד 10 דקות.
         instructionEn: Turn off the flame and wait for 10 minutes.
+        timerMinutes: 10
       - instruction: פותחים ומאוורירים את האורז.לפיצוחים- במחבת מבשלים מים וסוכר לטמפ' של 115 מעלות.
         instructionEn: Open and ventilate the rice. For cracking - in a pan, boil water and sugar to a temperature of 115 degrees.
       - instruction: מוסיפים את האגוזים ומערבבים עד לקבלת ׳חול׳- מצב בו הסוכר מתגבש על גבי הפיצוחים.

@@ -93,6 +93,7 @@ steps:
         instructionEn: Draw circles, sprinkle with the filling and fold into the shape of a manna ear.
       - instruction: מעבירים לתבנית מרופדת בנייר אפייה ואופים כ-15-20 דקות עד להזהבה קלה.
         instructionEn: Transfer to a pan lined with baking paper and bake for about 15-20 minutes until lightly golden.
+        timerMinutes: 20
       - instruction: מוציאיםמהתנור, מצננים ומאבקים באבקת סוכר.
         instructionEn: Remove from the oven, cool and dust with powdered sugar.
 tips: []

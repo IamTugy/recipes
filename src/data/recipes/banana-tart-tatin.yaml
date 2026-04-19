@@ -60,8 +60,12 @@ steps:
         instructionEn: Pour the water. Heat the oven to 160 degrees. Roll the dough into a sheet 1/2 cm thick and 26 cm in diameter.
       - instruction: מניחים מעל וטוחבים את השוליים פנימה.
         instructionEn: Place on top and tuck the edges in.
-      - instruction: מבשלים את התכולה מעל להבה בינוינת 10 דקות ומעבירים לתנור לאפייה של 35 דקות.מצננים מעט והופכים על צלחת הגשה.
-        instructionEn: >-
-          Cook the contents over a moderate flame for 10 minutes and transfer to the oven to bake for 35 minutes. Cool
-          slightly and invert onto a serving plate.
+      - instruction: מבשלים את התכולה מעל להבה בינוינת 10 דקות
+        instructionEn: Cook the contents over a moderate flame for 10 minutes
+        timerMinutes: 10
+      - instruction: ומעבירים לתנור לאפייה של 35 דקות.
+        instructionEn: and transfer to the oven to bake for 35 minutes.
+        timerMinutes: 35
+      - instruction: מצננים מעט והופכים על צלחת הגשה.
+        instructionEn: Cool slightly and invert onto a serving plate.
 tips: []

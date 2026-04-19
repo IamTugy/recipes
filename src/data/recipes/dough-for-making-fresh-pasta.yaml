@@ -63,4 +63,5 @@ steps:
         instructionEn: >-
           Cut. Cook fresh pasta in boiling salted water for 2-3 minutes, according to the following ratio: 1 liter of
           water - 100 grams of pasta - 1 teaspoon of salt.
+        timerMinutes: 3
 tips: []

@@ -82,10 +82,14 @@ steps:
         instructionEn: >-
           Cool the filling. Transfer the dough to a piping bag with a sultan nozzle (a tube designed for piping dough
           rings) and pour onto a baking sheet lined with baking paper.
-      - instruction: >-
-          מקפיאים ל-10 דקות.מניחים מעט מתערובת המילוי במרכז כל טבעת בצק.מחממים תנור לחום של 180 מעלות ואופים 12
-          דקות.מצננים היטב על מגש האפייה ומעבירים לכלי אטום.
+      - instruction: מקפיאים ל-10 דקות.
+        instructionEn: Freeze for 10 minutes.
+        timerMinutes: 10
+      - instruction: מניחים מעט מתערובת המילוי במרכז כל טבעת בצק.מחממים תנור לחום של 180 מעלות ואופים 12 דקות.
         instructionEn: >-
-          Freeze for 10 minutes. Place a little of the filling mixture in the center of each dough ring. Heat the oven
-          to 180 degrees and bake for 12 minutes. Cool well on the baking tray and transfer to an airtight container.
+          Place a little of the filling mixture in the center of each dough ring. Heat the oven to 180 degrees and bake
+          for 12 minutes.
+        timerMinutes: 12
+      - instruction: מצננים היטב על מגש האפייה ומעבירים לכלי אטום.
+        instructionEn: Cool well on the baking tray and transfer to an airtight container.
 tips: []

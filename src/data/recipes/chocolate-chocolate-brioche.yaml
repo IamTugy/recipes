@@ -52,19 +52,25 @@ steps:
   - title: ""
     items:
       - instruction: >-
-          להכנת הבצק (6 שעות קודם) במערבל מצויד בוו גיטרה מניחים את כל מרכיבי הבצק למעט החמאה, ולשים לבצק אחיד ודביק,
-          כ-5 דקות.מוסיפים את החמאה בחתיכות קטנות, תוך לישה.
+          להכנת הבצק (6 שעות קודם) במערבל מצויד בוו גיטרה מניחים את כל מרכיבי הבצק למעט החמאה, ולשים לבצק אחיד ודביק, כ-5
+          דקות.
         instructionEn: >-
           To prepare the dough (6 hours before), in a mixer equipped with a guitar hook, place all the ingredients of
-          the dough except for the butter, and knead for a uniform and sticky dough, about 5 minutes. Add the butter in
-          small pieces, while kneading.
-      - instruction: >-
-          לשים לאיחוד ואיסוף, עוד כ-5 דקות ומוסיפים שוקולד קצוץ. מעבירים לקערה מכוסה ומתפיחים כשעה בטמפרטורת החד
-          ומעבירים להתפחה של 6 שעות בקירור. מחלקים את הבצק למנות במשקל של 60 גרם ומעצבים לכדור חלק.
-        instructionEn: >-
-          Put to combine and collect, another 5 minutes and add chopped chocolate. Transfer to a covered bowl and leave
-          to rise for about an hour at the sharp temperature and leave to rise for 6 hours in the refrigerator. Divide
-          the dough into portions weighing 60 grams and form into a smooth ball.
+          the dough except for the butter, and knead for a uniform and sticky dough, about 5 minutes.
+        timerMinutes: 5
+      - instruction: מוסיפים את החמאה בחתיכות קטנות, תוך לישה.
+        instructionEn: Add the butter in small pieces, while kneading.
+      - instruction: לשים לאיחוד ואיסוף, עוד כ-5 דקות ומוסיפים שוקולד קצוץ.
+        instructionEn: Put to combine and collect, another 5 minutes and add chopped chocolate.
+        timerMinutes: 5
+      - instruction: מעבירים לקערה מכוסה ומתפיחים כשעה בטמפרטורת החדר.
+        instructionEn: Transfer to a covered bowl and leave to rise for about an hour at room temperature.
+        timerMinutes: 60
+      - instruction: מעבירים להתפחה של 6 שעות בקירור.
+        instructionEn: Transfer to rise for 6 hours in the refrigerator.
+        timerMinutes: 360
+      - instruction: מחלקים את הבצק למנות במשקל של 60 גרם ומעצבים לכדור חלק.
+        instructionEn: Divide the dough into portions weighing 60 grams and form into a smooth ball.
       - instruction: >-
           מניחים בתבניות שקעים, מכסים ומניחים להתפחה עד3/4 מנפח המאפה המקורי. מברישים את הבריוש בביצה טרופה ומפזרים סוכר
           גבישי ופולי קקאו גרוס. אופים בתנור שחומם מראש ל-180 מעלות כ-17 דקות.
@@ -72,4 +78,5 @@ steps:
           Place in hollow molds, cover and allow to rise to 3/4 of the original pastry volume. Brush the brioche with
           beaten egg and sprinkle with granulated sugar and ground cocoa beans. Bake in an oven preheated to 180 degrees
           for about 17 minutes.
+        timerMinutes: 17
 tips: []

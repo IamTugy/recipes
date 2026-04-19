@@ -76,8 +76,10 @@ steps:
           coarse salt.
       - instruction: אופים כ-40 דקות או על למידת העשייה הרצויה.
         instructionEn: Bake for about 40 minutes or until desired doneness.
+        timerMinutes: 40
       - instruction: מוציאים מהתנור ומניחים ל-15 דקות לפחות לפני הפריסה.מגישים בליווי רוטב יין אדום ותפוחי אדמה אפויים.
         instructionEn: >-
           Remove from the oven and leave for at least 15 minutes before serving. Serve with red wine sauce and baked
           potatoes.
+        timerMinutes: 15
 tips: []

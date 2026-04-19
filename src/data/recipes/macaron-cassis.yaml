@@ -61,6 +61,7 @@ steps:
           Sieve well. Heat an oven to 140 degrees. In a mixer equipped with the whisk balloon, beat egg whites, color
           and sugar for 10 minutes, for a very stable meringue. Fold the dry ingredients into the meringue with quick
           movements and process with folding movements until the mixture is uniform, smooth and shiny.
+        timerMinutes: 10
       - instruction: >-
           מעבירים את התערובת לשק זילוף מצויד בצנתר חלק מספר 8 ומזלפים כדורים בקוטר 3-4 ס"מ. אופים את המקארון 20 דקות,
           מצננים. במידה ובחורים להשתמש בצבע המטאלי, מאבקים אותו עם מברשת יבשה על גבי המקארון עכשיו. למילוי: ממיסים את
@@ -69,6 +70,7 @@ steps:
           Transfer the mixture to a piping bag equipped with a smooth nozzle number 8 and sprinkle balls with a diameter
           of 3-4 cm. Bake the macaron for 20 minutes, cool. If you choose to use the metallic color, dust it with a dry
           brush on top of the macaron now. For the filling: melt the ingredients over a bain marie.
+        timerMinutes: 20
       - instruction: >-
           מצננים 6 שעות בקירור. הרכבה: מעבירים את הגנאש למיקסר מצויד בוו גיטרה ומקציפים קלות למרקם גמיש. מעבירים לשק
           זילוף וממלאים את המקארון. שומרים בקירור או במקפיא.
@@ -76,4 +78,5 @@ steps:
           Cool for 6 hours in the refrigerator. Assembly: transfer the ganache to a mixer equipped with a guitar hook
           and whip lightly to a flexible texture. Transfer to a piping bag and fill the macaron. Keep refrigerated or in
           the freezer.
+        timerMinutes: 360
 tips: []

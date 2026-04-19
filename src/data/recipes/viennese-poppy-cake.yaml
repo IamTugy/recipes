@@ -96,6 +96,7 @@ steps:
         instructionEn: >-
           Assembly, baking and serving: spread the poppy filling on top of the dough base and sprinkle the dough crumbs
           evenly over it. Heat the oven to 170 degrees and bake the cake for 35-40 minutes, until golden.
+        timerMinutes: 40
       - instruction: מצננים ומאבקים באבקת סוכר.
         instructionEn: Cool and dust with powdered sugar.
 tips: []

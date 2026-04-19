@@ -110,8 +110,12 @@ steps:
   - items:
       - instruction: בסיר גדול מחממים שמן ומטגנים בצל, שום, כרישה ושורשים עד להזהבה.
         instructionEn: In a large pot, heat oil and sauté onion, garlic, leek and roots until golden.
-      - instruction: מוסיפים תבלינים, מערבבים ומטגנים 3 דקות. מוסיפים עגבניות ומבשלים 2 דקות.
-        instructionEn: Add spices, stir and fry for 3 minutes. Add tomatoes and cook 2 more minutes.
+      - instruction: מוסיפים תבלינים, מערבבים ומטגנים 3 דקות.
+        instructionEn: Add spices, stir and fry for 3 minutes.
+        timerMinutes: 3
+      - instruction: מוסיפים עגבניות ומבשלים 2 דקות.
+        instructionEn: Add tomatoes and cook 2 more minutes.
+        timerMinutes: 2
       - instruction: מוסיפים חומוס, עדשים, מים ותפוח אדמה - מביאים לרתיחה. מבשלים על להבה נמוכה כ-30 דקות.
         instructionEn: Add chickpeas, lentils, water and potato - bring to a boil. Simmer on low heat for about 30 minutes.
         timerMinutes: 30

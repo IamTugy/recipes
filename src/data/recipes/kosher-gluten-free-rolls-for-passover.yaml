@@ -83,12 +83,14 @@ steps:
           Add the eggs, flour and yeast. Continue kneading for about 3 minutes until the ingredients are incorporated
           and until you get a uniform and slightly sticky dough. Oil the dough and transfer to a greased bowl to rise
           until doubled in volume. Divide the dough into portions weighing 60-80 grams and shape the shape of the buns.
+        timerMinutes: 3
       - instruction: מניחים על מגש אפייה, מברישים בביצה טרופה ומפזרים שומשום.
         instructionEn: Place on a baking tray, brush with beaten egg and sprinkle with sesame seeds.
       - instruction: מכסים ומניחים להתפחה של 80% מנפח הבצק המקורי.מחממים תנור לחום של 200 מעלות ואופים 18-20 דקות להזהבה.
         instructionEn: >-
           Cover and let rise to 80% of the original dough volume. Heat the oven to 200 degrees and bake for 18-20
           minutes until golden.
+        timerMinutes: 20
       - instruction: מצננים ואורזים היטב בניילון.
         instructionEn: Cool and wrap well in plastic.
 tips: []

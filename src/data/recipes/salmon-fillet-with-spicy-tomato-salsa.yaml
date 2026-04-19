@@ -55,10 +55,13 @@ steps:
         instructionEn: Season with salt and pepper.
       - instruction: מערבבים את כל חומרי הסלסה ומשהים ל-1/2 שעה.
         instructionEn: Mix all the salsa ingredients and leave for 1/2 hour.
+        timerMinutes: 120
       - instruction: צורבים את הפילה על מחבת משומנת קלות מצד העור בלבד למשך 2-3 דקות.
         instructionEn: Sear the fillet on a lightly oiled pan on the skin side only for 2-3 minutes.
+        timerMinutes: 3
       - instruction: מעבירים לתנור וצולים בחום של 200 מעלות למשך 6 דקות.
         instructionEn: Transfer to the oven and roast at 200 degrees for 6 minutes.
+        timerMinutes: 6
       - instruction: מגישים מיד על מצע הסלסה.
         instructionEn: Serve immediately on top of the salsa.
 tips: []

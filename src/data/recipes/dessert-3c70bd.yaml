@@ -94,6 +94,7 @@ steps:
           ball and pour the rest of the mixture on top, so that it reaches 2/3 of the height of the herring.
       - instruction: אופים כ-30-40 דקות בחום של 130 מעלות להתייצבות.
         instructionEn: Bake for about 30-40 minutes at 130 degrees to stabilize.
+        timerMinutes: 40
       - instruction: מצננים היטב ומגישים עם כדור טראפל'ס נוסף מעל.
         instructionEn: Cool well and serve with another truffle ball on top.
 tips: []

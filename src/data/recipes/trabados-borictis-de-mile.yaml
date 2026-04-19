@@ -85,6 +85,7 @@ steps:
         instructionEn: For the filling, mix all the ingredients into a thick doughy mixture.
       - instruction: לסירופמביאים את כל החומרים לרתיחה ומבשלים 5 דקות.
         instructionEn: Bring all the ingredients to a boil and cook for 5 minutes.
+        timerMinutes: 5
       - instruction: מחממים את התנור לחום של 170 מעלות.
         instructionEn: Heat the oven to 170 degrees.
       - instruction: >-
@@ -96,6 +97,7 @@ steps:
           circles with a diameter of 6-8 cm and place a heaping spoonful of the filling on top of each one. Close into a
           half-moon shape and tighten the edges well. Place on a baking sheet lined with baking paper and bake for 1/2
           hour, until golden.
+        timerMinutes: 120
       - instruction: >-
           מצננים.מביאים את הסירופ לרתיחה ומניחים בכל פעם כ-10 בורקיטס לבישול קצר של דקה.מעבירים לקופסא ויוצקים את שארית
           הסירופ מעל.שומרים ומגישים בטמפרטורת החדר עד כ-10 ימים.

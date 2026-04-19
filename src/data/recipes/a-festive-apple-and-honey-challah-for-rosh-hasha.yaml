@@ -86,6 +86,7 @@ steps:
           liquids and oil.
       - instruction: לשים 10 דקות.
         instructionEn: put 10 minutes.
+        timerMinutes: 10
       - instruction: >-
           מעבירים לקערה ומתפיחים להכפלת נפח.המילוי: מערבבים את כל החומרים לתערובת אחידה.הכנת העיטור: מניחים את חומרי
           הסירופ בסיר ומרתיחים.
@@ -107,6 +108,7 @@ steps:
           Wrap them and set aside for 15 minutes. Roll each ball of dough into a rectangular sheet. Place 1/3 of the
           filling along the rectangle and roll into a sausage, a tight and dense roll. After filling all the parts of
           the dough, braid the sausages.
+        timerMinutes: 15
       - instruction: >-
           מניחים על הצמה, בצורה אקראית, את פרוסות התפוחים המסוכרות (שומרים את הסירופ לזיגוג). מניחים את החלה על מגש
           מרופד בנייר אפייה, כאשר היא מכוסה באופן רופף עם ניילון נצמד, להתפחה כמעט כפולה. מברישים את החלה בביצה טרופה.
@@ -115,4 +117,5 @@ steps:
           Place the candied apple slices randomly on the braid (save the syrup for the glaze). Place the challah on a
           tray lined with baking paper, when it is loosely covered with plastic wrap, to rise almost double. Brush the
           challah with a beaten egg. Bake at 180 degrees for about 35 minutes.
+        timerMinutes: 35
 tips: []

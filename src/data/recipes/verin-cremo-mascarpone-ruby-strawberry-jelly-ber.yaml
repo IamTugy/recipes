@@ -135,6 +135,7 @@ steps:
         instructionEn: Add dry for easy mixing.
       - instruction: מניחים כמות של כפית מהתערובת בתבנית שקעים מסיליקון ואופים 8-10 דקות.
         instructionEn: Place a teaspoonful of the mixture in a silicone mold and bake for 8-10 minutes.
+        timerMinutes: 10
       - instruction: מצננים ומשחררים.
         instructionEn: Cool and release.
       - instruction: מניחים על נייר סופג.

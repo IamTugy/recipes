@@ -124,14 +124,18 @@ steps:
           Chickpeas: cut the chickpea into cubes, mix all the ingredients into a mixture, soak the chickpeas and
           refrigerate. impale on skewers (3 cubes per portion). Before serving, grill the skewer for about 2 minutes on
           each side. Quinoa: heat olive oil in a pot and fry the onion and garlic in it.
+        timerMinutes: 2
       - instruction: מוסיפים את הקינואה ומטגנים 5 דקות.
         instructionEn: Add the quinoa and fry for 5 minutes.
+        timerMinutes: 5
       - instruction: מוסיפים את המים הרותחים, מתבלים ומנמיכים את הלהבה.
         instructionEn: Add the boiling water, season and lower the flame.
       - instruction: מבשלים כ-30 דקות או עד שכל המים נספגים.
         instructionEn: Cook for about 30 minutes or until all the water is absorbed.
+        timerMinutes: 30
       - instruction: מכבים את האש ומניחים לסיר לעמוד כ-15 דקות.
         instructionEn: Turn off the heat and let the pot stand for about 15 minutes.
+        timerMinutes: 15
       - instruction: "מעבירים לכלי שטוח ומצננים.סלט: מערבבים את הקינואה עם כל המרכיבים."
         instructionEn: "Transfer to a flat dish and cool. Salad: Mix the quinoa with all the ingredients."
       - instruction: "מתקנים תיבול.להגשה: עורמים מסלט הקינואה ומניחים מעל את השיפוד הצלוי."

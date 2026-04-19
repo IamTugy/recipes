@@ -66,12 +66,14 @@ steps:
         instructionEn: >-
           Add the nuts and dried fruits, and mix to a uniform mixture. Transfer to an English cake pan lined with baking
           paper or to a 8x20 cm baking frame, and bake for about 30 minutes.
+        timerMinutes: 30
       - instruction: >-
           מצננים ומשחררים מהתבנית.פורסים את הכיכרות לפרוסות דקות מאוד ומכניסים שוב לתנור לייבוש עוד 30 דקות בחום נמוך של
           120 מעלות.
         instructionEn: >-
           Cool and release from the mold. Slice the loaves into very thin slices and put them back in the oven to dry
           for another 30 minutes at a low temperature of 120 degrees.
+        timerMinutes: 30
       - instruction: מצננים.
         instructionEn: cooling
 tips: []

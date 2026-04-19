@@ -43,4 +43,5 @@ steps:
         instructionEn: Freeze. Tear the dough into circles or cut into squares and place on a tray lined with baking paper.
       - instruction: אופים 17-22 דקות בחום של 170 מעלות.מגישים בעודם חמים.
         instructionEn: Bake for 17-22 minutes at 170 degrees. Serve while still hot.
+        timerMinutes: 22
 tips: []

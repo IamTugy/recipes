@@ -71,12 +71,14 @@ steps:
           diameter of the rice sheet.
       - instruction: טובלים דף אורז בבלילה למשך 15 שניות, לריכוך חלקי, ומעבירים למשטח העבודה.
         instructionEn: Dip a sheet of rice in the batter for 15 seconds, to partially soften, and transfer to the work surface.
+        timerMinutes: 1
       - instruction: >-
           ממתינים עוד 10 שניות, לריכוך נוסף, מניחים כף מהמילוי במרכז ומקפלים לצורת מעטפה מרובעת, אותה מקפלים חצי,
           למשולש.
         instructionEn: >-
           Wait another 10 seconds, for additional softening, place a spoonful of the filling in the center and fold it
           into a square envelope, which you fold in half, into a triangle.
+        timerMinutes: 1
       - instruction: מעבירים לתבנית אפייה מרופדת.
         instructionEn: Transfer to a lined baking tray.
       - instruction: חוזרים על פעולה זו עם כל יתרת דפי האורז והמילוי.
@@ -85,6 +87,7 @@ steps:
         instructionEn: Spread each burek with the remaining batter and sprinkle with sesame seeds.
       - instruction: אופים בחום של 190 מעלות כ-25 דקות, להזהבה עמוקה.
         instructionEn: Bake at 190 degrees for about 25 minutes, until deep golden.
+        timerMinutes: 25
       - instruction: מגישים חם.
         instructionEn: Serve hot.
 tips: []

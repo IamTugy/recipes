@@ -123,8 +123,10 @@ steps:
         instructionEn: >-
           Place a sheet of cling film or baking paper, place a weight on top (legumes for example) and bake at 160
           degrees for 20 minutes.
+        timerMinutes: 20
       - instruction: מסירים את המשקולת ואופים עוד 8 דקות.
         instructionEn: Remove the dumbbell and bake for another 8 minutes.
+        timerMinutes: 8
       - instruction: מצננים.לשכבת הגנאש- מרתיחים שמנת מתוקה וגלוקוזה ויוצקים אל השוקולד.
         instructionEn: Cool. For the ganache layer - boil sweet cream and glucose and pour into the chocolate.
       - instruction: ממתינים דקה ומערבבים ליצירת אמולסיה.

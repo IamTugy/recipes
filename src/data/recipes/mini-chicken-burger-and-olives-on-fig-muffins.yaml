@@ -108,6 +108,7 @@ steps:
         instructionEn: Mix gently until a uniform mixture is obtained.
       - instruction: מעבירים לתבניות מאפינס מסיליקון משומנות, ולאופים עד להזהבה כ-14 דקות.
         instructionEn: Transfer to greased silicone muffin tins, and bake until golden, about 14 minutes.
+        timerMinutes: 14
       - instruction: "מצננים על רשת.המבורגר: מעבדים את כל המרכיבים, מערבבים היטב ומשהים לחצי שעה."
         instructionEn: "Cool on a wire rack. Hamburger: process all the ingredients, mix well and leave for half an hour."
       - instruction: >-
@@ -116,8 +117,10 @@ steps:
         instructionEn: >-
           Taste and adjust the seasoning. Heat a pan with a little oil for frying. Form hamburgers the size of the
           muffins and lightly fry until golden. Transfer to the oven and roast for another 5-8 minutes.
+        timerMinutes: 8
       - instruction: "מעבירים לנייר סופג.עגבניות: צולים את העגבניות בתנור בחום של 220 מעלות במשך 5 דקות."
         instructionEn: "Transfer to absorbent paper. Tomatoes: Roast the tomatoes in the oven at 220 degrees for 5 minutes."
+        timerMinutes: 5
       - instruction: "שומרים בטמפ' החדר.להגשה: חוצים את המאפינס, מורחים מיונז ומניחים מעל את ההמבורגרים."
         instructionEn: "Keep at room temperature. To serve: cut the muffins, spread mayonnaise and place the hamburgers on top."
       - instruction: מכסים בכיפת המאפינס ונועצים קיסם ועגבניית שרי צלויה.
@@ -211,6 +214,7 @@ steps:
           circles on baking paper with a forma and then sprinkle without difficulty.
       - instruction: חממו את התנור לחום של 140 מעלות ואפו את המקארון 17-20 דקות.
         instructionEn: Heat the oven to 140 degrees and bake the macaron for 17-20 minutes.
+        timerMinutes: 20
       - instruction: הוא יבריק, יתרומם וייצור את ה"חצאית" המוכרת בבסיסו.
         instructionEn: It will shine, rise and form the familiar "skirt" at its base.
       - instruction: כעת תנו לו להצטנן לחלוטין ורק אז שחררו אותו בעדינות והדביקו אותו עם זילוף של קרם גבינה משובח.
@@ -221,6 +225,7 @@ steps:
         instructionEn: And now - S B L N U T!!!
       - instruction: מקארון יהיה במיטבו 8-12 שעות מרגע הצמדתו עם קרם.
         instructionEn: A macaron will be at its best 8-12 hours from the moment it is attached with cream.
+        timerMinutes: 720
       - instruction: נסו להתאפק ולא לאכול אותו מיד.
         instructionEn: Try to hold back and not eat it right away.
       - instruction: היא יישמר בקירור כשבוע ובמקפיא כחודש.

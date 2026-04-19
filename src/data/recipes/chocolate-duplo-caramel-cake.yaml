@@ -120,12 +120,14 @@ steps:
           get a uniform dough.
       - instruction: מרדדים בין שני ניירות אפייה לעלה בעובי 1/2 ס"מ ומקפיאים ל-20 דקות.
         instructionEn: Roll out between two sheets of baking paper to a 1/2 cm thick sheet and freeze for 20 minutes.
+        timerMinutes: 20
       - instruction: >-
           קורצים עם תבנית האפיה ומעבירים איתה לאפייה בתנור שחומם ל-150 מעלות ל-17 דקות.לשכבת הפאדג'- מעל באן מארי מתיכים
           חמאה ושוקלד.
         instructionEn: >-
           Wink with the baking pan and bake with it in an oven heated to 150 degrees for 17 minutes. For the fudge layer
           - melt butter and chocolate on top of a bain marie.
+        timerMinutes: 17
       - instruction: בקערה נפרדת טורפים סוכר וביצה.
         instructionEn: In a separate bowl, beat sugar and egg.
       - instruction: מוסיפים חלב ואת תערובת השוקולד.
@@ -134,6 +136,7 @@ steps:
         instructionEn: Add the rest of the ingredients and stir to combine.
       - instruction: יוצקים מעל התחתית האפויה ומחזירים לתנור לעוד 30 דקות אפייה.
         instructionEn: Pour over the baked bottom and return to the oven for another 30 minutes of baking.
+        timerMinutes: 30
       - instruction: באותו החום.
         instructionEn: in the same heat.
       - instruction: מצננים.לגנאש- מתיכים שוקולדים מעל באן מארי.
@@ -144,6 +147,7 @@ steps:
         instructionEn: Combine the two mixtures in stages and grind well with a stick blender.
       - instruction: יוצקים 2/3 מהתערובת על שכבת הפאדג' שבתבנית ומעבירים להקפאה של 3 שעות.
         instructionEn: Pour 2/3 of the mixture on the fudge layer in the mold and freeze for 3 hours.
+        timerMinutes: 180
       - instruction: את יתרת התערובת מצננים ויוצרים ממנה, לאחר התייצבות, כדורי טראפלס במגוון גדלים.
         instructionEn: The rest of the mixture is cooled and, after stabilization, truffle balls of various sizes are formed from it.
       - instruction: מקפיאים.לציפוי- בסיר על להבה גבוהה מכינים מהסוכר קרמל ענברי.
