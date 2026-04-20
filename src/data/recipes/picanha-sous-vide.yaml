@@ -3,7 +3,7 @@ title: Picanha Sous Vide
 titleHe: פיקנייה סו-ויד
 description: פיקנייה מבושלת סו-ויד עם ציפוי תבלינים עשיר, צרובה על שכבת השומן לקבלת קראסט מושלם
 descriptionEn: Sous vide picanha with a rich spice rub, seared fat-side for a perfect crust
-image: https://assets.tugy.dev/placeholder.jpg
+image: placeholder
 category: dinner
 difficulty: medium
 source: "https://www.sousvide.co.il/recipes/פיקנייה-סו-ויד/"
@@ -71,5 +71,6 @@ steps:
       - instruction: מניחים לנוח 5 דקות, ואז פורסים נגד כיוון הסיבים. מגישים מיד.
         instructionEn: Rest for 5 minutes, then slice against the grain. Serve immediately.
 tips:
-  - tip: אם לא מגישים מיד, מעבירים לאמבטיית קרח לאחר הסו-ויד לצינון מהיר ושומרים במקרר עד 3 ימים. לפני ההגשה מחממים בסו-ויד ב-54 מעלות ל-30 דקות וצורבים.
-    tipEn: If not serving immediately, transfer to an ice bath after sous vide to cool quickly and refrigerate for up to 3 days. Before serving, reheat in sous vide at 54°C for 30 minutes then sear.
+  - אם לא מגישים מיד, מעבירים לאמבטיית קרח אחרי הסו-ויד לצינון מהיר ושומרים במקרר עד 3 ימים. לפני ההגשה מחממים בסו-ויד ב-54 מעלות ל-30 דקות וצורבים.
+tipsEn:
+  - If not serving immediately, transfer to an ice bath after sous vide and refrigerate up to 3 days. Before serving, reheat in sous vide at 54°C for 30 minutes then sear.
