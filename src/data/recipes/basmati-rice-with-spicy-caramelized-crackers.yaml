@@ -51,6 +51,7 @@ ingredients:
         name: עלי דפנה
         nameEn: bay leaves
   - group: לפיצוחים
+    groupEn: For the nut crunch
     items:
       - amount: 150
         unit: g

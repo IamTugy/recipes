@@ -41,6 +41,7 @@ ingredients:
         name: חלבון
         nameEn: protein
   - group: למילוי
+    groupEn: For the filling
     items:
       - amount: 200
         unit: g

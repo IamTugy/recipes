@@ -17,6 +17,7 @@ tags:
   - ללא גלוטן
 ingredients:
   - group: לתערובת עוגת הפופקורן
+    groupEn: For the popcorn cake mixture
     items:
       - amount: 80
         unit: g
@@ -63,6 +64,7 @@ ingredients:
         name: סוכר אינברטי
         nameEn: Invert sugar
   - group: לקרם פופקורן
+    groupEn: For the popcorn cream
     items:
       - amount: 400
         unit: g
@@ -81,6 +83,7 @@ ingredients:
         name: שוקולד לבן
         nameEn: white chocolate
   - group: לעוגה
+    groupEn: For the cake
     items:
       - amount: 0.5
         unit: ""

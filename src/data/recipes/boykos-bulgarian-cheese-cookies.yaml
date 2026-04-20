@@ -46,6 +46,7 @@ ingredients:
         name: חלמונים
         nameEn: egg yolks
   - group: לציפוי
+    groupEn: For the coating
     items:
       - amount: 0
         unit: ""

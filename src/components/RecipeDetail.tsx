@@ -25,15 +25,16 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
 
   const [multiplier, setMultiplier] = useState(1)
   const [customInput, setCustomInput] = useState('')
-  const [checkedSteps, setCheckedSteps] = useState<Set<string>>(() => {
+  const [checkedSteps, setCheckedSteps] = useState<Set<string>>(new Set())
+
+  // Reset checked steps and scroll when recipe changes
+  useEffect(() => {
     try {
       const saved = sessionStorage.getItem(`checked-${id}`)
-      return saved ? new Set(JSON.parse(saved)) : new Set()
-    } catch { return new Set() }
-  })
-
-  // Scroll to top when recipe opens
-  useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }) }, [id])
+      setCheckedSteps(saved ? new Set(JSON.parse(saved)) : new Set())
+    } catch { setCheckedSteps(new Set()) }
+    window.scrollTo({ top: 0, behavior: 'instant' })
+  }, [id])
 
   if (!recipe) {
     return (
@@ -71,11 +72,12 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
   }
 
   function getTimerForStep(groupIdx: number, stepIdx: number) {
-    return timers.find(t => t.recipeId === recipe!.id && t.stepIndex === groupIdx * 1000 + stepIdx)
+    const key = groupIdx * 10000 + stepIdx
+    return timers.find(t => t.recipeId === recipe!.id && t.stepIndex === key)
   }
 
   function startTimer(label: string, minutes: number, groupIdx: number, stepIdx: number) {
-    onAddTimer(label, minutes, recipe!.id, groupIdx * 1000 + stepIdx)
+    onAddTimer(label, minutes, recipe!.id, groupIdx * 10000 + stepIdx)
   }
 
   function handleCustomInput(val: string) {
@@ -85,7 +87,7 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
       return
     }
     const n = parseFloat(val)
-    if (!isNaN(n) && n > 0 && n <= 100) {
+    if (!isNaN(n) && n > 0 && n <= 100 && recipe!.servings > 0) {
       setMultiplier(n / recipe!.servings)
     }
   }
@@ -95,7 +97,9 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
     setCustomInput('')
   }
 
-  let globalStepNum = 0
+  // Precompute sequential step numbers to avoid mutable counter inside render
+  let _n = 0
+  const stepNums = recipe.steps.map(g => g.items.map(() => ++_n))
 
   return (
     <div className="min-h-screen bg-bg pt-14" dir={lang === 'he' ? 'rtl' : 'ltr'}>
@@ -234,7 +238,7 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
                           <li key={ii} className="flex gap-2 text-sm" dir={lang === 'he' ? 'rtl' : 'ltr'}>
                             <span className="font-semibold text-cream/90 shrink-0 w-14 text-right" dir={lang === 'he' ? 'rtl' : 'ltr'}>
                               {(() => {
-                                if (!item.amount) return null
+                                if (item.amount == null) return null
                                 const scaled = item.amount * multiplier
                                 const amt = scaleAmount(item.amount, multiplier)
                                 const unit = lang === 'he' ? heUnit(item.unit, scaled) : item.unit
@@ -274,8 +278,7 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
                         const stepKey = `${gi}-${si}`
                         const checked = checkedSteps.has(stepKey)
                         const existingTimer = getTimerForStep(gi, si)
-                        globalStepNum++
-                        const stepNum = globalStepNum
+                        const stepNum = stepNums[gi][si]
                         const instruction = lang === 'he'
                           ? step.instruction
                           : (step.instructionEn ?? step.instruction)
@@ -333,7 +336,7 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
                                     ) : (
                                       <button
                                         onClick={() => startTimer(
-                                          `${stepNum}: ${instruction.slice(0, 40)}...`,
+                                          `${stepNum}: ${instruction.length > 40 ? instruction.slice(0, 40) + '…' : instruction}`,
                                           step.timerMinutes!,
                                           gi, si
                                         )}

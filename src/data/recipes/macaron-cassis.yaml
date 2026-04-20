@@ -36,6 +36,7 @@ ingredients:
         name: מעט צבע מאכל סגול בהיר
         nameEn: a little light purple food coloring
   - group: למילוי
+    groupEn: For the filling
     items:
       - amount: 200
         unit: g

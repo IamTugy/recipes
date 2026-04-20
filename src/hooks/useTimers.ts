@@ -6,7 +6,7 @@ let timerIdCounter = 0
 
 function saveTimers(timers: TimerState[]) {
   try {
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify({
+    localStorage.setItem(SESSION_KEY, JSON.stringify({
       timers,
       savedAt: Date.now(),
     }))
@@ -15,14 +15,17 @@ function saveTimers(timers: TimerState[]) {
 
 function loadTimers(): TimerState[] {
   try {
-    const raw = sessionStorage.getItem(SESSION_KEY)
+    const raw = localStorage.getItem(SESSION_KEY)
     if (!raw) return []
-    const { timers, savedAt } = JSON.parse(raw) as { timers: TimerState[], savedAt: number }
+    const parsed = JSON.parse(raw)
+    if (!Array.isArray(parsed?.timers) || typeof parsed?.savedAt !== 'number') return []
+    const { timers, savedAt } = parsed as { timers: TimerState[], savedAt: number }
     const elapsedSeconds = Math.floor((Date.now() - savedAt) / 1000)
     return timers.map(t => {
       if (t.done || !t.running) return t
       const remaining = Math.max(0, t.remainingSeconds - elapsedSeconds)
-      return { ...t, remainingSeconds: remaining, done: remaining === 0, running: remaining > 0 }
+      const done = remaining === 0
+      return { ...t, remainingSeconds: remaining, done, running: !done }
     })
   } catch { return [] }
 }

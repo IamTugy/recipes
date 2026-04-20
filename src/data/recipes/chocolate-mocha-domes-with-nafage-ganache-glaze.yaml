@@ -60,6 +60,7 @@ ingredients:
         name: שמנת מתוקה
         nameEn: sweet cream
   - group: לגנאש נפאז'
+    groupEn: For the Nappage ganache
     items:
       - amount: 150
         unit: g

@@ -56,6 +56,7 @@ ingredients:
         name: חמאה מומסת
         nameEn: melted butter
   - group: קראמבל
+    groupEn: Crumble
     items:
       - amount: 125
         unit: g
@@ -86,6 +87,7 @@ ingredients:
         name: קראמבל טחון (מתכון לעיל)
         nameEn: ground crumble (recipe above)
   - group: גנאש
+    groupEn: Ganache
     items:
       - amount: 130
         unit: g
@@ -96,6 +98,7 @@ ingredients:
         name: שוקולד מריר 53% מוצקי קקאו
         nameEn: Dark chocolate 53% cocoa solids
   - group: קרם קפה
+    groupEn: Coffee cream
     items:
       - amount: 200
         unit: g

@@ -39,6 +39,7 @@ ingredients:
         name: מלח
         nameEn: salt
   - group: למילוי
+    groupEn: For the filling
     items:
       - amount: 130
         unit: g
@@ -69,6 +70,7 @@ ingredients:
         name: שוקולד חלב, מגורר דק
         nameEn: Milk chocolate, finely grated
   - group: המילוי
+    groupEn: The filling
     items:
       - amount: 0
         unit: ""

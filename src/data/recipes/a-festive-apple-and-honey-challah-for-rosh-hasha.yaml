@@ -48,6 +48,7 @@ ingredients:
         name: שמן קנולה
         nameEn: Canola oil
   - group: למילוי
+    groupEn: For the filling
     items:
       - amount: 2
         unit: ""

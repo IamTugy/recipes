@@ -16,6 +16,7 @@ tags:
   - עוגיות
 ingredients:
   - group: לבצק
+    groupEn: For the dough
     items:
       - amount: 120
         unit: g
@@ -42,6 +43,7 @@ ingredients:
         name: חמאה קרה
         nameEn: cold butter
   - group: למילוי
+    groupEn: For the filling
     items:
       - amount: 200
         unit: g

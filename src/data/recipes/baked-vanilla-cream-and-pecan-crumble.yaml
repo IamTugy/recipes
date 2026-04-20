@@ -37,6 +37,7 @@ ingredients:
         name: משחת וניל או מקל וניל חצוי
         nameEn: Vanilla paste or halved vanilla stick
   - group: לקראמבל
+    groupEn: For the crumble
     items:
       - amount: 100
         unit: g

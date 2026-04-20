@@ -72,6 +72,7 @@ ingredients:
         name: קינמון
         nameEn: cinnamon
   - group: לרוטב
+    groupEn: For the sauce
     items:
       - amount: 2
         unit: ""

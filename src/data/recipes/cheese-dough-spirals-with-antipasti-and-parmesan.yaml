@@ -48,6 +48,7 @@ ingredients:
         name: מים
         nameEn: water
   - group: למילוי אנטיפסטי
+    groupEn: For the antipasti filling
     items:
       - amount: 200
         unit: g

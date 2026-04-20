@@ -39,6 +39,7 @@ ingredients:
         name: אבקת אפייה
         nameEn: baking powder
   - group: למילוי
+    groupEn: For the filling
     items:
       - amount: 200
         unit: g
@@ -61,6 +62,7 @@ ingredients:
         name: חלבון
         nameEn: protein
   - group: לסירופ
+    groupEn: For the syrup
     items:
       - amount: 1
         unit: kg

@@ -16,6 +16,7 @@ tags:
   - גבינה
 ingredients:
   - group: לעוגה בקוטר 22 ס״מ     לתחתית
+    groupEn: For the cake (22cm) - base
     items:
       - amount: 150
         unit: g
@@ -30,6 +31,7 @@ ingredients:
         name: סוכר
         nameEn: sugar
   - group: מילוי
+    groupEn: Filling
     items:
       - amount: 180
         unit: g
@@ -52,6 +54,7 @@ ingredients:
         name: שמנת חמוצה
         nameEn: Sour cream
   - group: לציפוי
+    groupEn: For the coating
     items:
       - amount: 300
         unit: g

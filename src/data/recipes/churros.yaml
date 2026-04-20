@@ -43,6 +43,7 @@ ingredients:
         name: שמן לטיגון עמוק
         nameEn: Oil for deep frying
   - group: לציפוי
+    groupEn: For the coating
     items:
       - amount: 0
         unit: ""

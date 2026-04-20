@@ -14,6 +14,7 @@ tags:
   - טבעוני
 ingredients:
   - group: למילוי
+    groupEn: For the filling
     items:
       - amount: 150
         unit: g
@@ -68,6 +69,7 @@ ingredients:
         name: מלח, פלפל שחור
         nameEn: salt, black pepper
   - group: לרוטב
+    groupEn: For the sauce
     items:
       - amount: 300
         unit: g

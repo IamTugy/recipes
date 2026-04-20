@@ -66,6 +66,7 @@ ingredients:
         name: אבקת אפייה
         nameEn: baking powder
   - group: שטרויזל
+    groupEn: Streusel
     items:
       - amount: 50
         unit: g

@@ -15,6 +15,7 @@ tags:
   - עוגה
 ingredients:
   - group: לשכבת התפוחים
+    groupEn: For the apple layer
     items:
       - amount: 2
         unit: ""
@@ -33,6 +34,7 @@ ingredients:
         name: מים
         nameEn: water
   - group: לעוגה
+    groupEn: For the cake
     items:
       - amount: 150
         unit: g
@@ -71,6 +73,7 @@ ingredients:
         name: אגוז מוסקט טחון
         nameEn: Ground nutmeg
   - group: לקישוט
+    groupEn: For decoration
     items:
       - amount: 0
         unit: ""

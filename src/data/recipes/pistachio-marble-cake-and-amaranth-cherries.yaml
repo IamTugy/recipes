@@ -57,6 +57,7 @@ ingredients:
         name: דובדבני אמרנה, חצויים
         nameEn: Amaranth cherries, halved
   - group: לציפוי
+    groupEn: For the coating
     items:
       - amount: 100
         unit: g
@@ -71,6 +72,7 @@ ingredients:
         name: לוז קלוי גרוס
         nameEn: Roasted and ground hazelnuts
   - group: לקישוט
+    groupEn: For decoration
     items:
       - amount: 0
         unit: ""

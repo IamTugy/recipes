@@ -52,6 +52,7 @@ ingredients:
         name: גבעולים וענפים מכרובית וברוקולי (התפרחות שמורות למילוי ולרוטב)
         nameEn: Stems and branches from cauliflower and broccoli (inflorescences reserved for filling and sauce)
   - group: לטיגון-2 ביציםקמחמלחפלפל שחור
+    groupEn: For frying
     items:
       - amount: 0
         unit: ""

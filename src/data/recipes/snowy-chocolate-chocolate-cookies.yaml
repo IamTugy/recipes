@@ -54,6 +54,7 @@ ingredients:
         name: שוקולד מריר, קצוץ גס
         nameEn: Dark chocolate, coarsely chopped
   - group: לציפוי
+    groupEn: For the coating
     items:
       - amount: 100
         unit: g

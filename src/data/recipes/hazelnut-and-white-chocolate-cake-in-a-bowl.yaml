@@ -70,6 +70,7 @@ ingredients:
         name: שוקולד לבן
         nameEn: white chocolate
   - group: לציפוי
+    groupEn: For the coating
     items:
       - amount: 150
         unit: g
@@ -80,6 +81,7 @@ ingredients:
         name: כפית אבקת נס קפה
         nameEn: A teaspoon of coffee miracle powder
   - group: לקישוט
+    groupEn: For decoration
     items:
       - amount: 0
         unit: ""

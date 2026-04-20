@@ -37,6 +37,7 @@ ingredients:
         name: שומשום לבן
         nameEn: white sesame
   - group: לבצק
+    groupEn: For the dough
     items:
       - amount: 300
         unit: g

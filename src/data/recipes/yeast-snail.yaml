@@ -16,6 +16,7 @@ tags:
   - שוקולד
 ingredients:
   - group: לבצק
+    groupEn: For the dough
     items:
       - amount: 400
         unit: g
@@ -46,6 +47,7 @@ ingredients:
         name: חמאה רכה
         nameEn: Soft butter
   - group: למילוי
+    groupEn: For the filling
     items:
       - amount: 100
         unit: g
@@ -68,6 +70,7 @@ ingredients:
         name: חלבון
         nameEn: protein
   - group: לציפוי
+    groupEn: For the coating
     items:
       - amount: 200
         unit: g
@@ -78,6 +81,7 @@ ingredients:
         name: שמן קנולה
         nameEn: Canola oil
   - group: לבצק
+    groupEn: For the dough
     items:
       - amount: 0
         unit: ""

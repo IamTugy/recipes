@@ -35,6 +35,7 @@ ingredients:
         name: פרלינה לוז
         nameEn: Pralina Luz
   - group: לתחתית
+    groupEn: For the base
     items:
       - amount: 200
         unit: g
@@ -49,6 +50,7 @@ ingredients:
         name: קקאו
         nameEn: cocoa
   - group: מילוי
+    groupEn: Filling
     items:
       - amount: 500
         unit: g

@@ -47,6 +47,7 @@ ingredients:
         name: חלב
         nameEn: milk
   - group: לציפוי
+    groupEn: For the coating
     items:
       - amount: 40
         unit: g

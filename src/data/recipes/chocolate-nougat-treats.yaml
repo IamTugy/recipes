@@ -49,6 +49,7 @@ ingredients:
         name: קמח
         nameEn: flour
   - group: לקישוט
+    groupEn: For decoration
     items:
       - amount: 0
         unit: ""

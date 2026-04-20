@@ -14,6 +14,7 @@ tags:
   - ללא גלוטן
 ingredients:
   - group: לבצק קיש כשר לפסח
+    groupEn: For the Passover quiche dough
     items:
       - amount: 250
         unit: g
@@ -48,6 +49,7 @@ ingredients:
         name: חלמון
         nameEn: yolk
   - group: למילוי
+    groupEn: For the filling
     items:
       - amount: 50
         unit: g
@@ -82,6 +84,7 @@ ingredients:
         name: מוצרלה מגוררת
         nameEn: grated mozzarella
   - group: רויאל
+    groupEn: Royal icing
     items:
       - amount: 100
         unit: ml

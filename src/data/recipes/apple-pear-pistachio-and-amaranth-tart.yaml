@@ -80,6 +80,7 @@ ingredients:
         name: דובדבני אמרנה
         nameEn: Amaranth cherries
   - group: תכנון
+    groupEn: Planning
     items:
       - amount: 0.333
         unit: cup

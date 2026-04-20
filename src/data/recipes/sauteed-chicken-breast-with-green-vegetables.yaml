@@ -14,6 +14,7 @@ tags:
   - ארוחת ערב
 ingredients:
   - group: לעוף
+    groupEn: For the chicken
     items:
       - amount: 1
         unit: ""
@@ -48,6 +49,7 @@ ingredients:
         name: שמן תירס/קנולה
         nameEn: Corn/canola oil
   - group: לרוטב
+    groupEn: For the sauce
     items:
       - amount: 120
         unit: g

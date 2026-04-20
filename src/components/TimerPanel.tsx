@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { TimerState } from '../types'
 import { formatSeconds } from '../utils/format'
 import { useLanguage } from '../context/LanguageContext'
@@ -97,11 +97,18 @@ export default function TimerPanel({ timers, onToggle, onRemove, onReset }: Time
 
   if (timers.length === 0) return null
 
-  const safeIdx = Math.min(mobileIdx, timers.length - 1)
-  const mobileTimer = timers[safeIdx]
+  // Sort: running (soonest end first), then paused (soonest first), then done
+  const sorted = useMemo(() => [...timers].sort((a, b) => {
+    if (a.done !== b.done) return a.done ? 1 : -1
+    if (a.running !== b.running) return a.running ? -1 : 1
+    return a.remainingSeconds - b.remainingSeconds
+  }), [timers])
+
+  const safeIdx = Math.min(mobileIdx, sorted.length - 1)
+  const mobileTimer = sorted[safeIdx]
 
   // Progress bar uses the most urgent running timer
-  const progressTimer = timers.find(t => t.running && !t.done) ?? timers[0]
+  const progressTimer = sorted.find(t => t.running && !t.done) ?? sorted[0]
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50">
@@ -122,7 +129,7 @@ export default function TimerPanel({ timers, onToggle, onRemove, onReset }: Time
         <div className="hidden sm:block">
           <div className="max-w-6xl mx-auto px-6 py-2">
             <div className="flex items-center gap-4 overflow-x-auto">
-              {timers.map(timer => (
+              {sorted.map(timer => (
                 <div key={timer.id} className="flex items-center gap-2.5 shrink-0 bg-tint/[0.03] border border-tint/[0.07] rounded-xl px-3 py-1.5 min-w-[200px]">
                   <MiniRing timer={timer} size={32} />
                   <div className="flex-1 min-w-0">
@@ -142,9 +149,9 @@ export default function TimerPanel({ timers, onToggle, onRemove, onReset }: Time
         <div className="sm:hidden">
           <div className="px-4 h-16 flex items-center gap-3">
             {/* Prev arrow */}
-            {timers.length > 1 && (
+            {sorted.length > 1 && (
               <button
-                onClick={() => setMobileIdx(i => (i - 1 + timers.length) % timers.length)}
+                onClick={() => setMobileIdx(i => (i - 1 + sorted.length) % sorted.length)}
                 className="w-7 h-7 flex items-center justify-center rounded-lg text-cream/30 hover:text-cream/60 hover:bg-tint/[0.06] transition-colors shrink-0"
               >
                 <svg className={`w-4 h-4 ${lang === 'he' ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
@@ -158,8 +165,8 @@ export default function TimerPanel({ timers, onToggle, onRemove, onReset }: Time
                 <p className={`font-mono text-base font-semibold leading-none ${mobileTimer.done ? 'text-herb' : 'text-cream'}`}>
                   {mobileTimer.done ? 'Done!' : formatSeconds(mobileTimer.remainingSeconds)}
                 </p>
-                {timers.length > 1 && (
-                  <span className="text-[10px] text-cream/30 font-mono">{safeIdx + 1}/{timers.length}</span>
+                {sorted.length > 1 && (
+                  <span className="text-[10px] text-cream/30 font-mono">{safeIdx + 1}/{sorted.length}</span>
                 )}
               </div>
               <p className="text-xs text-cream/40 truncate mt-0.5 max-w-[160px]">{mobileTimer.label}</p>
@@ -168,9 +175,9 @@ export default function TimerPanel({ timers, onToggle, onRemove, onReset }: Time
             <TimerControls timer={mobileTimer} onToggle={onToggle} onReset={onReset} onRemove={onRemove} />
 
             {/* Next arrow */}
-            {timers.length > 1 && (
+            {sorted.length > 1 && (
               <button
-                onClick={() => setMobileIdx(i => (i + 1) % timers.length)}
+                onClick={() => setMobileIdx(i => (i + 1) % sorted.length)}
                 className="w-7 h-7 flex items-center justify-center rounded-lg text-cream/30 hover:text-cream/60 hover:bg-tint/[0.06] transition-colors shrink-0"
               >
                 <svg className={`w-4 h-4 ${lang === 'he' ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/></svg>

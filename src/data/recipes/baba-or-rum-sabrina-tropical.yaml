@@ -48,6 +48,7 @@ ingredients:
         name: מיץ תפוזים
         nameEn: orange juice
   - group: לסירופ
+    groupEn: For the syrup
     items:
       - amount: 1
         unit: l

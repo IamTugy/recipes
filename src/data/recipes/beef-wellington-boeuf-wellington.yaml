@@ -19,6 +19,7 @@ ingredients:
         name: חרדל דיז׳ון
         nameEn: Dijon mustard
   - group: לדוקסל
+    groupEn: For the duxelles
     items:
       - amount: 2
         unit: ""

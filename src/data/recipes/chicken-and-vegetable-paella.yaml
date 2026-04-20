@@ -13,6 +13,7 @@ tags:
   - ארוחת ערב
 ingredients:
   - group: לעוף
+    groupEn: For the chicken
     items:
       - amount: 3.5
         unit: pcs
@@ -39,6 +40,7 @@ ingredients:
         name: פלפל שחור
         nameEn: Black pepper
   - group: לפאייה
+    groupEn: For the paella
     items:
       - amount: 4
         unit: tbsp

@@ -47,12 +47,14 @@ ingredients:
         name: חמאה רכה
         nameEn: Soft butter
   - group: לקיפול
+    groupEn: For the fold
     items:
       - amount: 200
         unit: g
         name: חמאה
         nameEn: butter
   - group: למילוי
+    groupEn: For the filling
     items:
       - amount: 100
         unit: g

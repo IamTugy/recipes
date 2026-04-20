@@ -93,6 +93,7 @@ ingredients:
         unit: ""
         name: "%"
   - group: לציפוי
+    groupEn: For the coating
     items:
       - amount: 200
         unit: g

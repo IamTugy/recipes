@@ -52,6 +52,7 @@ ingredients:
         name: שיני שום כתושותמלח, פלפל שחור
         nameEn: Crushed garlic cloves, salt, black pepper
   - group: לסלט
+    groupEn: For the salad
     items:
       - amount: 50
         unit: g

@@ -34,6 +34,7 @@ ingredients:
         name: כפית תמצית וניל
         nameEn: A teaspoon of vanilla extract
   - group: לעוגה
+    groupEn: For the cake
     items:
       - amount: 180
         unit: g

@@ -19,6 +19,7 @@ ingredients:
         name: פילה סלמון במשקל של 2 ק״ג
         nameEn: Salmon fillet weighing 2 kg
   - group: למרינדה
+    groupEn: For the marinade
     items:
       - amount: 80
         unit: g
@@ -49,6 +50,7 @@ ingredients:
         name: מלח, פלפל שחור
         nameEn: Salt, black pepper
   - group: לקראסט
+    groupEn: For the crust
     items:
       - amount: 200
         unit: g
@@ -75,6 +77,7 @@ ingredients:
         name: מלח, פלפל שחור
         nameEn: Salt, black pepper
   - group: לאפייה
+    groupEn: For baking
     items:
       - amount: 500
         unit: g

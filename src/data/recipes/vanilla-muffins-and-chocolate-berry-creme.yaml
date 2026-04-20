@@ -82,6 +82,7 @@ ingredients:
         name: שוקולד חלב, קצוץ
         nameEn: Milk chocolate, chopped
   - group: לציפוי
+    groupEn: For the coating
     items:
       - amount: 250
         unit: g

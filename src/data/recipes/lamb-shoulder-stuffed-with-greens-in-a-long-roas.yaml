@@ -13,6 +13,7 @@ tags:
   - ארוחת ערב
 ingredients:
   - group: למילוי
+    groupEn: For the filling
     items:
       - amount: 60
         unit: g

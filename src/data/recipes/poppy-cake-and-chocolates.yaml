@@ -79,6 +79,7 @@ ingredients:
         name: צימוקים מושרים ברום
         nameEn: Raisins soaked in rum
   - group: לציפוי
+    groupEn: For the coating
     items:
       - amount: 100
         unit: g

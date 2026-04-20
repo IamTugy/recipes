@@ -14,6 +14,7 @@ tags:
   - מאפה
 ingredients:
   - group: לבצק
+    groupEn: For the dough
     items:
       - amount: 450
         unit: g
@@ -32,6 +33,7 @@ ingredients:
         name: שמן קנולה
         nameEn: Canola oil
   - group: למילוי
+    groupEn: For the filling
     items:
       - amount: 200
         unit: g

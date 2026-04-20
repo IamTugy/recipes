@@ -57,6 +57,7 @@ ingredients:
         name: קקאו כהה
         nameEn: dark cocoa
   - group: למילוי ולציפוי
+    groupEn: For the filling and coating
     items:
       - amount: 200
         unit: g

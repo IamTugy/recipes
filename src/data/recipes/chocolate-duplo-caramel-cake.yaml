@@ -16,6 +16,7 @@ tags:
   - עוגה
 ingredients:
   - group: לתחתית
+    groupEn: For the base
     items:
       - amount: 60
         unit: g
@@ -34,6 +35,7 @@ ingredients:
         name: קקאו
         nameEn: cocoa
   - group: שכבת פאדג' שוקולד
+    groupEn: Chocolate fudge layer
     items:
       - amount: 50
         unit: g
@@ -68,6 +70,7 @@ ingredients:
         name: קורט מלח
         nameEn: A pinch of salt
   - group: לגנאש
+    groupEn: For the ganache
     items:
       - amount: 150
         unit: g
@@ -90,6 +93,7 @@ ingredients:
         name: קורט מלח
         nameEn: A pinch of salt
   - group: לזיגוג
+    groupEn: For the glaze
     items:
       - amount: 100
         unit: g

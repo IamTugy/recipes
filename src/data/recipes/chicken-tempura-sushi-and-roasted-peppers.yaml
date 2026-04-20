@@ -31,6 +31,7 @@ ingredients:
         name: דפי אצת נורי לסושי
         nameEn: Nori seaweed sheets for sushi
   - group: לטיגון עמוק:שמן שמן
+    groupEn: For deep frying: oil
     items:
       - amount: 0
         unit: ""
@@ -49,6 +50,7 @@ ingredients:
         name: אבקת שום
         nameEn: garlic powder
   - group: לעוף:1/2 פרפר חזה עוף טרימלחפלפל שחור גרוס
+    groupEn: For the chicken
     items:
       - amount: 0
         unit: ""
@@ -67,6 +69,7 @@ ingredients:
         name: זעתר יבש
         nameEn: Dry zaatar
   - group: לרוטב
+    groupEn: For the sauce
     items:
       - amount: 3
         unit: tsp

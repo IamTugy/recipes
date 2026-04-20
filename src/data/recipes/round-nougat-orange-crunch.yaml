@@ -15,6 +15,7 @@ tags:
   - הדרים
 ingredients:
   - group: לבצק
+    groupEn: For the dough
     items:
       - amount: 400
         unit: g
@@ -53,6 +54,7 @@ ingredients:
         name: חמאה רכה
         nameEn: Soft butter
   - group: למילוי
+    groupEn: For the filling
     items:
       - amount: 100
         unit: g

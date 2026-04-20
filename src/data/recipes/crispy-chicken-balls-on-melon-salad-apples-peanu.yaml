@@ -119,12 +119,14 @@ ingredients:
         name: צרור כוסברה, קרועים
         nameEn: Bunch of cilantro, torn
   - group: לסלט
+    groupEn: For the salad
     items:
       - amount: 0
         unit: ""
         name: חותכים את המלפפון והמלון לז׳וליין ומניחים בקערה עם יתרת חומרי הסלט.
         nameEn: Cut the cucumber and melon into julienne and place in a bowl with the rest of the salad ingredients.
   - group: לרוטב
+    groupEn: For the sauce
     items:
       - amount: 2
         unit: ""

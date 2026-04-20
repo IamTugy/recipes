@@ -17,6 +17,7 @@ tags:
   - עוגה
 ingredients:
   - group: לבסיס
+    groupEn: For the base
     items:
       - amount: 100
         unit: g
@@ -43,6 +44,7 @@ ingredients:
         name: קורט מלח
         nameEn: A pinch of salt
   - group: למוס שוקולד
+    groupEn: For the chocolate mousse
     items:
       - amount: 250
         unit: g
@@ -61,6 +63,7 @@ ingredients:
         name: שמנת מתוקה, מוקצפת
         nameEn: Sweet, whipped cream
   - group: למוס קרם עוגיות
+    groupEn: For the cookie cream mousse
     items:
       - amount: 250
         unit: g
@@ -87,6 +90,7 @@ ingredients:
         name: שמנת מתוקה, מוקצפת
         nameEn: Sweet, whipped cream
   - group: לציפוי
+    groupEn: For the coating
     items:
       - amount: 200
         unit: g

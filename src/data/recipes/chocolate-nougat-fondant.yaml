@@ -53,6 +53,7 @@ ingredients:
         name: רום
         nameEn: rum
   - group: לקישוט
+    groupEn: For decoration
     items:
       - amount: 0
         unit: ""

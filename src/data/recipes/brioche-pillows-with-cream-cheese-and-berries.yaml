@@ -49,6 +49,7 @@ ingredients:
         name: חמאה בטמפ' החדר
         nameEn: Butter at room temperature
   - group: לקרם גבינה פירות יער
+    groupEn: For the berry cream cheese
     items:
       - amount: 50
         unit: g

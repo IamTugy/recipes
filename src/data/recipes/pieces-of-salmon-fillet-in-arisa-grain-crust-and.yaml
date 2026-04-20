@@ -39,6 +39,7 @@ ingredients:
         name: פילה סלמון, נקי מעור ועצמות ופרוס למנות
         nameEn: Salmon fillet, free of skin and bones and sliced ​​into portions
   - group: לקראסט
+    groupEn: For the crust
     items:
       - amount: 50
         unit: g

@@ -14,6 +14,7 @@ tags:
   - הדרים
 ingredients:
   - group: לבצק
+    groupEn: For the dough
     items:
       - amount: 400
         unit: g
@@ -48,6 +49,7 @@ ingredients:
         name: כפית תמצית וניל
         nameEn: A teaspoon of vanilla extract
   - group: למילוי
+    groupEn: For the filling
     items:
       - amount: 200
         unit: g

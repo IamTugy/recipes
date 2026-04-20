@@ -36,6 +36,7 @@ ingredients:
         name: חלמון
         nameEn: yolk
   - group: למילוי
+    groupEn: For the filling
     items:
       - amount: 60
         unit: g
@@ -66,6 +67,7 @@ ingredients:
         name: דובדבני אמרנה, מסוננים
         nameEn: Amaranth cherries, drained
   - group: לציפוי מקארון
+    groupEn: For the macaron coating
     items:
       - amount: 85
         unit: g

@@ -36,6 +36,7 @@ ingredients:
         name: כפית משחת וניל
         nameEn: A teaspoon of vanilla paste
   - group: לקראמבל
+    groupEn: For the crumble
     items:
       - amount: 100
         unit: g
@@ -54,6 +55,7 @@ ingredients:
         name: סוכר דמררה
         nameEn: Demerara sugar
   - group: להגשה
+    groupEn: For serving
     items:
       - amount: 0
         unit: ""

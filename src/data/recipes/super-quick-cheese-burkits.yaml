@@ -41,6 +41,7 @@ ingredients:
         name: שמן
         nameEn: oil
   - group: למילוי
+    groupEn: For the filling
     items:
       - amount: 150
         unit: g

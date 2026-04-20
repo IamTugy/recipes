@@ -15,6 +15,7 @@ tags:
   - מתוק
 ingredients:
   - group: לבצק
+    groupEn: For the dough
     items:
       - amount: 1
         unit: ""

@@ -15,6 +15,7 @@ tags:
   - שוקולד
 ingredients:
   - group: לבצק
+    groupEn: For the dough
     items:
       - amount: 450
         unit: g
@@ -41,6 +42,7 @@ ingredients:
         name: שמנת מתוקה 38% שומן
         nameEn: Sweet cream 38% fat
   - group: למילוי
+    groupEn: For the filling
     items:
       - amount: 350
         unit: g

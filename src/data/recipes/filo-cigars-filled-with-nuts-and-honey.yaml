@@ -13,6 +13,7 @@ tags:
   - מאפה
 ingredients:
   - group: למילוי
+    groupEn: For the filling
     items:
       - amount: 100
         unit: g
@@ -47,6 +48,7 @@ ingredients:
         name: ביצהכף מי ורדיםקליפה מגוררת מלימון אחד
         nameEn: An egg, a spoonful of rose water, grated rind from one lemon
   - group: סירופ
+    groupEn: Syrup
     items:
       - amount: 200
         unit: g

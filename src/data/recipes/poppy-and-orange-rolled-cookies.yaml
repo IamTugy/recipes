@@ -17,6 +17,7 @@ tags:
   - הדרים
 ingredients:
   - group: לבצק
+    groupEn: For the dough
     items:
       - amount: 200
         unit: g
@@ -43,6 +44,7 @@ ingredients:
         name: קמח
         nameEn: flour
   - group: למילוי
+    groupEn: For the filling
     items:
       - amount: 300
         unit: g

@@ -71,6 +71,7 @@ ingredients:
         name: צרור כוסברה, קרועים
         nameEn: Bunch of cilantro, torn
   - group: לרוטב
+    groupEn: For the sauce
     items:
       - amount: 2
         unit: ""

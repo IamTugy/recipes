@@ -13,6 +13,7 @@ tags:
   - מאפה
 ingredients:
   - group: לביגה
+    groupEn: For the biga
     items:
       - amount: 330
         unit: g
@@ -27,6 +28,7 @@ ingredients:
         name: שמרים
         nameEn: yeast
   - group: לבצק
+    groupEn: For the dough
     items:
       - amount: 0
         unit: ""
@@ -49,6 +51,7 @@ ingredients:
         name: מים
         nameEn: water
   - group: לציפוי
+    groupEn: For the coating
     items:
       - amount: 100
         unit: g

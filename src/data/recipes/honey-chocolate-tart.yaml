@@ -65,6 +65,7 @@ ingredients:
         name: חלב מרוכז ממותק
         nameEn: Sweetened condensed milk
   - group: לגנאש
+    groupEn: For the ganache
     items:
       - amount: 250
         unit: g

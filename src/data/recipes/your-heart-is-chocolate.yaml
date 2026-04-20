@@ -15,6 +15,7 @@ tags:
   - שוקולד
 ingredients:
   - group: לבצק
+    groupEn: For the dough
     items:
       - amount: 0.5
         unit: קילו
@@ -45,6 +46,7 @@ ingredients:
         name: חמאה רכה
         nameEn: Soft butter
   - group: למילוי
+    groupEn: For the filling
     items:
       - amount: 80
         unit: g
@@ -63,6 +65,7 @@ ingredients:
         name: מעט קינמון
         nameEn: A little cinnamon
   - group: לסירופ
+    groupEn: For the syrup
     items:
       - amount: 300
         unit: g

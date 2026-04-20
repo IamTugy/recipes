@@ -42,6 +42,7 @@ ingredients:
         name: קורט מלח
         nameEn: a pinch of salt
   - group: למילוי
+    groupEn: For the filling
     items:
       - amount: 200
         unit: g

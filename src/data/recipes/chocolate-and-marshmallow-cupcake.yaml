@@ -53,6 +53,7 @@ ingredients:
         name: מרשמלו, קצוץ גס
         nameEn: Marshmallow, coarsely chopped
   - group: לקרם
+    groupEn: For the cream
     items:
       - amount: 500
         unit: g
@@ -63,6 +64,7 @@ ingredients:
         name: שוקולד מריר
         nameEn: dark chocolate
   - group: לקישוט
+    groupEn: For decoration
     items:
       - amount: 0
         unit: ""
