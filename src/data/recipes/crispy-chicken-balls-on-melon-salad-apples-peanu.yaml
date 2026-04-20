@@ -171,7 +171,7 @@ steps:
           and grind to a uniform puree.
       - instruction: מעבירים לקערה, מוסיפים את העוף ופירורי הלחם, מערבבים היטב ומשהים ל1/2 שעה.
         instructionEn: Transfer to a bowl, add the chicken and bread crumbs, mix well and leave for 1/2 hour.
-        timerMinutes: 120
+        timerMinutes: 30
       - instruction: אם התערובת רכה מידי לאחר המנוחה ניתן להוסיף עוד מעט פירורי לחם.
         instructionEn: If the mixture is too soft after resting, you can add a little more breadcrumbs.
       - instruction: יוצרים מהתערובת כדורי במשקל 25 גרם.
