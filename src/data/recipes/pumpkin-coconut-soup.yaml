@@ -19,6 +19,7 @@ prepTime: 30
 cookTime: 35
 servings: 8
 difficulty: easy
+source: "Oren Giron"
 ingredients:
   - group: מרק
     groupEn: Soup

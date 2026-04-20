@@ -159,6 +159,19 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
             {displayDescription}
           </p>
 
+          {recipe.source && (
+            <p className="text-cream/30 text-xs mb-5">
+              {lang === 'he' ? 'מקור: ' : 'Source: '}
+              {recipe.source.startsWith('http') ? (
+                <a href={recipe.source} target="_blank" rel="noopener noreferrer" className="underline hover:text-cream/60 transition-colors">
+                  {recipe.source.replace(/^https?:\/\//, '').replace(/\/.*$/, '')}
+                </a>
+              ) : (
+                recipe.source
+              )}
+            </p>
+          )}
+
           {/* Meta grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[

@@ -22,6 +22,7 @@ prepTime: 20
 cookTime: 30
 servings: 35
 difficulty: medium
+source: "Oren Giron"
 ingredients:
   - items:
       - amount: 600

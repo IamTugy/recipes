@@ -22,6 +22,7 @@ prepTime: 30
 cookTime: 60
 servings: 6
 difficulty: medium
+source: "Oren Giron"
 featured: true
 ingredients:
   - group: עוף

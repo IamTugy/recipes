@@ -1,0 +1,75 @@
+id: picanha-sous-vide
+title: Picanha Sous Vide
+titleHe: פיקנייה סו-ויד
+description: פיקנייה מבושלת סו-ויד עם ציפוי תבלינים עשיר, צרובה על שכבת השומן לקבלת קראסט מושלם
+descriptionEn: Sous vide picanha with a rich spice rub, seared fat-side for a perfect crust
+image: https://assets.tugy.dev/placeholder.jpg
+category: dinner
+difficulty: medium
+source: "https://www.sousvide.co.il/recipes/פיקנייה-סו-ויד/"
+prepTime: 10
+cookTime: 480
+servings: 4
+tags:
+  - בקר
+  - סו-ויד
+ingredients:
+  - group: ""
+    groupEn: ""
+    items:
+      - amount: 1
+        unit: ""
+        name: פיקנייה שלמה (עם שכבת שומן)
+        nameEn: Whole picanha (with fat cap)
+      - amount: 0
+        unit: ""
+        name: מלח גס מעושן
+        nameEn: Smoked coarse salt
+      - amount: 0
+        unit: ""
+        name: שמן זית
+        nameEn: Olive oil
+      - amount: 0
+        unit: ""
+        name: פפריקה חריפה מעושנת
+        nameEn: Hot smoked paprika
+      - amount: 0
+        unit: ""
+        name: פלפל קאיין
+        nameEn: Cayenne pepper
+      - amount: 0
+        unit: ""
+        name: פלפל שחור גרוס
+        nameEn: Ground black pepper
+      - amount: 0
+        unit: ""
+        name: תערובת תבלין גריל עוף
+        nameEn: Chicken grill spice mix
+      - amount: 0
+        unit: ""
+        name: ראס אל-חנות
+        nameEn: Ras el hanout
+      - amount: 0
+        unit: ""
+        name: ענפי טימין טריים
+        nameEn: Fresh thyme sprigs
+steps:
+  - title: ""
+    items:
+      - instruction: מערבבים את כל התבלינים עם שמן זית ליצירת משחת תיבול. מורחים את המשחה על הפיקנייה מכל הצדדים ומעסים היטב.
+        instructionEn: Mix all spices with olive oil to form a spice paste. Rub the paste all over the picanha and massage well.
+      - instruction: מכניסים את הפיקנייה לשקית ואקום יחד עם ענפי טימין ואוטמים.
+        instructionEn: Place the picanha in a vacuum bag with thyme sprigs and seal.
+      - instruction: מבשלים בסו-ויד בטמפרטורה של 58 מעלות למשך 8 שעות.
+        instructionEn: Cook sous vide at 58°C for 8 hours.
+        timerMinutes: 480
+      - instruction: מוציאים מהשקית ומייבשים היטב עם נייר סופג. מסרטים את שכבת השומן בסכין חדה בתבנית משבצות.
+        instructionEn: Remove from the bag and pat dry thoroughly with paper towels. Score the fat cap in a crosshatch pattern with a sharp knife.
+      - instruction: מחממים מחבת ברזל כבדה על חום גבוה מאוד עד שמעשן. מניחים את הפיקנייה עם צד השומן כלפי מטה וצורבים 3-4 דקות עד לקראסט זהוב ופריך.
+        instructionEn: Heat a heavy cast iron pan over very high heat until smoking. Place the picanha fat-side down and sear for 3-4 minutes until a golden, crispy crust forms.
+        timerMinutes: 4
+      - instruction: מניחים לנוח 5 דקות, ואז פורסים נגד כיוון הסיבים. מגישים מיד.
+        instructionEn: Rest for 5 minutes, then slice against the grain. Serve immediately.
+tips:
+  - tip: אם לא מגישים מיד, מעבירים לאמבטיית קרח לאחר הסו-ויד לצינון מהיר ושומרים במקרר עד 3 ימים. לפני ההגשה מחממים בסו-ויד ב-54 מעלות ל-30 דקות וצורבים.
+    tipEn: If not serving immediately, transfer to an ice bath after sous vide to cool quickly and refrigerate for up to 3 days. Before serving, reheat in sous vide at 54°C for 30 minutes then sear.

@@ -6,6 +6,7 @@ descriptionEn: Chicken tempura sushi and roasted peppers
 image: https://assets.tugy.dev/chicken-tempura-sushi-and-roasted-peppers.jpg
 category: dinner
 difficulty: hard
+source: "Oren Giron"
 prepTime: 15
 cookTime: 10
 servings: 6
@@ -30,8 +31,8 @@ ingredients:
         unit: ""
         name: דפי אצת נורי לסושי
         nameEn: Nori seaweed sheets for sushi
-  - group: לטיגון עמוק:שמן שמן
-    groupEn: For deep frying: oil
+  - group: "לטיגון עמוק:שמן שמן"
+    groupEn: "For deep frying: oil"
     items:
       - amount: 0
         unit: ""

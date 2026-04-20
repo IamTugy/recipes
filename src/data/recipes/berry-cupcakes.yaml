@@ -19,6 +19,7 @@ prepTime: 40
 cookTime: 20
 servings: 6
 difficulty: medium
+source: "Oren Giron"
 ingredients:
   - group: בסיס פרי
     groupEn: Berry Base
