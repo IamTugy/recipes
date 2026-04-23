@@ -1,16 +1,29 @@
-# Recipe Photo Prompt
+# Recipe Illustration Prompt
 
-Used by `generate-images.mjs` to generate recipe images via Gemini.
+Used by `generate-images.mjs` to generate anime/watercolor recipe illustrations via Pollinations.ai (flux model).
+
+Style matches the Ghibli-inspired site redesign: chalky watercolor, muted pastels, ingredients-only composition.
 
 ## Prompt Template
 
 ```
-A high-end, professional culinary photograph of {RECIPE_TITLE} for a fine-dining website. {DESCRIPTION}
-The dish is elegantly plated with chef-level precision and artistic garnishes. The camera angle is a 
-low-perspective, tight close-up (macro food photography) focusing on texture and detail, with very little 
-background visible. The background is a crisp, clean white linen sheet with soft, natural side-lighting. 
-Minimalist aesthetic. No utensils, no cutlery, and no hands in the frame. Only the main dish and its 
-immediate accompaniment (like a small side plate or garnish) are shown, tightly grouped. 8k resolution, 
-shallow depth of field with a soft bokeh effect. Do not use elements that are not in the recipe, unless 
-that element is usually served alongside this dish.
+Anime-style food illustration, Studio Ghibli inspired, soft watercolor and gouache textures,
+chalky muted pastel palette, warm natural lighting, hand-painted look with visible brush strokes,
+top-down three-quarter view of the finished dish on a simple ceramic plate or bowl,
+against a cream linen or chalky off-white paper background.
+Dish: {TITLE}.
+Show ONLY these ingredients, appetizingly arranged: {INGREDIENTS}.
+No text, no labels, no utensils, no hands, no extra garnish that is not listed.
+Cozy, detailed but clean, subtle steam if the dish is hot. Square composition,
+soft edges, slightly desaturated, dreamy atmosphere. No photorealism.
 ```
+
+## Variables
+- `{TITLE}` — `recipe.titleEn ?? recipe.title`
+- `{INGREDIENTS}` — flattened `ingredients[].items[].nameEn ?? name`, parenthetical notes stripped, deduped, capped at 14 items.
+
+## Workflow
+1. Dry run to inspect prompts: `node scripts/generate-images.mjs --dry-run --limit=5`
+2. Small batch to review: `node scripts/generate-images.mjs --limit=5`
+3. Inspect `public/images/*.jpg` and the patched YAML `image:` fields
+4. Full run: `node scripts/generate-images.mjs`

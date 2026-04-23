@@ -1,81 +1,72 @@
 /**
- * Generate recipe images using Gemini image generation API.
- * Usage: GEMINI_API_KEY=your_key node scripts/generate-images.mjs
+ * Generate anime-style watercolor recipe illustrations via Pollinations.ai.
  *
- * Options:
- *   --only=id1,id2   Only regenerate specific recipe IDs
- *   --skip-existing  Skip recipes that already have a local image (default: true)
+ * Usage:
+ *   node scripts/generate-images.mjs                 # process all recipes, skip existing
+ *   node scripts/generate-images.mjs --only=id1,id2  # only these recipes
+ *   node scripts/generate-images.mjs --limit=5       # cap N to process (batch review)
+ *   node scripts/generate-images.mjs --no-skip-existing  # regenerate all
+ *   node scripts/generate-images.mjs --dry-run       # print prompts only, don't fetch
+ *
+ * Images written to public/images/{id}.jpg and the recipe YAML's `image:`
+ * field is patched to `/images/{id}.jpg`.
  */
 
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import yaml from 'js-yaml'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
-
-// No API key needed - uses Pollinations.ai (free, no auth)
-
-const IMAGES_DIR = path.join(ROOT, 'public', 'images')
+const RECIPES_DIR = path.join(ROOT, 'src/data/recipes')
+const IMAGES_DIR = path.join(ROOT, 'public/images')
 fs.mkdirSync(IMAGES_DIR, { recursive: true })
 
 const args = process.argv.slice(2)
-const onlyIds = args.find(a => a.startsWith('--only='))?.split('=')[1]?.split(',') ?? null
+const argVal = k => args.find(a => a.startsWith(`${k}=`))?.split('=')[1]
+const onlyIds = argVal('--only')?.split(',') ?? null
+const limit = Number(argVal('--limit')) || null
 const skipExisting = !args.includes('--no-skip-existing')
+const dryRun = args.includes('--dry-run')
 
-// ── Parse recipes.ts ──────────────────────────────────────────────────────────
+// ── Prompt ────────────────────────────────────────────────────────────────────
 
-const src = fs.readFileSync(path.join(ROOT, 'src/data/recipes.ts'), 'utf8')
-
-const idRe = /id: '([^']+)'/g
-const idPositions = []
-let m
-while ((m = idRe.exec(src)) !== null) {
-  idPositions.push({ id: m[1], pos: m.index })
-}
-
-function extractChunk(i) {
-  const start = idPositions[i].pos
-  const end = idPositions[i + 1] ? idPositions[i + 1].pos : src.length
-  return src.slice(start, end)
-}
-
-const recipes = idPositions.map((item, i) => {
-  const chunk = extractChunk(i)
-  const title = chunk.match(/^\s*title: ['"]([^'"]+)['"]/m)?.[1] ?? item.id
-  const descEn = chunk.match(/descriptionEn: ['"]([^'"]+)['"]/)?.[1]
-  const desc = chunk.match(/^\s+description: ['"]([^'"]+)['"]/m)?.[1] ?? ''
-  const cuisine = chunk.match(/cuisine: ['"]([^'"]+)['"]/)?.[1] ?? ''
-  const category = chunk.match(/category: ['"]([^'"]+)['"]/)?.[1] ?? ''
-
-  // Extract all English ingredient names for a richer prompt
-  const ingredientNames = [...chunk.matchAll(/nameEn: ['"]([^'"]+)['"]/g)]
-    .map(m => m[1])
-    .filter(n => n.length < 40) // skip long notes
-    .slice(0, 12)
+function buildPrompt(recipe) {
+  const title = recipe.titleEn ?? recipe.title
+  const ingredients = (recipe.ingredients ?? [])
+    .flatMap(g => g.items ?? [])
+    .map(item => item.nameEn ?? item.name ?? '')
+    .map(n => n.replace(/\s*\(.*?\)\s*/g, '').trim())
+    .filter(n => n && n.length < 50)
+    .filter((n, i, arr) => arr.indexOf(n) === i)
+    .slice(0, 14)
     .join(', ')
 
-  return { id: item.id, title, description: descEn ?? desc, cuisine, category, ingredients: ingredientNames }
-})
-
-// ── Image generation ──────────────────────────────────────────────────────────
-
-function buildPrompt({ title, description, cuisine, category, ingredients }) {
-  const ingredientLine = ingredients ? `Key ingredients: ${ingredients}.` : ''
-  const cuisineLine = cuisine ? `Cuisine: ${cuisine}.` : ''
-  return `A high-end, professional culinary photograph of ${title} for a fine-dining website. ${description} ${ingredientLine} ${cuisineLine} The full dish is elegantly plated and shown in its entirety with breathing room around it. Camera angle: eye-level to slightly elevated (30-40 degrees), like sitting at a restaurant table looking at the dish - NOT overhead. Soft, warm natural side-lighting casting gentle shadows. Clean white or light linen surface. Minimalist styling with a small relevant garnish only. No utensils, no cutlery, no hands in the frame. Shallow depth of field, soft bokeh background. 8K resolution, photorealistic. Only use ingredients that are actually in this dish.`
+  return [
+    'Anime-style food illustration, Studio Ghibli inspired, soft watercolor and gouache textures,',
+    'chalky muted pastel palette, warm natural lighting, hand-painted look with visible brush strokes,',
+    'top-down three-quarter view of the finished dish on a simple ceramic plate or bowl,',
+    'against a cream linen or chalky off-white paper background.',
+    `Dish: ${title}.`,
+    ingredients ? `Show ONLY these ingredients, appetizingly arranged: ${ingredients}.` : '',
+    'No text, no labels, no utensils, no hands, no extra garnish that is not listed.',
+    'Cozy, detailed but clean, subtle steam if the dish is hot. Square composition,',
+    'soft edges, slightly desaturated, dreamy atmosphere. No photorealism.',
+  ].filter(Boolean).join(' ')
 }
 
-async function generateImage(recipe) {
-  const prompt = buildPrompt(recipe)
+// ── Fetch ─────────────────────────────────────────────────────────────────────
+
+async function generateImage(prompt, seed) {
   const encoded = encodeURIComponent(prompt)
-  const url = `https://image.pollinations.ai/prompt/${encoded}?width=1200&height=800&model=flux&nologo=true&seed=${Math.floor(Math.random() * 99999)}`
+  const url = `https://image.pollinations.ai/prompt/${encoded}?width=1024&height=1024&model=flux&nologo=true&seed=${seed}`
 
   for (let attempt = 1; attempt <= 5; attempt++) {
     const res = await fetch(url)
     if (res.status === 429) {
       const wait = attempt * 10000
-      process.stdout.write(` [rate-limited, waiting ${wait/1000}s]`)
+      process.stdout.write(` [rate-limited, waiting ${wait / 1000}s]`)
       await new Promise(r => setTimeout(r, wait))
       continue
     }
@@ -87,44 +78,40 @@ async function generateImage(recipe) {
   throw new Error('Max retries exceeded')
 }
 
-// ── Update recipes.ts image paths ─────────────────────────────────────────────
+// ── YAML patch ────────────────────────────────────────────────────────────────
 
-function updateRecipesTs(id, imagePath) {
-  const rel = imagePath.replace(path.join(ROOT, 'public'), '')
-  let updated = fs.readFileSync(path.join(ROOT, 'src/data/recipes.ts'), 'utf8')
-
-  // Replace the image line for this specific recipe block
-  const idIndex = updated.indexOf(`id: '${id}'`)
-  if (idIndex === -1) return
-
-  const nextId = updated.indexOf("id: '", idIndex + 1)
-  const chunk = updated.slice(idIndex, nextId === -1 ? undefined : nextId)
-
-  const newChunk = chunk.replace(
-    /image: ['"][^'"]*['"]/,
-    `image: '${rel}'`
-  )
-
-  if (chunk === newChunk) {
-    console.log(`  No image field found to update for ${id}`)
-    return
+function patchImageField(filePath, newImage) {
+  const src = fs.readFileSync(filePath, 'utf8')
+  if (/^image:\s*.*$/m.test(src)) {
+    const patched = src.replace(/^image:\s*.*$/m, `image: ${newImage}`)
+    fs.writeFileSync(filePath, patched)
+  } else {
+    // insert after id line
+    const patched = src.replace(/^(id:\s*.*)$/m, `$1\nimage: ${newImage}`)
+    fs.writeFileSync(filePath, patched)
   }
-
-  updated = updated.slice(0, idIndex) + newChunk + (nextId === -1 ? '' : updated.slice(nextId))
-  fs.writeFileSync(path.join(ROOT, 'src/data/recipes.ts'), updated)
 }
 
-// ── Main loop ─────────────────────────────────────────────────────────────────
+// ── Load recipes ──────────────────────────────────────────────────────────────
 
-const toProcess = onlyIds
-  ? recipes.filter(r => onlyIds.includes(r.id))
-  : recipes
+const files = fs.readdirSync(RECIPES_DIR).filter(f => f.endsWith('.yaml'))
+const recipes = files.map(f => {
+  const filePath = path.join(RECIPES_DIR, f)
+  const data = yaml.load(fs.readFileSync(filePath, 'utf8'))
+  return { ...data, __file: filePath }
+})
 
-console.log(`Processing ${toProcess.length} recipes...`)
+let toProcess = onlyIds ? recipes.filter(r => onlyIds.includes(r.id)) : recipes
+if (limit) toProcess = toProcess.slice(0, limit)
+
+// ── Main ──────────────────────────────────────────────────────────────────────
+
+console.log(`Processing ${toProcess.length} / ${recipes.length} recipes${dryRun ? ' (dry run)' : ''}`)
 let success = 0, skipped = 0, failed = 0
 
 for (const recipe of toProcess) {
   const outPath = path.join(IMAGES_DIR, `${recipe.id}.jpg`)
+  const relPath = `/images/${recipe.id}.jpg`
 
   if (skipExisting && fs.existsSync(outPath)) {
     console.log(`[skip] ${recipe.id}`)
@@ -132,12 +119,20 @@ for (const recipe of toProcess) {
     continue
   }
 
-  process.stdout.write(`[gen]  ${recipe.id} ... `)
+  const prompt = buildPrompt(recipe)
 
+  if (dryRun) {
+    console.log(`\n[${recipe.id}]\n${prompt}\n`)
+    success++
+    continue
+  }
+
+  process.stdout.write(`[gen]  ${recipe.id} ... `)
   try {
-    const imageData = await generateImage(recipe)
+    const seed = Math.floor(Math.random() * 99999)
+    const imageData = await generateImage(prompt, seed)
     fs.writeFileSync(outPath, imageData)
-    updateRecipesTs(recipe.id, outPath)
+    patchImageField(recipe.__file, relPath)
     console.log('done')
     success++
   } catch (err) {
@@ -145,11 +140,7 @@ for (const recipe of toProcess) {
     failed++
   }
 
-  // Small delay to be polite to the free service
   await new Promise(r => setTimeout(r, 1500))
 }
 
 console.log(`\nDone. ${success} generated, ${skipped} skipped, ${failed} failed.`)
-if (success > 0) {
-  console.log('Run "npm run build" to bundle the new images.')
-}
