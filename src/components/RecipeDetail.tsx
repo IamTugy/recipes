@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import RecipePlaceholder from './RecipePlaceholder'
+import CategoryIllustration from './placeholders/CategoryIllustration'
 import { useNavigate, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { getRecipe } from '../data/recipes'
@@ -7,6 +7,7 @@ import { formatTime, formatSeconds, scaleAmount } from '../utils/format'
 import { t, categoryEmoji, heUnit } from '../i18n'
 import { useLanguage } from '../context/LanguageContext'
 import type { TimerState } from '../types'
+import { SteamSwirl, Sparkle, LeafSprig } from './motifs'
 
 interface RecipeDetailProps {
   onAddTimer: (label: string, minutes: number, recipeId: string, stepIndex: number) => void
@@ -27,7 +28,6 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
   const [customInput, setCustomInput] = useState('')
   const [checkedSteps, setCheckedSteps] = useState<Set<string>>(new Set())
 
-  // Reset checked steps and scroll when recipe changes
   useEffect(() => {
     try {
       const saved = sessionStorage.getItem(`checked-${id}`)
@@ -38,10 +38,10 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
 
   if (!recipe) {
     return (
-      <div className="min-h-screen bg-bg flex items-center justify-center pt-14">
+      <div className="min-h-screen bg-bg flex items-center justify-center pt-16">
         <div className="text-center">
           <p className="text-6xl mb-4">🍳</p>
-          <p className="text-cream/60 text-lg">{tx.notFound}</p>
+          <p className="text-ink/60 text-lg">{tx.notFound}</p>
           <button onClick={() => navigate('/')} className="btn-primary mt-6">
             {tx.backToRecipes}
           </button>
@@ -62,6 +62,8 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
     ? (recipe.tips ?? [])
     : (recipe.tipsEn ?? recipe.tips ?? [])
 
+  const hasImage = recipe.image && recipe.image.includes('assets.tugy.dev')
+
   function toggleStep(key: string) {
     setCheckedSteps(prev => {
       const next = new Set(prev)
@@ -73,7 +75,7 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
 
   function getTimerForStep(groupIdx: number, stepIdx: number) {
     const key = groupIdx * 10000 + stepIdx
-    return timers.find(t => t.recipeId === recipe!.id && t.stepIndex === key)
+    return timers.find(timer => timer.recipeId === recipe!.id && timer.stepIndex === key)
   }
 
   function startTimer(label: string, minutes: number, groupIdx: number, stepIdx: number) {
@@ -97,27 +99,28 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
     setCustomInput('')
   }
 
-  // Precompute sequential step numbers to avoid mutable counter inside render
   let _n = 0
   const stepNums = recipe.steps.map(g => g.items.map(() => ++_n))
 
   return (
-    <div className="min-h-screen bg-bg pt-14" dir={lang === 'he' ? 'rtl' : 'ltr'}>
-      {/* Hero image */}
-      <div className="relative h-64 sm:h-96 overflow-hidden">
-        {recipe.image.includes('assets.tugy.dev') ? (
-          <img
-            src={recipe.image}
-            alt={displayTitle}
-            className="w-full h-full object-cover"
-          />
+    <div className="min-h-screen bg-bg pt-16" dir={lang === 'he' ? 'rtl' : 'ltr'}>
+      {/* Hero */}
+      <div className="relative h-72 sm:h-[420px] overflow-hidden">
+        {hasImage ? (
+          <img src={recipe.image} alt={displayTitle} className="w-full h-full object-cover" />
         ) : (
-          <RecipePlaceholder recipe={recipe} />
+          <CategoryIllustration category={recipe.category} title={recipe.id} />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/50 to-transparent" />
+
+        {/* Steam overlay */}
+        <div className="absolute top-6 right-10 text-accent/50 animate-steam pointer-events-none hidden sm:block">
+          <SteamSwirl width="60" height="80" />
+        </div>
+
         <button
           onClick={() => navigate('/')}
-          className={`absolute top-4 ${lang === 'he' ? 'right-4' : 'left-4'} flex items-center gap-2 px-3 py-2 bg-black/40 backdrop-blur-sm text-white/80 hover:text-white rounded-xl text-sm transition-colors border border-white/10`}
+          className={`absolute top-4 ${lang === 'he' ? 'right-4' : 'left-4'} flex items-center gap-2 px-4 py-2 bg-card/80 backdrop-blur-md text-ink/75 hover:text-accent rounded-full text-sm transition-colors border border-tint/10 shadow-lg`}
         >
           <svg
             className={`w-4 h-4 ${lang === 'he' ? 'rotate-180' : ''}`}
@@ -129,41 +132,49 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
         </button>
       </div>
 
-      <div className="max-w-3xl mx-auto px-4 -mt-16 relative pb-24">
+      <div className="max-w-4xl mx-auto px-4 -mt-20 relative pb-24">
         {/* Header card */}
-        <div className="card p-6 mb-6">
-          <div className="flex flex-wrap items-center gap-2 mb-3">
+        <div className="card card-paper p-8 mb-6 relative overflow-hidden">
+          <div className="absolute top-4 right-4 text-accent/25 pointer-events-none">
+            <LeafSprig width="40" height="60" />
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 mb-4">
             <span className="tag">{categoryEmoji[recipe.category]} {tx.categories[recipe.category]}</span>
-            {recipe.cuisine && <span className="tag">{recipe.cuisine}</span>}
-            {recipe.featured && <span className="tag-terra text-xs font-semibold">{tx.featured}</span>}
+            {recipe.cuisine && <span className="tag-herb">{recipe.cuisine}</span>}
+            {recipe.featured && (
+              <span className="tag-terra">
+                <Sparkle width="10" height="10" /> {tx.featured}
+              </span>
+            )}
           </div>
 
           <h1
-            className="font-serif text-3xl sm:text-4xl font-bold text-cream leading-tight mb-1"
+            className="font-serif text-4xl sm:text-5xl font-medium text-ink leading-[1.05] mb-2"
             dir={lang === 'he' ? 'rtl' : 'ltr'}
           >
             {displayTitle}
           </h1>
           {displaySubtitle && (
             <p
-              className="text-cream/40 text-lg mb-3"
+              className="text-ink/40 text-xl font-serif italic mb-4"
               dir={lang === 'he' ? 'ltr' : 'rtl'}
             >
               {displaySubtitle}
             </p>
           )}
           <p
-            className="text-cream/70 text-base leading-relaxed mb-5"
+            className="text-ink/70 text-base leading-relaxed mb-6 max-w-2xl"
             dir={lang === 'he' ? 'rtl' : 'ltr'}
           >
             {displayDescription}
           </p>
 
           {recipe.source && (
-            <p className="text-cream/30 text-xs mb-5">
-              {lang === 'he' ? 'מקור: ' : 'Source: '}
+            <p className="text-ink/35 text-xs mb-6 smallcaps">
+              {lang === 'he' ? 'מקור · ' : 'Source · '}
               {recipe.source.startsWith('http') ? (
-                <a href={recipe.source} target="_blank" rel="noopener noreferrer" className="underline hover:text-cream/60 transition-colors">
+                <a href={recipe.source} target="_blank" rel="noopener noreferrer" className="underline hover:text-accent transition-colors">
                   {recipe.source.replace(/^https?:\/\//, '').replace(/\/.*$/, '')}
                 </a>
               ) : (
@@ -172,7 +183,7 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
             </p>
           )}
 
-          {/* Meta grid */}
+          {/* Meta row */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
               { label: tx.prep, value: formatTime(recipe.prepTime), icon: '🔪' },
@@ -180,10 +191,10 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
               { label: tx.total, value: formatTime(totalTime), icon: '⏱' },
               { label: tx.servings, value: scaledServings.toString(), icon: '🍽' },
             ].map(item => (
-              <div key={item.label} className="bg-tint/[0.03] rounded-xl p-3 text-center border border-tint/5">
-                <p className="text-xl mb-1">{item.icon}</p>
-                <p className="font-bold text-cream text-lg">{item.value}</p>
-                <p className="text-cream/40 text-xs">{item.label}</p>
+              <div key={item.label} className="bg-surface/60 rounded-2xl p-4 text-center border border-tint/5">
+                <p className="text-2xl mb-1">{item.icon}</p>
+                <p className="font-serif text-2xl text-ink">{item.value}</p>
+                <p className="text-ink/45 text-[11px] smallcaps mt-1">{item.label}</p>
               </div>
             ))}
           </div>
@@ -192,23 +203,22 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
         {/* Portion control */}
         <div className="card p-4 mb-6">
           <div className="flex items-center gap-3 flex-wrap">
-            <span className="text-cream/60 text-sm font-medium">{tx.portions}</span>
+            <span className="text-ink/70 text-sm font-medium smallcaps">{tx.portions}</span>
             <div className="flex gap-1.5 flex-wrap">
               {presetMultipliers.map(m => (
                 <button
                   key={m}
                   onClick={() => handlePresetClick(m)}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
+                  className={`px-3.5 py-1.5 rounded-full text-sm font-semibold transition-all ${
                     multiplier === m && !customInput
-                      ? 'bg-amber text-bg scale-105'
-                      : 'bg-tint/[0.04] text-cream/60 hover:text-cream hover:bg-tint/[0.08] border border-tint/10'
+                      ? 'bg-accent text-card scale-105 shadow-md shadow-accent/30'
+                      : 'bg-surface text-ink/65 hover:text-accent hover:bg-surface/80 border border-tint/10'
                   }`}
                 >
                   {presetLabels[m]}
                 </button>
               ))}
-              {/* Custom portion input */}
-              <div className="flex items-center gap-1.5 bg-tint/[0.04] border border-tint/10 rounded-lg px-2 py-1">
+              <div className="flex items-center gap-1.5 bg-surface border border-tint/10 rounded-full px-3 py-1">
                 <input
                   type="number"
                   min="1"
@@ -216,14 +226,14 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
                   value={customInput}
                   onChange={e => handleCustomInput(e.target.value)}
                   placeholder={lang === 'he' ? 'מנות' : 'qty'}
-                  className="w-14 bg-transparent text-cream text-sm text-center outline-none placeholder-cream/30"
+                  className="w-14 bg-transparent text-ink text-sm text-center outline-none placeholder-ink/30"
                   dir="ltr"
                 />
               </div>
             </div>
             {multiplier !== 1 && (
-              <span className="text-amber text-sm ms-auto">
-                {scaledServings} {lang === 'he' ? 'מנות' : 'servings'}
+              <span className="text-accent text-sm ms-auto font-serif italic">
+                → {scaledServings} {lang === 'he' ? 'מנות' : 'servings'}
               </span>
             )}
           </div>
@@ -231,58 +241,70 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
 
         <div className="grid grid-cols-1 sm:grid-cols-5 gap-6">
           {/* Ingredients */}
-          {recipe.ingredients.length > 0 && <div className="sm:col-span-2">
-            <h2 className="font-serif text-xl font-bold text-cream mb-4">{tx.ingredients}</h2>
-            <div className="space-y-4">
-              {recipe.ingredients.map((group, gi) => {
-                const groupLabel = lang === 'he' ? group.group : (group.groupEn ?? group.group)
-                return (
-                  <div key={gi}>
-                    {groupLabel && (
-                      <h3 className="text-amber text-xs font-semibold uppercase tracking-wider mb-2">
-                        {groupLabel}
-                      </h3>
-                    )}
-                    <ul className="space-y-2">
-                      {group.items.map((item, ii) => {
-                        const itemName = lang === 'he' ? item.name : (item.nameEn ?? item.name)
-                        const itemNote = lang === 'he' ? item.note : (item.noteEn ?? item.note)
-                        return (
-                          <li key={ii} className="flex gap-2 text-sm" dir={lang === 'he' ? 'rtl' : 'ltr'}>
-                            <span className="font-semibold text-cream/90 shrink-0 w-14 text-right" dir={lang === 'he' ? 'rtl' : 'ltr'}>
-                              {(() => {
-                                if (item.amount == null) return null
-                                const scaled = item.amount * multiplier
-                                const amt = scaleAmount(item.amount, multiplier)
-                                const unit = lang === 'he' ? heUnit(item.unit, scaled) : item.unit
-                                if (!unit) return amt
-                                return `${amt} ${unit}`
-                              })()}
-                            </span>
-                            <span className="text-cream/70">
-                              {itemName}
-                              {itemNote && <span className="text-cream/40 italic"> ({itemNote})</span>}
-                            </span>
-                          </li>
-                        )
-                      })}
-                    </ul>
-                  </div>
-                )
-              })}
+          {recipe.ingredients.length > 0 && (
+            <div className="sm:col-span-2">
+              <div className="sticky top-20">
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-accent"><LeafSprig width="14" height="22" /></span>
+                  <h2 className="font-serif text-2xl text-ink">{tx.ingredients}</h2>
+                </div>
+                <div className="card card-paper p-5 space-y-5">
+                  {recipe.ingredients.map((group, gi) => {
+                    const groupLabel = lang === 'he' ? group.group : (group.groupEn ?? group.group)
+                    return (
+                      <div key={gi}>
+                        {groupLabel && (
+                          <h3 className="text-accent smallcaps mb-3">
+                            {groupLabel}
+                          </h3>
+                        )}
+                        <ul className="space-y-2.5">
+                          {group.items.map((item, ii) => {
+                            const itemName = lang === 'he' ? item.name : (item.nameEn ?? item.name)
+                            const itemNote = lang === 'he' ? item.note : (item.noteEn ?? item.note)
+                            return (
+                              <li key={ii} className="flex gap-2 text-sm items-baseline border-b border-tint/5 pb-2 last:border-0 last:pb-0" dir={lang === 'he' ? 'rtl' : 'ltr'}>
+                                <span className="font-semibold text-accent shrink-0 min-w-[3.5rem] font-mono text-[13px]" dir={lang === 'he' ? 'rtl' : 'ltr'}>
+                                  {(() => {
+                                    if (item.amount == null) return '·'
+                                    const scaled = item.amount * multiplier
+                                    const amt = scaleAmount(item.amount, multiplier)
+                                    const unit = lang === 'he' ? heUnit(item.unit, scaled) : item.unit
+                                    if (!unit) return amt
+                                    return `${amt} ${unit}`
+                                  })()}
+                                </span>
+                                <span className="text-ink/80 flex-1">
+                                  {itemName}
+                                  {itemNote && <span className="text-ink/40 italic"> ({itemNote})</span>}
+                                </span>
+                              </li>
+                            )
+                          })}
+                        </ul>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
             </div>
-          </div>}
+          )}
 
           {/* Steps */}
           <div className="sm:col-span-3">
-            <h2 className="font-serif text-xl font-bold text-cream mb-4">{tx.instructions}</h2>
-            <div className="space-y-6">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-highlight"><Sparkle width="16" height="16" /></span>
+              <h2 className="font-serif text-2xl text-ink">{tx.instructions}</h2>
+            </div>
+
+            <div className="space-y-7">
               {recipe.steps.map((group, gi) => {
                 const groupTitle = lang === 'he' ? group.title : (group.titleEn ?? group.title)
                 return (
                   <div key={gi}>
                     {groupTitle && (
-                      <h3 className="text-amber text-xs font-semibold uppercase tracking-wider mb-3">
+                      <h3 className="text-accent smallcaps mb-3 flex items-center gap-2">
+                        <span className="inline-block w-6 h-px bg-accent/40" />
                         {groupTitle}
                       </h3>
                     )}
@@ -301,23 +323,25 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
                           <motion.div
                             key={si}
                             layout
-                            className={`relative rounded-xl border p-4 transition-colors cursor-pointer ${
+                            className={`relative rounded-2xl border p-5 transition-colors cursor-pointer ${
                               checked
-                                ? 'border-herb/30 bg-herb/5'
-                                : 'border-tint/5 bg-tint/[0.02] hover:border-tint/10'
+                                ? 'border-accent-soft/40 bg-accent-soft/15'
+                                : 'border-tint/8 bg-card hover:border-accent/30 hover:bg-card/70'
                             }`}
                             onClick={() => toggleStep(stepKey)}
                           >
-                            <div className="flex gap-3">
-                              <div className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${
-                                checked ? 'bg-herb text-white' : 'bg-tint/10 text-cream/50'
+                            <div className="flex gap-4">
+                              <div className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center font-serif text-lg transition-all ${
+                                checked
+                                  ? 'bg-accent-soft text-card'
+                                  : 'bg-accent/10 text-accent border-2 border-accent/30'
                               }`}>
                                 {checked ? '✓' : stepNum}
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p
-                                  className={`text-sm leading-relaxed transition-colors ${
-                                    checked ? 'text-cream/40 line-through' : 'text-cream/80'
+                                  className={`text-[15px] leading-relaxed transition-colors ${
+                                    checked ? 'text-ink/40 line-through' : 'text-ink/85'
                                   }`}
                                   dir={lang === 'he' ? 'rtl' : 'ltr'}
                                 >
@@ -325,7 +349,7 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
                                 </p>
 
                                 {tip && !checked && (
-                                  <p className="mt-2 text-xs text-amber/70 flex items-start gap-1.5">
+                                  <p className="mt-3 text-xs text-highlight/85 flex items-start gap-1.5 italic">
                                     <span className="mt-0.5">💡</span>
                                     <span dir={lang === 'he' ? 'rtl' : 'ltr'}>{tip}</span>
                                   </p>
@@ -334,12 +358,12 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
                                 {step.timerMinutes && !checked && (
                                   <div className="mt-3" onClick={e => e.stopPropagation()}>
                                     {existingTimer ? (
-                                      <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-mono font-semibold border ${
+                                      <div className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-mono font-semibold border ${
                                         existingTimer.done
-                                          ? 'text-herb border-herb/30 bg-herb/10'
+                                          ? 'text-accent-soft border-accent-soft/40 bg-accent-soft/15'
                                           : existingTimer.running
-                                            ? 'text-amber border-amber/30 bg-amber/10'
-                                            : 'text-cream/50 border-tint/20 bg-tint/5'
+                                            ? 'text-accent border-accent/40 bg-accent/10 animate-pulse'
+                                            : 'text-ink/55 border-tint/20 bg-surface'
                                       }`}>
                                         <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -378,14 +402,17 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
 
         {/* Tips */}
         {displayTips.length > 0 && (
-          <div className="mt-8 card p-5">
-            <h2 className="font-serif text-lg font-bold text-cream mb-3 flex items-center gap-2">
-              <span>💡</span> {tx.tipsTitle}
+          <div className="mt-10 card card-paper p-6 relative overflow-hidden">
+            <div className="absolute -top-4 -right-4 text-highlight/20 rotate-12 pointer-events-none">
+              <SteamSwirl width="80" height="100" />
+            </div>
+            <h2 className="font-serif text-2xl text-ink mb-4 flex items-center gap-2">
+              <span className="text-highlight">💡</span> {tx.tipsTitle}
             </h2>
-            <ul className="space-y-2">
+            <ul className="space-y-3">
               {displayTips.map((tip, i) => (
-                <li key={i} className="flex gap-2 text-sm text-cream/70" dir={lang === 'he' ? 'rtl' : 'ltr'}>
-                  <span className="text-amber/60 shrink-0 mt-0.5">-</span>
+                <li key={i} className="flex gap-3 text-[15px] text-ink/75 leading-relaxed" dir={lang === 'he' ? 'rtl' : 'ltr'}>
+                  <span className="text-highlight shrink-0 mt-0.5 font-serif text-xl leading-none">※</span>
                   <span>{tip}</span>
                 </li>
               ))}
@@ -395,9 +422,9 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
 
         {/* Tags */}
         {recipe.tags.length > 0 && (
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-6 flex flex-wrap gap-2">
             {(lang === 'he' ? recipe.tags : (recipe.tagsEn ?? recipe.tags)).map(tag => (
-              <span key={tag} className="tag">{tag}</span>
+              <span key={tag} className="tag-herb">{tag}</span>
             ))}
           </div>
         )}

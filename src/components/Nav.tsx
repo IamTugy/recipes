@@ -1,49 +1,54 @@
 import { useNavigate } from 'react-router-dom'
 import { useLanguage } from '../context/LanguageContext'
 import { useTheme } from '../context/ThemeContext'
+import { ThemeIcon, RiceBowl } from './motifs'
+
+const THEME_LABEL: Record<'matcha' | 'ramen' | 'sakura', string> = {
+  matcha: 'Matcha',
+  ramen: 'Ramen',
+  sakura: 'Sakura',
+}
 
 export default function Nav() {
   const navigate = useNavigate()
   const { lang, setLang } = useLanguage()
-  const { theme, toggleTheme } = useTheme()
+  const { theme, cycleTheme } = useTheme()
 
   return (
-    <nav className="fixed top-0 inset-x-0 z-50 bg-bg/90 backdrop-blur-md border-b border-tint/[0.06]">
-      <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between" dir="ltr">
+    <nav className="fixed top-0 inset-x-0 z-50 bg-bg/85 backdrop-blur-lg border-b border-tint/[0.06]">
+      <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between" dir="ltr">
         <button
           onClick={() => navigate('/')}
-          className="font-serif text-lg font-medium text-cream/90 hover:text-cream tracking-wide transition-colors"
+          className="flex items-center gap-2.5 group"
         >
-          Tugy's Cookbook
+          <span className="text-accent w-7 h-7 inline-flex">
+            <RiceBowl width="28" height="28" />
+          </span>
+          <span className="font-serif text-xl font-medium text-ink/90 group-hover:text-ink tracking-wide transition-colors">
+            Tugy's Cookbook
+          </span>
         </button>
 
         <div className="flex items-center gap-2">
-          {/* Theme toggle */}
           <button
-            onClick={toggleTheme}
-            className="h-7 w-7 flex items-center justify-center rounded-lg text-cream/40 hover:text-cream/70 border border-tint/10 hover:bg-tint/[0.05] transition-colors"
-            title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+            onClick={cycleTheme}
+            className="h-9 px-3 flex items-center gap-2 rounded-full text-ink/65 hover:text-accent border border-tint/10 hover:border-accent/40 bg-card/60 transition-all"
+            title={`Theme: ${THEME_LABEL[theme]} — click to cycle`}
           >
-            {theme === 'light' ? (
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-              </svg>
-            ) : (
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-            )}
+            <span className="text-accent w-5 h-5 inline-flex">
+              <ThemeIcon theme={theme} width="20" height="20" />
+            </span>
+            <span className="smallcaps text-[10px]">{THEME_LABEL[theme]}</span>
           </button>
 
-          {/* Language toggle */}
           <button
             onClick={() => setLang(lang === 'he' ? 'en' : 'he')}
-            className="flex items-center gap-1.5 px-3 h-7 rounded-lg text-xs font-semibold tracking-widest border border-tint/10 bg-tint/[0.03] hover:bg-tint/[0.07] transition-colors"
+            className="flex items-center gap-1.5 px-3 h-9 rounded-full text-xs font-semibold tracking-widest border border-tint/10 bg-card/60 hover:border-accent/40 transition-all"
             title={lang === 'he' ? 'Switch to English' : 'עבור לעברית'}
           >
-            <span className={lang === 'he' ? 'text-amber' : 'text-cream/35'}>עב</span>
-            <span className="text-cream/15">|</span>
-            <span className={lang === 'en' ? 'text-amber' : 'text-cream/35'}>EN</span>
+            <span className={lang === 'he' ? 'text-accent' : 'text-ink/35'}>עב</span>
+            <span className="text-ink/20">|</span>
+            <span className={lang === 'en' ? 'text-accent' : 'text-ink/35'}>EN</span>
           </button>
         </div>
       </div>

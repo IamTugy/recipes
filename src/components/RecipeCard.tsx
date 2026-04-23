@@ -5,7 +5,8 @@ import { formatTime } from '../utils/format'
 import { t, categoryEmoji } from '../i18n'
 import { useLanguage } from '../context/LanguageContext'
 import Highlight from './Highlight'
-import RecipePlaceholder from './RecipePlaceholder'
+import CategoryIllustration from './placeholders/CategoryIllustration'
+import { Sparkle } from './motifs'
 
 interface RecipeCardProps {
   recipe: Recipe
@@ -14,9 +15,9 @@ interface RecipeCardProps {
 }
 
 const difficultyColor = {
-  easy: 'text-herb',
-  medium: 'text-amber',
-  hard: 'text-terra',
+  easy: 'text-accent-soft',
+  medium: 'text-accent',
+  hard: 'text-highlight',
 }
 
 export default function RecipeCard({ recipe, index, searchQuery }: RecipeCardProps) {
@@ -31,90 +32,95 @@ export default function RecipeCard({ recipe, index, searchQuery }: RecipeCardPro
     : (recipe.descriptionEn ?? recipe.description)
   const displayTags = lang === 'he' ? recipe.tags : (recipe.tagsEn ?? recipe.tags)
 
+  const hasImage = recipe.image && recipe.image.includes('assets.tugy.dev')
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.04, duration: 0.35 }}
+      transition={{ delay: index * 0.035, duration: 0.4 }}
+      whileHover={{ y: -4 }}
     >
       <Link to={`/recipe/${recipe.id}`} className="block group">
-        <div className="card overflow-hidden">
-          {/* Image */}
-          <div className="relative h-44 sm:h-48 overflow-hidden">
-            {recipe.image.includes('assets.tugy.dev') ? (
+        <div className="card card-paper overflow-hidden relative">
+          {/* Illustration / image */}
+          <div className="relative h-48 overflow-hidden">
+            {hasImage ? (
               <img
                 src={recipe.image}
                 alt={displayTitle}
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                className="w-full h-full object-cover transition-transform duration-[900ms] group-hover:scale-[1.06]"
                 loading="lazy"
               />
             ) : (
-              <RecipePlaceholder recipe={recipe} />
+              <CategoryIllustration category={recipe.category} title={recipe.id} />
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-card/95 via-card/30 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-card to-transparent" />
+
             <div className="absolute top-3 left-3">
-              <span className="tag flex items-center gap-1">
+              <span className="tag">
                 <span>{categoryEmoji[recipe.category]}</span>
                 <span>{tx.categories[recipe.category]}</span>
               </span>
             </div>
             {recipe.featured && (
               <div className="absolute top-3 right-3">
-                <span className="tag-terra text-[10px] font-semibold px-2 py-0.5">{tx.featured}</span>
+                <span className="tag-terra flex items-center gap-1">
+                  <Sparkle width="10" height="10" />
+                  {tx.featured}
+                </span>
               </div>
             )}
           </div>
 
           {/* Content */}
-          <div className="p-4">
+          <div className="p-5">
             <h3
-              className="font-serif text-base font-medium text-cream leading-snug mb-0.5 group-hover:text-amber transition-colors line-clamp-1"
+              className="font-serif text-xl font-medium text-ink leading-snug mb-1 group-hover:text-accent transition-colors line-clamp-1"
               dir={lang === 'he' ? 'rtl' : 'ltr'}
             >
               <Highlight text={displayTitle} query={searchQuery} />
             </h3>
             {displaySubtitle && displaySubtitle !== displayTitle && (
               <p
-                className="text-cream/25 text-[11px] mb-2 font-light tracking-wide"
+                className="text-ink/30 text-[11px] mb-2.5 font-light tracking-wide"
                 dir={lang === 'he' ? 'ltr' : 'rtl'}
               >
                 {displaySubtitle}
               </p>
             )}
             <p
-              className="text-cream/50 text-xs leading-relaxed line-clamp-2 mb-3"
+              className="text-ink/55 text-[13px] leading-relaxed line-clamp-2 mb-4"
               dir={lang === 'he' ? 'rtl' : 'ltr'}
             >
               <Highlight text={displayDescription} query={searchQuery} />
             </p>
 
-            {/* Meta row */}
-            <div className="flex items-center gap-3 text-[11px] text-cream/35 border-t border-tint/[0.04] pt-3">
+            <div className="flex items-center gap-3 text-[11px] text-ink/50 border-t border-tint/[0.05] pt-3">
               <span className="flex items-center gap-1">
-                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0114 0z" />
                 </svg>
                 {formatTime(totalTime)}
               </span>
               <span className="flex items-center gap-1">
-                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
                 {recipe.servings}
               </span>
-              <span className={`font-medium ${difficultyColor[recipe.difficulty]}`}>
+              <span className={`font-medium smallcaps ${difficultyColor[recipe.difficulty]}`}>
                 {tx.difficulty[recipe.difficulty]}
               </span>
               {recipe.cuisine && (
-                <span className="ml-auto text-cream/20 tracking-wide">{recipe.cuisine}</span>
+                <span className="ml-auto text-ink/30 italic font-serif text-xs">{recipe.cuisine}</span>
               )}
             </div>
 
-            {/* Tags */}
             {displayTags.length > 0 && (
-              <div className="flex flex-wrap gap-1 mt-2.5">
+              <div className="flex flex-wrap gap-1.5 mt-3">
                 {displayTags.slice(0, 3).map(tag => (
-                  <span key={tag} className="tag text-[9px] px-2 py-0.5">{tag}</span>
+                  <span key={tag} className="tag-herb text-[10px]">{tag}</span>
                 ))}
               </div>
             )}

@@ -16,6 +16,11 @@ export default {
         cream:   'rgb(var(--color-cream) / <alpha-value>)',
         herb:    'rgb(var(--color-herb) / <alpha-value>)',
         tint:    'rgb(var(--color-tint) / <alpha-value>)',
+        // Semantic aliases for redesigned components
+        ink:       'rgb(var(--color-cream) / <alpha-value>)',
+        accent:    'rgb(var(--color-amber) / <alpha-value>)',
+        'accent-soft': 'rgb(var(--color-herb) / <alpha-value>)',
+        highlight: 'rgb(var(--color-terra) / <alpha-value>)',
       },
       fontFamily: {
         serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
@@ -23,6 +28,9 @@ export default {
         mono:  ['"JetBrains Mono"', 'monospace'],
       },
       borderRadius: { '2xl': '1rem', '3xl': '1.5rem', '4xl': '2rem' },
+      backgroundImage: {
+        'radial-fade': 'radial-gradient(circle at center, rgb(var(--color-amber) / 0.12), transparent 70%)',
+      },
     },
   },
   plugins: [],

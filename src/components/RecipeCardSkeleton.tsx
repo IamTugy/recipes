@@ -2,7 +2,7 @@ export default function RecipeCardSkeleton() {
   return (
     <div className="card overflow-hidden animate-pulse">
       {/* Image placeholder */}
-      <div className="h-44 sm:h-48 bg-tint/[0.06]" />
+      <div className="h-48 bg-surface" />
 
       {/* Content */}
       <div className="p-4">
