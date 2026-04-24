@@ -36,7 +36,7 @@ export const heUnits: Record<string, string> = Object.fromEntries(
 export const t = {
   he: {
     siteTitle: "המטבח של טוגי",
-    heroLine1: 'לא המתכונים שלי. המטבח שלי.',
+    heroLine1: 'המטבח של טוגי.',
     heroLine2: 'ארכיון אישי של בישול ים-תיכוני וישראלי - נבדק, נאהב, ומשותף.',
     searchPlaceholder: "חפשו מתכון...",
     searchResultsCount: (n: number) => `נמצאו ${n} מתכון${n !== 1 ? 'ות' : ''}`,
@@ -75,7 +75,7 @@ export const t = {
   },
   en: {
     siteTitle: "Tugy's Cookbook",
-    heroLine1: 'Not my recipes. My kitchen.',
+    heroLine1: "Tugy's Kitchen.",
     heroLine2: 'A personal archive of Mediterranean and Israeli cooking - tested, loved, and shared.',
     searchPlaceholder: "Search recipes...",
     searchResultsCount: (n: number) => `${n} recipe${n !== 1 ? 's' : ''} found`,
