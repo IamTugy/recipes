@@ -14,6 +14,14 @@ interface RecipeDetailProps {
   timers: TimerState[]
 }
 
+function loadChecked(id: string | undefined): Set<string> {
+  if (!id) return new Set()
+  try {
+    const saved = sessionStorage.getItem(`checked-${id}`)
+    return saved ? new Set(JSON.parse(saved)) : new Set()
+  } catch { return new Set() }
+}
+
 const presetMultipliers = [0.5, 1, 1.5, 2, 3, 4]
 const presetLabels: Record<number, string> = { 0.5: '½x', 1: '1x', 1.5: '1.5x', 2: '2x', 3: '3x', 4: '4x' }
 
@@ -26,13 +34,17 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
 
   const [multiplier, setMultiplier] = useState(1)
   const [customInput, setCustomInput] = useState('')
-  const [checkedSteps, setCheckedSteps] = useState<Set<string>>(new Set())
+  const [checkedState, setCheckedState] = useState<{ id: string | undefined; checked: Set<string> }>(
+    () => ({ id, checked: loadChecked(id) })
+  )
+  if (checkedState.id !== id) {
+    setCheckedState({ id, checked: loadChecked(id) })
+  }
+  const checkedSteps = checkedState.checked
+  const setCheckedSteps = (updater: (prev: Set<string>) => Set<string>) =>
+    setCheckedState(s => ({ id: s.id, checked: updater(s.checked) }))
 
   useEffect(() => {
-    try {
-      const saved = sessionStorage.getItem(`checked-${id}`)
-      setCheckedSteps(saved ? new Set(JSON.parse(saved)) : new Set())
-    } catch { setCheckedSteps(new Set()) }
     window.scrollTo({ top: 0, behavior: 'instant' })
   }, [id])
 
@@ -67,8 +79,9 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
   function toggleStep(key: string) {
     setCheckedSteps(prev => {
       const next = new Set(prev)
-      next.has(key) ? next.delete(key) : next.add(key)
-      try { sessionStorage.setItem(`checked-${id}`, JSON.stringify([...next])) } catch {}
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      try { sessionStorage.setItem(`checked-${id}`, JSON.stringify([...next])) } catch { /* storage unavailable */ }
       return next
     })
   }
