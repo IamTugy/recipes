@@ -48,7 +48,7 @@ export default function Home() {
     <div className="min-h-screen bg-bg pt-14">
 
       {/* Search + categories */}
-      <div className="max-w-6xl mx-auto px-6 pt-6 pb-4">
+      <div className="max-w-6xl mx-auto px-6 pt-10 pb-6">
         <div className="relative max-w-md">
           <svg
             className={`absolute ${lang === 'he' ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 w-4 h-4 text-cream/25`}

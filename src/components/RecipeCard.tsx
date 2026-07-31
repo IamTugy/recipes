@@ -42,7 +42,7 @@ export default function RecipeCard({ recipe, index, searchQuery, isFavorite, onT
       <Link to={`/recipe/${recipe.id}`} className="block group">
         <div className="card overflow-hidden">
           {/* Image */}
-          <div className="relative h-44 sm:h-48 overflow-hidden">
+          <div className="relative h-52 sm:h-60 overflow-hidden">
             {recipe.image.includes('assets.tugy.dev') ? (
               <img
                 src={recipe.image}
@@ -83,7 +83,7 @@ export default function RecipeCard({ recipe, index, searchQuery, isFavorite, onT
           {/* Content */}
           <div className="p-4">
             <h3
-              className="font-serif text-base font-medium text-cream leading-snug mb-0.5 group-hover:text-amber transition-colors line-clamp-1"
+              className="font-serif text-lg font-medium text-cream leading-snug mb-0.5 group-hover:text-amber transition-colors line-clamp-1"
               dir={lang === 'he' ? 'rtl' : 'ltr'}
             >
               <Highlight text={displayTitle} query={searchQuery} />
