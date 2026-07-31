@@ -1,6 +1,8 @@
 import * as fs from 'fs'
 import * as path from 'path'
-import { parseRecipeFiles } from './seed-recipes'
+import mongoose from 'mongoose'
+import { MongoMemoryServer } from 'mongodb-memory-server'
+import { parseRecipeFiles, seedRecipes } from './seed-recipes'
 
 describe('parseRecipeFiles', () => {
   const tmpDir = path.join(__dirname, '__fixtures__')
@@ -33,4 +35,62 @@ describe('parseRecipeFiles', () => {
     expect(recipes).toHaveLength(1)
     expect(recipes[0]).toMatchObject({ slug: 'test-recipe', title: 'Test Recipe' })
   })
+})
+
+describe('seedRecipes idempotency', () => {
+  const tmpDir = path.join(__dirname, '__fixtures_seed__')
+  let mongod: MongoMemoryServer
+  let mongoUri: string
+
+  const recipeYaml = (id: string, title: string) =>
+    [
+      `id: ${id}`,
+      `title: ${title}`,
+      'category: dessert',
+      'image: https://assets.tugy.dev/test.jpg',
+      'description: A test',
+      'prepTime: 5',
+      'cookTime: 10',
+      'servings: 2',
+      'difficulty: easy',
+      'tags: []',
+      'ingredients: []',
+      'steps: []',
+    ].join('\n')
+
+  beforeAll(async () => {
+    fs.mkdirSync(tmpDir, { recursive: true })
+    fs.writeFileSync(path.join(tmpDir, 'one.yaml'), recipeYaml('seed-one', 'Seed One'))
+    fs.writeFileSync(path.join(tmpDir, 'two.yaml'), recipeYaml('seed-two', 'Seed Two'))
+    mongod = await MongoMemoryServer.create()
+    mongoUri = mongod.getUri()
+  }, 60000)
+
+  afterAll(async () => {
+    fs.rmSync(tmpDir, { recursive: true, force: true })
+    await mongoose.disconnect()
+    await mongod.stop()
+  })
+
+  async function countRecipes(): Promise<number> {
+    await mongoose.connect(mongoUri)
+    const count = await mongoose.connection.collection('recipes').countDocuments()
+    await mongoose.disconnect()
+    return count
+  }
+
+  it('running the seed twice upserts rather than duplicating', async () => {
+    expect(await seedRecipes(mongoUri, tmpDir)).toBe(2)
+    expect(await countRecipes()).toBe(2)
+
+    expect(await seedRecipes(mongoUri, tmpDir)).toBe(2)
+    expect(await countRecipes()).toBe(2)
+
+    await mongoose.connect(mongoUri)
+    const slugs = (await mongoose.connection.collection('recipes').find({}).toArray())
+      .map((doc) => doc.slug)
+      .sort()
+    await mongoose.disconnect()
+    expect(slugs).toEqual(['seed-one', 'seed-two'])
+  }, 60000)
 })

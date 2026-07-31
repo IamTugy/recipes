@@ -17,7 +17,10 @@ export function parseRecipeFiles(dir: string): Record<string, unknown>[] {
 
 export async function seedRecipes(mongoUri: string, dataDir: string): Promise<number> {
   await mongoose.connect(mongoUri)
-  const RecipeModel = mongoose.model(Recipe.name, RecipeSchema)
+  // Reuse the compiled model if it exists: mongoose keeps models registered
+  // across connect/disconnect, so recompiling on a second call in the same
+  // process throws OverwriteModelError.
+  const RecipeModel = mongoose.models[Recipe.name] ?? mongoose.model(Recipe.name, RecipeSchema)
   const recipes = parseRecipeFiles(dataDir)
 
   for (const recipe of recipes) {
