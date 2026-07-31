@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import RecipePlaceholder from './RecipePlaceholder'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { useRecipe } from '../hooks/useRecipes'
+import { useRecipe, useRecipes } from '../hooks/useRecipes'
 import { useFavorites } from '../hooks/useFavorites'
 import { useRecentlyViewed } from '../hooks/useRecentlyViewed'
 import { useAuth } from '@clerk/react'
@@ -26,6 +26,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
   const { lang } = useLanguage()
   const tx = t[lang]
   const { recipe } = useRecipe(id)
+  const { recipes: allRecipes } = useRecipes()
   const { favoriteSlugs, toggle: toggleFavorite } = useFavorites()
   const { addRecent } = useRecentlyViewed()
   const { getToken } = useAuth()
@@ -101,6 +102,10 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
   const displayTips = lang === 'he'
     ? (recipe.tips ?? [])
     : (recipe.tipsEn ?? recipe.tips ?? [])
+
+  const relatedRecipes = allRecipes
+    .filter(r => r.id !== recipe.id && r.category === recipe.category && !r.hidden)
+    .slice(0, 4)
 
   function addAllToShoppingList() {
     const items = recipe!.ingredients.flatMap(group =>
@@ -504,6 +509,41 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
             {(lang === 'he' ? recipe.tags : (recipe.tagsEn ?? recipe.tags)).map(tag => (
               <span key={tag} className="tag">{tag}</span>
             ))}
+          </div>
+        )}
+
+        {/* Related recipes */}
+        {relatedRecipes.length > 0 && (
+          <div className="mt-10">
+            <h2 className="font-serif text-lg font-bold text-cream mb-4">
+              {lang === 'he' ? 'מתכונים דומים' : 'You might also like'}
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {relatedRecipes.map(r => {
+                const title = lang === 'he' ? (r.titleHe ?? r.title) : r.title
+                return (
+                  <Link key={r.id} to={`/recipe/${r.id}`} className="group">
+                    <div className="relative h-24 rounded-xl overflow-hidden mb-2">
+                      {r.image.includes('assets.tugy.dev') ? (
+                        <img
+                          src={r.image}
+                          alt={title}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-tint/[0.05] flex items-center justify-center text-2xl">
+                          {categoryEmoji[r.category]}
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-xs text-cream/70 group-hover:text-amber transition-colors line-clamp-2" dir={lang === 'he' ? 'rtl' : 'ltr'}>
+                      {title}
+                    </p>
+                  </Link>
+                )
+              })}
+            </div>
           </div>
         )}
       </div>
