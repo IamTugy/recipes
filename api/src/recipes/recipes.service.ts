@@ -12,6 +12,6 @@ export class RecipesService {
   }
 
   async findBySlug(slug: string): Promise<RecipeDocument | null> {
-    return this.recipeModel.findOne({ slug }).exec()
+    return this.recipeModel.findOne({ slug, hidden: { $ne: true } }).exec()
   }
 }
