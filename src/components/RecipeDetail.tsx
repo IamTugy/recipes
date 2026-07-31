@@ -3,6 +3,8 @@ import RecipePlaceholder from './RecipePlaceholder'
 import { useNavigate, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useRecipe } from '../hooks/useRecipes'
+import { useFavorites } from '../hooks/useFavorites'
+import { useAuth } from '@clerk/react'
 import { formatTime, formatSeconds, scaleAmount } from '../utils/format'
 import { t, categoryEmoji, heUnit } from '../i18n'
 import { useLanguage } from '../context/LanguageContext'
@@ -22,10 +24,40 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
   const { lang } = useLanguage()
   const tx = t[lang]
   const { recipe } = useRecipe(id)
+  const { favoriteSlugs, toggle: toggleFavorite } = useFavorites()
+  const { getToken } = useAuth()
 
   const [multiplier, setMultiplier] = useState(1)
   const [customInput, setCustomInput] = useState('')
   const [checkedSteps, setCheckedSteps] = useState<Set<string>>(new Set())
+  const [userRating, setUserRating] = useState<number | null>(null)
+  const [shareState, setShareState] = useState<'idle' | 'copied'>('idle')
+
+  async function rate(score: number) {
+    setUserRating(score)
+    const token = await getToken()
+    await fetch(`/api/ratings/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({ score }),
+    })
+  }
+
+  async function share() {
+    const shareData = { title: recipe?.title, url: window.location.href }
+    if (navigator.share) {
+      try { await navigator.share(shareData) } catch { /* user cancelled */ }
+      return
+    }
+    try {
+      await navigator.clipboard.writeText(window.location.href)
+      setShareState('copied')
+      setTimeout(() => setShareState('idle'), 2000)
+    } catch { /* clipboard unavailable */ }
+  }
 
   // Reset checked steps and scroll when recipe changes
   useEffect(() => {
@@ -65,8 +97,9 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
   function toggleStep(key: string) {
     setCheckedSteps(prev => {
       const next = new Set(prev)
-      next.has(key) ? next.delete(key) : next.add(key)
-      try { sessionStorage.setItem(`checked-${id}`, JSON.stringify([...next])) } catch {}
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      try { sessionStorage.setItem(`checked-${id}`, JSON.stringify([...next])) } catch { /* sessionStorage unavailable */ }
       return next
     })
   }
@@ -186,6 +219,44 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
                 <p className="text-cream/40 text-xs">{item.label}</p>
               </div>
             ))}
+          </div>
+
+          {/* Favorite / rating / share */}
+          <div className="flex items-center gap-4 mt-5 pt-5 border-t border-tint/[0.06]">
+            <button
+              onClick={() => toggleFavorite(recipe.id)}
+              className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${
+                favoriteSlugs.has(recipe.id) ? 'text-amber' : 'text-cream/40 hover:text-cream/70'
+              }`}
+            >
+              <svg className="w-4 h-4" fill={favoriteSlugs.has(recipe.id) ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 010-6.364z" />
+              </svg>
+              {lang === 'he' ? 'מועדף' : 'Favorite'}
+            </button>
+
+            <div className="flex items-center gap-1">
+              {[1, 2, 3, 4, 5].map(n => (
+                <button key={n} onClick={() => rate(n)} className="text-lg leading-none">
+                  <span className={n <= (userRating ?? 0) ? 'text-amber' : 'text-cream/20'}>★</span>
+                </button>
+              ))}
+              {!!recipe.averageRating && (
+                <span className="text-cream/40 text-xs ms-1">
+                  {recipe.averageRating} ({recipe.ratingCount})
+                </span>
+              )}
+            </div>
+
+            <button
+              onClick={share}
+              className="ms-auto flex items-center gap-1.5 text-sm font-medium text-cream/40 hover:text-cream/70 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342a3 3 0 100-2.684l-6.44 3.22a3 3 0 100 2.684l6.44-3.22zM8.684 13.342l6.632 3.316m0-11.317l-6.632 3.316" />
+              </svg>
+              {shareState === 'copied' ? (lang === 'he' ? 'הועתק!' : 'Copied!') : (lang === 'he' ? 'שתף' : 'Share')}
+            </button>
           </div>
         </div>
 

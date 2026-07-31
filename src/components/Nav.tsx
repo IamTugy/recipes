@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { UserButton } from '@clerk/react'
 import { useLanguage } from '../context/LanguageContext'
 import { useTheme } from '../context/ThemeContext'
 
@@ -45,6 +46,8 @@ export default function Nav() {
             <span className="text-cream/15">|</span>
             <span className={lang === 'en' ? 'text-amber' : 'text-cream/35'}>EN</span>
           </button>
+
+          <UserButton />
         </div>
       </div>
     </nav>

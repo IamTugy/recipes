@@ -11,6 +11,8 @@ interface RecipeCardProps {
   recipe: Recipe
   index: number
   searchQuery: string
+  isFavorite: boolean
+  onToggleFavorite: (slug: string) => void
 }
 
 const difficultyColor = {
@@ -19,7 +21,7 @@ const difficultyColor = {
   hard: 'text-terra',
 }
 
-export default function RecipeCard({ recipe, index, searchQuery }: RecipeCardProps) {
+export default function RecipeCard({ recipe, index, searchQuery, isFavorite, onToggleFavorite }: RecipeCardProps) {
   const { lang } = useLanguage()
   const tx = t[lang]
   const totalTime = recipe.prepTime + recipe.cookTime
@@ -58,11 +60,24 @@ export default function RecipeCard({ recipe, index, searchQuery }: RecipeCardPro
                 <span>{tx.categories[recipe.category]}</span>
               </span>
             </div>
-            {recipe.featured && (
-              <div className="absolute top-3 right-3">
+            <div className="absolute top-3 right-3 flex items-center gap-1.5">
+              {recipe.featured && (
                 <span className="tag-terra text-[10px] font-semibold px-2 py-0.5">{tx.featured}</span>
-              </div>
-            )}
+              )}
+              <button
+                onClick={e => { e.preventDefault(); e.stopPropagation(); onToggleFavorite(recipe.id) }}
+                className={`h-7 w-7 flex items-center justify-center rounded-full backdrop-blur-sm border transition-colors ${
+                  isFavorite
+                    ? 'bg-amber/90 border-amber text-bg'
+                    : 'bg-black/30 border-white/20 text-white/80 hover:text-white'
+                }`}
+                aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+              >
+                <svg className="w-3.5 h-3.5" fill={isFavorite ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 010-6.364z" />
+                </svg>
+              </button>
+            </div>
           </div>
 
           {/* Content */}
@@ -105,6 +120,14 @@ export default function RecipeCard({ recipe, index, searchQuery }: RecipeCardPro
               <span className={`font-medium ${difficultyColor[recipe.difficulty]}`}>
                 {tx.difficulty[recipe.difficulty]}
               </span>
+              {!!recipe.averageRating && (
+                <span className="flex items-center gap-1 text-amber">
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.958a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.367 2.446a1 1 0 00-.363 1.118l1.287 3.957c.3.922-.755 1.688-1.539 1.118l-3.367-2.446a1 1 0 00-1.175 0l-3.367 2.446c-.784.57-1.838-.196-1.539-1.118l1.287-3.957a1 1 0 00-.364-1.118L2.813 9.385c-.783-.57-.38-1.81.588-1.81h4.163a1 1 0 00.95-.69l1.286-3.958z" />
+                  </svg>
+                  {recipe.averageRating}
+                </span>
+              )}
               {recipe.cuisine && (
                 <span className="ml-auto text-cream/20 tracking-wide">{recipe.cuisine}</span>
               )}

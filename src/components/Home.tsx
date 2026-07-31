@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import type { Category } from '../types'
 import { useRecipes } from '../hooks/useRecipes'
+import { useFavorites } from '../hooks/useFavorites'
 import { t, categoryEmoji } from '../i18n'
 import { useLanguage } from '../context/LanguageContext'
 import RecipeCard from './RecipeCard'
@@ -14,9 +15,12 @@ export default function Home() {
   const [search, setSearch] = useState('')
   const [activeCategory, setActiveCategory] = useState<Category | null>(null)
   const { recipes, loading, error } = useRecipes()
+  const { favoriteSlugs, toggle: toggleFavorite } = useFavorites()
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false)
 
   const filtered = useMemo(() => {
     let list = recipes.filter(r => !r.hidden)
+    if (showFavoritesOnly) list = list.filter(r => favoriteSlugs.has(r.id))
     if (activeCategory) list = list.filter(r => r.category === activeCategory)
     if (search.trim()) {
       const q = search.toLowerCase()
@@ -38,7 +42,7 @@ export default function Home() {
       })
     }
     return list
-  }, [search, activeCategory, lang, recipes])
+  }, [search, activeCategory, lang, recipes, showFavoritesOnly, favoriteSlugs])
 
   return (
     <div className="min-h-screen bg-bg pt-14">
@@ -75,6 +79,17 @@ export default function Home() {
             }`}
           >
             {tx.categories.all}
+          </button>
+          <button
+            onClick={() => setShowFavoritesOnly(v => !v)}
+            className={`shrink-0 flex items-center gap-1.5 px-4 py-2 text-xs tracking-wider font-medium transition-colors rounded-lg ${
+              showFavoritesOnly
+                ? 'text-amber bg-amber/10 border border-amber/20'
+                : 'text-cream/40 hover:text-cream/70 border border-transparent'
+            }`}
+          >
+            <span>♥</span>
+            <span>{lang === 'he' ? 'מועדפים' : 'Favorites'}</span>
           </button>
           {categories.map(cat => (
             <button
@@ -123,7 +138,14 @@ export default function Home() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {filtered.map((r, i) => (
-              <RecipeCard key={r.id} recipe={r} index={i} searchQuery={search} />
+              <RecipeCard
+                key={r.id}
+                recipe={r}
+                index={i}
+                searchQuery={search}
+                isFavorite={favoriteSlugs.has(r.id)}
+                onToggleFavorite={toggleFavorite}
+              />
             ))}
           </div>
         )}
