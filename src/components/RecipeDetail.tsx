@@ -13,12 +13,13 @@ import type { TimerState } from '../types'
 interface RecipeDetailProps {
   onAddTimer: (label: string, minutes: number, recipeId: string, stepIndex: number) => void
   timers: TimerState[]
+  onAddToShoppingList: (items: { name: string; amount: string }[], recipeTitle: string) => void
 }
 
 const presetMultipliers = [0.5, 1, 1.5, 2, 3, 4]
 const presetLabels: Record<number, string> = { 0.5: '½x', 1: '1x', 1.5: '1.5x', 2: '2x', 3: '3x', 4: '4x' }
 
-export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) {
+export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }: RecipeDetailProps) {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { lang } = useLanguage()
@@ -93,6 +94,20 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
   const displayTips = lang === 'he'
     ? (recipe.tips ?? [])
     : (recipe.tipsEn ?? recipe.tips ?? [])
+
+  function addAllToShoppingList() {
+    const items = recipe!.ingredients.flatMap(group =>
+      group.items.map(item => {
+        const itemName = lang === 'he' ? item.name : (item.nameEn ?? item.name)
+        if (item.amount == null) return { name: itemName, amount: '' }
+        const scaled = item.amount * multiplier
+        const amt = scaleAmount(item.amount, multiplier)
+        const unit = lang === 'he' ? heUnit(item.unit, scaled) : item.unit
+        return { name: itemName, amount: unit ? `${amt} ${unit}` : amt }
+      })
+    )
+    onAddToShoppingList(items, displayTitle)
+  }
 
   function toggleStep(key: string) {
     setCheckedSteps(prev => {
@@ -248,9 +263,21 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
               )}
             </div>
 
+            {recipe.ingredients.length > 0 && (
+              <button
+                onClick={addAllToShoppingList}
+                className="ms-auto flex items-center gap-1.5 text-sm font-medium text-cream/40 hover:text-cream/70 transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m-10 0a2 2 0 100 4 2 2 0 000-4zm10 0a2 2 0 100 4 2 2 0 000-4z" />
+                </svg>
+                {lang === 'he' ? 'הוסף לרשימת קניות' : 'Add to list'}
+              </button>
+            )}
+
             <button
               onClick={share}
-              className="ms-auto flex items-center gap-1.5 text-sm font-medium text-cream/40 hover:text-cream/70 transition-colors"
+              className={`flex items-center gap-1.5 text-sm font-medium text-cream/40 hover:text-cream/70 transition-colors ${recipe.ingredients.length > 0 ? '' : 'ms-auto'}`}
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342a3 3 0 100-2.684l-6.44 3.22a3 3 0 100 2.684l6.44-3.22zM8.684 13.342l6.632 3.316m0-11.317l-6.632 3.316" />

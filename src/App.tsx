@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import { useAuth, SignIn } from '@clerk/react'
@@ -5,10 +6,14 @@ import Nav from './components/Nav'
 import Home from './components/Home'
 import RecipeDetail from './components/RecipeDetail'
 import TimerPanel from './components/TimerPanel'
+import ShoppingListPanel from './components/ShoppingListPanel'
 import { useTimers } from './hooks/useTimers'
+import { useShoppingList } from './hooks/useShoppingList'
 
 export default function App() {
   const { timers, addTimer, toggleTimer, removeTimer, resetTimer } = useTimers()
+  const shoppingList = useShoppingList()
+  const [shoppingListOpen, setShoppingListOpen] = useState(false)
   const { isLoaded, isSignedIn } = useAuth()
 
   if (!isLoaded) {
@@ -25,7 +30,10 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-bg">
-      <Nav />
+      <Nav
+        shoppingListCount={shoppingList.items.length}
+        onOpenShoppingList={() => setShoppingListOpen(true)}
+      />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route
@@ -34,6 +42,7 @@ export default function App() {
             <RecipeDetail
               onAddTimer={addTimer}
               timers={timers}
+              onAddToShoppingList={shoppingList.addItems}
             />
           }
         />
@@ -48,6 +57,15 @@ export default function App() {
           />
         )}
       </AnimatePresence>
+      <ShoppingListPanel
+        open={shoppingListOpen}
+        onClose={() => setShoppingListOpen(false)}
+        items={shoppingList.items}
+        onToggle={shoppingList.toggle}
+        onRemove={shoppingList.remove}
+        onClearChecked={shoppingList.clearChecked}
+        onClearAll={shoppingList.clear}
+      />
     </div>
   )
 }

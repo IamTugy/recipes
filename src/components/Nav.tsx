@@ -3,7 +3,12 @@ import { UserButton } from '@clerk/react'
 import { useLanguage } from '../context/LanguageContext'
 import { useTheme } from '../context/ThemeContext'
 
-export default function Nav() {
+interface NavProps {
+  shoppingListCount: number
+  onOpenShoppingList: () => void
+}
+
+export default function Nav({ shoppingListCount, onOpenShoppingList }: NavProps) {
   const navigate = useNavigate()
   const { lang, setLang } = useLanguage()
   const { theme, toggleTheme } = useTheme()
@@ -45,6 +50,22 @@ export default function Nav() {
             <span className={lang === 'he' ? 'text-amber' : 'text-cream/35'}>עב</span>
             <span className="text-cream/15">|</span>
             <span className={lang === 'en' ? 'text-amber' : 'text-cream/35'}>EN</span>
+          </button>
+
+          {/* Shopping list */}
+          <button
+            onClick={onOpenShoppingList}
+            className="relative h-7 w-7 flex items-center justify-center rounded-lg text-cream/40 hover:text-cream/70 border border-tint/10 hover:bg-tint/[0.05] transition-colors"
+            title={lang === 'he' ? 'רשימת קניות' : 'Shopping list'}
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m-10 0a2 2 0 100 4 2 2 0 000-4zm10 0a2 2 0 100 4 2 2 0 000-4z" />
+            </svg>
+            {shoppingListCount > 0 && (
+              <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-amber text-bg text-[9px] font-bold flex items-center justify-center">
+                {shoppingListCount}
+              </span>
+            )}
           </button>
 
           <UserButton />
