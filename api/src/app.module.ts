@@ -4,6 +4,7 @@ import { HealthController } from './health/health.controller'
 import { MongoModule } from './mongo/mongo.module'
 import { RedisModule } from './redis/redis.module'
 import { AuthModule } from './auth/auth.module'
+import { RecipesModule } from './recipes/recipes.module'
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { AuthModule } from './auth/auth.module'
     MongoModule,
     RedisModule,
     AuthModule,
+    RecipesModule,
   ],
   controllers: [HealthController],
 })
