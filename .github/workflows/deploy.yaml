@@ -23,6 +23,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Gate the API image on its test suite. A failure here fails the job,
+      # which blocks both the image push and the downstream deploy.
+      - name: Set up Node
+        if: matrix.app == 'recipes-api'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: api/package-lock.json
+
+      - name: Run API tests
+        if: matrix.app == 'recipes-api'
+        working-directory: api
+        run: |
+          npm ci
+          npm test
+          npm run test:e2e
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
