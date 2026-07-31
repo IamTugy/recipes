@@ -74,6 +74,8 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64,linux/arm64
+          build-args: |
+            VITE_CLERK_PUBLISHABLE_KEY=${{ matrix.app == 'recipes' && vars.CLERK_PUBLISHABLE_KEY || '' }}
           cache-from: type=registry,ref=${{ env.DOCKERHUB_USER }}/${{ matrix.app }}:buildcache
           cache-to: type=registry,ref=${{ env.DOCKERHUB_USER }}/${{ matrix.app }}:buildcache,mode=max
 

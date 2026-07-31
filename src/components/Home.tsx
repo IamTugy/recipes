@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { Category } from '../types'
-import { recipes } from '../data/recipes'
+import { useRecipes } from '../hooks/useRecipes'
 import { t, categoryEmoji } from '../i18n'
 import { useLanguage } from '../context/LanguageContext'
 import RecipeCard from './RecipeCard'
@@ -13,12 +13,7 @@ export default function Home() {
   const tx = t[lang]
   const [search, setSearch] = useState('')
   const [activeCategory, setActiveCategory] = useState<Category | null>(null)
-  const [loaded, setLoaded] = useState(false)
-
-  useEffect(() => {
-    const id = requestAnimationFrame(() => setLoaded(true))
-    return () => cancelAnimationFrame(id)
-  }, [])
+  const { recipes, loading, error } = useRecipes()
 
   const filtered = useMemo(() => {
     let list = recipes.filter(r => !r.hidden)
@@ -43,7 +38,7 @@ export default function Home() {
       })
     }
     return list
-  }, [search, activeCategory, lang])
+  }, [search, activeCategory, lang, recipes])
 
   return (
     <div className="min-h-screen bg-bg pt-14">
@@ -108,11 +103,17 @@ export default function Home() {
           {' '}{lang === 'he' ? 'מתכונים' : 'recipes'}
         </p>
 
-        {!loaded ? (
+        {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {Array.from({ length: 12 }).map((_, i) => (
               <RecipeCardSkeleton key={i} />
             ))}
+          </div>
+        ) : error ? (
+          <div className="text-center py-24 text-cream/30">
+            <p className="text-sm tracking-widest uppercase mb-2">
+              {lang === 'he' ? 'שגיאה בטעינת המתכונים' : 'Failed to load recipes'}
+            </p>
           </div>
         ) : filtered.length === 0 ? (
           <div className="text-center py-24 text-cream/30">

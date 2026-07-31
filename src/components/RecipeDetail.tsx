@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import RecipePlaceholder from './RecipePlaceholder'
 import { useNavigate, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { getRecipe } from '../data/recipes'
+import { useRecipe } from '../hooks/useRecipes'
 import { formatTime, formatSeconds, scaleAmount } from '../utils/format'
 import { t, categoryEmoji, heUnit } from '../i18n'
 import { useLanguage } from '../context/LanguageContext'
@@ -21,7 +21,7 @@ export default function RecipeDetail({ onAddTimer, timers }: RecipeDetailProps) 
   const navigate = useNavigate()
   const { lang } = useLanguage()
   const tx = t[lang]
-  const recipe = id ? getRecipe(id) : undefined
+  const { recipe } = useRecipe(id)
 
   const [multiplier, setMultiplier] = useState(1)
   const [customInput, setCustomInput] = useState('')
