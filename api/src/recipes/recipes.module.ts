@@ -1,13 +1,17 @@
 import { Module } from '@nestjs/common'
 import { MongooseModule } from '@nestjs/mongoose'
 import { Recipe, RecipeSchema } from './schemas/recipe.schema'
+import { Rating, RatingSchema } from '../ratings/schemas/rating.schema'
 import { RecipesService } from './recipes.service'
 import { RecipesController } from './recipes.controller'
 import { ActivityLogModule } from '../activity-log/activity-log.module'
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Recipe.name, schema: RecipeSchema }]),
+    MongooseModule.forFeature([
+      { name: Recipe.name, schema: RecipeSchema },
+      { name: Rating.name, schema: RatingSchema },
+    ]),
     ActivityLogModule,
   ],
   providers: [RecipesService],

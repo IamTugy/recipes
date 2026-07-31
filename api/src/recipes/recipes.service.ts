@@ -2,16 +2,55 @@ import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { Recipe, RecipeDocument } from './schemas/recipe.schema'
+import { Rating, RatingDocument } from '../ratings/schemas/rating.schema'
+
+interface RatingAggregate {
+  _id: string
+  avg: number
+  count: number
+}
 
 @Injectable()
 export class RecipesService {
-  constructor(@InjectModel(Recipe.name) private readonly recipeModel: Model<RecipeDocument>) {}
+  constructor(
+    @InjectModel(Recipe.name) private readonly recipeModel: Model<RecipeDocument>,
+    @InjectModel(Rating.name) private readonly ratingModel: Model<RatingDocument>,
+  ) {}
 
-  async findAll(): Promise<RecipeDocument[]> {
-    return this.recipeModel.find({ hidden: { $ne: true } }).exec()
+  private async ratingsBySlug(slugs: string[]): Promise<Map<string, { avg: number; count: number }>> {
+    const aggregates = (await this.ratingModel.aggregate([
+      { $match: { recipeSlug: { $in: slugs } } },
+      { $group: { _id: '$recipeSlug', avg: { $avg: '$score' }, count: { $sum: 1 } } },
+    ])) as RatingAggregate[]
+
+    return new Map(aggregates.map(a => [a._id, { avg: a.avg, count: a.count }]))
   }
 
-  async findBySlug(slug: string): Promise<RecipeDocument | null> {
-    return this.recipeModel.findOne({ slug, hidden: { $ne: true } }).exec()
+  private attachRatings<T extends { slug: string }>(
+    recipes: T[],
+    ratings: Map<string, { avg: number; count: number }>,
+  ) {
+    return recipes.map(recipe => {
+      const rating = ratings.get(recipe.slug)
+      return {
+        ...recipe,
+        averageRating: rating ? Math.round(rating.avg * 10) / 10 : null,
+        ratingCount: rating?.count ?? 0,
+      }
+    })
+  }
+
+  async findAll() {
+    const recipes = await this.recipeModel.find({ hidden: { $ne: true } }).exec()
+    const plain = recipes.map(r => r.toObject())
+    const ratings = await this.ratingsBySlug(plain.map(r => r.slug))
+    return this.attachRatings(plain, ratings)
+  }
+
+  async findBySlug(slug: string) {
+    const recipe = await this.recipeModel.findOne({ slug, hidden: { $ne: true } }).exec()
+    if (!recipe) return null
+    const ratings = await this.ratingsBySlug([slug])
+    return this.attachRatings([recipe.toObject()], ratings)[0]
   }
 }
