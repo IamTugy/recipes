@@ -74,5 +74,7 @@ describe('Recipes flow (e2e)', () => {
     const activityModel = app.get('ActivityLogModel')
     const logs = await activityModel.find({ action: 'recipe_viewed' })
     expect(logs).toHaveLength(1)
+    expect(logs[0].userId).toBe('user_1')
+    expect(logs[0].recipeId).toBe('test-recipe')
   })
 })
