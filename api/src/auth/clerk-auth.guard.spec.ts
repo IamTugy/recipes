@@ -1,14 +1,14 @@
 import { ExecutionContext, UnauthorizedException } from '@nestjs/common'
 import { ClerkAuthGuard } from './clerk-auth.guard'
 
+const mockGetUser = jest.fn()
+
 jest.mock('@clerk/backend', () => ({
   verifyToken: jest.fn(),
-  createClerkClient: jest.fn(() => ({
-    users: { getUser: jest.fn().mockResolvedValue({ emailAddresses: [{ emailAddress: 'a@b.com' }], firstName: 'A' }) },
-  })),
+  createClerkClient: jest.fn(() => ({ users: { getUser: mockGetUser } })),
 }))
 
-import { verifyToken } from '@clerk/backend'
+import { verifyToken, createClerkClient } from '@clerk/backend'
 
 function contextWithHeader(header?: string): ExecutionContext {
   const req: any = { headers: header ? { authorization: header } : {} }
@@ -24,7 +24,10 @@ describe('ClerkAuthGuard', () => {
   const configService = { get: () => 'sk_test_xxx' }
   const reflector = { getAllAndOverride: () => false }
 
-  beforeEach(() => jest.clearAllMocks())
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockGetUser.mockResolvedValue({ emailAddresses: [{ emailAddress: 'a@b.com' }], firstName: 'A' })
+  })
 
   it('rejects when no Authorization header is present', async () => {
     const guard = new ClerkAuthGuard(reflector as any, configService as any, usersService as any)
@@ -57,5 +60,39 @@ describe('ClerkAuthGuard', () => {
     const guard = new ClerkAuthGuard(publicReflector as any, configService as any, usersService as any)
     await expect(guard.canActivate(contextWithHeader())).resolves.toBe(true)
     expect(usersService.upsertFromClerk).not.toHaveBeenCalled()
+  })
+
+  it('constructs the Clerk client once, not per request', async () => {
+    ;(createClerkClient as jest.Mock).mockClear()
+    ;(verifyToken as jest.Mock).mockResolvedValue({ sub: 'user_1' })
+    const guard = new ClerkAuthGuard(reflector as any, configService as any, usersService as any)
+    expect(createClerkClient).toHaveBeenCalledTimes(1)
+
+    await guard.canActivate(contextWithHeader('Bearer goodtoken'))
+    await guard.canActivate(contextWithHeader('Bearer goodtoken'))
+    expect(createClerkClient).toHaveBeenCalledTimes(1)
+  })
+
+  it('still authorizes when the Clerk getUser call fails', async () => {
+    ;(verifyToken as jest.Mock).mockResolvedValue({ sub: 'user_1' })
+    mockGetUser.mockRejectedValue(new Error('clerk is down'))
+    const guard = new ClerkAuthGuard(reflector as any, configService as any, usersService as any)
+    const context = contextWithHeader('Bearer goodtoken')
+    const req = context.switchToHttp().getRequest()
+
+    await expect(guard.canActivate(context)).resolves.toBe(true)
+    expect(req.userId).toBe('user_1')
+    expect(usersService.upsertFromClerk).not.toHaveBeenCalled()
+  })
+
+  it('still authorizes when the profile upsert fails', async () => {
+    ;(verifyToken as jest.Mock).mockResolvedValue({ sub: 'user_1' })
+    usersService.upsertFromClerk.mockRejectedValue(new Error('mongo is down'))
+    const guard = new ClerkAuthGuard(reflector as any, configService as any, usersService as any)
+    const context = contextWithHeader('Bearer goodtoken')
+    const req = context.switchToHttp().getRequest()
+
+    await expect(guard.canActivate(context)).resolves.toBe(true)
+    expect(req.userId).toBe('user_1')
   })
 })
