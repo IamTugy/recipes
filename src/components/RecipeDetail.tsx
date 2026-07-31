@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useRecipe } from '../hooks/useRecipes'
 import { useFavorites } from '../hooks/useFavorites'
+import { useRecentlyViewed } from '../hooks/useRecentlyViewed'
 import { useAuth } from '@clerk/react'
 import { formatTime, formatSeconds, scaleAmount } from '../utils/format'
 import { t, categoryEmoji, heUnit } from '../i18n'
@@ -26,6 +27,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
   const tx = t[lang]
   const { recipe } = useRecipe(id)
   const { favoriteSlugs, toggle: toggleFavorite } = useFavorites()
+  const { addRecent } = useRecentlyViewed()
   const { getToken } = useAuth()
 
   const [multiplier, setMultiplier] = useState(1)
@@ -68,6 +70,11 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
     } catch { setCheckedSteps(new Set()) }
     window.scrollTo({ top: 0, behavior: 'instant' })
   }, [id])
+
+  // Track this recipe as recently viewed once it has loaded
+  useEffect(() => {
+    if (recipe) addRecent(recipe.id)
+  }, [recipe, addRecent])
 
   if (!recipe) {
     return (
