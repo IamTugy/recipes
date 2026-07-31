@@ -9,11 +9,17 @@ on:
 
 env:
   DOCKERHUB_USER: tugy
-  APPLICATION_NAME: recipes
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - app: recipes
+            dockerfile: Dockerfile
+          - app: recipes-api
+            dockerfile: api/Dockerfile
     steps:
       - uses: actions/checkout@v4
 
@@ -27,7 +33,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.DOCKERHUB_USER }}/${{ env.APPLICATION_NAME }}
+          images: ${{ env.DOCKERHUB_USER }}/${{ matrix.app }}
           tags: |
             type=sha,priority=610
             type=ref,event=branch
@@ -45,12 +51,55 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
+          file: ${{ matrix.dockerfile }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64,linux/arm64
-          cache-from: type=registry,ref=${{ env.DOCKERHUB_USER }}/${{ env.APPLICATION_NAME }}:buildcache
-          cache-to: type=registry,ref=${{ env.DOCKERHUB_USER }}/${{ env.APPLICATION_NAME }}:buildcache,mode=max
+          cache-from: type=registry,ref=${{ env.DOCKERHUB_USER }}/${{ matrix.app }}:buildcache
+          cache-to: type=registry,ref=${{ env.DOCKERHUB_USER }}/${{ matrix.app }}:buildcache,mode=max
+
+      # Job-level `outputs:` are not matrix-aware: every leg writes to the same
+      # output map, so parallel legs clobber each other. Each leg instead writes
+      # its tag to its own artifact file, and the deploy job merges them.
+      - name: Capture image tag
+        env:
+          META_JSON: ${{ steps.meta.outputs.json }}
+        run: |
+          mkdir -p image-tags
+          TAG="$(echo "$META_JSON" | jq -r '.tags[0]')"
+          if [ -z "$TAG" ] || [ "$TAG" = "null" ]; then
+            echo "No image tag produced for ${{ matrix.app }}" >&2
+            exit 1
+          fi
+          echo "$TAG" > "image-tags/${{ matrix.app }}.tag"
+
+      - name: Upload image tag
+        uses: actions/upload-artifact@v4
+        with:
+          name: image-tag-${{ matrix.app }}
+          path: image-tags/${{ matrix.app }}.tag
+          retention-days: 1
+          if-no-files-found: error
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download image tags
+        uses: actions/download-artifact@v4
+        with:
+          pattern: image-tag-*
+          merge-multiple: true
+          path: image-tags
+
+      - name: Read image tags
+        id: tags
+        run: |
+          RECIPES_IMAGE="$(cat image-tags/recipes.tag)"
+          RECIPES_API_IMAGE="$(cat image-tags/recipes-api.tag)"
+          echo "recipes_image=$RECIPES_IMAGE" >> "$GITHUB_OUTPUT"
+          echo "recipes_api_image=$RECIPES_API_IMAGE" >> "$GITHUB_OUTPUT"
 
       - name: Generate a token
         id: generate-token
@@ -65,6 +114,6 @@ jobs:
         env:
           GH_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |
-          gh workflow run -R IamTugy/server deploy.yaml \
-            -f "application_name=${{ env.APPLICATION_NAME }}" \
-            -f "image=${{ fromJSON(steps.meta.outputs.json).tags[0] }}"
+          gh workflow run -R IamTugy/server deploy-recipes.yaml \
+            -f "recipes_image=${{ steps.tags.outputs.recipes_image }}" \
+            -f "recipes_api_image=${{ steps.tags.outputs.recipes_api_image }}"
