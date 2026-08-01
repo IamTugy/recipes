@@ -44,7 +44,8 @@ export default function RecipeCard({ recipe, index, searchQuery, isFavorite, onT
                 src={recipe.image}
                 alt={displayTitle}
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                loading="lazy"
+                loading={index < 4 ? 'eager' : 'lazy'}
+                fetchPriority={index === 0 ? 'high' : 'auto'}
               />
             ) : (
               <RecipePlaceholder recipe={recipe} />
