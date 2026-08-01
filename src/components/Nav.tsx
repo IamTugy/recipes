@@ -11,7 +11,7 @@ interface NavProps {
 export default function Nav({ shoppingListCount, onOpenShoppingList }: NavProps) {
   const navigate = useNavigate()
   const { lang, setLang } = useLanguage()
-  const { theme, toggleTheme } = useTheme()
+  const { mode, cycleTheme } = useTheme()
 
   return (
     <nav className="print:hidden fixed top-0 inset-x-0 z-50 bg-bg/90 backdrop-blur-md border-b border-tint/[0.06]">
@@ -25,20 +25,25 @@ export default function Nav({ shoppingListCount, onOpenShoppingList }: NavProps)
         </button>
 
         <div className="flex items-center gap-0.5 sm:gap-2 shrink-0">
-          {/* Theme toggle */}
+          {/* Theme cycle: light -> dark -> system */}
           <button type="button"
-            onClick={toggleTheme}
+            onClick={cycleTheme}
             className="h-10 w-10 sm:h-7 sm:w-7 flex items-center justify-center rounded-lg text-cream/40 hover:text-cream/70 border border-tint/10 hover:bg-tint/[0.05] transition-colors"
-            title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
-            aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+            title={mode === 'light' ? 'Switch to dark mode' : mode === 'dark' ? 'Switch to system theme' : 'Switch to light mode'}
+            aria-label={mode === 'light' ? 'Switch to dark mode' : mode === 'dark' ? 'Switch to system theme' : 'Switch to light mode'}
           >
-            {theme === 'light' ? (
+            {mode === 'light' ? (
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
               </svg>
-            ) : (
+            ) : mode === 'dark' ? (
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <rect x="2" y="4" width="20" height="13" rx="2" strokeWidth={1.5} />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 21h8M12 17v4" />
               </svg>
             )}
           </button>
