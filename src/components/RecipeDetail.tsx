@@ -14,6 +14,7 @@ import { useAuth } from '@clerk/react'
 import { formatTime, formatSeconds, scaleAmount } from '../utils/format'
 import { t, categoryEmoji, heUnit, difficultyColor } from '../i18n'
 import { useLanguage } from '../hooks/useLanguage'
+import { useToast } from '../hooks/useToast'
 import type { TimerState } from '../types'
 
 interface RecipeDetailProps {
@@ -53,6 +54,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
   const { addRecent } = useRecentlyViewed()
   const { text: savedNote, save: saveNote, status: noteStatus } = useNote(id)
   const { getToken, userId: currentUserId } = useAuth()
+  const { showToast } = useToast()
 
   const [multiplier, setMultiplier] = useState(1)
   const [customInput, setCustomInput] = useState('')
@@ -161,13 +163,20 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
     const created = await createCollection(name)
     if (created) await addRecipeToCollection(created._id, id)
     setNewCollectionName('')
+    showToast(lang === 'he' ? `נוסף לאוסף "${name}"` : `Added to "${name}"`)
   }
 
   function postReview() {
     if (!userRating) return
     submitRating(userRating, reviewComment.trim(), reviewPhotoUrl ?? undefined)
+    const wasAlreadyPosted = hasPostedReview
     setHasPostedReview(true)
     setIsEditingReview(false)
+    showToast(
+      wasAlreadyPosted
+        ? (lang === 'he' ? 'הביקורת עודכנה' : 'Review updated')
+        : (lang === 'he' ? 'הביקורת פורסמה' : 'Review posted')
+    )
   }
 
   async function deleteMyReview() {
@@ -184,6 +193,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
     setHasPostedReview(false)
     setIsEditingReview(false)
     loadReviews()
+    showToast(lang === 'he' ? 'הביקורת נמחקה' : 'Review deleted')
   }
 
   async function share() {
@@ -205,6 +215,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
     if (!window.confirm(confirmMsg)) return
     await deleteRecipe(id, getToken)
     navigate('/')
+    showToast(lang === 'he' ? 'המתכון נמחק' : 'Recipe deleted')
   }
 
   // Reset checked steps/ingredients and scroll when recipe changes
@@ -297,6 +308,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
       })
     )
     onAddToShoppingList(items, displayTitle)
+    showToast(lang === 'he' ? `${items.length} פריטים נוספו לרשימת הקניות` : `Added ${items.length} items to your shopping list`)
   }
 
   function toggleStep(key: string) {

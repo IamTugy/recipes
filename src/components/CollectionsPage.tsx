@@ -3,9 +3,11 @@ import { Link } from 'react-router-dom'
 import { useCollections } from '../hooks/useCollections'
 import { useRecipes } from '../hooks/useRecipes'
 import { useLanguage } from '../hooks/useLanguage'
+import { useToast } from '../hooks/useToast'
 
 export default function CollectionsPage() {
   const { lang } = useLanguage()
+  const { showToast } = useToast()
   const { collections, loading, create, rename, remove, removeRecipe } = useCollections()
   const { recipes } = useRecipes()
   const [newName, setNewName] = useState('')
@@ -28,6 +30,12 @@ export default function CollectionsPage() {
     if (!name) return
     create(name)
     setNewName('')
+    showToast(lang === 'he' ? `האוסף "${name}" נוצר` : `Collection "${name}" created`)
+  }
+
+  function handleRemove(id: string, name: string) {
+    remove(id)
+    showToast(lang === 'he' ? `האוסף "${name}" נמחק` : `Collection "${name}" deleted`)
   }
 
   return (
@@ -93,7 +101,7 @@ export default function CollectionsPage() {
                     </h2>
                   )}
                   <button type="button"
-                    onClick={() => remove(col._id)}
+                    onClick={() => handleRemove(col._id, col.name)}
                     className="shrink-0 text-xs text-cream/30 hover:text-red-400 transition-colors"
                   >
                     {lang === 'he' ? 'מחק' : 'Delete'}

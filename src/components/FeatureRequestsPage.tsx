@@ -2,11 +2,13 @@ import { useState } from 'react'
 import { useAuth } from '@clerk/react'
 import { useFeatureRequests } from '../hooks/useFeatureRequests'
 import { useLanguage } from '../hooks/useLanguage'
+import { useToast } from '../hooks/useToast'
 
 const OWNER_USER_ID = 'user_3HHok7VTx8lyXObDglJRi71DU6C'
 
 export default function FeatureRequestsPage() {
   const { lang } = useLanguage()
+  const { showToast } = useToast()
   const { userId } = useAuth()
   const { requests, loading, create, approve } = useFeatureRequests()
   const [title, setTitle] = useState('')
@@ -23,7 +25,13 @@ export default function FeatureRequestsPage() {
     if (ok) {
       setTitle('')
       setDescription('')
+      showToast(lang === 'he' ? 'הבקשה נשלחה' : 'Request submitted')
     }
+  }
+
+  async function handleApprove(number: number) {
+    const ok = await approve(number)
+    if (ok) showToast(lang === 'he' ? 'אושר לביצוע' : 'Approved for Claude')
   }
 
   return (
@@ -103,7 +111,7 @@ export default function FeatureRequestsPage() {
                     </a>
                     {isOwner && !approved && r.state === 'open' && (
                       <button type="button"
-                        onClick={() => approve(r.number)}
+                        onClick={() => handleApprove(r.number)}
                         className="text-xs font-semibold text-amber hover:text-amber/80 transition-colors"
                       >
                         {lang === 'he' ? 'אשר לביצוע' : 'Approve for Claude'}

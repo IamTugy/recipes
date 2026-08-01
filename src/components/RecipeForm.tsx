@@ -5,6 +5,7 @@ import type { Category, Difficulty, IngredientGroup, Recipe, StepGroup } from '.
 import { createRecipe, updateRecipe, type RecipeInput } from '../hooks/useRecipes'
 import { t, categoryEmoji } from '../i18n'
 import { useLanguage } from '../hooks/useLanguage'
+import { useToast } from '../hooks/useToast'
 
 interface RecipeFormProps {
   existing?: Recipe
@@ -26,6 +27,7 @@ export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps)
   const navigate = useNavigate()
   const { getToken } = useAuth()
   const { lang } = useLanguage()
+  const { showToast } = useToast()
   const tx = t[lang]
   const isEditing = !!existing
   const prefill = existing ?? duplicateFrom
@@ -147,9 +149,11 @@ export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps)
       if (isEditing) {
         await updateRecipe(existing!.id, input, getToken)
         navigate(`/recipe/${existing!.id}`)
+        showToast(lang === 'he' ? 'המתכון עודכן' : 'Recipe updated')
       } else {
         const slug = await createRecipe(input, getToken)
         navigate(`/recipe/${slug}`)
+        showToast(lang === 'he' ? 'המתכון נוצר' : 'Recipe created')
       }
     } catch {
       setError(lang === 'he' ? 'שמירת המתכון נכשלה. נסו שוב.' : 'Failed to save the recipe. Please try again.')

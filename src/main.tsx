@@ -4,6 +4,7 @@ import { HashRouter } from 'react-router-dom'
 import { LanguageProvider } from './context/LanguageContext'
 import { ThemeProvider } from './context/ThemeContext'
 import { LocalizedClerkProvider } from './context/LocalizedClerkProvider'
+import { ToastProvider } from './context/ToastContext'
 import './index.css'
 import App from './App.tsx'
 
@@ -17,7 +18,9 @@ createRoot(document.getElementById('root')!).render(
       <ThemeProvider>
         <LanguageProvider>
           <LocalizedClerkProvider>
-            <App />
+            <ToastProvider>
+              <App />
+            </ToastProvider>
           </LocalizedClerkProvider>
         </LanguageProvider>
       </ThemeProvider>
