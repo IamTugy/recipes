@@ -61,7 +61,8 @@ function TimerControls({ timer, onToggle, onReset, onRemove }: {
 
 function playDoneSound() {
   try {
-    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
+    const AudioContextClass = window.AudioContext ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+    const ctx = new AudioContextClass()
     const notes = [523, 659, 784, 1047] // C5 E5 G5 C6
     notes.forEach((freq, i) => {
       const osc = ctx.createOscillator()
@@ -77,7 +78,7 @@ function playDoneSound() {
       osc.start(start)
       osc.stop(start + 0.4)
     })
-  } catch {}
+  } catch { /* AudioContext unavailable */ }
 }
 
 export default function TimerPanel({ timers, onToggle, onRemove, onReset }: TimerPanelProps) {
@@ -95,14 +96,14 @@ export default function TimerPanel({ timers, onToggle, onRemove, onReset }: Time
     prevDoneIds.current = new Set(timers.filter(t => t.done).map(t => t.id))
   }, [timers])
 
-  if (timers.length === 0) return null
-
   // Sort: running (soonest end first), then paused (soonest first), then done
   const sorted = useMemo(() => [...timers].sort((a, b) => {
     if (a.done !== b.done) return a.done ? 1 : -1
     if (a.running !== b.running) return a.running ? -1 : 1
     return a.remainingSeconds - b.remainingSeconds
   }), [timers])
+
+  if (timers.length === 0) return null
 
   const safeIdx = Math.min(mobileIdx, sorted.length - 1)
   const mobileTimer = sorted[safeIdx]
@@ -111,7 +112,7 @@ export default function TimerPanel({ timers, onToggle, onRemove, onReset }: Time
   const progressTimer = sorted.find(t => t.running && !t.done) ?? sorted[0]
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50">
+    <div className="print:hidden fixed bottom-0 left-0 right-0 z-50">
       {/* Progress bar */}
       <div className="h-0.5 bg-tint/[0.06] relative">
         <div

@@ -179,7 +179,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
         <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/40 to-transparent" />
         <button
           onClick={() => navigate('/')}
-          className={`absolute top-4 ${lang === 'he' ? 'right-4' : 'left-4'} flex items-center gap-2 px-3 py-2 bg-black/40 backdrop-blur-sm text-white/80 hover:text-white rounded-xl text-sm transition-colors border border-white/10`}
+          className={`print:hidden absolute top-4 ${lang === 'he' ? 'right-4' : 'left-4'} flex items-center gap-2 px-3 py-2 bg-black/40 backdrop-blur-sm text-white/80 hover:text-white rounded-xl text-sm transition-colors border border-white/10`}
         >
           <svg
             className={`w-4 h-4 ${lang === 'he' ? 'rotate-180' : ''}`}
@@ -250,8 +250,8 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
             ))}
           </div>
 
-          {/* Favorite / rating / share */}
-          <div className="flex items-center gap-4 mt-5 pt-5 border-t border-tint/[0.06]">
+          {/* Favorite / rating / share / print */}
+          <div className="print:hidden flex items-center gap-4 mt-5 pt-5 border-t border-tint/[0.06]">
             <button
               onClick={() => toggleFavorite(recipe.id)}
               className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${
@@ -298,11 +298,21 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
               </svg>
               {shareState === 'copied' ? (lang === 'he' ? 'הועתק!' : 'Copied!') : (lang === 'he' ? 'שתף' : 'Share')}
             </button>
+
+            <button
+              onClick={() => window.print()}
+              className="flex items-center gap-1.5 text-sm font-medium text-cream/40 hover:text-cream/70 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6v-8z" />
+              </svg>
+              {lang === 'he' ? 'הדפס' : 'Print'}
+            </button>
           </div>
         </div>
 
         {/* Portion control */}
-        <div className="card p-4 mb-6">
+        <div className="print:hidden card p-4 mb-6">
           <div className="flex items-center gap-3 flex-wrap">
             <span className="text-cream/60 text-sm font-medium">{tx.portions}</span>
             <div className="flex gap-1.5 flex-wrap">
@@ -392,7 +402,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
               {cookMode.supported && (
                 <button
                   onClick={cookMode.toggle}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                  className={`print:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
                     cookMode.active
                       ? 'bg-amber/10 border-amber/30 text-amber'
                       : 'border-tint/10 text-cream/40 hover:text-cream/70'
@@ -535,7 +545,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
 
         {/* Related recipes */}
         {relatedRecipes.length > 0 && (
-          <div className="mt-10">
+          <div className="print:hidden mt-10">
             <h2 className="font-serif text-lg font-bold text-cream mb-4">
               {lang === 'he' ? 'מתכונים דומים' : 'You might also like'}
             </h2>

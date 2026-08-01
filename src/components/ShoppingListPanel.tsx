@@ -26,14 +26,14 @@ export default function ShoppingListPanel({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/40 z-40"
+            className="print:hidden fixed inset-0 bg-black/40 z-40"
           />
           <motion.div
             initial={{ x: lang === 'he' ? '-100%' : '100%' }}
             animate={{ x: 0 }}
             exit={{ x: lang === 'he' ? '-100%' : '100%' }}
             transition={{ type: 'tween', duration: 0.25 }}
-            className={`fixed top-0 ${lang === 'he' ? 'left-0' : 'right-0'} h-full w-full sm:w-96 bg-card z-50 shadow-2xl flex flex-col`}
+            className={`print:hidden fixed top-0 ${lang === 'he' ? 'left-0' : 'right-0'} h-full w-full sm:w-96 bg-card z-50 shadow-2xl flex flex-col`}
             dir={lang === 'he' ? 'rtl' : 'ltr'}
           >
             <div className="flex items-center justify-between px-5 h-14 border-b border-tint/[0.06]">

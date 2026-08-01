@@ -30,6 +30,18 @@
   --scrollbar-thumb: #3a2e24;
 }
 
+/* ── Print ── force light, ink-friendly colors regardless of the active theme */
+@media print {
+  :root, [data-theme="dark"] {
+    --color-bg: 255 255 255;
+    --color-surface: 255 255 255;
+    --color-card: 255 255 255;
+    --color-cream: 20 20 20;
+    --color-tint: 0 0 0;
+  }
+  .card { box-shadow: none !important; border-color: #ddd !important; }
+}
+
 @layer base {
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: auto; }

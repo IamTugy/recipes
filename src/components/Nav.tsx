@@ -14,7 +14,7 @@ export default function Nav({ shoppingListCount, onOpenShoppingList }: NavProps)
   const { theme, toggleTheme } = useTheme()
 
   return (
-    <nav className="fixed top-0 inset-x-0 z-50 bg-bg/90 backdrop-blur-md border-b border-tint/[0.06]">
+    <nav className="print:hidden fixed top-0 inset-x-0 z-50 bg-bg/90 backdrop-blur-md border-b border-tint/[0.06]">
       <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between" dir="ltr">
         <button
           onClick={() => navigate('/')}
