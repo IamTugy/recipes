@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import type { Category } from '../types'
+import type { Category, Difficulty } from '../types'
 import { useRecipes, useTrending } from '../hooks/useRecipes'
 import { useFavorites } from '../hooks/useFavorites'
 import { useRecentlyViewed } from '../hooks/useRecentlyViewed'
@@ -10,6 +10,7 @@ import RecipeCard from './RecipeCard'
 import RecipeCardSkeleton from './RecipeCardSkeleton'
 
 const categories: Category[] = ['breakfast', 'lunch', 'dinner', 'dessert', 'salad', 'soup', 'snack', 'bread', 'sauce']
+const difficulties: Difficulty[] = ['easy', 'medium', 'hard']
 
 type SortOption = 'default' | 'rating' | 'quickest'
 
@@ -19,6 +20,7 @@ export default function Home() {
   const tx = t[lang]
   const [search, setSearch] = useState('')
   const [activeCategory, setActiveCategory] = useState<Category | null>(null)
+  const [activeDifficulty, setActiveDifficulty] = useState<Difficulty | null>(null)
   const { recipes, loading, error } = useRecipes()
   const { favoriteSlugs, toggle: toggleFavorite } = useFavorites()
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false)
@@ -54,6 +56,7 @@ export default function Home() {
     let list = recipes.filter(r => !r.hidden)
     if (showFavoritesOnly) list = list.filter(r => favoriteSlugs.has(r.id))
     if (activeCategory) list = list.filter(r => r.category === activeCategory)
+    if (activeDifficulty) list = list.filter(r => r.difficulty === activeDifficulty)
     if (search.trim()) {
       const q = search.toLowerCase()
       list = list.filter(r => {
@@ -79,7 +82,7 @@ export default function Home() {
       list = [...list].sort((a, b) => (a.prepTime + a.cookTime) - (b.prepTime + b.cookTime))
     }
     return list
-  }, [search, activeCategory, lang, recipes, showFavoritesOnly, favoriteSlugs, sortBy])
+  }, [search, activeCategory, activeDifficulty, lang, recipes, showFavoritesOnly, favoriteSlugs, sortBy])
 
   function surpriseMe() {
     if (filtered.length === 0) return
@@ -163,6 +166,25 @@ export default function Home() {
             >
               <span className="text-sm">{categoryEmoji[cat]}</span>
               <span>{tx.categories[cat]}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Difficulty filter */}
+      <div className="max-w-6xl mx-auto px-6 mb-6">
+        <div className="flex gap-1.5">
+          {difficulties.map(diff => (
+            <button
+              key={diff}
+              onClick={() => setActiveDifficulty(diff === activeDifficulty ? null : diff)}
+              className={`px-3 py-1.5 text-[11px] tracking-wider font-medium transition-colors rounded-lg border ${
+                activeDifficulty === diff
+                  ? 'text-amber bg-amber/10 border-amber/20'
+                  : 'text-cream/35 hover:text-cream/60 border-tint/10'
+              }`}
+            >
+              {tx.difficulty[diff]}
             </button>
           ))}
         </div>
