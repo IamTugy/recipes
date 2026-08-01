@@ -36,19 +36,29 @@ export function useFeatureRequests() {
       },
       body: JSON.stringify({ title, description }),
     })
-    if (res.ok) load()
+    if (res.ok) {
+      const created: FeatureRequest = await res.json()
+      setRequests(prev => [created, ...prev])
+    }
     return res.ok
-  }, [getToken, load])
+  }, [getToken])
 
   const approve = useCallback(async (number: number) => {
+    setRequests(prev => prev.map(r => (
+      r.number === number ? { ...r, labels: [...r.labels, 'approved-for-claude'] } : r
+    )))
     const token = await getToken()
     const res = await fetch(`/api/feature-requests/${number}/approve`, {
       method: 'POST',
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     })
-    if (res.ok) load()
+    if (!res.ok) {
+      setRequests(prev => prev.map(r => (
+        r.number === number ? { ...r, labels: r.labels.filter(l => l !== 'approved-for-claude') } : r
+      )))
+    }
     return res.ok
-  }, [getToken, load])
+  }, [getToken])
 
   return { requests, loading, create, approve }
 }
