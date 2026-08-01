@@ -65,6 +65,9 @@ export function useTimers() {
   }, [])
 
   const addTimer = useCallback((label: string, minutes: number, recipeId: string, stepIndex: number) => {
+    if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+      Notification.requestPermission().catch(() => { /* ignore - notifications are a nice-to-have */ })
+    }
     const id = `timer-${++timerIdCounter}`
     const totalSeconds = minutes * 60
     setTimers(prev => {

@@ -86,15 +86,22 @@ export default function TimerPanel({ timers, onToggle, onRemove, onReset }: Time
   const [mobileIdx, setMobileIdx] = useState(0)
   const prevDoneIds = useRef<Set<string>>(new Set(timers.filter(t => t.done).map(t => t.id)))
 
-  // Play sound when a timer newly completes
+  // Play sound (and notify, if the tab is backgrounded) when a timer newly completes
   useEffect(() => {
     timers.forEach(t => {
       if (t.done && !prevDoneIds.current.has(t.id)) {
         playDoneSound()
+        if (
+          document.hidden &&
+          typeof Notification !== 'undefined' &&
+          Notification.permission === 'granted'
+        ) {
+          new Notification(lang === 'he' ? 'הטיימר הסתיים!' : 'Timer done!', { body: t.label })
+        }
       }
     })
     prevDoneIds.current = new Set(timers.filter(t => t.done).map(t => t.id))
-  }, [timers])
+  }, [timers, lang])
 
   // Sort: running (soonest end first), then paused (soonest first), then done
   const sorted = useMemo(() => [...timers].sort((a, b) => {
