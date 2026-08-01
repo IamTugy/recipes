@@ -14,8 +14,9 @@
 #
 # Requires: gh (authenticated), claude, git, running from inside this repo.
 # Requires these labels to already exist on the repo: feature-request,
-# approved-for-claude, claude-in-progress (gh issue edit fails if a label
-# doesn't exist yet - create with `gh label create <name>` once).
+# approved-for-claude, claude-in-progress, claude-needs-input, claude-pr-open
+# (gh issue edit fails if a label doesn't exist yet - create with
+# `gh label create <name>` once).
 
 set -euo pipefail
 
@@ -23,6 +24,8 @@ REPO="IamTugy/recipes"
 POLL_INTERVAL_SECONDS=60
 LABEL_APPROVED="approved-for-claude"
 LABEL_IN_PROGRESS="claude-in-progress"
+LABEL_NEEDS_INPUT="claude-needs-input"
+LABEL_PR_OPEN="claude-pr-open"
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 WORKTREES_DIR="$REPO_ROOT/.worktrees"
@@ -45,6 +48,7 @@ process_issue() {
     git worktree add "$worktree" -b "$branch" main
   fi
 
+  local claude_log="$worktree/.claude-output.log"
   (
     cd "$worktree"
     local prompt
@@ -59,6 +63,12 @@ Work in this branch ($branch). Follow the existing conventions in this
 codebase (see CLAUDE.md if present). Run the relevant test suite and
 linter before committing. Make focused commits with clear messages.
 When done, leave the working tree clean (all changes committed).
+
+If you genuinely need a decision only the repo owner can make (choice
+of external provider, a cost/billing tradeoff, an ambiguous or
+conflicting requirement), do not guess and do not implement a partial
+placeholder - stop and clearly state the question and the options
+instead of writing code.
 EOF
 )
     echo "[feature-request-worker] Running claude -p for issue #$number in $worktree"
@@ -66,8 +76,25 @@ EOF
     # prompts. Safe here specifically because the worktree/branch is a throwaway
     # sandbox - Claude never touches the main checkout, and every result lands
     # as a PR for the owner to review before merging, never an auto-merge.
-    claude -p "$prompt" --dangerously-skip-permissions
+    claude -p "$prompt" --dangerously-skip-permissions 2>&1 | tee "$claude_log"
   )
+
+  local commit_count
+  commit_count=$(git -C "$worktree" rev-list --count main.."$branch")
+
+  if [ "$commit_count" -eq 0 ]; then
+    echo "[feature-request-worker] No commits from issue #$number - Claude needs input, not opening a PR"
+    gh issue edit "$number" -R "$REPO" --remove-label "$LABEL_IN_PROGRESS" --add-label "$LABEL_NEEDS_INPUT"
+    gh issue comment "$number" -R "$REPO" --body "Claude didn't make any changes and needs input to proceed:
+
+\`\`\`
+$(tail -40 "$claude_log")
+\`\`\`
+
+Answer in this issue, then re-approve (add the \`$LABEL_APPROVED\` label) to try again."
+    echo "[feature-request-worker] Done with issue #$number -> needs input, see comment"
+    return
+  fi
 
   echo "[feature-request-worker] Pushing branch and opening a PR for issue #$number"
   git -C "$worktree" push -u origin "$branch"
@@ -81,6 +108,7 @@ EOF
 Closes #$number." \
     2>&1 | tail -1) || pr_url="(PR creation failed - check $worktree manually)"
 
+  gh issue edit "$number" -R "$REPO" --remove-label "$LABEL_IN_PROGRESS" --add-label "$LABEL_PR_OPEN"
   gh issue comment "$number" -R "$REPO" --body "Claude has proposed a fix: $pr_url
 
 Worktree left at \`$worktree\` on this machine for review/iteration."
