@@ -4,7 +4,10 @@ import { ThemeContext, type Theme } from './themeContextObject'
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>(() => {
     const saved = localStorage.getItem('theme')
-    return (saved === 'dark' || saved === 'light') ? saved : 'light'
+    if (saved === 'dark' || saved === 'light') return saved
+    const prefersDark = typeof window !== 'undefined' &&
+      window.matchMedia?.('(prefers-color-scheme: dark)').matches
+    return prefersDark ? 'dark' : 'light'
   })
 
   useEffect(() => {
