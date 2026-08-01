@@ -14,10 +14,11 @@ interface RecipeCardProps {
   isFavorite: boolean
   onToggleFavorite: (slug: string) => void
   statusBadge?: { label: string; className: string }
+  editable?: boolean
 }
 
 
-export default function RecipeCard({ recipe, index, searchQuery, isFavorite, onToggleFavorite, statusBadge }: RecipeCardProps) {
+export default function RecipeCard({ recipe, index, searchQuery, isFavorite, onToggleFavorite, statusBadge, editable }: RecipeCardProps) {
   const navigate = useNavigate()
   const { lang } = useLanguage()
   const tx = t[lang]
@@ -67,6 +68,17 @@ export default function RecipeCard({ recipe, index, searchQuery, isFavorite, onT
               )}
               {recipe.featured && (
                 <span className="tag-terra text-[10px] font-semibold px-2 py-0.5">{tx.featured}</span>
+              )}
+              {editable && (
+                <button type="button"
+                  onClick={e => { e.preventDefault(); e.stopPropagation(); navigate(`/recipe/${recipe.id}/edit`) }}
+                  className="h-9 w-9 sm:h-7 sm:w-7 flex items-center justify-center rounded-full backdrop-blur-sm border bg-black/30 border-white/20 text-white/80 hover:text-white transition-colors"
+                  aria-label={lang === 'he' ? 'ערוך מתכון' : 'Edit recipe'}
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </button>
               )}
               <button type="button"
                 onClick={e => { e.preventDefault(); e.stopPropagation(); onToggleFavorite(recipe.id) }}

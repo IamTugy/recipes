@@ -196,6 +196,7 @@ export default function MyRecipesPage() {
                   statusBadge={status === 'published' && r.currentRevision === r.publishedRevision
                     ? undefined
                     : { label: statusLabel[status][lang], className: statusClass[status] }}
+                  editable={status !== 'pending_review'}
                 />
               )
             })}
