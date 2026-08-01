@@ -7,6 +7,7 @@ import Home from './components/Home'
 import RecipeDetail from './components/RecipeDetail'
 import TimerPanel from './components/TimerPanel'
 import ShoppingListPanel from './components/ShoppingListPanel'
+import ScrollToTopButton from './components/ScrollToTopButton'
 import { useTimers } from './hooks/useTimers'
 import { useShoppingList } from './hooks/useShoppingList'
 
@@ -66,6 +67,7 @@ export default function App() {
         onClearChecked={shoppingList.clearChecked}
         onClearAll={shoppingList.clear}
       />
+      <ScrollToTopButton raised={timers.length > 0} />
     </div>
   )
 }
