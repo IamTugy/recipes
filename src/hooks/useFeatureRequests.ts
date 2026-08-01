@@ -10,6 +10,7 @@ export interface FeatureRequest {
   state: string
   labels: string[]
   createdAt: string
+  submittedBy: string | null
 }
 
 export function useFeatureRequests() {

@@ -12,8 +12,11 @@ export class FeatureRequestsController {
   ) {}
 
   @Get()
-  async list() {
-    return this.featureRequestsService.list()
+  async list(@Req() req: Request & { userId: string }) {
+    const requests = await this.featureRequestsService.list()
+    const ownerUserId = this.config.get<string>('OWNER_USER_ID')
+    if (req.userId === ownerUserId) return requests
+    return requests.filter(r => r.submittedBy === req.userId)
   }
 
   @Post()

@@ -10,10 +10,24 @@ describe('FeatureRequestsController', () => {
     return { get: jest.fn().mockReturnValue(ownerUserId) }
   }
 
-  it('GET /feature-requests lists all feature requests', async () => {
-    featureRequestsService.list.mockResolvedValue([{ number: 1, title: 'A' }])
+  it('GET /feature-requests returns every request to the owner', async () => {
+    const all = [
+      { number: 1, title: 'A', submittedBy: 'user_1' },
+      { number: 2, title: 'B', submittedBy: 'user_2' },
+    ]
+    featureRequestsService.list.mockResolvedValue(all)
     const controller = new FeatureRequestsController(featureRequestsService as any, makeConfig('owner_1') as any)
-    await expect(controller.list()).resolves.toEqual([{ number: 1, title: 'A' }])
+    await expect(controller.list({ userId: 'owner_1' } as any)).resolves.toEqual(all)
+  })
+
+  it('GET /feature-requests only returns a non-owner their own submitted requests', async () => {
+    const all = [
+      { number: 1, title: 'A', submittedBy: 'user_1' },
+      { number: 2, title: 'B', submittedBy: 'user_2' },
+    ]
+    featureRequestsService.list.mockResolvedValue(all)
+    const controller = new FeatureRequestsController(featureRequestsService as any, makeConfig('owner_1') as any)
+    await expect(controller.list({ userId: 'user_1' } as any)).resolves.toEqual([all[0]])
   })
 
   it('POST /feature-requests creates a feature request for the current user', async () => {

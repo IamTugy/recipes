@@ -9,10 +9,12 @@ export interface FeatureRequest {
   state: string
   labels: string[]
   createdAt: string
+  submittedBy: string | null
 }
 
 const FEATURE_REQUEST_LABEL = 'feature-request'
 const APPROVED_LABEL = 'approved-for-claude'
+const SUBMITTER_PATTERN = /Submitted via the app by user `([^`]+)`\./
 
 interface GitHubIssue {
   number: number
@@ -52,14 +54,16 @@ export class FeatureRequestsService {
   }
 
   private toFeatureRequest(issue: GitHubIssue): FeatureRequest {
+    const body = issue.body ?? ''
     return {
       number: issue.number,
       title: issue.title,
-      body: issue.body ?? '',
+      body,
       htmlUrl: issue.html_url,
       state: issue.state,
       labels: issue.labels.map(l => (typeof l === 'string' ? l : l.name)),
       createdAt: issue.created_at,
+      submittedBy: body.match(SUBMITTER_PATTERN)?.[1] ?? null,
     }
   }
 

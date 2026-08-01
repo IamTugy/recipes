@@ -60,6 +60,7 @@ describe('FeatureRequestsService', () => {
       state: 'open',
       labels: ['feature-request'],
       createdAt: mockIssue.created_at,
+      submittedBy: 'user_1',
     })
   })
 
@@ -93,7 +94,29 @@ describe('FeatureRequestsService', () => {
       state: 'open',
       labels: ['feature-request'],
       createdAt: '2026-08-01T00:00:00Z',
+      submittedBy: null,
     }])
+  })
+
+  it('list extracts the submitter user ID embedded in the issue body', async () => {
+    const mockIssues = [
+      {
+        number: 1,
+        title: 'A',
+        body: 'Do the thing.\n\n---\nSubmitted via the app by user `user_42`.',
+        html_url: 'https://github.com/x/1',
+        state: 'open',
+        labels: ['feature-request'],
+        created_at: '2026-08-01T00:00:00Z',
+      },
+    ]
+    const fetchMock = jest.fn().mockResolvedValue({ ok: true, json: async () => mockIssues })
+    global.fetch = fetchMock as unknown as typeof fetch
+
+    const service = await makeService()
+    const result = await service.list()
+
+    expect(result[0].submittedBy).toBe('user_42')
   })
 
   it('approve adds the approved-for-claude label to the issue', async () => {

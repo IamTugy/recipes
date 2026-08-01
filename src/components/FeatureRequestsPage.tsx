@@ -33,9 +33,13 @@ export default function FeatureRequestsPage() {
           {lang === 'he' ? 'בקשות לתכונות חדשות' : 'Feature Requests'}
         </h1>
         <p className="text-sm text-cream/40 mb-6">
-          {lang === 'he'
-            ? 'יש לכם רעיון לתכונה שכדאי להוסיף? שתפו אותו כאן.'
-            : "Have an idea for something the app should do? Suggest it here."}
+          {isOwner
+            ? (lang === 'he'
+              ? 'יש לכם רעיון לתכונה שכדאי להוסיף? שתפו אותו כאן. כאן תוכלו לראות ולאשר את כל הבקשות.'
+              : 'Have an idea for something the app should do? Suggest it here. You can see and approve every request below.')
+            : (lang === 'he'
+              ? 'יש לכם רעיון לתכונה שכדאי להוסיף? שתפו אותו כאן. למטה תראו רק את הבקשות שלכם ואת הסטטוס שלהן.'
+              : "Have an idea for something the app should do? Suggest it here. Below you'll only see your own requests and their status.")}
         </p>
 
         <form onSubmit={handleSubmit} className="card p-5 space-y-3 mb-8">
