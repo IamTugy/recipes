@@ -11,6 +11,7 @@ export interface Review {
   upvotedByMe: boolean
   replyCount: number
   createdAt: string
+  recipeRevision: number
 }
 
 interface Reply {
@@ -33,6 +34,7 @@ interface ReviewItemProps {
   onOpenLightbox: (url: string) => void
   translation?: { text: string; showing: boolean; loading: boolean }
   onToggleTranslate?: () => void
+  currentRevision?: number
 }
 
 function displayName(userName: string | null, lang: 'he' | 'en'): string {
@@ -58,7 +60,7 @@ function UpvoteButton({ upvoted, count, onToggle, lang }: { upvoted: boolean; co
   )
 }
 
-export default function ReviewItem({ recipeSlug, review, lang, getToken, onOpenLightbox, translation, onToggleTranslate }: ReviewItemProps) {
+export default function ReviewItem({ recipeSlug, review, lang, getToken, onOpenLightbox, translation, onToggleTranslate, currentRevision }: ReviewItemProps) {
   const showingTranslation = !!translation?.showing
   const [upvoted, setUpvoted] = useState(review.upvotedByMe)
   const [upvoteCount, setUpvoteCount] = useState(review.upvoteCount)
@@ -154,6 +156,11 @@ export default function ReviewItem({ recipeSlug, review, lang, getToken, onOpenL
         <span className="text-cream/25 text-[11px]">
           {new Date(review.createdAt).toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-US')}
         </span>
+        {currentRevision !== undefined && review.recipeRevision < currentRevision && (
+          <span className="text-cream/25 text-[10px] italic">
+            {lang === 'he' ? `לגבי גרסה קודמת (v${review.recipeRevision})` : `about an earlier version (v${review.recipeRevision})`}
+          </span>
+        )}
       </div>
       <p className="text-sm text-cream/70 leading-relaxed" dir={showingTranslation ? (lang === 'he' ? 'rtl' : 'ltr') : undefined}>
         {showingTranslation ? (translation?.loading ? (lang === 'he' ? 'מתרגם...' : 'Translating...') : translation?.text) : review.comment}

@@ -6,7 +6,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useRecipe, useRecipes, deleteRecipe, submitForReview, cancelSubmission } from '../hooks/useRecipes'
 import { OWNER_USER_ID } from '../lib/admin'
-import { ApiError } from '../lib/api'
+import { ApiError, apiFetch } from '../lib/api'
 import { useWakeLock } from '../hooks/useWakeLock'
 import { useFavorites } from '../hooks/useFavorites'
 import { useCollections } from '../hooks/useCollections'
@@ -18,7 +18,7 @@ import { t, categoryEmoji, heUnit, difficultyColor } from '../i18n'
 import { useLanguage } from '../hooks/useLanguage'
 import { useToast } from '../hooks/useToast'
 import ReviewItem, { type Review } from './ReviewItem'
-import type { TimerState } from '../types'
+import type { TimerState, RecipeRevision } from '../types'
 
 interface RecipeDetailProps {
   onAddTimer: (label: string, minutes: number, recipeId: string, stepIndex: number) => void
@@ -248,6 +248,18 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
   }
 
   const [submitting, setSubmitting] = useState(false)
+  const [revisionsOpen, setRevisionsOpen] = useState(false)
+  const [revisions, setRevisions] = useState<RecipeRevision[] | null>(null)
+
+  async function loadRevisions() {
+    if (!id) return
+    try {
+      const data = await apiFetch<RecipeRevision[]>(`/recipes/${id}/revisions`, getToken)
+      setRevisions(data)
+    } catch {
+      setRevisions([])
+    }
+  }
 
   async function handleSubmitForReview() {
     if (!id) return
@@ -1186,6 +1198,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                   onOpenLightbox={setLightboxUrl}
                   translation={translations[r.userId]}
                   onToggleTranslate={() => toggleTranslateReview(r.userId, r.comment)}
+                  currentRevision={recipe.currentRevision}
                 />
               ))}
             </ul>
@@ -1198,6 +1211,33 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
             )
           })()}
         </div>
+
+        {/* Revision history */}
+        {!!recipe.currentRevision && (
+          <div className="print:hidden mt-6">
+            <button type="button"
+              onClick={() => { setRevisionsOpen(v => !v); if (!revisionsOpen && revisions === null) loadRevisions() }}
+              className="text-xs font-medium text-cream/35 hover:text-cream/60 transition-colors"
+            >
+              {revisionsOpen
+                ? (lang === 'he' ? 'הסתר היסטוריית גרסאות' : 'Hide revision history')
+                : (lang === 'he' ? 'הצג היסטוריית גרסאות' : 'Show revision history')}
+            </button>
+            {revisionsOpen && revisions && (
+              <ul className="mt-3 space-y-2">
+                {revisions.map(rev => (
+                  <li key={rev.revisionNumber} className="card p-3 text-xs text-cream/50">
+                    <span className="font-semibold text-cream/70">v{rev.revisionNumber}</span>
+                    {' · '}
+                    {new Date(rev.publishedAt).toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-US')}
+                    {' · '}
+                    {(rev.snapshot.title as string) ?? ''}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
 
         {/* Related recipes */}
         {relatedRecipes.length > 0 && (
