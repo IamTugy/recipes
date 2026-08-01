@@ -10,7 +10,7 @@ function saveTimers(timers: TimerState[]) {
       timers,
       savedAt: Date.now(),
     }))
-  } catch {}
+  } catch { /* localStorage unavailable */ }
 }
 
 function loadTimers(): TimerState[] {
@@ -121,7 +121,8 @@ export function useTimers() {
   }, [])
 
   useEffect(() => {
-    return () => { intervalsRef.current.forEach(i => clearInterval(i)) }
+    const intervals = intervalsRef.current
+    return () => { intervals.forEach(i => clearInterval(i)) }
   }, [])
 
   return { timers, addTimer, toggleTimer, removeTimer, resetTimer }
