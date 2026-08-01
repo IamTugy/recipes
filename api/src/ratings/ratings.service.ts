@@ -18,6 +18,18 @@ export class RatingsService {
     return { score: doc!.score }
   }
 
+  async distributionForRecipe(recipeSlug: string): Promise<Record<1 | 2 | 3 | 4 | 5, number>> {
+    const rows = await this.ratingModel.aggregate([
+      { $match: { recipeSlug } },
+      { $group: { _id: '$score', count: { $sum: 1 } } },
+    ])
+    const distribution: Record<1 | 2 | 3 | 4 | 5, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
+    for (const row of rows) {
+      distribution[row._id as 1 | 2 | 3 | 4 | 5] = row.count
+    }
+    return distribution
+  }
+
   async reviewsForRecipe(recipeSlug: string, limit = 20): Promise<{ score: number; comment: string; createdAt: Date }[]> {
     const docs = await this.ratingModel
       .find({ recipeSlug, comment: { $exists: true, $ne: '' } })

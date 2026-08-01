@@ -1,7 +1,7 @@
 import { RatingsController } from './ratings.controller'
 
 describe('RatingsController', () => {
-  const ratingsService = { rate: jest.fn(), reviewsForRecipe: jest.fn() }
+  const ratingsService = { rate: jest.fn(), reviewsForRecipe: jest.fn(), distributionForRecipe: jest.fn() }
 
   it('PUT /ratings/:slug rates the recipe as the current user', async () => {
     ratingsService.rate.mockResolvedValue({ score: 5 })
@@ -25,5 +25,14 @@ describe('RatingsController', () => {
     const result = await controller.reviews('a')
     expect(ratingsService.reviewsForRecipe).toHaveBeenCalledWith('a')
     expect(result).toEqual(reviews)
+  })
+
+  it('GET /ratings/:slug/distribution returns the score distribution for a recipe', async () => {
+    const distribution = { 1: 0, 2: 0, 3: 1, 4: 0, 5: 3 }
+    ratingsService.distributionForRecipe.mockResolvedValue(distribution)
+    const controller = new RatingsController(ratingsService as any)
+    const result = await controller.distribution('a')
+    expect(ratingsService.distributionForRecipe).toHaveBeenCalledWith('a')
+    expect(result).toEqual(distribution)
   })
 })

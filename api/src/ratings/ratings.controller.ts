@@ -12,6 +12,11 @@ export class RatingsController {
     return this.ratingsService.reviewsForRecipe(slug)
   }
 
+  @Get(':slug/distribution')
+  async distribution(@Param('slug') slug: string) {
+    return this.ratingsService.distributionForRecipe(slug)
+  }
+
   @Put(':slug')
   async rate(
     @Param('slug') slug: string,

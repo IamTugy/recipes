@@ -41,4 +41,23 @@ describe('RatingsService', () => {
     expect(limit).toHaveBeenCalledWith(20)
     expect(result).toEqual([{ score: 5, comment: 'Amazing', createdAt: new Date('2026-01-02') }])
   })
+
+  it('distributionForRecipe returns a count per score, defaulting missing scores to 0', async () => {
+    const aggregate = jest.fn().mockResolvedValue([
+      { _id: 5, count: 3 },
+      { _id: 3, count: 1 },
+    ])
+    const moduleRef = await Test.createTestingModule({
+      providers: [RatingsService, { provide: getModelToken(Rating.name), useValue: { aggregate } }],
+    }).compile()
+
+    const service = moduleRef.get(RatingsService)
+    const result = await service.distributionForRecipe('a')
+
+    expect(aggregate).toHaveBeenCalledWith([
+      { $match: { recipeSlug: 'a' } },
+      { $group: { _id: '$score', count: { $sum: 1 } } },
+    ])
+    expect(result).toEqual({ 1: 0, 2: 0, 3: 1, 4: 0, 5: 3 })
+  })
 })

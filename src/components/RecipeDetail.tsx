@@ -44,6 +44,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
   const [noteInput, setNoteInput] = useState('')
   const [reviews, setReviews] = useState<{ score: number; comment: string; createdAt: string }[]>([])
   const [reviewComment, setReviewComment] = useState('')
+  const [distribution, setDistribution] = useState<Record<1 | 2 | 3 | 4 | 5, number> | null>(null)
   const cookMode = useWakeLock()
 
   // Sync the textarea once the saved note has loaded for this recipe
@@ -53,10 +54,13 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
 
   async function loadReviews() {
     const token = await getToken()
-    const res = await fetch(`/api/ratings/${id}/reviews`, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-    })
-    if (res.ok) setReviews(await res.json())
+    const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {}
+    const [reviewsRes, distributionRes] = await Promise.all([
+      fetch(`/api/ratings/${id}/reviews`, { headers }),
+      fetch(`/api/ratings/${id}/distribution`, { headers }),
+    ])
+    if (reviewsRes.ok) setReviews(await reviewsRes.json())
+    if (distributionRes.ok) setDistribution(await distributionRes.json())
   }
 
   useEffect(() => {
@@ -678,6 +682,23 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
           <h2 id="reviews-heading" className="font-serif text-lg font-bold text-cream mb-3 flex items-center gap-2">
             <span>💬</span> {lang === 'he' ? 'ביקורות' : 'Reviews'}
           </h2>
+          {!!recipe.ratingCount && distribution && (
+            <div className="flex flex-col gap-1 mb-4">
+              {([5, 4, 3, 2, 1] as const).map(star => {
+                const count = distribution[star]
+                const pct = recipe.ratingCount ? Math.round((count / recipe.ratingCount) * 100) : 0
+                return (
+                  <div key={star} className="flex items-center gap-2 text-xs">
+                    <span className="w-8 text-cream/40 shrink-0">{star} ★</span>
+                    <div className="flex-1 h-1.5 rounded-full bg-tint/[0.06] overflow-hidden">
+                      <div className="h-full bg-amber/70 rounded-full" style={{ width: `${pct}%` }} />
+                    </div>
+                    <span className="w-6 text-cream/30 text-right shrink-0">{count}</span>
+                  </div>
+                )
+              })}
+            </div>
+          )}
           <div className="flex flex-col gap-2 mb-4">
             <textarea
               aria-labelledby="reviews-heading"
