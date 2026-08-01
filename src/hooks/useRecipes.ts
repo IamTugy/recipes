@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '@clerk/react'
 import type { Recipe } from '../types'
-import { apiFetch } from '../lib/api'
+import { apiFetch, ApiError } from '../lib/api'
 
 interface ApiRecipe extends Omit<Recipe, 'id'> {
   slug: string
@@ -9,6 +9,45 @@ interface ApiRecipe extends Omit<Recipe, 'id'> {
 
 function toRecipe(r: ApiRecipe): Recipe {
   return { ...r, id: r.slug }
+}
+
+export type RecipeInput = Omit<Recipe, 'id' | 'averageRating' | 'ratingCount' | 'viewCount'>
+
+export async function createRecipe(input: RecipeInput, getToken: () => Promise<string | null>): Promise<string> {
+  const token = await getToken()
+  const res = await fetch('/api/recipes', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(input),
+  })
+  if (!res.ok) throw new ApiError(res.status, 'Failed to create recipe')
+  const data: ApiRecipe = await res.json()
+  return data.slug
+}
+
+export async function updateRecipe(slug: string, input: RecipeInput, getToken: () => Promise<string | null>): Promise<void> {
+  const token = await getToken()
+  const res = await fetch(`/api/recipes/${slug}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(input),
+  })
+  if (!res.ok) throw new ApiError(res.status, 'Failed to update recipe')
+}
+
+export async function deleteRecipe(slug: string, getToken: () => Promise<string | null>): Promise<void> {
+  const token = await getToken()
+  const res = await fetch(`/api/recipes/${slug}`, {
+    method: 'DELETE',
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  })
+  if (!res.ok) throw new ApiError(res.status, 'Failed to delete recipe')
 }
 
 export function useRecipes() {

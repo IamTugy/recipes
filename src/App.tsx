@@ -6,6 +6,8 @@ import Nav from './components/Nav'
 import Home from './components/Home'
 import RecipeDetail from './components/RecipeDetail'
 import CollectionsPage from './components/CollectionsPage'
+import NewRecipePage from './components/NewRecipePage'
+import EditRecipePage from './components/EditRecipePage'
 import TimerPanel from './components/TimerPanel'
 import ShoppingListPanel from './components/ShoppingListPanel'
 import ScrollToTopButton from './components/ScrollToTopButton'
@@ -56,6 +58,8 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/collections" element={<CollectionsPage />} />
+        <Route path="/recipes/new" element={<NewRecipePage />} />
+        <Route path="/recipe/:id/edit" element={<EditRecipePage />} />
         <Route
           path="/recipe/:id"
           element={

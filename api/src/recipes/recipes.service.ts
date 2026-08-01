@@ -4,6 +4,15 @@ import { Model } from 'mongoose'
 import { Recipe, RecipeDocument } from './schemas/recipe.schema'
 import { Rating, RatingDocument } from '../ratings/schemas/rating.schema'
 import { ActivityLogService } from '../activity-log/activity-log.service'
+import { RecipeDto } from './dto/recipe.dto'
+
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\p{L}\p{N}]+/gu, '-')
+    .replace(/^-+|-+$/g, '')
+}
 
 interface RatingAggregate {
   _id: string
@@ -63,5 +72,29 @@ export class RecipesService {
       this.activityLogService.viewCountsBySlug([slug]),
     ])
     return this.attachRatingsAndViews([recipe.toObject()], ratings, views)[0]
+  }
+
+  private async generateUniqueSlug(title: string): Promise<string> {
+    const base = slugify(title) || 'recipe'
+    let candidate = base
+    let suffix = 2
+    while (await this.recipeModel.exists({ slug: candidate })) {
+      candidate = `${base}-${suffix}`
+      suffix += 1
+    }
+    return candidate
+  }
+
+  async create(dto: RecipeDto): Promise<RecipeDocument> {
+    const slug = await this.generateUniqueSlug(dto.title)
+    return this.recipeModel.create({ ...dto, slug })
+  }
+
+  async update(slug: string, dto: RecipeDto): Promise<RecipeDocument | null> {
+    return this.recipeModel.findOneAndUpdate({ slug }, { $set: dto }, { new: true }).exec()
+  }
+
+  async remove(slug: string): Promise<void> {
+    await this.recipeModel.deleteOne({ slug }).exec()
   }
 }

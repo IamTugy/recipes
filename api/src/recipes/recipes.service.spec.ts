@@ -90,4 +90,94 @@ describe('RecipesService', () => {
     expect(findOne).toHaveBeenCalledWith({ slug: 'hidden-one', hidden: { $ne: true } })
     expect(result).toBeNull()
   })
+
+  const minimalDto = {
+    title: 'Tomato Soup',
+    category: 'soup',
+    tags: [],
+    image: 'https://assets.tugy.dev/tomato-soup.jpg',
+    description: 'A soup',
+    prepTime: 10,
+    cookTime: 20,
+    servings: 4,
+    difficulty: 'easy',
+    ingredients: [],
+    steps: [],
+  }
+
+  it('create slugifies the title and stores the recipe', async () => {
+    const exists = jest.fn().mockResolvedValue(null)
+    const create = jest.fn().mockResolvedValue({ slug: 'tomato-soup', ...minimalDto })
+    const moduleRef = await Test.createTestingModule({
+      providers: [
+        RecipesService,
+        { provide: getModelToken(Recipe.name), useValue: { find: jest.fn(), findOne: jest.fn(), exists, create } },
+        { provide: getModelToken(Rating.name), useValue: { aggregate: jest.fn() } },
+        { provide: ActivityLogService, useValue: makeActivityLog() },
+      ],
+    }).compile()
+
+    const service = moduleRef.get(RecipesService)
+    await service.create(minimalDto as any)
+
+    expect(exists).toHaveBeenCalledWith({ slug: 'tomato-soup' })
+    expect(create).toHaveBeenCalledWith({ ...minimalDto, slug: 'tomato-soup' })
+  })
+
+  it('create appends a numeric suffix when the slug is already taken', async () => {
+    const exists = jest.fn()
+      .mockResolvedValueOnce({ _id: '1' })
+      .mockResolvedValueOnce(null)
+    const create = jest.fn().mockResolvedValue({ slug: 'tomato-soup-2', ...minimalDto })
+    const moduleRef = await Test.createTestingModule({
+      providers: [
+        RecipesService,
+        { provide: getModelToken(Recipe.name), useValue: { find: jest.fn(), findOne: jest.fn(), exists, create } },
+        { provide: getModelToken(Rating.name), useValue: { aggregate: jest.fn() } },
+        { provide: ActivityLogService, useValue: makeActivityLog() },
+      ],
+    }).compile()
+
+    const service = moduleRef.get(RecipesService)
+    await service.create(minimalDto as any)
+
+    expect(create).toHaveBeenCalledWith({ ...minimalDto, slug: 'tomato-soup-2' })
+  })
+
+  it('update sets the recipe fields for the given slug', async () => {
+    const exec = jest.fn().mockResolvedValue({ slug: 'tomato-soup', ...minimalDto })
+    const findOneAndUpdate = jest.fn().mockReturnValue({ exec })
+    const moduleRef = await Test.createTestingModule({
+      providers: [
+        RecipesService,
+        { provide: getModelToken(Recipe.name), useValue: { find: jest.fn(), findOne: jest.fn(), findOneAndUpdate } },
+        { provide: getModelToken(Rating.name), useValue: { aggregate: jest.fn() } },
+        { provide: ActivityLogService, useValue: makeActivityLog() },
+      ],
+    }).compile()
+
+    const service = moduleRef.get(RecipesService)
+    const result = await service.update('tomato-soup', minimalDto as any)
+
+    expect(findOneAndUpdate).toHaveBeenCalledWith({ slug: 'tomato-soup' }, { $set: minimalDto }, { new: true })
+    expect(result).toEqual({ slug: 'tomato-soup', ...minimalDto })
+  })
+
+  it('remove deletes the recipe by slug', async () => {
+    const exec = jest.fn().mockResolvedValue({})
+    const deleteOne = jest.fn().mockReturnValue({ exec })
+    const moduleRef = await Test.createTestingModule({
+      providers: [
+        RecipesService,
+        { provide: getModelToken(Recipe.name), useValue: { find: jest.fn(), findOne: jest.fn(), deleteOne } },
+        { provide: getModelToken(Rating.name), useValue: { aggregate: jest.fn() } },
+        { provide: ActivityLogService, useValue: makeActivityLog() },
+      ],
+    }).compile()
+
+    const service = moduleRef.get(RecipesService)
+    await service.remove('tomato-soup')
+
+    expect(deleteOne).toHaveBeenCalledWith({ slug: 'tomato-soup' })
+  })
 })

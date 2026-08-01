@@ -1,7 +1,8 @@
-import { Controller, Get, Param, NotFoundException, Req } from '@nestjs/common'
+import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Put, Req } from '@nestjs/common'
 import { Request } from 'express'
 import { RecipesService } from './recipes.service'
 import { ActivityLogService } from '../activity-log/activity-log.service'
+import { RecipeDto } from './dto/recipe.dto'
 
 @Controller('recipes')
 export class RecipesController {
@@ -30,5 +31,26 @@ export class RecipesController {
     }
     await this.activityLog.record(req.userId, slug, 'recipe_viewed')
     return recipe
+  }
+
+  @Post()
+  async create(@Body() body: RecipeDto) {
+    const recipe = await this.recipesService.create(body)
+    return recipe.toObject()
+  }
+
+  @Put(':slug')
+  async update(@Param('slug') slug: string, @Body() body: RecipeDto) {
+    const recipe = await this.recipesService.update(slug, body)
+    if (!recipe) {
+      throw new NotFoundException(`Recipe '${slug}' not found`)
+    }
+    return recipe.toObject()
+  }
+
+  @Delete(':slug')
+  async remove(@Param('slug') slug: string) {
+    await this.recipesService.remove(slug)
+    return { deleted: true }
   }
 }

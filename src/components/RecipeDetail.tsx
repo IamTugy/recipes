@@ -3,7 +3,7 @@ import RecipePlaceholder from './RecipePlaceholder'
 import RecipeDetailSkeleton from './RecipeDetailSkeleton'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { useRecipe, useRecipes } from '../hooks/useRecipes'
+import { useRecipe, useRecipes, deleteRecipe } from '../hooks/useRecipes'
 import { useWakeLock } from '../hooks/useWakeLock'
 import { useFavorites } from '../hooks/useFavorites'
 import { useCollections } from '../hooks/useCollections'
@@ -144,6 +144,14 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
       setShareState('copied')
       setTimeout(() => setShareState('idle'), 2000)
     } catch { /* clipboard unavailable */ }
+  }
+
+  async function handleDeleteRecipe() {
+    if (!id) return
+    const confirmMsg = lang === 'he' ? 'למחוק את המתכון הזה לצמיתות?' : 'Permanently delete this recipe?'
+    if (!window.confirm(confirmMsg)) return
+    await deleteRecipe(id, getToken)
+    navigate('/')
   }
 
   // Reset checked steps/ingredients and scroll when recipe changes
@@ -510,6 +518,26 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6v-8z" />
               </svg>
               {lang === 'he' ? 'הדפס' : 'Print'}
+            </button>
+
+            <button type="button"
+              onClick={() => navigate(`/recipe/${id}/edit`)}
+              className="flex items-center gap-1.5 text-sm font-medium text-cream/40 hover:text-cream/70 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              {lang === 'he' ? 'ערוך' : 'Edit'}
+            </button>
+
+            <button type="button"
+              onClick={handleDeleteRecipe}
+              className="flex items-center gap-1.5 text-sm font-medium text-cream/40 hover:text-red-400 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              {lang === 'he' ? 'מחק' : 'Delete'}
             </button>
           </div>
         </div>
