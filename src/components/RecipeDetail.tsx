@@ -10,7 +10,7 @@ import { useRecentlyViewed } from '../hooks/useRecentlyViewed'
 import { useNote } from '../hooks/useNote'
 import { useAuth } from '@clerk/react'
 import { formatTime, formatSeconds, scaleAmount } from '../utils/format'
-import { t, categoryEmoji, heUnit } from '../i18n'
+import { t, categoryEmoji, heUnit, difficultyColor } from '../i18n'
 import { useLanguage } from '../hooks/useLanguage'
 import type { TimerState } from '../types'
 
@@ -225,6 +225,9 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
           <div className="flex flex-wrap items-center gap-2 mb-3">
             <span className="tag">{categoryEmoji[recipe.category]} {tx.categories[recipe.category]}</span>
             {recipe.cuisine && <span className="tag">{recipe.cuisine}</span>}
+            <span className={`tag font-semibold ${difficultyColor[recipe.difficulty]}`}>
+              {tx.difficulty[recipe.difficulty]}
+            </span>
             {recipe.featured && <span className="tag-terra text-xs font-semibold">{tx.featured}</span>}
           </div>
 

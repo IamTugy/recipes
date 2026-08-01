@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import type { Recipe } from '../types'
 import { formatTime } from '../utils/format'
-import { t, categoryEmoji } from '../i18n'
+import { t, categoryEmoji, difficultyColor } from '../i18n'
 import { useLanguage } from '../hooks/useLanguage'
 import Highlight from './Highlight'
 import RecipePlaceholder from './RecipePlaceholder'
@@ -15,11 +15,6 @@ interface RecipeCardProps {
   onToggleFavorite: (slug: string) => void
 }
 
-const difficultyColor = {
-  easy: 'text-herb',
-  medium: 'text-amber',
-  hard: 'text-terra',
-}
 
 export default function RecipeCard({ recipe, index, searchQuery, isFavorite, onToggleFavorite }: RecipeCardProps) {
   const navigate = useNavigate()

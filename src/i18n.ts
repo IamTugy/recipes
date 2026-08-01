@@ -110,6 +110,12 @@ export const t = {
   },
 }
 
+export const difficultyColor: Record<Difficulty, string> = {
+  easy: 'text-herb',
+  medium: 'text-amber',
+  hard: 'text-terra',
+}
+
 export const categoryEmoji: Record<Category, string> = {
   breakfast: '🍳',
   lunch: '🥗',
