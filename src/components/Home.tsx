@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import type { Category } from '../types'
 import { useRecipes } from '../hooks/useRecipes'
@@ -24,6 +24,25 @@ export default function Home() {
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false)
   const [sortBy, setSortBy] = useState<SortOption>('default')
   const { recentIds } = useRecentlyViewed()
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  // "/" focuses search (from anywhere on the page), Escape clears + blurs it
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      const target = e.target as HTMLElement
+      const isTyping = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable
+
+      if (e.key === '/' && !isTyping) {
+        e.preventDefault()
+        searchInputRef.current?.focus()
+      } else if (e.key === 'Escape' && target === searchInputRef.current) {
+        setSearch('')
+        searchInputRef.current?.blur()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   const recentRecipes = useMemo(
     () => recentIds.map(id => recipes.find(r => r.id === id)).filter((r): r is NonNullable<typeof r> => !!r),
@@ -81,6 +100,7 @@ export default function Home() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input
+              ref={searchInputRef}
               type="text"
               value={search}
               onChange={e => setSearch(e.target.value)}
@@ -88,6 +108,11 @@ export default function Home() {
               className={`input-field ${lang === 'he' ? 'pr-11 text-right' : 'pl-11'} w-full`}
               dir={lang === 'he' ? 'rtl' : 'ltr'}
             />
+            {!search && (
+              <kbd className={`hidden sm:flex absolute ${lang === 'he' ? 'left-3' : 'right-3'} top-1/2 -translate-y-1/2 items-center justify-center w-5 h-5 rounded text-[10px] font-mono text-cream/25 border border-tint/10 bg-tint/[0.03]`}>
+                /
+              </kbd>
+            )}
           </div>
           <button
             onClick={surpriseMe}
