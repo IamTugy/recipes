@@ -58,7 +58,7 @@ export default function App() {
       />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/collections" element={<CollectionsPage />} />
+        <Route path="/collections" element={<CollectionsPage onAddToShoppingList={shoppingList.addItems} />} />
         <Route path="/recipes/new" element={<NewRecipePage />} />
         <Route path="/recipe/:id/edit" element={<EditRecipePage />} />
         <Route path="/feature-requests" element={<FeatureRequestsPage />} />

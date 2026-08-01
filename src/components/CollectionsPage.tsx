@@ -4,8 +4,13 @@ import { useCollections } from '../hooks/useCollections'
 import { useRecipes } from '../hooks/useRecipes'
 import { useLanguage } from '../hooks/useLanguage'
 import { useToast } from '../hooks/useToast'
+import { heUnit } from '../i18n'
 
-export default function CollectionsPage() {
+interface CollectionsPageProps {
+  onAddToShoppingList: (items: { name: string; amount: string }[], recipeTitle: string) => void
+}
+
+export default function CollectionsPage({ onAddToShoppingList }: CollectionsPageProps) {
   const { lang } = useLanguage()
   const { showToast } = useToast()
   const { collections, loading, create, rename, remove, removeRecipe } = useCollections()
@@ -36,6 +41,30 @@ export default function CollectionsPage() {
   function handleRemove(id: string, name: string) {
     remove(id)
     showToast(lang === 'he' ? `האוסף "${name}" נמחק` : `Collection "${name}" deleted`)
+  }
+
+  function handleAddCollectionToShoppingList(slugs: string[]) {
+    let recipeCount = 0
+    for (const slug of slugs) {
+      const r = recipes.find(rec => rec.id === slug)
+      if (!r) continue
+      recipeCount++
+      const title = lang === 'he' ? (r.titleHe ?? r.title) : r.title
+      const items = r.ingredients.flatMap(group =>
+        group.items.map(item => {
+          const itemName = lang === 'he' ? item.name : (item.nameEn ?? item.name)
+          if (!item.amount) return { name: itemName, amount: '' }
+          const unit = lang === 'he' ? heUnit(item.unit, item.amount) : item.unit
+          return { name: itemName, amount: unit ? `${item.amount} ${unit}` : `${item.amount}` }
+        })
+      )
+      onAddToShoppingList(items, title)
+    }
+    showToast(
+      lang === 'he'
+        ? `המצרכים של ${recipeCount} מתכונים נוספו לרשימת הקניות`
+        : `Added ingredients from ${recipeCount} recipes to your shopping list`
+    )
   }
 
   return (
@@ -100,12 +129,22 @@ export default function CollectionsPage() {
                       {col.name} <span className="text-cream/30 text-sm font-sans">({col.recipeSlugs.length})</span>
                     </h2>
                   )}
-                  <button type="button"
-                    onClick={() => handleRemove(col._id, col.name)}
-                    className="shrink-0 text-xs text-cream/30 hover:text-red-400 transition-colors"
-                  >
-                    {lang === 'he' ? 'מחק' : 'Delete'}
-                  </button>
+                  <div className="flex items-center gap-3 shrink-0">
+                    {col.recipeSlugs.length > 0 && (
+                      <button type="button"
+                        onClick={() => handleAddCollectionToShoppingList(col.recipeSlugs)}
+                        className="text-xs text-cream/40 hover:text-amber transition-colors"
+                      >
+                        {lang === 'he' ? 'הוסף הכל לרשימת קניות' : 'Add all to shopping list'}
+                      </button>
+                    )}
+                    <button type="button"
+                      onClick={() => handleRemove(col._id, col.name)}
+                      className="text-xs text-cream/30 hover:text-red-400 transition-colors"
+                    >
+                      {lang === 'he' ? 'מחק' : 'Delete'}
+                    </button>
+                  </div>
                 </div>
                 {col.recipeSlugs.length === 0 ? (
                   <p className="text-xs text-cream/25">
