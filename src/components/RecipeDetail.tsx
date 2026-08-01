@@ -33,6 +33,8 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
   const { recipes: allRecipes } = useRecipes()
   const { favoriteSlugs, toggle: toggleFavorite } = useFavorites()
   const { collections, create: createCollection, addRecipe: addRecipeToCollection, removeRecipe: removeRecipeFromCollection } = useCollections()
+  const [wizardOpen, setWizardOpen] = useState(false)
+  const [wizardIndex, setWizardIndex] = useState(0)
   const [collectionMenuOpen, setCollectionMenuOpen] = useState(false)
   const [newCollectionName, setNewCollectionName] = useState('')
   const collectionMenuRef = useRef<HTMLDivElement>(null)
@@ -147,6 +149,19 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
     if (recipe) addRecent(recipe.id)
   }, [recipe, addRecent])
 
+  const stepsCount = recipe?.steps.reduce((n, g) => n + g.items.length, 0) ?? 0
+
+  useEffect(() => {
+    if (!wizardOpen) return
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === 'ArrowRight') setWizardIndex(i => Math.min(i + 1, stepsCount - 1))
+      if (e.key === 'ArrowLeft') setWizardIndex(i => Math.max(i - 1, 0))
+      if (e.key === 'Escape') setWizardOpen(false)
+    }
+    document.addEventListener('keydown', handleKey)
+    return () => document.removeEventListener('keydown', handleKey)
+  }, [wizardOpen, stepsCount])
+
   if (recipeLoading) {
     return <RecipeDetailSkeleton />
   }
@@ -244,6 +259,23 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
   // Precompute sequential step numbers to avoid mutable counter inside render
   let _n = 0
   const stepNums = recipe.steps.map(g => g.items.map(() => ++_n))
+
+  const flatSteps = recipe.steps.flatMap((group, gi) =>
+    group.items.map((step, si) => ({
+      groupIdx: gi,
+      stepIdx: si,
+      stepNum: stepNums[gi][si],
+      instruction: lang === 'he' ? step.instruction : (step.instructionEn ?? step.instruction),
+      tip: lang === 'he' ? step.tip : (step.tipEn ?? step.tip),
+      timerMinutes: step.timerMinutes,
+    }))
+  )
+
+  function openWizard() {
+    const firstUnchecked = flatSteps.findIndex(s => !checkedSteps.has(`${s.groupIdx}-${s.stepIdx}`))
+    setWizardIndex(firstUnchecked === -1 ? 0 : firstUnchecked)
+    setWizardOpen(true)
+  }
 
   return (
     <div className="min-h-dvh bg-bg pt-14" dir={lang === 'he' ? 'rtl' : 'ltr'}>
@@ -579,6 +611,20 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
           <div className="sm:col-span-3">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-serif text-xl font-bold text-cream">{tx.instructions}</h2>
+              <div className="print:hidden flex items-center gap-2">
+                {flatSteps.length > 0 && (
+                  <button type="button"
+                    onClick={openWizard}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-tint/10 text-cream/40 hover:text-cream/70 transition-colors"
+                    title={lang === 'he' ? 'הדריכו אותי שלב אחר שלב' : 'Guide me step by step'}
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {lang === 'he' ? 'מצב הדרכה' : 'Guided mode'}
+                  </button>
+                )}
               {cookMode.supported && (
                 <button type="button"
                   onClick={cookMode.toggle}
@@ -596,6 +642,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                   {lang === 'he' ? 'מצב בישול' : 'Cook Mode'}
                 </button>
               )}
+              </div>
             </div>
             <div className="space-y-6">
               {recipe.steps.map((group, gi) => {
@@ -869,6 +916,93 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
           </div>
         )}
       </div>
+
+      {/* Guided step-by-step wizard */}
+      {wizardOpen && flatSteps.length > 0 && (() => {
+        const step = flatSteps[wizardIndex]
+        const stepKey = `${step.groupIdx}-${step.stepIdx}`
+        const checked = checkedSteps.has(stepKey)
+        const existingTimer = getTimerForStep(step.groupIdx, step.stepIdx)
+        return (
+          <div className="print:hidden fixed inset-0 z-50 bg-bg flex flex-col" dir={lang === 'he' ? 'rtl' : 'ltr'}>
+            <div className="flex items-center justify-between px-4 h-14 border-b border-tint/[0.06]">
+              <span className="text-cream/40 text-sm">
+                {lang === 'he' ? `שלב ${wizardIndex + 1} מתוך ${flatSteps.length}` : `Step ${wizardIndex + 1} of ${flatSteps.length}`}
+              </span>
+              <button type="button"
+                onClick={() => setWizardOpen(false)}
+                aria-label={lang === 'he' ? 'סגור מצב הדרכה' : 'Close guided mode'}
+                className="h-9 w-9 flex items-center justify-center rounded-lg text-cream/40 hover:text-cream/70 transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="h-1 bg-tint/[0.06]">
+              <div className="h-full bg-amber transition-all" style={{ width: `${((wizardIndex + 1) / flatSteps.length) * 100}%` }} />
+            </div>
+
+            <div className="flex-1 flex flex-col items-center justify-center px-6 text-center gap-6 overflow-y-auto py-8">
+              <div className={`w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold ${
+                checked ? 'bg-herb text-white' : 'bg-tint/10 text-cream/60'
+              }`}>
+                {checked ? '✓' : step.stepNum}
+              </div>
+              <p className="max-w-lg text-xl sm:text-2xl leading-relaxed text-cream">
+                {step.instruction}
+              </p>
+              {step.tip && (
+                <p className="max-w-md text-sm text-amber/70 flex items-start gap-1.5">
+                  <span className="mt-0.5">💡</span>
+                  <span>{step.tip}</span>
+                </p>
+              )}
+              <div className="flex items-center gap-3">
+                {step.timerMinutes && !existingTimer && (
+                  <button type="button"
+                    onClick={() => startTimer(step.instruction.slice(0, 40), step.timerMinutes!, step.groupIdx, step.stepIdx)}
+                    className="px-4 py-2 rounded-lg text-sm font-medium bg-amber/10 border border-amber/30 text-amber hover:bg-amber/20 transition-colors"
+                  >
+                    ⏱ {lang === 'he' ? `התחל טיימר ${step.timerMinutes} דק'` : `Start ${step.timerMinutes}m timer`}
+                  </button>
+                )}
+                <button type="button"
+                  onClick={() => toggleStep(stepKey)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
+                    checked ? 'border-herb/30 bg-herb/10 text-herb' : 'border-tint/10 text-cream/50 hover:text-cream/80'
+                  }`}
+                >
+                  {checked ? (lang === 'he' ? '✓ הושלם' : '✓ Done') : (lang === 'he' ? 'סמן כהושלם' : 'Mark done')}
+                </button>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 px-6 py-4 border-t border-tint/[0.06]">
+              <button type="button"
+                onClick={() => setWizardIndex(i => Math.max(i - 1, 0))}
+                disabled={wizardIndex === 0}
+                className="flex-1 py-3 rounded-xl text-sm font-medium border border-tint/10 text-cream/60 hover:text-cream/90 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                {lang === 'he' ? 'הקודם' : 'Previous'}
+              </button>
+              {wizardIndex === flatSteps.length - 1 ? (
+                <button type="button"
+                  onClick={() => setWizardOpen(false)}
+                  className="flex-1 py-3 rounded-xl text-sm font-semibold bg-amber/90 text-bg hover:bg-amber transition-colors"
+                >
+                  {lang === 'he' ? 'סיום' : 'Finish'}
+                </button>
+              ) : (
+                <button type="button"
+                  onClick={() => setWizardIndex(i => Math.min(i + 1, flatSteps.length - 1))}
+                  className="flex-1 py-3 rounded-xl text-sm font-semibold bg-amber/90 text-bg hover:bg-amber transition-colors"
+                >
+                  {lang === 'he' ? 'הבא' : 'Next'}
+                </button>
+              )}
+            </div>
+          </div>
+        )
+      })()}
     </div>
   )
 }
