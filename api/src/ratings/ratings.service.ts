@@ -15,8 +15,8 @@ export class RatingsService {
     const setDoc: { userId: string; recipeSlug: string; score: number; comment?: string; photoUrl?: string; recipeRevision?: number } = { userId, recipeSlug, score }
     if (comment !== undefined) setDoc.comment = comment
     if (photoUrl !== undefined) setDoc.photoUrl = photoUrl
-    const recipe = await this.recipeModel.findOne({ slug: recipeSlug }).select('currentRevision').lean().exec()
-    if (recipe) setDoc.recipeRevision = recipe.currentRevision
+    const recipe = await this.recipeModel.findOne({ slug: recipeSlug }).select('publishedRevision').lean().exec()
+    if (recipe?.publishedRevision != null) setDoc.recipeRevision = recipe.publishedRevision
     const doc = await this.ratingModel
       .findOneAndUpdate({ userId, recipeSlug }, { $set: setDoc }, { upsert: true, new: true })
       .exec()

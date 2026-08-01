@@ -58,9 +58,9 @@ describe('RatingsService', () => {
     )
   })
 
-  it("rate stamps the recipe's currentRevision onto the rating when the recipe is found", async () => {
+  it("rate stamps the recipe's publishedRevision onto the rating when the recipe has been published", async () => {
     const findOneAndUpdate = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue({ score: 5 }) })
-    const recipeModel = { findOne: jest.fn().mockReturnValue({ select: () => ({ lean: () => ({ exec: jest.fn().mockResolvedValue({ currentRevision: 3 }) }) }) }) }
+    const recipeModel = { findOne: jest.fn().mockReturnValue({ select: () => ({ lean: () => ({ exec: jest.fn().mockResolvedValue({ publishedRevision: 3 }) }) }) }) }
     const service = await makeService({ findOneAndUpdate }, recipeModel)
     await service.rate('user_1', 'a', 5)
 

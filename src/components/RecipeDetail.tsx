@@ -251,6 +251,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
 
   const [submitting, setSubmitting] = useState(false)
   const [revisionsOpen, setRevisionsOpen] = useState(false)
+  const [openRevision, setOpenRevision] = useState<number | null>(null)
   const [revisions, setRevisions] = useState<RecipeRevision[] | null>(null)
 
   async function loadRevisions() {
@@ -510,7 +511,13 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
             </div>
           )}
 
-          {recipe.status && recipe.status !== 'published' && canEdit && (
+          {canEdit && recipe.status === 'published' && recipe.currentRevision !== recipe.publishedRevision && (
+            <p className="text-xs text-amber mb-2">
+              {lang === 'he' ? 'יש לכם שינויים שלא פורסמו' : 'You have unpublished changes'}
+            </p>
+          )}
+
+          {recipe.status && (recipe.status !== 'published' || recipe.currentRevision !== recipe.publishedRevision) && canEdit && (
             <div className="flex items-center gap-3 mb-4">
               {recipe.status === 'pending_review' ? (
                 <button type="button" disabled={submitting} onClick={handleCancelSubmission} className="btn-ghost text-xs disabled:opacity-50">
@@ -729,7 +736,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
               {lang === 'he' ? 'הדפס' : 'Print'}
             </button>
 
-            {canEdit && recipe.status !== 'pending_review' && (recipe.status !== 'published' || isAdmin) && (
+            {canEdit && recipe.status !== 'pending_review' && (
               <button type="button"
                 onClick={() => navigate(`/recipe/${id}/edit`)}
                 className="flex items-center gap-1.5 text-sm font-medium text-cream/40 hover:text-cream/70 transition-colors"
@@ -751,7 +758,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
               {lang === 'he' ? 'שכפל' : 'Duplicate'}
             </button>
 
-            {(isAdmin || (isOwner && recipe.status !== 'published')) && (
+            {(isAdmin || (isOwner && recipe.publishedRevision == null)) && (
               <button type="button"
                 onClick={handleDeleteRecipe}
                 className="flex items-center gap-1.5 text-sm font-medium text-cream/40 hover:text-red-400 transition-colors"
@@ -1223,7 +1230,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                   onOpenLightbox={setLightboxUrl}
                   translation={translations[r.userId]}
                   onToggleTranslate={() => toggleTranslateReview(r.userId, r.comment)}
-                  currentRevision={recipe.currentRevision}
+                  liveRevision={recipe.publishedRevision ?? undefined}
                 />
               ))}
             </ul>
@@ -1249,17 +1256,54 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                 : (lang === 'he' ? 'הצג היסטוריית גרסאות' : 'Show revision history')}
             </button>
             {revisionsOpen && revisions && (
-              <ul className="mt-3 space-y-2">
-                {revisions.map(rev => (
-                  <li key={rev.revisionNumber} className="card p-3 text-xs text-cream/50">
-                    <span className="font-semibold text-cream/70">v{rev.revisionNumber}</span>
-                    {' · '}
-                    {new Date(rev.publishedAt).toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-US')}
-                    {' · '}
-                    {(rev.snapshot.title as string) ?? ''}
-                  </li>
-                ))}
-              </ul>
+              revisions.length === 0 ? (
+                <p className="mt-3 text-xs text-cream/25">
+                  {lang === 'he' ? 'אין עדיין גרסאות' : 'No revisions yet'}
+                </p>
+              ) : (
+                <ul className="mt-3 space-y-2">
+                  {revisions.map(rev => {
+                    const isOpen = openRevision === rev.revisionNumber
+                    const ingredientCount = Array.isArray(rev.snapshot.ingredients)
+                      ? (rev.snapshot.ingredients as { items: unknown[] }[]).reduce((n, g) => n + (g.items?.length ?? 0), 0)
+                      : 0
+                    const stepCount = Array.isArray(rev.snapshot.steps)
+                      ? (rev.snapshot.steps as { items: unknown[] }[]).reduce((n, g) => n + (g.items?.length ?? 0), 0)
+                      : 0
+                    return (
+                      <li key={rev.revisionNumber} className="card p-3 text-xs text-cream/50">
+                        <button type="button"
+                          onClick={() => setOpenRevision(isOpen ? null : rev.revisionNumber)}
+                          className="w-full text-start flex items-center justify-between gap-2"
+                        >
+                          <span>
+                            <span className="font-semibold text-cream/70">v{rev.revisionNumber}</span>
+                            {' · '}
+                            {new Date(rev.publishedAt).toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-US')}
+                            {' · '}
+                            {(rev.snapshot.title as string) ?? ''}
+                          </span>
+                          {rev.published && (
+                            <span className="shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-herb/10 text-herb">
+                              {lang === 'he' ? 'פורסם' : 'Published'}
+                            </span>
+                          )}
+                        </button>
+                        {isOpen && (
+                          <div className="mt-2 pt-2 border-t border-tint/[0.06] space-y-1 text-cream/40">
+                            <p>{(rev.snapshot.description as string) ?? ''}</p>
+                            <p>
+                              {lang === 'he'
+                                ? `${ingredientCount} רכיבים · ${stepCount} שלבים`
+                                : `${ingredientCount} ingredients · ${stepCount} steps`}
+                            </p>
+                          </div>
+                        )}
+                      </li>
+                    )
+                  })}
+                </ul>
+              )
             )}
           </div>
         )}

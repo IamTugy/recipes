@@ -58,15 +58,16 @@ export class RecipesController {
     if (!recipe) {
       throw new NotFoundException(`Recipe '${slug}' not found`)
     }
-    if (recipe.status === 'published') {
+    if (recipe.publishedRevision != null) {
       await this.activityLog.record(req.userId, slug, 'recipe_viewed')
     }
     return recipe
   }
 
   @Get(':slug/revisions')
-  async listRevisions(@Param('slug') slug: string) {
-    return this.recipesService.listRevisions(slug)
+  async listRevisions(@Param('slug') slug: string, @Req() req: Request & { userId: string }) {
+    const includeDrafts = await this.recipesService.canViewDraftRevisions(slug, req.userId, this.isAdmin(req.userId))
+    return this.recipesService.listRevisions(slug, includeDrafts)
   }
 
   @Post()

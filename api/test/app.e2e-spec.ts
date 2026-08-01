@@ -58,6 +58,9 @@ describe('Recipes flow (e2e)', () => {
       tags: [],
       ingredients: [],
       steps: [],
+      status: 'published',
+      currentRevision: 1,
+      publishedRevision: 1,
     })
 
     const listRes = await request(app.getHttpServer())

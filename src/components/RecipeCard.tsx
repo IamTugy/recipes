@@ -13,10 +13,11 @@ interface RecipeCardProps {
   searchQuery: string
   isFavorite: boolean
   onToggleFavorite: (slug: string) => void
+  statusBadge?: { label: string; className: string }
 }
 
 
-export default function RecipeCard({ recipe, index, searchQuery, isFavorite, onToggleFavorite }: RecipeCardProps) {
+export default function RecipeCard({ recipe, index, searchQuery, isFavorite, onToggleFavorite, statusBadge }: RecipeCardProps) {
   const navigate = useNavigate()
   const { lang } = useLanguage()
   const tx = t[lang]
@@ -59,6 +60,11 @@ export default function RecipeCard({ recipe, index, searchQuery, isFavorite, onT
               </span>
             </div>
             <div className="absolute top-3 right-3 flex items-center gap-1.5">
+              {statusBadge && (
+                <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${statusBadge.className}`}>
+                  {statusBadge.label}
+                </span>
+              )}
               {recipe.featured && (
                 <span className="tag-terra text-[10px] font-semibold px-2 py-0.5">{tx.featured}</span>
               )}

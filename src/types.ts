@@ -73,12 +73,14 @@ export interface Recipe {
   status?: 'draft' | 'pending_review' | 'published' | 'rejected'
   reviewComment?: string
   currentRevision?: number
+  publishedRevision?: number | null
 }
 
 export interface RecipeRevision {
   revisionNumber: number
   authorId: string
   snapshot: Record<string, unknown>
+  published: boolean
   publishedAt: string
 }
 

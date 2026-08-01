@@ -83,6 +83,13 @@ export class Recipe {
 
   @Prop({ default: 0 })
   currentRevision!: number
+
+  // The revision number currently live to the public. Undefined means this
+  // recipe has never been approved. Editing after publishing keeps advancing
+  // currentRevision without touching this, so the public keeps seeing the
+  // last-approved snapshot until a new edit is submitted and approved again.
+  @Prop()
+  publishedRevision?: number
 }
 
 export const RecipeSchema = SchemaFactory.createForClass(Recipe)

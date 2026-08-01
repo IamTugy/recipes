@@ -16,6 +16,7 @@ describe('RecipesController', () => {
     approveSubmission: jest.fn(),
     rejectSubmission: jest.fn(),
     listRevisions: jest.fn(),
+    canViewDraftRevisions: jest.fn(),
     remove: jest.fn(),
   }
   const usersService = { namesByIds: jest.fn().mockResolvedValue({}) }
@@ -34,17 +35,17 @@ describe('RecipesController', () => {
     await expect(controller.findAll()).resolves.toEqual([{ slug: 'a' }])
   })
 
-  it('GET /recipes/:slug returns the recipe and logs a view when published', async () => {
-    recipesService.findBySlugForUser.mockResolvedValue({ slug: 'a', status: 'published' })
+  it('GET /recipes/:slug returns the recipe and logs a view when it has ever been published', async () => {
+    recipesService.findBySlugForUser.mockResolvedValue({ slug: 'a', status: 'published', publishedRevision: 1 })
     const controller = makeController()
 
     const result = await controller.findOne('a', { userId: 'user_1' } as any)
 
     expect(recipesService.findBySlugForUser).toHaveBeenCalledWith('a', 'user_1', false)
-    expect(result).toEqual({ slug: 'a', status: 'published' })
+    expect(result).toEqual({ slug: 'a', status: 'published', publishedRevision: 1 })
   })
 
-  it('GET /recipes/:slug does not log a view for a non-published recipe', async () => {
+  it('GET /recipes/:slug does not log a view for a never-published recipe', async () => {
     recipesService.findBySlugForUser.mockResolvedValue({ slug: 'a', status: 'draft' })
     const activityLog = { record: jest.fn(), trendingSlugs: jest.fn() }
     const config = { get: jest.fn().mockReturnValue('admin_1') }
@@ -180,10 +181,24 @@ describe('RecipesController', () => {
     expect(recipesService.rejectSubmission).not.toHaveBeenCalled()
   })
 
-  it('GET /recipes/:slug/revisions returns the revision history', async () => {
+  it("GET /recipes/:slug/revisions includes drafts when the requester can view them (owner/admin)", async () => {
+    recipesService.canViewDraftRevisions.mockResolvedValue(true)
+    recipesService.listRevisions.mockResolvedValue([{ revisionNumber: 2 }, { revisionNumber: 1 }])
+    const controller = makeController('admin_1')
+    const result = await controller.listRevisions('a', { userId: 'admin_1' } as any)
+
+    expect(recipesService.canViewDraftRevisions).toHaveBeenCalledWith('a', 'admin_1', true)
+    expect(recipesService.listRevisions).toHaveBeenCalledWith('a', true)
+    expect(result).toEqual([{ revisionNumber: 2 }, { revisionNumber: 1 }])
+  })
+
+  it("GET /recipes/:slug/revisions excludes drafts for a random visitor", async () => {
+    recipesService.canViewDraftRevisions.mockResolvedValue(false)
     recipesService.listRevisions.mockResolvedValue([{ revisionNumber: 1 }])
     const controller = makeController()
-    await expect(controller.listRevisions('a')).resolves.toEqual([{ revisionNumber: 1 }])
+    await controller.listRevisions('a', { userId: 'user_2' } as any)
+
+    expect(recipesService.listRevisions).toHaveBeenCalledWith('a', false)
   })
 
   it('DELETE /recipes/:slug deletes a recipe', async () => {

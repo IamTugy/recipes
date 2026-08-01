@@ -34,7 +34,7 @@ interface ReviewItemProps {
   onOpenLightbox: (url: string) => void
   translation?: { text: string; showing: boolean; loading: boolean }
   onToggleTranslate?: () => void
-  currentRevision?: number
+  liveRevision?: number
 }
 
 function displayName(userName: string | null, lang: 'he' | 'en'): string {
@@ -60,7 +60,7 @@ function UpvoteButton({ upvoted, count, onToggle, lang }: { upvoted: boolean; co
   )
 }
 
-export default function ReviewItem({ recipeSlug, review, lang, getToken, onOpenLightbox, translation, onToggleTranslate, currentRevision }: ReviewItemProps) {
+export default function ReviewItem({ recipeSlug, review, lang, getToken, onOpenLightbox, translation, onToggleTranslate, liveRevision }: ReviewItemProps) {
   const showingTranslation = !!translation?.showing
   const [upvoted, setUpvoted] = useState(review.upvotedByMe)
   const [upvoteCount, setUpvoteCount] = useState(review.upvoteCount)
@@ -156,7 +156,7 @@ export default function ReviewItem({ recipeSlug, review, lang, getToken, onOpenL
         <span className="text-cream/25 text-[11px]">
           {new Date(review.createdAt).toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-US')}
         </span>
-        {currentRevision !== undefined && review.recipeRevision < currentRevision && (
+        {liveRevision !== undefined && review.recipeRevision < liveRevision && (
           <span className="text-cream/25 text-[10px] italic">
             {lang === 'he' ? `לגבי גרסה קודמת (v${review.recipeRevision})` : `about an earlier version (v${review.recipeRevision})`}
           </span>
