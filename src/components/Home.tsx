@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import type { Category } from '../types'
-import { useRecipes } from '../hooks/useRecipes'
+import { useRecipes, useTrending } from '../hooks/useRecipes'
 import { useFavorites } from '../hooks/useFavorites'
 import { useRecentlyViewed } from '../hooks/useRecentlyViewed'
 import { t, categoryEmoji } from '../i18n'
@@ -24,6 +24,7 @@ export default function Home() {
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false)
   const [sortBy, setSortBy] = useState<SortOption>('default')
   const { recentIds } = useRecentlyViewed()
+  const { trending } = useTrending()
   const searchInputRef = useRef<HTMLInputElement>(null)
 
   // "/" focuses search (from anywhere on the page), Escape clears + blurs it
@@ -166,6 +167,41 @@ export default function Home() {
           ))}
         </div>
       </div>
+
+      {/* Trending */}
+      {!loading && trending.length > 0 && !search && !activeCategory && !showFavoritesOnly && (
+        <div className="max-w-6xl mx-auto px-6 mb-8">
+          <p className="text-cream/25 text-xs tracking-wider mb-3">
+            {lang === 'he' ? '🔥 פופולרי השבוע' : '🔥 Trending this week'}
+          </p>
+          <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-none">
+            {trending.map(r => {
+              const title = lang === 'he' ? (r.titleHe ?? r.title) : r.title
+              return (
+                <Link key={r.id} to={`/recipe/${r.id}`} className="shrink-0 w-32 group">
+                  <div className="relative h-20 w-32 rounded-lg overflow-hidden mb-1.5">
+                    {r.image.includes('assets.tugy.dev') ? (
+                      <img
+                        src={r.image}
+                        alt={title}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-tint/[0.05] flex items-center justify-center text-2xl">
+                        {categoryEmoji[r.category]}
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-xs text-cream/70 group-hover:text-amber transition-colors line-clamp-1" dir={lang === 'he' ? 'rtl' : 'ltr'}>
+                    {title}
+                  </p>
+                </Link>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Recently viewed */}
       {!loading && recentRecipes.length > 0 && !search && !activeCategory && !showFavoritesOnly && (

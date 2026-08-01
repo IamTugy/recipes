@@ -69,3 +69,23 @@ export function useRecipe(slug: string | undefined) {
 
   return { recipe, loading, notFound }
 }
+
+export function useTrending() {
+  const { getToken, isLoaded, isSignedIn } = useAuth()
+  const [trending, setTrending] = useState<Recipe[]>([])
+
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn) return
+    let cancelled = false
+
+    apiFetch<ApiRecipe[]>('/recipes/trending', getToken)
+      .then(data => {
+        if (!cancelled) setTrending(data.map(toRecipe))
+      })
+      .catch(() => { /* trending is a nice-to-have, fail silently */ })
+
+    return () => { cancelled = true }
+  }, [isLoaded, isSignedIn, getToken])
+
+  return { trending }
+}
