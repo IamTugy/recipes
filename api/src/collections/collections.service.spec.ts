@@ -38,6 +38,18 @@ describe('CollectionsService', () => {
     expect(result).toEqual({ name: 'Desserts', recipeSlugs: [] })
   })
 
+  it("rename updates only the requesting user's collection name", async () => {
+    findOneAndUpdate.mockReturnValue({ exec: jest.fn().mockResolvedValue({ name: 'Desserts (new)' }) })
+    const service = await makeService()
+    const result = await service.rename('user_1', 'col_1', 'Desserts (new)')
+    expect(findOneAndUpdate).toHaveBeenCalledWith(
+      { _id: 'col_1', userId: 'user_1' },
+      { name: 'Desserts (new)' },
+      { new: true },
+    )
+    expect(result).toEqual({ name: 'Desserts (new)' })
+  })
+
   it('remove deletes only the requesting user\'s collection', async () => {
     deleteOne.mockReturnValue({ exec: jest.fn().mockResolvedValue({}) })
     const service = await makeService()

@@ -6,9 +6,22 @@ import { useLanguage } from '../hooks/useLanguage'
 
 export default function CollectionsPage() {
   const { lang } = useLanguage()
-  const { collections, loading, create, remove, removeRecipe } = useCollections()
+  const { collections, loading, create, rename, remove, removeRecipe } = useCollections()
   const { recipes } = useRecipes()
   const [newName, setNewName] = useState('')
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editingName, setEditingName] = useState('')
+
+  function startEditing(id: string, currentName: string) {
+    setEditingId(id)
+    setEditingName(currentName)
+  }
+
+  function commitEdit() {
+    const name = editingName.trim()
+    if (name && editingId) rename(editingId, name)
+    setEditingId(null)
+  }
 
   function handleCreate() {
     const name = newName.trim()
@@ -54,13 +67,34 @@ export default function CollectionsPage() {
           <div className="space-y-6">
             {collections.map(col => (
               <div key={col._id} className="card p-5">
-                <div className="flex items-center justify-between mb-3">
-                  <h2 className="font-serif text-lg font-medium text-cream">
-                    {col.name} <span className="text-cream/30 text-sm font-sans">({col.recipeSlugs.length})</span>
-                  </h2>
+                <div className="flex items-center justify-between mb-3 gap-2">
+                  {editingId === col._id ? (
+                    <input
+                      autoFocus
+                      value={editingName}
+                      onChange={e => setEditingName(e.target.value)}
+                      onBlur={commitEdit}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') commitEdit()
+                        if (e.key === 'Escape') setEditingId(null)
+                      }}
+                      maxLength={60}
+                      aria-label={lang === 'he' ? 'שם האוסף' : 'Collection name'}
+                      className="font-serif text-lg font-medium text-cream bg-tint/[0.03] border border-amber/30 rounded-lg px-2 py-0.5 outline-none flex-1 min-w-0"
+                      dir={lang === 'he' ? 'rtl' : 'ltr'}
+                    />
+                  ) : (
+                    <h2
+                      className="font-serif text-lg font-medium text-cream cursor-pointer hover:text-amber transition-colors truncate"
+                      onClick={() => startEditing(col._id, col.name)}
+                      title={lang === 'he' ? 'לחצו לעריכת השם' : 'Click to rename'}
+                    >
+                      {col.name} <span className="text-cream/30 text-sm font-sans">({col.recipeSlugs.length})</span>
+                    </h2>
+                  )}
                   <button type="button"
                     onClick={() => remove(col._id)}
-                    className="text-xs text-cream/30 hover:text-red-400 transition-colors"
+                    className="shrink-0 text-xs text-cream/30 hover:text-red-400 transition-colors"
                   >
                     {lang === 'he' ? 'מחק' : 'Delete'}
                   </button>

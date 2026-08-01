@@ -4,6 +4,7 @@ describe('CollectionsController', () => {
   const collectionsService = {
     listForUser: jest.fn(),
     create: jest.fn(),
+    rename: jest.fn(),
     remove: jest.fn(),
     addRecipe: jest.fn(),
     removeRecipe: jest.fn(),
@@ -24,6 +25,14 @@ describe('CollectionsController', () => {
     const result = await controller.create({ name: 'Desserts' }, { userId: 'user_1' } as any)
     expect(collectionsService.create).toHaveBeenCalledWith('user_1', 'Desserts')
     expect(result).toEqual({ name: 'Desserts' })
+  })
+
+  it('PUT /collections/:id renames the collection', async () => {
+    collectionsService.rename.mockResolvedValue({ name: 'Desserts (new)' })
+    const controller = new CollectionsController(collectionsService as any)
+    const result = await controller.rename('col_1', { name: 'Desserts (new)' }, { userId: 'user_1' } as any)
+    expect(collectionsService.rename).toHaveBeenCalledWith('user_1', 'col_1', 'Desserts (new)')
+    expect(result).toEqual({ name: 'Desserts (new)' })
   })
 
   it('DELETE /collections/:id removes the collection', async () => {

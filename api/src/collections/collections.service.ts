@@ -15,6 +15,10 @@ export class CollectionsService {
     return this.collectionModel.create({ userId, name, recipeSlugs: [] })
   }
 
+  async rename(userId: string, id: string, name: string): Promise<CollectionDocument | null> {
+    return this.collectionModel.findOneAndUpdate({ _id: id, userId }, { name }, { new: true }).exec()
+  }
+
   async remove(userId: string, id: string): Promise<void> {
     await this.collectionModel.deleteOne({ _id: id, userId }).exec()
   }

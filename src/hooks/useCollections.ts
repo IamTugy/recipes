@@ -38,6 +38,19 @@ export function useCollections() {
     return created
   }, [getToken])
 
+  const rename = useCallback(async (id: string, name: string) => {
+    setCollections(prev => prev.map(c => (c._id === id ? { ...c, name } : c)))
+    const token = await getToken()
+    await fetch(`/api/collections/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({ name }),
+    })
+  }, [getToken])
+
   const remove = useCallback(async (id: string) => {
     setCollections(prev => prev.filter(c => c._id !== id))
     const token = await getToken()
@@ -69,5 +82,5 @@ export function useCollections() {
     })
   }, [getToken])
 
-  return { collections, loading, create, remove, addRecipe, removeRecipe }
+  return { collections, loading, create, rename, remove, addRecipe, removeRecipe }
 }

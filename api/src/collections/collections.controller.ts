@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Req } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Post, Put, Req } from '@nestjs/common'
 import { Request } from 'express'
 import { CollectionsService } from './collections.service'
 import { CreateCollectionDto } from './dto/create-collection.dto'
@@ -16,6 +16,15 @@ export class CollectionsController {
   @Post()
   async create(@Body() body: CreateCollectionDto, @Req() req: Request & { userId: string }) {
     return this.collectionsService.create(req.userId, body.name)
+  }
+
+  @Put(':id')
+  async rename(
+    @Param('id') id: string,
+    @Body() body: CreateCollectionDto,
+    @Req() req: Request & { userId: string },
+  ) {
+    return this.collectionsService.rename(req.userId, id, body.name)
   }
 
   @Delete(':id')
