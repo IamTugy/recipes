@@ -37,6 +37,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
   const [multiplier, setMultiplier] = useState(1)
   const [customInput, setCustomInput] = useState('')
   const [checkedSteps, setCheckedSteps] = useState<Set<string>>(new Set())
+  const [checkedIngredients, setCheckedIngredients] = useState<Set<string>>(new Set())
   const [userRating, setUserRating] = useState<number | null>(null)
   const [shareState, setShareState] = useState<'idle' | 'copied'>('idle')
   const [noteInput, setNoteInput] = useState('')
@@ -73,12 +74,16 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
     } catch { /* clipboard unavailable */ }
   }
 
-  // Reset checked steps and scroll when recipe changes
+  // Reset checked steps/ingredients and scroll when recipe changes
   useEffect(() => {
     try {
       const saved = sessionStorage.getItem(`checked-${id}`)
       setCheckedSteps(saved ? new Set(JSON.parse(saved)) : new Set())
     } catch { setCheckedSteps(new Set()) }
+    try {
+      const saved = sessionStorage.getItem(`checked-ingredients-${id}`)
+      setCheckedIngredients(saved ? new Set(JSON.parse(saved)) : new Set())
+    } catch { setCheckedIngredients(new Set()) }
     window.scrollTo({ top: 0, behavior: 'instant' })
   }, [id])
 
@@ -137,6 +142,16 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
       if (next.has(key)) next.delete(key)
       else next.add(key)
       try { sessionStorage.setItem(`checked-${id}`, JSON.stringify([...next])) } catch { /* sessionStorage unavailable */ }
+      return next
+    })
+  }
+
+  function toggleIngredient(key: string) {
+    setCheckedIngredients(prev => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      try { sessionStorage.setItem(`checked-ingredients-${id}`, JSON.stringify([...next])) } catch { /* sessionStorage unavailable */ }
       return next
     })
   }
@@ -387,9 +402,23 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                       {group.items.map((item, ii) => {
                         const itemName = lang === 'he' ? item.name : (item.nameEn ?? item.name)
                         const itemNote = lang === 'he' ? item.note : (item.noteEn ?? item.note)
+                        const ingredientKey = `${gi}-${ii}`
+                        const checked = checkedIngredients.has(ingredientKey)
                         return (
-                          <li key={ii} className="flex gap-2 text-sm" dir={lang === 'he' ? 'rtl' : 'ltr'}>
-                            <span className="font-semibold text-cream/90 shrink-0 w-14 text-right" dir={lang === 'he' ? 'rtl' : 'ltr'}>
+                          <li
+                            key={ii}
+                            onClick={() => toggleIngredient(ingredientKey)}
+                            className="flex gap-2 text-sm cursor-pointer"
+                            dir={lang === 'he' ? 'rtl' : 'ltr'}
+                          >
+                            <span
+                              className={`shrink-0 w-4 h-4 mt-0.5 rounded border flex items-center justify-center transition-colors ${
+                                checked ? 'bg-herb border-herb text-white' : 'border-tint/20 text-transparent'
+                              }`}
+                            >
+                              {checked && '✓'}
+                            </span>
+                            <span className={`font-semibold shrink-0 w-14 text-right transition-colors ${checked ? 'text-cream/30 line-through' : 'text-cream/90'}`} dir={lang === 'he' ? 'rtl' : 'ltr'}>
                               {(() => {
                                 if (item.amount == null) return null
                                 const scaled = item.amount * multiplier
@@ -399,7 +428,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                                 return `${amt} ${unit}`
                               })()}
                             </span>
-                            <span className="text-cream/70">
+                            <span className={`transition-colors ${checked ? 'text-cream/30 line-through' : 'text-cream/70'}`}>
                               {itemName}
                               {itemNote && <span className="text-cream/40 italic"> ({itemNote})</span>}
                             </span>
