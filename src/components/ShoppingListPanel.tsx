@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import type { ShoppingListItem } from '../hooks/useShoppingList'
 import { useLanguage } from '../context/LanguageContext'
@@ -16,6 +17,16 @@ export default function ShoppingListPanel({
   open, onClose, items, onToggle, onRemove, onClearChecked, onClearAll,
 }: ShoppingListPanelProps) {
   const { lang } = useLanguage()
+  const [copied, setCopied] = useState(false)
+
+  async function copyAsText() {
+    const text = items.map(item => `- ${item.amount ? `${item.amount} ` : ''}${item.name}`).join('\n')
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    } catch { /* clipboard unavailable */ }
+  }
 
   return (
     <AnimatePresence>
@@ -91,13 +102,20 @@ export default function ShoppingListPanel({
             </div>
 
             {items.length > 0 && (
-              <div className="flex items-center gap-2 px-5 py-3 border-t border-tint/[0.06]">
-                <button onClick={onClearChecked} className="btn-ghost text-xs flex-1">
-                  {lang === 'he' ? 'נקה מסומנים' : 'Clear checked'}
+              <div className="px-5 py-3 border-t border-tint/[0.06] space-y-2">
+                <button onClick={copyAsText} className="btn-ghost text-xs w-full">
+                  {copied
+                    ? (lang === 'he' ? 'הועתק!' : 'Copied!')
+                    : (lang === 'he' ? 'העתק כטקסט' : 'Copy as text')}
                 </button>
-                <button onClick={onClearAll} className="btn-ghost text-xs flex-1 text-red-400/80">
-                  {lang === 'he' ? 'נקה הכל' : 'Clear all'}
-                </button>
+                <div className="flex items-center gap-2">
+                  <button onClick={onClearChecked} className="btn-ghost text-xs flex-1">
+                    {lang === 'he' ? 'נקה מסומנים' : 'Clear checked'}
+                  </button>
+                  <button onClick={onClearAll} className="btn-ghost text-xs flex-1 text-red-400/80">
+                    {lang === 'he' ? 'נקה הכל' : 'Clear all'}
+                  </button>
+                </div>
               </div>
             )}
           </motion.div>
