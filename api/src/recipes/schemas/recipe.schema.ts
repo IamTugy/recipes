@@ -67,6 +67,22 @@ export class Recipe {
 
   @Prop({ type: [String] })
   tipsEn?: string[]
+
+  // Ownership + publish workflow. Existing seeded recipes predate these
+  // fields entirely - the schema defaults below make Mongoose fill them in
+  // as "published, no owner" for any document that lacks them, so legacy
+  // data keeps working as public/immutable without a migration script.
+  @Prop({ index: true })
+  ownerId?: string
+
+  @Prop({ default: 'published', index: true })
+  status!: 'draft' | 'pending_review' | 'published' | 'rejected'
+
+  @Prop()
+  reviewComment?: string
+
+  @Prop({ default: 0 })
+  currentRevision!: number
 }
 
 export const RecipeSchema = SchemaFactory.createForClass(Recipe)

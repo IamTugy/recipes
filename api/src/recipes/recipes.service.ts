@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { Recipe, RecipeDocument } from './schemas/recipe.schema'
+import { RecipeRevision, RecipeRevisionDocument } from './schemas/recipe-revision.schema'
 import { Rating, RatingDocument } from '../ratings/schemas/rating.schema'
 import { ActivityLogService } from '../activity-log/activity-log.service'
-import { RecipeDto } from './dto/recipe.dto'
+import { SaveRecipeDraftDto } from './dto/save-recipe-draft.dto'
 
 function slugify(text: string): string {
   return text
@@ -20,10 +21,17 @@ interface RatingAggregate {
   count: number
 }
 
+const RECIPE_FIELDS = [
+  'title', 'titleHe', 'category', 'tags', 'tagsEn', 'cuisine', 'image', 'description',
+  'descriptionEn', 'prepTime', 'cookTime', 'servings', 'difficulty', 'ingredients',
+  'steps', 'tips', 'tipsEn', 'featured',
+] as const
+
 @Injectable()
 export class RecipesService {
   constructor(
     @InjectModel(Recipe.name) private readonly recipeModel: Model<RecipeDocument>,
+    @InjectModel(RecipeRevision.name) private readonly revisionModel: Model<RecipeRevisionDocument>,
     @InjectModel(Rating.name) private readonly ratingModel: Model<RatingDocument>,
     private readonly activityLogService: ActivityLogService,
   ) {}
@@ -54,7 +62,7 @@ export class RecipesService {
   }
 
   async findAll() {
-    const recipes = await this.recipeModel.find({ hidden: { $ne: true } }).exec()
+    const recipes = await this.recipeModel.find({ hidden: { $ne: true }, status: 'published' }).exec()
     const plain = recipes.map(r => r.toObject())
     const slugs = plain.map(r => r.slug)
     const [ratings, views] = await Promise.all([
@@ -65,13 +73,34 @@ export class RecipesService {
   }
 
   async findBySlug(slug: string) {
-    const recipe = await this.recipeModel.findOne({ slug, hidden: { $ne: true } }).exec()
+    const recipe = await this.recipeModel.findOne({ slug, hidden: { $ne: true }, status: 'published' }).exec()
     if (!recipe) return null
     const [ratings, views] = await Promise.all([
       this.ratingsBySlug([slug]),
       this.activityLogService.viewCountsBySlug([slug]),
     ])
     return this.attachRatingsAndViews([recipe.toObject()], ratings, views)[0]
+  }
+
+  // Bypasses the published-only filter for the owner previewing their own
+  // draft/pending/rejected recipe, or an admin checking anything.
+  async findBySlugForUser(slug: string, userId: string, isAdmin: boolean) {
+    const recipe = await this.recipeModel.findOne({ slug }).exec()
+    if (!recipe) return null
+    if (recipe.status !== 'published' && recipe.ownerId !== userId && !isAdmin) return null
+    if (recipe.status === 'published') {
+      const [ratings, views] = await Promise.all([
+        this.ratingsBySlug([slug]),
+        this.activityLogService.viewCountsBySlug([slug]),
+      ])
+      return this.attachRatingsAndViews([recipe.toObject()], ratings, views)[0]
+    }
+    return { ...recipe.toObject(), averageRating: null, ratingCount: 0, viewCount: 0 }
+  }
+
+  async findMine(userId: string) {
+    const recipes = await this.recipeModel.find({ ownerId: userId }).sort({ updatedAt: -1 }).exec()
+    return recipes.map(r => r.toObject())
   }
 
   private async generateUniqueSlug(title: string): Promise<string> {
@@ -85,16 +114,126 @@ export class RecipesService {
     return candidate
   }
 
-  async create(dto: RecipeDto): Promise<RecipeDocument> {
+  async createDraft(userId: string, dto: SaveRecipeDraftDto): Promise<RecipeDocument> {
     const slug = await this.generateUniqueSlug(dto.title)
-    return this.recipeModel.create({ ...dto, slug })
+    return this.recipeModel.create({ ...dto, slug, ownerId: userId, status: 'draft' })
   }
 
-  async update(slug: string, dto: RecipeDto): Promise<RecipeDocument | null> {
-    return this.recipeModel.findOneAndUpdate({ slug }, { $set: dto }, { new: true }).exec()
+  private async getEditableOrThrow(slug: string, userId: string, isAdmin: boolean): Promise<RecipeDocument> {
+    const recipe = await this.recipeModel.findOne({ slug }).exec()
+    if (!recipe) throw new NotFoundException(`Recipe '${slug}' not found`)
+    if (recipe.ownerId && recipe.ownerId !== userId && !isAdmin) {
+      throw new ForbiddenException('Only the owner or an admin can edit this recipe')
+    }
+    if (recipe.status === 'pending_review') {
+      throw new BadRequestException('This recipe is locked while its publish request is pending review')
+    }
+    if (recipe.status === 'published' && !isAdmin) {
+      throw new BadRequestException('Published recipes can only be changed via a new revision, ask an admin')
+    }
+    return recipe
   }
 
-  async remove(slug: string): Promise<void> {
+  async updateDraft(slug: string, userId: string, isAdmin: boolean, dto: SaveRecipeDraftDto): Promise<RecipeDocument> {
+    const recipe = await this.getEditableOrThrow(slug, userId, isAdmin)
+    recipe.set(dto)
+    await recipe.save()
+    return recipe
+  }
+
+  async submitForReview(slug: string, userId: string, isAdmin: boolean): Promise<RecipeDocument> {
+    const recipe = await this.getEditableOrThrow(slug, userId, isAdmin)
+    const missing = this.missingRequiredFields(recipe)
+    if (missing.length > 0) {
+      throw new BadRequestException(`Cannot submit for review, missing/invalid: ${missing.join(', ')}`)
+    }
+    recipe.status = 'pending_review'
+    recipe.reviewComment = undefined
+    await recipe.save()
+    return recipe
+  }
+
+  private missingRequiredFields(recipe: RecipeDocument): string[] {
+    const missing: string[] = []
+    if (!recipe.title?.trim()) missing.push('title')
+    if (!recipe.category) missing.push('category')
+    if (!recipe.description?.trim()) missing.push('description')
+    if (!recipe.image?.trim() || !recipe.image.includes('assets.tugy.dev')) missing.push('image (must be an uploaded photo)')
+    if (!recipe.prepTime && recipe.prepTime !== 0) missing.push('prepTime')
+    if (!recipe.cookTime && recipe.cookTime !== 0) missing.push('cookTime')
+    if (!recipe.servings) missing.push('servings')
+    if (!recipe.difficulty) missing.push('difficulty')
+    if (!recipe.ingredients || (recipe.ingredients as unknown[]).length === 0) missing.push('ingredients')
+    if (!recipe.steps || (recipe.steps as unknown[]).length === 0) missing.push('steps')
+    return missing
+  }
+
+  async cancelSubmission(slug: string, userId: string, isAdmin: boolean): Promise<RecipeDocument> {
+    const recipe = await this.recipeModel.findOne({ slug }).exec()
+    if (!recipe) throw new NotFoundException(`Recipe '${slug}' not found`)
+    if (recipe.ownerId !== userId && !isAdmin) throw new ForbiddenException('Only the owner or an admin can cancel this submission')
+    if (recipe.status !== 'pending_review') throw new BadRequestException('This recipe is not pending review')
+    recipe.status = 'draft'
+    await recipe.save()
+    return recipe
+  }
+
+  async listPendingSubmissions() {
+    const recipes = await this.recipeModel.find({ status: 'pending_review' }).sort({ updatedAt: 1 }).exec()
+    return recipes.map(r => r.toObject())
+  }
+
+  async approveSubmission(slug: string, adminId: string): Promise<RecipeDocument> {
+    const recipe = await this.recipeModel.findOne({ slug }).exec()
+    if (!recipe) throw new NotFoundException(`Recipe '${slug}' not found`)
+    if (recipe.status !== 'pending_review') throw new BadRequestException('This recipe is not pending review')
+
+    const nextRevision = recipe.currentRevision + 1
+    const snapshot: Record<string, unknown> = {}
+    for (const field of RECIPE_FIELDS) snapshot[field] = recipe[field]
+
+    await this.revisionModel.create({
+      recipeSlug: slug,
+      revisionNumber: nextRevision,
+      authorId: adminId,
+      snapshot,
+    })
+
+    recipe.status = 'published'
+    recipe.currentRevision = nextRevision
+    recipe.reviewComment = undefined
+    await recipe.save()
+    return recipe
+  }
+
+  async rejectSubmission(slug: string, comment: string): Promise<RecipeDocument> {
+    const recipe = await this.recipeModel.findOne({ slug }).exec()
+    if (!recipe) throw new NotFoundException(`Recipe '${slug}' not found`)
+    if (recipe.status !== 'pending_review') throw new BadRequestException('This recipe is not pending review')
+    recipe.status = 'rejected'
+    recipe.reviewComment = comment
+    await recipe.save()
+    return recipe
+  }
+
+  async listRevisions(slug: string) {
+    const revisions = await this.revisionModel.find({ recipeSlug: slug }).sort({ revisionNumber: -1 }).lean().exec()
+    return revisions.map(r => ({
+      revisionNumber: r.revisionNumber,
+      authorId: r.authorId,
+      snapshot: r.snapshot,
+      publishedAt: (r as unknown as { createdAt: Date }).createdAt,
+    }))
+  }
+
+  async remove(slug: string, userId: string, isAdmin: boolean): Promise<void> {
+    const recipe = await this.recipeModel.findOne({ slug }).exec()
+    if (!recipe) return
+    if (recipe.status === 'published') {
+      if (!isAdmin) throw new ForbiddenException('Only an admin can delete a published recipe')
+    } else if (recipe.ownerId && recipe.ownerId !== userId && !isAdmin) {
+      throw new ForbiddenException('Only the owner or an admin can delete this recipe')
+    }
     await this.recipeModel.deleteOne({ slug }).exec()
   }
 }

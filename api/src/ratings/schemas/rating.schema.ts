@@ -22,6 +22,12 @@ export class Rating {
 
   @Prop({ type: [String], default: [] })
   upvotes!: string[]
+
+  // The recipe's currentRevision at the moment this rating/review was
+  // written, so a review always points at the specific published version
+  // it was actually about, even after the recipe is revised later.
+  @Prop({ default: 0 })
+  recipeRevision!: number
 }
 
 export const RatingSchema = SchemaFactory.createForClass(Rating)

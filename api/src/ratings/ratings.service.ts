@@ -2,15 +2,21 @@ import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { Rating, RatingDocument } from './schemas/rating.schema'
+import { Recipe, RecipeDocument } from '../recipes/schemas/recipe.schema'
 
 @Injectable()
 export class RatingsService {
-  constructor(@InjectModel(Rating.name) private readonly ratingModel: Model<RatingDocument>) {}
+  constructor(
+    @InjectModel(Rating.name) private readonly ratingModel: Model<RatingDocument>,
+    @InjectModel(Recipe.name) private readonly recipeModel: Model<RecipeDocument>,
+  ) {}
 
   async rate(userId: string, recipeSlug: string, score: number, comment?: string, photoUrl?: string): Promise<{ score: number }> {
-    const setDoc: { userId: string; recipeSlug: string; score: number; comment?: string; photoUrl?: string } = { userId, recipeSlug, score }
+    const setDoc: { userId: string; recipeSlug: string; score: number; comment?: string; photoUrl?: string; recipeRevision?: number } = { userId, recipeSlug, score }
     if (comment !== undefined) setDoc.comment = comment
     if (photoUrl !== undefined) setDoc.photoUrl = photoUrl
+    const recipe = await this.recipeModel.findOne({ slug: recipeSlug }).select('currentRevision').lean().exec()
+    if (recipe) setDoc.recipeRevision = recipe.currentRevision
     const doc = await this.ratingModel
       .findOneAndUpdate({ userId, recipeSlug }, { $set: setDoc }, { upsert: true, new: true })
       .exec()
@@ -39,7 +45,7 @@ export class RatingsService {
     return distribution
   }
 
-  async reviewsForRecipe(recipeSlug: string, limit = 20): Promise<{ id: string; userId: string; score: number; comment: string; photoUrl: string | null; upvotes: string[]; createdAt: Date }[]> {
+  async reviewsForRecipe(recipeSlug: string, limit = 20): Promise<{ id: string; userId: string; score: number; comment: string; photoUrl: string | null; upvotes: string[]; recipeRevision: number; createdAt: Date }[]> {
     const docs = await this.ratingModel
       .find({ recipeSlug, comment: { $exists: true, $ne: '' } })
       .sort({ createdAt: -1 })
@@ -53,6 +59,7 @@ export class RatingsService {
       comment: d.comment!,
       photoUrl: d.photoUrl ?? null,
       upvotes: d.upvotes ?? [],
+      recipeRevision: d.recipeRevision ?? 0,
       createdAt: (d as unknown as { createdAt: Date }).createdAt,
     }))
   }
