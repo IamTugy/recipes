@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@clerk/localizations": "^4.13.10",
     "@clerk/react": "^6.12.10",
     "@heyputer/puter.js": "^2.2.15",
     "framer-motion": "^12.38.0",
