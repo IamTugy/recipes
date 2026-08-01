@@ -6,6 +6,17 @@ import { useToast } from '../hooks/useToast'
 
 const OWNER_USER_ID = 'user_3HHok7VTx8lyXObDglJRi71DU6C'
 
+type RequestStatus = 'pending' | 'approved' | 'in-progress' | 'needs-input' | 'pr-open' | 'closed'
+
+function getStatus(labels: string[], state: string): RequestStatus {
+  if (state === 'closed') return 'closed'
+  if (labels.includes('claude-pr-open')) return 'pr-open'
+  if (labels.includes('claude-needs-input')) return 'needs-input'
+  if (labels.includes('claude-in-progress')) return 'in-progress'
+  if (labels.includes('approved-for-claude')) return 'approved'
+  return 'pending'
+}
+
 export default function FeatureRequestsPage() {
   const { lang } = useLanguage()
   const { showToast } = useToast()
@@ -87,19 +98,30 @@ export default function FeatureRequestsPage() {
         ) : (
           <div className="space-y-3">
             {requests.map(r => {
-              const approved = r.labels.includes('approved-for-claude')
+              const status = getStatus(r.labels, r.state)
+              const statusLabel: Record<RequestStatus, string> = {
+                pending: lang === 'he' ? 'ממתין' : 'Pending',
+                approved: lang === 'he' ? 'אושר' : 'Approved',
+                'in-progress': lang === 'he' ? 'קלוד עובד על זה' : 'Claude is working on it',
+                'needs-input': lang === 'he' ? 'דורש תשובה מכם' : 'Needs your input',
+                'pr-open': lang === 'he' ? 'PR פתוח לבדיקה' : 'PR open for review',
+                closed: lang === 'he' ? 'סגור' : 'Closed',
+              }
+              const statusClass: Record<RequestStatus, string> = {
+                pending: 'bg-amber/10 text-amber',
+                approved: 'bg-herb/10 text-herb',
+                'in-progress': 'bg-amber/10 text-amber',
+                'needs-input': 'bg-red-500/10 text-red-400',
+                'pr-open': 'bg-herb/10 text-herb',
+                closed: 'bg-tint/10 text-cream/30',
+              }
+              const canApprove = status === 'pending' || status === 'needs-input'
               return (
                 <div key={r.number} className="card p-4">
                   <div className="flex items-start justify-between gap-3 mb-1">
                     <h2 className="font-serif text-base font-medium text-cream">{r.title}</h2>
-                    <span className={`shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-                      approved ? 'bg-herb/10 text-herb' : r.state === 'closed' ? 'bg-tint/10 text-cream/30' : 'bg-amber/10 text-amber'
-                    }`}>
-                      {approved
-                        ? (lang === 'he' ? 'אושר' : 'Approved')
-                        : r.state === 'closed'
-                          ? (lang === 'he' ? 'סגור' : 'Closed')
-                          : (lang === 'he' ? 'ממתין' : 'Pending')}
+                    <span className={`shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full ${statusClass[status]}`}>
+                      {statusLabel[status]}
                     </span>
                   </div>
                   <p className="text-sm text-cream/60 whitespace-pre-wrap mb-2">
@@ -109,12 +131,14 @@ export default function FeatureRequestsPage() {
                     <a href={r.htmlUrl} target="_blank" rel="noreferrer" className="text-xs text-cream/30 hover:text-cream/60 transition-colors">
                       {lang === 'he' ? 'צפה ב-GitHub' : 'View on GitHub'} #{r.number}
                     </a>
-                    {isOwner && !approved && r.state === 'open' && (
+                    {isOwner && canApprove && (
                       <button type="button"
                         onClick={() => handleApprove(r.number)}
                         className="text-xs font-semibold text-amber hover:text-amber/80 transition-colors"
                       >
-                        {lang === 'he' ? 'אשר לביצוע' : 'Approve for Claude'}
+                        {status === 'needs-input'
+                          ? (lang === 'he' ? 'נסה שוב' : 'Retry')
+                          : (lang === 'he' ? 'אשר לביצוע' : 'Approve for Claude')}
                       </button>
                     )}
                   </div>
