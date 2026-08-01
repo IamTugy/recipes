@@ -1265,6 +1265,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                 <ul className="mt-3 space-y-2">
                   {revisions.map(rev => {
                     const isOpen = openRevision === rev.revisionNumber
+                    const isCurrentlyLive = rev.revisionNumber === recipe.publishedRevision
                     const ingredientCount = Array.isArray(rev.snapshot.ingredients)
                       ? (rev.snapshot.ingredients as { items: unknown[] }[]).reduce((n, g) => n + (g.items?.length ?? 0), 0)
                       : 0
@@ -1272,7 +1273,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                       ? (rev.snapshot.steps as { items: unknown[] }[]).reduce((n, g) => n + (g.items?.length ?? 0), 0)
                       : 0
                     return (
-                      <li key={rev.revisionNumber} className="card p-3 text-xs text-cream/50">
+                      <li key={rev.revisionNumber} className={`card p-3 text-xs text-cream/50 ${isCurrentlyLive ? 'border border-amber/30' : ''}`}>
                         <button type="button"
                           onClick={() => setOpenRevision(isOpen ? null : rev.revisionNumber)}
                           className="w-full text-start flex items-center justify-between gap-2"
@@ -1284,11 +1285,17 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                             {' · '}
                             {(rev.snapshot.title as string) ?? ''}
                           </span>
-                          {rev.published && (
-                            <span className="shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-herb/10 text-herb">
-                              {lang === 'he' ? 'פורסם' : 'Published'}
-                            </span>
-                          )}
+                          <span className="flex items-center gap-1.5 shrink-0">
+                            {isCurrentlyLive ? (
+                              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-amber/10 text-amber">
+                                {lang === 'he' ? 'הגרסה הפעילה' : 'Currently live'}
+                              </span>
+                            ) : rev.published && (
+                              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-herb/10 text-herb">
+                                {lang === 'he' ? 'פורסם בעבר' : 'Previously published'}
+                              </span>
+                            )}
+                          </span>
                         </button>
                         {isOpen && (
                           <div className="mt-2 pt-2 border-t border-tint/[0.06] space-y-1 text-cream/40">
