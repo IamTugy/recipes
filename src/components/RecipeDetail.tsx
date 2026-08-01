@@ -70,6 +70,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
   const [distribution, setDistribution] = useState<Record<1 | 2 | 3 | 4 | 5, number> | null>(null)
   const [hasPostedReview, setHasPostedReview] = useState(false)
   const [isEditingReview, setIsEditingReview] = useState(false)
+  const [translations, setTranslations] = useState<Record<string, { text: string; showing: boolean; loading: boolean }>>({})
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null)
   const cookMode = useWakeLock()
 
@@ -87,6 +88,28 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
     ])
     if (reviewsRes.ok) setReviews(await reviewsRes.json())
     if (distributionRes.ok) setDistribution(await distributionRes.json())
+  }
+
+  async function toggleTranslateReview(userId: string, comment: string) {
+    const existing = translations[userId]
+    if (existing && !existing.loading) {
+      setTranslations(prev => ({ ...prev, [userId]: { ...existing, showing: !existing.showing } }))
+      return
+    }
+    setTranslations(prev => ({ ...prev, [userId]: { text: '', showing: true, loading: true } }))
+    try {
+      const token = await getToken()
+      const headers: HeadersInit = { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) }
+      const res = await fetch('/api/translations', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ text: comment, targetLang: lang }),
+      })
+      const data = res.ok ? await res.json() : null
+      setTranslations(prev => ({ ...prev, [userId]: { text: data?.translated ?? comment, showing: true, loading: false } }))
+    } catch {
+      setTranslations(prev => ({ ...prev, [userId]: { text: comment, showing: true, loading: false } }))
+    }
   }
 
   async function loadMyRating() {
@@ -1078,7 +1101,10 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
             const otherReviews = reviews.filter(r => r.userId !== currentUserId)
             return otherReviews.length > 0 ? (
             <ul className="space-y-4">
-              {otherReviews.map((r, i) => (
+              {otherReviews.map((r, i) => {
+                const translation = translations[r.userId]
+                const showingTranslation = !!translation?.showing
+                return (
                 <li key={i} className="border-t border-tint/[0.06] pt-3 first:border-t-0 first:pt-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-amber text-sm leading-none">
@@ -1089,9 +1115,21 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                       {new Date(r.createdAt).toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-US')}
                     </span>
                   </div>
-                  <p className="text-sm text-cream/70 leading-relaxed" dir={lang === 'he' ? 'rtl' : 'ltr'}>
-                    {r.comment}
+                  <p className="text-sm text-cream/70 leading-relaxed" dir={showingTranslation ? (lang === 'he' ? 'rtl' : 'ltr') : undefined}>
+                    {showingTranslation ? (translation?.loading ? (lang === 'he' ? 'מתרגם...' : 'Translating...') : translation?.text) : r.comment}
                   </p>
+                  {r.comment.trim() && (
+                    <button
+                      type="button"
+                      onClick={() => toggleTranslateReview(r.userId, r.comment)}
+                      disabled={translation?.loading}
+                      className="mt-1 text-[11px] text-cream/40 hover:text-cream/70 underline underline-offset-2 disabled:opacity-50"
+                    >
+                      {showingTranslation
+                        ? (lang === 'he' ? 'הצג מקור' : 'Show original')
+                        : (lang === 'he' ? 'תרגם' : 'Translate')}
+                    </button>
+                  )}
                   {r.photoUrl && (
                     <img
                       src={r.photoUrl}
@@ -1101,7 +1139,8 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                     />
                   )}
                 </li>
-              ))}
+                )
+              })}
             </ul>
             ) : (
               <p className="text-xs text-cream/25">
