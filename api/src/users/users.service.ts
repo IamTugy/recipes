@@ -16,4 +16,13 @@ export class UsersService {
       )
       .exec()
   }
+
+  async namesByIds(clerkUserIds: string[]): Promise<Record<string, string | undefined>> {
+    const uniqueIds = [...new Set(clerkUserIds)]
+    if (uniqueIds.length === 0) return {}
+    const users = await this.userModel.find({ clerkUserId: { $in: uniqueIds } }).lean().exec()
+    const names: Record<string, string | undefined> = {}
+    for (const user of users) names[user.clerkUserId] = user.name
+    return names
+  }
 }
