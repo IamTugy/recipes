@@ -83,13 +83,13 @@ export async function rejectSubmission(slug: string, comment: string, getToken: 
   return toRecipe(await postAction(`/recipes/${slug}/reject`, getToken, { comment }))
 }
 
-export function useMyRecipes() {
+export function useMyRecipes(enabled = true) {
   const { getToken, isLoaded, isSignedIn } = useAuth()
   const [recipes, setRecipes] = useState<Recipe[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!isLoaded || !isSignedIn) return
+    if (!isLoaded || !isSignedIn || !enabled) return
     let cancelled = false
 
     apiFetch<ApiRecipe[]>('/recipes/mine', getToken)
@@ -97,12 +97,12 @@ export function useMyRecipes() {
       .finally(() => { if (!cancelled) setLoading(false) })
 
     return () => { cancelled = true }
-  }, [isLoaded, isSignedIn, getToken])
+  }, [isLoaded, isSignedIn, enabled, getToken])
 
   return { recipes, loading }
 }
 
-export function usePendingSubmissions() {
+export function usePendingSubmissions(enabled = true) {
   const { getToken, isLoaded, isSignedIn } = useAuth()
   const [recipes, setRecipes] = useState<Recipe[]>([])
   const [loading, setLoading] = useState(true)
@@ -112,7 +112,7 @@ export function usePendingSubmissions() {
   }
 
   useEffect(() => {
-    if (!isLoaded || !isSignedIn) return
+    if (!isLoaded || !isSignedIn || !enabled) return
     let cancelled = false
 
     reload()
@@ -121,7 +121,7 @@ export function usePendingSubmissions() {
 
     return () => { cancelled = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoaded, isSignedIn, getToken])
+  }, [isLoaded, isSignedIn, enabled, getToken])
 
   return { recipes, loading, reload }
 }

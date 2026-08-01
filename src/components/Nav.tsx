@@ -3,6 +3,7 @@ import { UserButton, useAuth } from '@clerk/react'
 import { useLanguage } from '../hooks/useLanguage'
 import { useTheme } from '../hooks/useTheme'
 import { OWNER_USER_ID } from '../lib/admin'
+import { useMyRecipes, usePendingSubmissions } from '../hooks/useRecipes'
 
 interface NavProps {
   shoppingListCount: number
@@ -15,6 +16,11 @@ export default function Nav({ shoppingListCount, onOpenShoppingList }: NavProps)
   const { mode, cycleTheme } = useTheme()
   const { userId } = useAuth()
   const isAdmin = userId === OWNER_USER_ID
+  const { recipes: pendingSubmissions } = usePendingSubmissions(isAdmin)
+  const { recipes: myRecipes } = useMyRecipes(!isAdmin)
+  const attentionCount = isAdmin
+    ? pendingSubmissions.length
+    : myRecipes.filter(r => r.status === 'rejected').length
 
   return (
     <nav className="print:hidden fixed top-0 inset-x-0 z-50 bg-bg/90 backdrop-blur-md border-b border-tint/[0.06]">
@@ -97,6 +103,27 @@ export default function Nav({ shoppingListCount, onOpenShoppingList }: NavProps)
             <span className="text-cream/15">|</span>
             <span className={lang === 'en' ? 'text-amber' : 'text-cream/35'}>EN</span>
           </button>
+
+          {/* Attention: pending submissions (admin) or rejected-with-feedback (owner) */}
+          {attentionCount > 0 && (
+            <button type="button"
+              onClick={() => navigate(isAdmin ? '/admin/submissions' : '/my-recipes')}
+              className="relative h-10 w-10 sm:h-7 sm:w-7 flex items-center justify-center rounded-lg text-cream/40 hover:text-cream/70 border border-tint/10 hover:bg-tint/[0.05] transition-colors"
+              title={isAdmin
+                ? (lang === 'he' ? 'בקשות ממתינות לאישור' : 'Submissions awaiting review')
+                : (lang === 'he' ? 'מתכונים שנדחו' : 'Recipes needing your attention')}
+              aria-label={isAdmin
+                ? (lang === 'he' ? 'בקשות ממתינות לאישור' : 'Submissions awaiting review')
+                : (lang === 'he' ? 'מתכונים שנדחו' : 'Recipes needing your attention')}
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+              <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-amber text-bg text-[9px] font-bold flex items-center justify-center">
+                {attentionCount}
+              </span>
+            </button>
+          )}
 
           {/* Shopping list */}
           <button type="button"
