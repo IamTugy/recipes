@@ -13,6 +13,9 @@
 #   ./scripts/feature-request-worker.sh --once        # process pending issues once and exit
 #
 # Requires: gh (authenticated), claude, git, running from inside this repo.
+# Requires these labels to already exist on the repo: feature-request,
+# approved-for-claude, claude-in-progress (gh issue edit fails if a label
+# doesn't exist yet - create with `gh label create <name>` once).
 
 set -euo pipefail
 
@@ -59,7 +62,11 @@ When done, leave the working tree clean (all changes committed).
 EOF
 )
     echo "[feature-request-worker] Running claude -p for issue #$number in $worktree"
-    claude -p "$prompt"
+    # --dangerously-skip-permissions: this runs unattended with no TTY to answer
+    # prompts. Safe here specifically because the worktree/branch is a throwaway
+    # sandbox - Claude never touches the main checkout, and every result lands
+    # as a PR for the owner to review before merging, never an auto-merge.
+    claude -p "$prompt" --dangerously-skip-permissions
   )
 
   echo "[feature-request-worker] Pushing branch and opening a PR for issue #$number"
@@ -92,9 +99,10 @@ run_once() {
     return
   fi
 
-  echo "$issues" | python3 -c 'import json,sys
+  echo "$issues" | python3 -c "
+import json, sys
 for issue in json.load(sys.stdin):
-    print(f"{issue[\"number\"]}\t{issue[\"title\"]}\t{issue[\"body\"].replace(chr(10), chr(2))}")' \
+    print(f\"{issue['number']}\t{issue['title']}\t{issue['body'].replace(chr(10), chr(2))}\")" \
   | while IFS=$'\t' read -r number title body_escaped; do
     body=$(echo "$body_escaped" | tr '\002' '\n')
     process_issue "$number" "$title" "$body" || echo "[feature-request-worker] FAILED on issue #$number, continuing"
