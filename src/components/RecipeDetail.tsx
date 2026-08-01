@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useFocusTrap } from '../hooks/useFocusTrap'
 import RecipePlaceholder from './RecipePlaceholder'
 import RecipeDetailSkeleton from './RecipeDetailSkeleton'
 import { Link, useNavigate, useParams } from 'react-router-dom'
@@ -173,6 +174,8 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
   }, [recipe, addRecent])
 
   const stepsCount = recipe?.steps.reduce((n, g) => n + g.items.length, 0) ?? 0
+  const wizardRef = useRef<HTMLDivElement>(null)
+  useFocusTrap(wizardRef, wizardOpen)
 
   useEffect(() => {
     if (!wizardOpen) return
@@ -979,7 +982,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
         const checked = checkedSteps.has(stepKey)
         const existingTimer = getTimerForStep(step.groupIdx, step.stepIdx)
         return (
-          <div className="print:hidden fixed inset-0 z-50 bg-bg flex flex-col" dir={lang === 'he' ? 'rtl' : 'ltr'}>
+          <div ref={wizardRef} role="dialog" aria-modal="true" className="print:hidden fixed inset-0 z-50 bg-bg flex flex-col" dir={lang === 'he' ? 'rtl' : 'ltr'}>
             <div className="flex items-center justify-between px-4 h-14 border-b border-tint/[0.06]">
               <span className="text-cream/40 text-sm">
                 {lang === 'he' ? `שלב ${wizardIndex + 1} מתוך ${flatSteps.length}` : `Step ${wizardIndex + 1} of ${flatSteps.length}`}

@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import type { ShoppingListItem } from '../hooks/useShoppingList'
 import { useLanguage } from '../hooks/useLanguage'
+import { useFocusTrap } from '../hooks/useFocusTrap'
 
 interface ShoppingListPanelProps {
   open: boolean
@@ -20,6 +21,8 @@ export default function ShoppingListPanel({
 }: ShoppingListPanelProps) {
   const { lang } = useLanguage()
   const [copied, setCopied] = useState(false)
+  const panelRef = useRef<HTMLDivElement>(null)
+  useFocusTrap(panelRef, open)
 
   const groups = new Map<string, ShoppingListItem[]>()
   for (const item of items) {
@@ -54,6 +57,9 @@ export default function ShoppingListPanel({
             className="print:hidden fixed inset-0 bg-black/40 z-40"
           />
           <motion.div
+            ref={panelRef}
+            role="dialog"
+            aria-modal="true"
             initial={{ x: lang === 'he' ? '-100%' : '100%' }}
             animate={{ x: 0 }}
             exit={{ x: lang === 'he' ? '-100%' : '100%' }}

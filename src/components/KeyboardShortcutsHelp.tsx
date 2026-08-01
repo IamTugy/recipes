@@ -1,4 +1,6 @@
+import { useRef } from 'react'
 import { useLanguage } from '../hooks/useLanguage'
+import { useFocusTrap } from '../hooks/useFocusTrap'
 
 interface KeyboardShortcutsHelpProps {
   open: boolean
@@ -7,6 +9,8 @@ interface KeyboardShortcutsHelpProps {
 
 export default function KeyboardShortcutsHelp({ open, onClose }: KeyboardShortcutsHelpProps) {
   const { lang } = useLanguage()
+  const dialogRef = useRef<HTMLDivElement>(null)
+  useFocusTrap(dialogRef, open)
 
   if (!open) return null
 
@@ -30,6 +34,9 @@ export default function KeyboardShortcutsHelp({ open, onClose }: KeyboardShortcu
       onClick={onClose}
     >
       <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
         className="card p-6 w-full max-w-sm"
         onClick={e => e.stopPropagation()}
         dir={lang === 'he' ? 'rtl' : 'ltr'}
