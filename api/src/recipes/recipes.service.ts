@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
+import { BadRequestException, ForbiddenException, Injectable, Logger, NotFoundException, OnModuleInit } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { Recipe, RecipeDocument } from './schemas/recipe.schema'
@@ -29,7 +29,9 @@ const RECIPE_FIELDS = [
 ] as const
 
 @Injectable()
-export class RecipesService {
+export class RecipesService implements OnModuleInit {
+  private readonly logger = new Logger(RecipesService.name)
+
   constructor(
     @InjectModel(Recipe.name) private readonly recipeModel: Model<RecipeDocument>,
     @InjectModel(RecipeRevision.name) private readonly revisionModel: Model<RecipeRevisionDocument>,
@@ -37,6 +39,23 @@ export class RecipesService {
     private readonly activityLogService: ActivityLogService,
     private readonly cookLogService: CookLogService,
   ) {}
+
+  // One-time backfill: recipes seeded before the ownership/publish-workflow
+  // fields existed have no `status` in Mongo at all. Mongoose's schema
+  // `default` only applies when hydrating a document in-memory, never to a
+  // raw query filter - so `find({ status: 'published' })` silently excluded
+  // every legacy recipe from every listing. This runs on every boot but is
+  // a no-op once the backfill has happened, since the filter matches zero
+  // documents afterwards.
+  async onModuleInit(): Promise<void> {
+    const result = await this.recipeModel.updateMany(
+      { status: { $exists: false } },
+      { $set: { status: 'published', currentRevision: 0 } },
+    )
+    if (result.modifiedCount > 0) {
+      this.logger.log(`Backfilled status='published' on ${result.modifiedCount} legacy recipe(s)`)
+    }
+  }
 
   private async ratingsBySlug(slugs: string[]): Promise<Map<string, { avg: number; count: number }>> {
     const aggregates = (await this.ratingModel.aggregate([

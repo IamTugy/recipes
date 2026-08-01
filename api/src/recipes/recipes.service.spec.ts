@@ -37,6 +37,17 @@ describe('RecipesService', () => {
     return moduleRef.get(RecipesService)
   }
 
+  it('onModuleInit backfills status=published on recipes stored before that field existed', async () => {
+    const updateMany = jest.fn().mockResolvedValue({ modifiedCount: 3 })
+    const service = await makeService({ updateMany })
+    await service.onModuleInit()
+
+    expect(updateMany).toHaveBeenCalledWith(
+      { status: { $exists: false } },
+      { $set: { status: 'published', currentRevision: 0 } },
+    )
+  })
+
   const minimalDto = {
     title: 'Tomato Soup',
     category: 'soup',
