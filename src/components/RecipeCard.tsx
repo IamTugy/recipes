@@ -62,7 +62,7 @@ export default function RecipeCard({ recipe, index, searchQuery, isFavorite, onT
               )}
               <button type="button"
                 onClick={e => { e.preventDefault(); e.stopPropagation(); onToggleFavorite(recipe.id) }}
-                className={`h-7 w-7 flex items-center justify-center rounded-full backdrop-blur-sm border transition-colors ${
+                className={`h-9 w-9 sm:h-7 sm:w-7 flex items-center justify-center rounded-full backdrop-blur-sm border transition-colors ${
                   isFavorite
                     ? 'bg-amber/90 border-amber text-bg'
                     : 'bg-black/30 border-white/20 text-white/80 hover:text-white'

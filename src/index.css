@@ -17,17 +17,17 @@
   --scrollbar-thumb: #d4c8bc;
 }
 
-/* ── Dark mode ── */
+/* ── Dark mode ── neutral charcoal, vivid accents (not the old warm-brown theme) */
 [data-theme="dark"] {
-  --color-bg:      24 18 14;
-  --color-surface: 34 26 19;
-  --color-card:    42 31 23;
-  --color-cream:   254 243 226;
-  --color-amber:   245 158 11;
-  --color-terra:   224 122 95;
-  --color-herb:    74 124 89;
+  --color-bg:      17 17 19;
+  --color-surface: 26 26 29;
+  --color-card:    32 32 36;
+  --color-cream:   240 240 242;
+  --color-amber:   251 191 36;
+  --color-terra:   248 113 113;
+  --color-herb:    74 222 128;
   --color-tint:    255 255 255;
-  --scrollbar-thumb: #3a2e24;
+  --scrollbar-thumb: #45454a;
 }
 
 /* ── Print ── force light, ink-friendly colors regardless of the active theme */

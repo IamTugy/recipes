@@ -282,7 +282,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
           </div>
 
           {/* Favorite / rating / share / print */}
-          <div className="print:hidden flex items-center gap-4 mt-5 pt-5 border-t border-tint/[0.06]">
+          <div className="print:hidden flex flex-wrap items-center gap-x-4 gap-y-3 mt-5 pt-5 border-t border-tint/[0.06]">
             <button type="button"
               onClick={() => toggleFavorite(recipe.id)}
               className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${
@@ -295,9 +295,9 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
               {lang === 'he' ? 'מועדף' : 'Favorite'}
             </button>
 
-            <div className="flex items-center gap-1">
+            <div className="flex items-center">
               {[1, 2, 3, 4, 5].map(n => (
-                <button type="button" key={n} onClick={() => rate(n)} className="text-lg leading-none">
+                <button type="button" key={n} onClick={() => rate(n)} className="text-lg leading-none p-1.5">
                   <span className={n <= (userRating ?? 0) ? 'text-amber' : 'text-cream/20'}>★</span>
                 </button>
               ))}
@@ -321,7 +321,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
             {recipe.ingredients.length > 0 && (
               <button type="button"
                 onClick={addAllToShoppingList}
-                className="ms-auto flex items-center gap-1.5 text-sm font-medium text-cream/40 hover:text-cream/70 transition-colors"
+                className="flex items-center gap-1.5 text-sm font-medium text-cream/40 hover:text-cream/70 transition-colors"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m-10 0a2 2 0 100 4 2 2 0 000-4zm10 0a2 2 0 100 4 2 2 0 000-4z" />
@@ -332,7 +332,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
 
             <button type="button"
               onClick={share}
-              className={`flex items-center gap-1.5 text-sm font-medium text-cream/40 hover:text-cream/70 transition-colors ${recipe.ingredients.length > 0 ? '' : 'ms-auto'}`}
+              className="flex items-center gap-1.5 text-sm font-medium text-cream/40 hover:text-cream/70 transition-colors"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342a3 3 0 100-2.684l-6.44 3.22a3 3 0 100 2.684l6.44-3.22zM8.684 13.342l6.632 3.316m0-11.317l-6.632 3.316" />
