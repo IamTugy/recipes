@@ -1,4 +1,5 @@
 import { BadRequestException, ForbiddenException, Injectable, Logger, NotFoundException, OnModuleInit } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { Recipe, RecipeDocument } from './schemas/recipe.schema'
@@ -38,6 +39,7 @@ export class RecipesService implements OnModuleInit {
     @InjectModel(Rating.name) private readonly ratingModel: Model<RatingDocument>,
     private readonly activityLogService: ActivityLogService,
     private readonly cookLogService: CookLogService,
+    private readonly config: ConfigService,
   ) {}
 
   // One-time backfill: recipes seeded before the ownership/publish-workflow
@@ -55,6 +57,56 @@ export class RecipesService implements OnModuleInit {
     if (result.modifiedCount > 0) {
       this.logger.log(`Backfilled status='published' on ${result.modifiedCount} legacy recipe(s)`)
     }
+    await this.backfillLegacyOwnership()
+  }
+
+  // One-time backfill: recipes seeded before ownership existed have no
+  // `ownerId` at all. They belong to the site owner, so they should show up
+  // under their "My Recipes" like anything else they authored. Only the
+  // ones the owner already rated/reviewed are treated as vetted enough to
+  // stay public; everything else becomes a private draft the owner can
+  // review and submit for publishing like any other recipe.
+  private async backfillLegacyOwnership(): Promise<void> {
+    const ownerId = this.config.get<string>('OWNER_USER_ID')
+    if (!ownerId) return
+
+    const unowned = await this.recipeModel.find({ ownerId: { $exists: false } }).exec()
+    if (unowned.length === 0) return
+
+    const ratedSlugs = new Set<string>(
+      await this.ratingModel.distinct('recipeSlug', { userId: ownerId }).exec(),
+    )
+    const unownedSlugs = unowned.map(r => r.slug)
+    const publishedSlugs = unownedSlugs.filter(s => ratedSlugs.has(s))
+    const draftSlugs = unownedSlugs.filter(s => !ratedSlugs.has(s))
+
+    await this.recipeModel.updateMany({ slug: { $in: unownedSlugs } }, { $set: { ownerId } })
+
+    if (draftSlugs.length > 0) {
+      await this.recipeModel.updateMany(
+        { slug: { $in: draftSlugs } },
+        { $set: { status: 'draft', currentRevision: 0 } },
+      )
+    }
+
+    if (publishedSlugs.length > 0) {
+      await this.recipeModel.updateMany(
+        { slug: { $in: publishedSlugs } },
+        { $set: { status: 'published', currentRevision: 1 } },
+      )
+      for (const recipe of unowned) {
+        if (!publishedSlugs.includes(recipe.slug)) continue
+        const alreadyHasRevision = await this.revisionModel.exists({ recipeSlug: recipe.slug, revisionNumber: 1 })
+        if (alreadyHasRevision) continue
+        const snapshot: Record<string, unknown> = {}
+        for (const field of RECIPE_FIELDS) snapshot[field] = recipe[field]
+        await this.revisionModel.create({ recipeSlug: recipe.slug, revisionNumber: 1, authorId: ownerId, snapshot })
+      }
+    }
+
+    this.logger.log(
+      `Backfilled ownership on ${unownedSlugs.length} legacy recipe(s): ${publishedSlugs.length} published, ${draftSlugs.length} draft`,
+    )
   }
 
   private async ratingsBySlug(slugs: string[]): Promise<Map<string, { avg: number; count: number }>> {

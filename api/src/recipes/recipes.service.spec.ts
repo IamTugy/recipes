@@ -1,4 +1,5 @@
 import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { Test } from '@nestjs/testing'
 import { getModelToken } from '@nestjs/mongoose'
 import { RecipesService } from './recipes.service'
@@ -17,12 +18,17 @@ describe('RecipesService', () => {
     return { countsBySlug: jest.fn().mockResolvedValue(cookCounts) }
   }
 
+  function noUnownedRecipes(overrides: Record<string, unknown> = {}) {
+    return { find: jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue([]) }), ...overrides }
+  }
+
   async function makeService(
     recipeModel: Record<string, unknown>,
     revisionModel: Record<string, unknown> = {},
     ratingModel: Record<string, unknown> = { aggregate: jest.fn().mockResolvedValue([]) },
     activityLog = makeActivityLog(),
     cookLog = makeCookLog(),
+    config: Record<string, unknown> = { get: jest.fn().mockReturnValue('owner_1') },
   ) {
     const moduleRef = await Test.createTestingModule({
       providers: [
@@ -32,6 +38,7 @@ describe('RecipesService', () => {
         { provide: getModelToken(Rating.name), useValue: ratingModel },
         { provide: ActivityLogService, useValue: activityLog },
         { provide: CookLogService, useValue: cookLog },
+        { provide: ConfigService, useValue: config },
       ],
     }).compile()
     return moduleRef.get(RecipesService)
@@ -39,13 +46,79 @@ describe('RecipesService', () => {
 
   it('onModuleInit backfills status=published on recipes stored before that field existed', async () => {
     const updateMany = jest.fn().mockResolvedValue({ modifiedCount: 3 })
-    const service = await makeService({ updateMany })
+    const service = await makeService({ updateMany, ...noUnownedRecipes() })
     await service.onModuleInit()
 
     expect(updateMany).toHaveBeenCalledWith(
       { status: { $exists: false } },
       { $set: { status: 'published', currentRevision: 0 } },
     )
+  })
+
+  it('onModuleInit does nothing further when OWNER_USER_ID is not configured', async () => {
+    const find = jest.fn()
+    const service = await makeService(
+      { updateMany: jest.fn().mockResolvedValue({ modifiedCount: 0 }), find },
+      {}, undefined, undefined, undefined,
+      { get: jest.fn().mockReturnValue(undefined) },
+    )
+    await service.onModuleInit()
+    expect(find).not.toHaveBeenCalled()
+  })
+
+  it('onModuleInit assigns ownership to legacy recipes, publishing only ones the owner already rated', async () => {
+    const unowned = [
+      { slug: 'rated-recipe', title: 'Rated Recipe' },
+      { slug: 'other-recipe', title: 'Other Recipe' },
+    ]
+    const find = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(unowned) })
+    const updateMany = jest.fn().mockResolvedValue({ modifiedCount: 0 })
+    const distinct = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(['rated-recipe']) })
+    const exists = jest.fn().mockResolvedValue(null)
+    const create = jest.fn().mockResolvedValue({})
+
+    const service = await makeService(
+      { updateMany, find },
+      { exists, create },
+      { aggregate: jest.fn().mockResolvedValue([]), distinct },
+    )
+    await service.onModuleInit()
+
+    expect(find).toHaveBeenCalledWith({ ownerId: { $exists: false } })
+    expect(distinct).toHaveBeenCalledWith('recipeSlug', { userId: 'owner_1' })
+    expect(updateMany).toHaveBeenCalledWith(
+      { slug: { $in: ['rated-recipe', 'other-recipe'] } },
+      { $set: { ownerId: 'owner_1' } },
+    )
+    expect(updateMany).toHaveBeenCalledWith(
+      { slug: { $in: ['other-recipe'] } },
+      { $set: { status: 'draft', currentRevision: 0 } },
+    )
+    expect(updateMany).toHaveBeenCalledWith(
+      { slug: { $in: ['rated-recipe'] } },
+      { $set: { status: 'published', currentRevision: 1 } },
+    )
+    expect(create).toHaveBeenCalledWith(expect.objectContaining({
+      recipeSlug: 'rated-recipe', revisionNumber: 1, authorId: 'owner_1',
+    }))
+  })
+
+  it('onModuleInit does not create a duplicate revision-1 snapshot when one already exists', async () => {
+    const unowned = [{ slug: 'rated-recipe', title: 'Rated Recipe' }]
+    const find = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(unowned) })
+    const updateMany = jest.fn().mockResolvedValue({ modifiedCount: 0 })
+    const distinct = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(['rated-recipe']) })
+    const exists = jest.fn().mockResolvedValue({ _id: 'existing' })
+    const create = jest.fn()
+
+    const service = await makeService(
+      { updateMany, find },
+      { exists, create },
+      { aggregate: jest.fn().mockResolvedValue([]), distinct },
+    )
+    await service.onModuleInit()
+
+    expect(create).not.toHaveBeenCalled()
   })
 
   const minimalDto = {
