@@ -690,6 +690,13 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
               </span>
             )}
 
+            {recipe.status === 'published' && recipe.ownerId && (
+              <Link to={`/chef/${recipe.ownerId}`} className="flex items-center gap-1 text-cream/30 hover:text-cream/60 text-xs transition-colors">
+                <span>👤</span>
+                {lang === 'he' ? 'עוד מהשף הזה' : "More from this chef"}
+              </Link>
+            )}
+
             {recipe.ingredients.length > 0 && (
               <button type="button"
                 onClick={addAllToShoppingList}

@@ -3,6 +3,7 @@ import { Request } from 'express'
 import { ConfigService } from '@nestjs/config'
 import { RecipesService } from './recipes.service'
 import { ActivityLogService } from '../activity-log/activity-log.service'
+import { UsersService } from '../users/users.service'
 import { SaveRecipeDraftDto } from './dto/save-recipe-draft.dto'
 import { RejectSubmissionDto } from './dto/reject-submission.dto'
 
@@ -12,6 +13,7 @@ export class RecipesController {
     private readonly recipesService: RecipesService,
     private readonly activityLog: ActivityLogService,
     private readonly config: ConfigService,
+    private readonly usersService: UsersService,
   ) {}
 
   private isAdmin(userId: string): boolean {
@@ -33,6 +35,15 @@ export class RecipesController {
   @Get('mine')
   async findMine(@Req() req: Request & { userId: string }) {
     return this.recipesService.findMine(req.userId)
+  }
+
+  @Get('chef/:userId')
+  async chefProfile(@Param('userId') userId: string) {
+    const [recipes, names] = await Promise.all([
+      this.recipesService.findPublishedByOwner(userId),
+      this.usersService.namesByIds([userId]),
+    ])
+    return { userId, name: names[userId] ?? null, recipes }
   }
 
   @Get('admin/submissions')

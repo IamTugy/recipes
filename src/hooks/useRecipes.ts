@@ -185,6 +185,30 @@ export function useRecipe(slug: string | undefined) {
   return { recipe, loading, notFound }
 }
 
+export function useChefProfile(userId: string | undefined) {
+  const { getToken, isLoaded, isSignedIn } = useAuth()
+  const [name, setName] = useState<string | null>(null)
+  const [recipes, setRecipes] = useState<Recipe[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn || !userId) return
+    let cancelled = false
+
+    apiFetch<{ userId: string; name: string | null; recipes: ApiRecipe[] }>(`/recipes/chef/${userId}`, getToken)
+      .then(data => {
+        if (cancelled) return
+        setName(data.name)
+        setRecipes(data.recipes.map(toRecipe))
+      })
+      .finally(() => { if (!cancelled) setLoading(false) })
+
+    return () => { cancelled = true }
+  }, [isLoaded, isSignedIn, userId, getToken])
+
+  return { name, recipes, loading }
+}
+
 export function useTrending() {
   const { getToken, isLoaded, isSignedIn } = useAuth()
   const [trending, setTrending] = useState<Recipe[]>([])

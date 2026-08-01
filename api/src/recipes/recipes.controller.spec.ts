@@ -7,6 +7,7 @@ describe('RecipesController', () => {
     findBySlug: jest.fn(),
     findBySlugForUser: jest.fn(),
     findMine: jest.fn(),
+    findPublishedByOwner: jest.fn(),
     createDraft: jest.fn(),
     updateDraft: jest.fn(),
     submitForReview: jest.fn(),
@@ -17,11 +18,12 @@ describe('RecipesController', () => {
     listRevisions: jest.fn(),
     remove: jest.fn(),
   }
+  const usersService = { namesByIds: jest.fn().mockResolvedValue({}) }
 
   function makeController(ownerUserId = 'admin_1') {
     const activityLog = { record: jest.fn(), trendingSlugs: jest.fn() }
     const config = { get: jest.fn().mockReturnValue(ownerUserId) }
-    return new RecipesController(recipesService as any, activityLog as any, config as any)
+    return new RecipesController(recipesService as any, activityLog as any, config as any, usersService as any)
   }
 
   beforeEach(() => jest.clearAllMocks())
@@ -46,7 +48,7 @@ describe('RecipesController', () => {
     recipesService.findBySlugForUser.mockResolvedValue({ slug: 'a', status: 'draft' })
     const activityLog = { record: jest.fn(), trendingSlugs: jest.fn() }
     const config = { get: jest.fn().mockReturnValue('admin_1') }
-    const controller = new RecipesController(recipesService as any, activityLog as any, config as any)
+    const controller = new RecipesController(recipesService as any, activityLog as any, config as any, usersService as any)
 
     await controller.findOne('a', { userId: 'user_1' } as any)
 
@@ -65,7 +67,7 @@ describe('RecipesController', () => {
     recipesService.findBySlug.mockImplementation((slug: string) =>
       slug === 'gone' ? Promise.resolve(null) : Promise.resolve({ slug }),
     )
-    const controller = new RecipesController(recipesService as any, activityLog as any, config as any)
+    const controller = new RecipesController(recipesService as any, activityLog as any, config as any, usersService as any)
 
     const result = await controller.trending()
 
@@ -78,6 +80,24 @@ describe('RecipesController', () => {
     const controller = makeController()
     await expect(controller.findMine({ userId: 'user_1' } as any)).resolves.toEqual([{ slug: 'a' }])
     expect(recipesService.findMine).toHaveBeenCalledWith('user_1')
+  })
+
+  it("GET /recipes/chef/:userId returns that owner's published recipes with their display name", async () => {
+    recipesService.findPublishedByOwner.mockResolvedValue([{ slug: 'a' }])
+    usersService.namesByIds.mockResolvedValue({ user_1: 'Tugy' })
+    const controller = makeController()
+    const result = await controller.chefProfile('user_1')
+    expect(recipesService.findPublishedByOwner).toHaveBeenCalledWith('user_1')
+    expect(usersService.namesByIds).toHaveBeenCalledWith(['user_1'])
+    expect(result).toEqual({ userId: 'user_1', name: 'Tugy', recipes: [{ slug: 'a' }] })
+  })
+
+  it("GET /recipes/chef/:userId returns a null name when the user has no display name on record", async () => {
+    recipesService.findPublishedByOwner.mockResolvedValue([])
+    usersService.namesByIds.mockResolvedValue({})
+    const controller = makeController()
+    const result = await controller.chefProfile('user_2')
+    expect(result).toEqual({ userId: 'user_2', name: null, recipes: [] })
   })
 
   it('GET /recipes/admin/submissions returns the pending queue for an admin', async () => {

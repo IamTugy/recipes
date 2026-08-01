@@ -12,6 +12,7 @@ import FeatureRequestsPage from './components/FeatureRequestsPage'
 import MyRecipesPage from './components/MyRecipesPage'
 import AdminSubmissionsPage from './components/AdminSubmissionsPage'
 import MealPlanPage from './components/MealPlanPage'
+import ChefProfilePage from './components/ChefProfilePage'
 import TimerPanel from './components/TimerPanel'
 import ShoppingListPanel from './components/ShoppingListPanel'
 import ScrollToTopButton from './components/ScrollToTopButton'
@@ -68,6 +69,7 @@ export default function App() {
         <Route path="/my-recipes" element={<MyRecipesPage />} />
         <Route path="/admin/submissions" element={<AdminSubmissionsPage />} />
         <Route path="/meal-plan" element={<MealPlanPage onAddToShoppingList={shoppingList.addItems} />} />
+        <Route path="/chef/:userId" element={<ChefProfilePage />} />
         <Route
           path="/recipe/:id"
           element={

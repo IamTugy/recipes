@@ -155,6 +155,16 @@ describe('RecipesService', () => {
     expect(result[0]).toMatchObject({ slug: 'a', averageRating: 4.5, ratingCount: 2, viewCount: 42 })
   })
 
+  it('findPublishedByOwner returns only that owner\'s published, non-hidden recipes', async () => {
+    const exec = jest.fn().mockResolvedValue([{ slug: 'a', toObject: () => ({ slug: 'a' }) }])
+    const find = jest.fn().mockReturnValue({ exec })
+    const service = await makeService({ find })
+    const result = await service.findPublishedByOwner('user_1')
+
+    expect(find).toHaveBeenCalledWith({ ownerId: 'user_1', hidden: { $ne: true }, status: 'published' })
+    expect(result).toEqual([{ slug: 'a', averageRating: null, ratingCount: 0, viewCount: 0, cookCount: 0 }])
+  })
+
   it('findBySlug returns the matching published recipe with ratings and views attached', async () => {
     const exec = jest.fn().mockResolvedValue({ slug: 'a', toObject: () => ({ slug: 'a' }) })
     const findOne = jest.fn().mockReturnValue({ exec })

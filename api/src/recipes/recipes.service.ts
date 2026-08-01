@@ -148,6 +148,18 @@ export class RecipesService implements OnModuleInit {
     return this.attachRatingsAndViews(plain, ratings, views, cooks)
   }
 
+  async findPublishedByOwner(ownerId: string) {
+    const recipes = await this.recipeModel.find({ ownerId, hidden: { $ne: true }, status: 'published' }).exec()
+    const plain = recipes.map(r => r.toObject())
+    const slugs = plain.map(r => r.slug)
+    const [ratings, views, cooks] = await Promise.all([
+      this.ratingsBySlug(slugs),
+      this.activityLogService.viewCountsBySlug(slugs),
+      this.cookLogService.countsBySlug(slugs),
+    ])
+    return this.attachRatingsAndViews(plain, ratings, views, cooks)
+  }
+
   async findBySlug(slug: string) {
     const recipe = await this.recipeModel.findOne({ slug, hidden: { $ne: true }, status: 'published' }).exec()
     if (!recipe) return null

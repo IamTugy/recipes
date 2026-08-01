@@ -7,6 +7,7 @@ import { RecipesService } from './recipes.service'
 import { RecipesController } from './recipes.controller'
 import { ActivityLogModule } from '../activity-log/activity-log.module'
 import { CookLogModule } from '../cook-log/cook-log.module'
+import { UsersModule } from '../users/users.module'
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { CookLogModule } from '../cook-log/cook-log.module'
     ]),
     ActivityLogModule,
     CookLogModule,
+    UsersModule,
   ],
   providers: [RecipesService],
   controllers: [RecipesController],
