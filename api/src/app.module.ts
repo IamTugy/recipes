@@ -11,6 +11,7 @@ import { NotesModule } from './notes/notes.module'
 import { CollectionsModule } from './collections/collections.module'
 import { UploadsModule } from './uploads/uploads.module'
 import { FeatureRequestsModule } from './feature-requests/feature-requests.module'
+import { TranslationsModule } from './translations/translations.module'
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { FeatureRequestsModule } from './feature-requests/feature-requests.modul
     CollectionsModule,
     UploadsModule,
     FeatureRequestsModule,
+    TranslationsModule,
   ],
   controllers: [HealthController],
 })
