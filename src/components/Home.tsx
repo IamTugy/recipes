@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import type { Category } from '../types'
 import { useRecipes } from '../hooks/useRecipes'
 import { useFavorites } from '../hooks/useFavorites'
@@ -12,6 +12,7 @@ import RecipeCardSkeleton from './RecipeCardSkeleton'
 const categories: Category[] = ['breakfast', 'lunch', 'dinner', 'dessert', 'salad', 'soup', 'snack', 'bread', 'sauce']
 
 export default function Home() {
+  const navigate = useNavigate()
   const { lang } = useLanguage()
   const tx = t[lang]
   const [search, setSearch] = useState('')
@@ -52,26 +53,43 @@ export default function Home() {
     return list
   }, [search, activeCategory, lang, recipes, showFavoritesOnly, favoriteSlugs])
 
+  function surpriseMe() {
+    if (filtered.length === 0) return
+    const pick = filtered[Math.floor(Math.random() * filtered.length)]
+    navigate(`/recipe/${pick.id}`)
+  }
+
   return (
     <div className="min-h-screen bg-bg pt-14">
 
       {/* Search + categories */}
       <div className="max-w-6xl mx-auto px-6 pt-10 pb-6">
-        <div className="relative max-w-md">
-          <svg
-            className={`absolute ${lang === 'he' ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 w-4 h-4 text-cream/25`}
-            fill="none" viewBox="0 0 24 24" stroke="currentColor"
+        <div className="flex items-center gap-3">
+          <div className="relative max-w-md flex-1">
+            <svg
+              className={`absolute ${lang === 'he' ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 w-4 h-4 text-cream/25`}
+              fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              type="text"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder={tx.searchPlaceholder}
+              className={`input-field ${lang === 'he' ? 'pr-11 text-right' : 'pl-11'} w-full`}
+              dir={lang === 'he' ? 'rtl' : 'ltr'}
+            />
+          </div>
+          <button
+            onClick={surpriseMe}
+            disabled={filtered.length === 0}
+            className="shrink-0 flex items-center gap-1.5 px-4 h-11 rounded-lg text-xs font-semibold tracking-wide border border-tint/10 bg-tint/[0.03] hover:bg-tint/[0.07] text-cream/60 hover:text-cream/90 transition-colors disabled:opacity-30"
+            title={lang === 'he' ? 'הפתע אותי' : 'Surprise me'}
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <input
-            type="text"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder={tx.searchPlaceholder}
-            className={`input-field ${lang === 'he' ? 'pr-11 text-right' : 'pl-11'} w-full`}
-            dir={lang === 'he' ? 'rtl' : 'ltr'}
-          />
+            <span className="text-base">🎲</span>
+            <span className="hidden sm:inline">{lang === 'he' ? 'הפתע אותי' : 'Surprise me'}</span>
+          </button>
         </div>
       </div>
 
