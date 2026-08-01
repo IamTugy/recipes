@@ -68,6 +68,17 @@ export interface Recipe {
   ratingCount?: number
   viewCount?: number
   createdAt?: string
+  ownerId?: string
+  status?: 'draft' | 'pending_review' | 'published' | 'rejected'
+  reviewComment?: string
+  currentRevision?: number
+}
+
+export interface RecipeRevision {
+  revisionNumber: number
+  authorId: string
+  snapshot: Record<string, unknown>
+  publishedAt: string
 }
 
 export interface TimerState {

@@ -50,6 +50,82 @@ export async function deleteRecipe(slug: string, getToken: () => Promise<string 
   if (!res.ok) throw new ApiError(res.status, 'Failed to delete recipe')
 }
 
+async function postAction(path: string, getToken: () => Promise<string | null>, body?: unknown): Promise<ApiRecipe> {
+  const token = await getToken()
+  const res = await fetch(`/api${path}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  })
+  if (!res.ok) {
+    const message = await res.json().then(d => d.message).catch(() => undefined)
+    throw new ApiError(res.status, Array.isArray(message) ? message.join(', ') : message ?? `Request to ${path} failed with ${res.status}`)
+  }
+  return res.json()
+}
+
+export async function submitForReview(slug: string, getToken: () => Promise<string | null>): Promise<Recipe> {
+  return toRecipe(await postAction(`/recipes/${slug}/submit`, getToken))
+}
+
+export async function cancelSubmission(slug: string, getToken: () => Promise<string | null>): Promise<Recipe> {
+  return toRecipe(await postAction(`/recipes/${slug}/cancel-submission`, getToken))
+}
+
+export async function approveSubmission(slug: string, getToken: () => Promise<string | null>): Promise<Recipe> {
+  return toRecipe(await postAction(`/recipes/${slug}/approve`, getToken))
+}
+
+export async function rejectSubmission(slug: string, comment: string, getToken: () => Promise<string | null>): Promise<Recipe> {
+  return toRecipe(await postAction(`/recipes/${slug}/reject`, getToken, { comment }))
+}
+
+export function useMyRecipes() {
+  const { getToken, isLoaded, isSignedIn } = useAuth()
+  const [recipes, setRecipes] = useState<Recipe[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn) return
+    let cancelled = false
+
+    apiFetch<ApiRecipe[]>('/recipes/mine', getToken)
+      .then(data => { if (!cancelled) setRecipes(data.map(toRecipe)) })
+      .finally(() => { if (!cancelled) setLoading(false) })
+
+    return () => { cancelled = true }
+  }, [isLoaded, isSignedIn, getToken])
+
+  return { recipes, loading }
+}
+
+export function usePendingSubmissions() {
+  const { getToken, isLoaded, isSignedIn } = useAuth()
+  const [recipes, setRecipes] = useState<Recipe[]>([])
+  const [loading, setLoading] = useState(true)
+
+  function reload() {
+    return apiFetch<ApiRecipe[]>('/recipes/admin/submissions', getToken).then(data => setRecipes(data.map(toRecipe)))
+  }
+
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn) return
+    let cancelled = false
+
+    reload()
+      .catch(() => { /* handled by the caller retrying, no need to surface here */ })
+      .finally(() => { if (!cancelled) setLoading(false) })
+
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoaded, isSignedIn, getToken])
+
+  return { recipes, loading, reload }
+}
+
 export function useRecipes() {
   const { getToken, isLoaded, isSignedIn } = useAuth()
   const [recipes, setRecipes] = useState<Recipe[]>([])

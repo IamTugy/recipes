@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom'
-import { UserButton } from '@clerk/react'
+import { UserButton, useAuth } from '@clerk/react'
 import { useLanguage } from '../hooks/useLanguage'
 import { useTheme } from '../hooks/useTheme'
+import { OWNER_USER_ID } from '../lib/admin'
 
 interface NavProps {
   shoppingListCount: number
@@ -12,6 +13,8 @@ export default function Nav({ shoppingListCount, onOpenShoppingList }: NavProps)
   const navigate = useNavigate()
   const { lang, setLang } = useLanguage()
   const { mode, cycleTheme } = useTheme()
+  const { userId } = useAuth()
+  const isAdmin = userId === OWNER_USER_ID
 
   return (
     <nav className="print:hidden fixed top-0 inset-x-0 z-50 bg-bg/90 backdrop-blur-md border-b border-tint/[0.06]">
@@ -107,6 +110,18 @@ export default function Nav({ shoppingListCount, onOpenShoppingList }: NavProps)
                 labelIcon={<span>💡</span>}
                 onClick={() => navigate('/feature-requests')}
               />
+              <UserButton.Action
+                label={lang === 'he' ? 'המתכונים שלי' : 'My Recipes'}
+                labelIcon={<span>📖</span>}
+                onClick={() => navigate('/my-recipes')}
+              />
+              {isAdmin && (
+                <UserButton.Action
+                  label={lang === 'he' ? 'תור אישורים' : 'Review Queue'}
+                  labelIcon={<span>✅</span>}
+                  onClick={() => navigate('/admin/submissions')}
+                />
+              )}
             </UserButton.MenuItems>
           </UserButton>
         </div>

@@ -4,7 +4,9 @@ import RecipePlaceholder from './RecipePlaceholder'
 import RecipeDetailSkeleton from './RecipeDetailSkeleton'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { useRecipe, useRecipes, deleteRecipe } from '../hooks/useRecipes'
+import { useRecipe, useRecipes, deleteRecipe, submitForReview, cancelSubmission } from '../hooks/useRecipes'
+import { OWNER_USER_ID } from '../lib/admin'
+import { ApiError } from '../lib/api'
 import { useWakeLock } from '../hooks/useWakeLock'
 import { useFavorites } from '../hooks/useFavorites'
 import { useCollections } from '../hooks/useCollections'
@@ -56,6 +58,9 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
   const { text: savedNote, save: saveNote, status: noteStatus } = useNote(id)
   const { getToken, userId: currentUserId } = useAuth()
   const { showToast } = useToast()
+  const isAdmin = currentUserId === OWNER_USER_ID
+  const isOwner = !!currentUserId && (!recipe?.ownerId || recipe.ownerId === currentUserId)
+  const canEdit = isOwner || isAdmin
 
   const [multiplier, setMultiplier] = useState(1)
   const [customInput, setCustomInput] = useState('')
@@ -240,6 +245,36 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
     await deleteRecipe(id, getToken)
     navigate('/')
     showToast(lang === 'he' ? 'המתכון נמחק' : 'Recipe deleted')
+  }
+
+  const [submitting, setSubmitting] = useState(false)
+
+  async function handleSubmitForReview() {
+    if (!id) return
+    setSubmitting(true)
+    try {
+      await submitForReview(id, getToken)
+      showToast(lang === 'he' ? 'נשלח לבדיקה' : 'Submitted for review')
+      window.location.reload()
+    } catch (err) {
+      showToast(err instanceof ApiError ? err.message : (lang === 'he' ? 'השליחה נכשלה' : 'Submission failed'), 'error')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  async function handleCancelSubmission() {
+    if (!id) return
+    setSubmitting(true)
+    try {
+      await cancelSubmission(id, getToken)
+      showToast(lang === 'he' ? 'הבקשה בוטלה' : 'Submission cancelled')
+      window.location.reload()
+    } catch {
+      showToast(lang === 'he' ? 'הביטול נכשל' : 'Cancel failed', 'error')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   // Reset checked steps/ingredients and scroll when recipe changes
@@ -440,7 +475,42 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
               {tx.difficulty[recipe.difficulty]}
             </span>
             {recipe.featured && <span className="tag-terra text-xs font-semibold">{tx.featured}</span>}
+            {recipe.status && recipe.status !== 'published' && canEdit && (
+              <span className={`tag font-semibold ${
+                recipe.status === 'draft' ? 'bg-tint/10 text-cream/40'
+                : recipe.status === 'pending_review' ? 'bg-amber/10 text-amber'
+                : 'bg-red-500/10 text-red-400'
+              }`}>
+                {recipe.status === 'draft'
+                  ? (lang === 'he' ? 'טיוטה' : 'Draft')
+                  : recipe.status === 'pending_review'
+                    ? (lang === 'he' ? 'ממתין לאישור' : 'Pending review')
+                    : (lang === 'he' ? 'נדחה' : 'Rejected')}
+              </span>
+            )}
           </div>
+
+          {recipe.status === 'rejected' && recipe.reviewComment && canEdit && (
+            <div className="card p-3 mb-4 text-sm text-red-400 border border-red-400/20">
+              <strong>{lang === 'he' ? 'הערת מנהל: ' : "Admin's note: "}</strong>{recipe.reviewComment}
+            </div>
+          )}
+
+          {recipe.status && recipe.status !== 'published' && canEdit && (
+            <div className="flex items-center gap-3 mb-4">
+              {recipe.status === 'pending_review' ? (
+                <button type="button" disabled={submitting} onClick={handleCancelSubmission} className="btn-ghost text-xs disabled:opacity-50">
+                  {lang === 'he' ? 'בטל שליחה' : 'Cancel submission'}
+                </button>
+              ) : (
+                <button type="button" disabled={submitting} onClick={handleSubmitForReview} className="btn-primary text-xs disabled:opacity-50">
+                  {submitting
+                    ? (lang === 'he' ? 'שולח...' : 'Submitting...')
+                    : (lang === 'he' ? 'שלח לבדיקה' : 'Submit for review')}
+                </button>
+              )}
+            </div>
+          )}
 
           <h1
             className="font-serif text-3xl sm:text-4xl font-bold text-cream leading-tight mb-1"
@@ -622,15 +692,17 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
               {lang === 'he' ? 'הדפס' : 'Print'}
             </button>
 
-            <button type="button"
-              onClick={() => navigate(`/recipe/${id}/edit`)}
-              className="flex items-center gap-1.5 text-sm font-medium text-cream/40 hover:text-cream/70 transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
-              {lang === 'he' ? 'ערוך' : 'Edit'}
-            </button>
+            {canEdit && recipe.status !== 'pending_review' && (recipe.status !== 'published' || isAdmin) && (
+              <button type="button"
+                onClick={() => navigate(`/recipe/${id}/edit`)}
+                className="flex items-center gap-1.5 text-sm font-medium text-cream/40 hover:text-cream/70 transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                {lang === 'he' ? 'ערוך' : 'Edit'}
+              </button>
+            )}
 
             <button type="button"
               onClick={() => navigate(`/recipes/new?from=${id}`)}
@@ -642,15 +714,17 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
               {lang === 'he' ? 'שכפל' : 'Duplicate'}
             </button>
 
-            <button type="button"
-              onClick={handleDeleteRecipe}
-              className="flex items-center gap-1.5 text-sm font-medium text-cream/40 hover:text-red-400 transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
-              {lang === 'he' ? 'מחק' : 'Delete'}
-            </button>
+            {(isAdmin || (isOwner && recipe.status !== 'published')) && (
+              <button type="button"
+                onClick={handleDeleteRecipe}
+                className="flex items-center gap-1.5 text-sm font-medium text-cream/40 hover:text-red-400 transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                {lang === 'he' ? 'מחק' : 'Delete'}
+              </button>
+            )}
           </div>
         </div>
 
