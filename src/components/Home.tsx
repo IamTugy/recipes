@@ -11,6 +11,8 @@ import RecipeCardSkeleton from './RecipeCardSkeleton'
 
 const categories: Category[] = ['breakfast', 'lunch', 'dinner', 'dessert', 'salad', 'soup', 'snack', 'bread', 'sauce']
 
+type SortOption = 'default' | 'rating' | 'quickest'
+
 export default function Home() {
   const navigate = useNavigate()
   const { lang } = useLanguage()
@@ -20,6 +22,7 @@ export default function Home() {
   const { recipes, loading, error } = useRecipes()
   const { favoriteSlugs, toggle: toggleFavorite } = useFavorites()
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false)
+  const [sortBy, setSortBy] = useState<SortOption>('default')
   const { recentIds } = useRecentlyViewed()
 
   const recentRecipes = useMemo(
@@ -50,8 +53,13 @@ export default function Home() {
         )
       })
     }
+    if (sortBy === 'rating') {
+      list = [...list].sort((a, b) => (b.averageRating ?? -1) - (a.averageRating ?? -1))
+    } else if (sortBy === 'quickest') {
+      list = [...list].sort((a, b) => (a.prepTime + a.cookTime) - (b.prepTime + b.cookTime))
+    }
     return list
-  }, [search, activeCategory, lang, recipes, showFavoritesOnly, favoriteSlugs])
+  }, [search, activeCategory, lang, recipes, showFavoritesOnly, favoriteSlugs, sortBy])
 
   function surpriseMe() {
     if (filtered.length === 0) return
@@ -175,13 +183,24 @@ export default function Home() {
 
       {/* Recipe grid */}
       <div className="max-w-6xl mx-auto px-6 pb-24">
-        <p className="text-cream/25 text-xs tracking-wider mb-5">
-          {(search || activeCategory)
-            ? `${filtered.length} / ${recipes.length}`
-            : `${recipes.length}`
-          }
-          {' '}{lang === 'he' ? 'מתכונים' : 'recipes'}
-        </p>
+        <div className="flex items-center justify-between mb-5">
+          <p className="text-cream/25 text-xs tracking-wider">
+            {(search || activeCategory)
+              ? `${filtered.length} / ${recipes.length}`
+              : `${recipes.length}`
+            }
+            {' '}{lang === 'he' ? 'מתכונים' : 'recipes'}
+          </p>
+          <select
+            value={sortBy}
+            onChange={e => setSortBy(e.target.value as SortOption)}
+            className="bg-tint/[0.03] border border-tint/10 rounded-lg text-xs text-cream/60 px-2.5 py-1.5 outline-none hover:bg-tint/[0.06] transition-colors"
+          >
+            <option value="default">{lang === 'he' ? 'ברירת מחדל' : 'Default order'}</option>
+            <option value="rating">{lang === 'he' ? 'דירוג גבוה' : 'Top rated'}</option>
+            <option value="quickest">{lang === 'he' ? 'הכי מהיר' : 'Quickest'}</option>
+          </select>
+        </div>
 
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
