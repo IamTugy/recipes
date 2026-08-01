@@ -63,6 +63,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
   const [reviews, setReviews] = useState<{ score: number; comment: string; createdAt: string }[]>([])
   const [reviewComment, setReviewComment] = useState('')
   const [distribution, setDistribution] = useState<Record<1 | 2 | 3 | 4 | 5, number> | null>(null)
+  const [hasPostedReview, setHasPostedReview] = useState(false)
   const cookMode = useWakeLock()
 
   // Sync the textarea once the saved note has loaded for this recipe
@@ -81,8 +82,22 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
     if (distributionRes.ok) setDistribution(await distributionRes.json())
   }
 
+  async function loadMyRating() {
+    const token = await getToken()
+    const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {}
+    const res = await fetch(`/api/ratings/${id}/mine`, { headers })
+    if (!res.ok) return
+    const mine: { score: number; comment: string | null } | null = await res.json()
+    setUserRating(mine?.score ?? null)
+    setReviewComment(mine?.comment ?? '')
+    setHasPostedReview(!!mine?.comment)
+  }
+
   useEffect(() => {
-    if (id) loadReviews()
+    if (id) {
+      loadReviews()
+      loadMyRating()
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
 
@@ -114,8 +129,8 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
 
   function postReview() {
     if (!userRating) return
-    submitRating(userRating, reviewComment.trim() || undefined)
-    setReviewComment('')
+    submitRating(userRating, reviewComment.trim())
+    setHasPostedReview(true)
   }
 
   async function share() {
@@ -852,7 +867,9 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
               disabled={!userRating || !reviewComment.trim()}
               className="self-start px-4 py-1.5 rounded-lg text-xs font-semibold bg-amber/90 text-bg hover:bg-amber transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              {lang === 'he' ? 'פרסם ביקורת' : 'Post review'}
+              {hasPostedReview
+                ? (lang === 'he' ? 'עדכן ביקורת' : 'Update review')
+                : (lang === 'he' ? 'פרסם ביקורת' : 'Post review')}
             </button>
           </div>
           {reviews.length > 0 ? (

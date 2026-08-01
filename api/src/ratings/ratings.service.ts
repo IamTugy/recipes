@@ -8,14 +8,18 @@ export class RatingsService {
   constructor(@InjectModel(Rating.name) private readonly ratingModel: Model<RatingDocument>) {}
 
   async rate(userId: string, recipeSlug: string, score: number, comment?: string): Promise<{ score: number }> {
+    const setDoc: { userId: string; recipeSlug: string; score: number; comment?: string } = { userId, recipeSlug, score }
+    if (comment !== undefined) setDoc.comment = comment
     const doc = await this.ratingModel
-      .findOneAndUpdate(
-        { userId, recipeSlug },
-        { userId, recipeSlug, score, comment: comment || undefined },
-        { upsert: true, new: true },
-      )
+      .findOneAndUpdate({ userId, recipeSlug }, { $set: setDoc }, { upsert: true, new: true })
       .exec()
     return { score: doc!.score }
+  }
+
+  async myRating(userId: string, recipeSlug: string): Promise<{ score: number; comment: string | null } | null> {
+    const doc = await this.ratingModel.findOne({ userId, recipeSlug }).lean().exec()
+    if (!doc) return null
+    return { score: doc.score, comment: doc.comment ?? null }
   }
 
   async distributionForRecipe(recipeSlug: string): Promise<Record<1 | 2 | 3 | 4 | 5, number>> {

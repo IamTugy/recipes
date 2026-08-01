@@ -15,10 +15,53 @@ describe('RatingsService', () => {
 
     expect(findOneAndUpdate).toHaveBeenCalledWith(
       { userId: 'user_1', recipeSlug: 'a' },
-      { userId: 'user_1', recipeSlug: 'a', score: 4 },
+      { $set: { userId: 'user_1', recipeSlug: 'a', score: 4 } },
       { upsert: true, new: true },
     )
     expect(result).toEqual({ score: 4 })
+  })
+
+  it("rate does not touch an existing comment when re-rating without one", async () => {
+    const findOneAndUpdate = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue({ score: 5 }) })
+    const moduleRef = await Test.createTestingModule({
+      providers: [RatingsService, { provide: getModelToken(Rating.name), useValue: { findOneAndUpdate } }],
+    }).compile()
+
+    const service = moduleRef.get(RatingsService)
+    await service.rate('user_1', 'a', 5, 'Loved it')
+
+    expect(findOneAndUpdate).toHaveBeenCalledWith(
+      { userId: 'user_1', recipeSlug: 'a' },
+      { $set: { userId: 'user_1', recipeSlug: 'a', score: 5, comment: 'Loved it' } },
+      { upsert: true, new: true },
+    )
+  })
+
+  it("myRating returns the user's own score and comment for a recipe", async () => {
+    const exec = jest.fn().mockResolvedValue({ score: 4, comment: 'Pretty good' })
+    const lean = jest.fn().mockReturnValue({ exec })
+    const findOne = jest.fn().mockReturnValue({ lean })
+    const moduleRef = await Test.createTestingModule({
+      providers: [RatingsService, { provide: getModelToken(Rating.name), useValue: { findOne } }],
+    }).compile()
+
+    const service = moduleRef.get(RatingsService)
+    const result = await service.myRating('user_1', 'a')
+
+    expect(findOne).toHaveBeenCalledWith({ userId: 'user_1', recipeSlug: 'a' })
+    expect(result).toEqual({ score: 4, comment: 'Pretty good' })
+  })
+
+  it('myRating returns null when the user has not rated the recipe', async () => {
+    const exec = jest.fn().mockResolvedValue(null)
+    const lean = jest.fn().mockReturnValue({ exec })
+    const findOne = jest.fn().mockReturnValue({ lean })
+    const moduleRef = await Test.createTestingModule({
+      providers: [RatingsService, { provide: getModelToken(Rating.name), useValue: { findOne } }],
+    }).compile()
+
+    const service = moduleRef.get(RatingsService)
+    await expect(service.myRating('user_1', 'a')).resolves.toBeNull()
   })
 
   it('reviewsForRecipe returns only reviews with a comment, newest first', async () => {

@@ -7,6 +7,11 @@ import { RateRecipeDto } from './dto/rate-recipe.dto'
 export class RatingsController {
   constructor(private readonly ratingsService: RatingsService) {}
 
+  @Get(':slug/mine')
+  async mine(@Param('slug') slug: string, @Req() req: Request & { userId: string }) {
+    return this.ratingsService.myRating(req.userId, slug)
+  }
+
   @Get(':slug/reviews')
   async reviews(@Param('slug') slug: string) {
     return this.ratingsService.reviewsForRecipe(slug)
