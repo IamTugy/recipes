@@ -95,4 +95,28 @@ describe('ClerkAuthGuard', () => {
     await expect(guard.canActivate(context)).resolves.toBe(true)
     expect(req.userId).toBe('user_1')
   })
+
+  it('authenticates as the owner via the personal API key, bypassing Clerk entirely', async () => {
+    const apiKeyConfig = { get: (key: string) => (key === 'RECIPES_API_KEY' ? 'secret123' : key === 'OWNER_USER_ID' ? 'owner_1' : 'sk_test_xxx') }
+    const guard = new ClerkAuthGuard(reflector as any, apiKeyConfig as any, usersService as any)
+    const context = contextWithHeader('Bearer secret123')
+    const req = context.switchToHttp().getRequest()
+
+    await expect(guard.canActivate(context)).resolves.toBe(true)
+    expect(req.userId).toBe('owner_1')
+    expect(verifyToken).not.toHaveBeenCalled()
+    expect(usersService.upsertFromClerk).not.toHaveBeenCalled()
+  })
+
+  it('falls through to normal Clerk verification when the token does not match the API key', async () => {
+    ;(verifyToken as jest.Mock).mockResolvedValue({ sub: 'user_1' })
+    const apiKeyConfig = { get: (key: string) => (key === 'RECIPES_API_KEY' ? 'secret123' : key === 'OWNER_USER_ID' ? 'owner_1' : 'sk_test_xxx') }
+    const guard = new ClerkAuthGuard(reflector as any, apiKeyConfig as any, usersService as any)
+    const context = contextWithHeader('Bearer someone-elses-token')
+    const req = context.switchToHttp().getRequest()
+
+    await expect(guard.canActivate(context)).resolves.toBe(true)
+    expect(req.userId).toBe('user_1')
+    expect(verifyToken).toHaveBeenCalled()
+  })
 })

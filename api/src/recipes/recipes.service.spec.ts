@@ -59,6 +59,17 @@ describe('RecipesService', () => {
     )
   })
 
+  it('onModuleInit backfills publishedRevision from currentRevision on recipes already marked published', async () => {
+    const updateMany = jest.fn().mockResolvedValue({ modifiedCount: 1 })
+    const service = await makeService({ updateMany, ...noUnownedRecipes() })
+    await service.onModuleInit()
+
+    expect(updateMany).toHaveBeenCalledWith(
+      { status: 'published', publishedRevision: { $exists: false } },
+      [{ $set: { publishedRevision: '$currentRevision' } }],
+    )
+  })
+
   it('onModuleInit does nothing further when OWNER_USER_ID is not configured', async () => {
     const find = jest.fn()
     const service = await makeService(

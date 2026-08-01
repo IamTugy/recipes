@@ -34,6 +34,16 @@ export class ClerkAuthGuard implements CanActivate {
     }
     const token = authHeader.slice('Bearer '.length)
 
+    // A personal API key (used by the MCP server so external tools like
+    // Claude/Gemini/ChatGPT can upload recipes on the owner's behalf)
+    // authenticates as the owner directly, bypassing Clerk entirely. Only
+    // set in the environment for that single trusted integration.
+    const apiKey = this.config.get<string>('RECIPES_API_KEY')
+    if (apiKey && token === apiKey) {
+      request.userId = this.config.get<string>('OWNER_USER_ID')
+      return true
+    }
+
     let userId: string
     try {
       const payload = await verifyToken(token, { secretKey: this.secretKey })

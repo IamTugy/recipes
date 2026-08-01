@@ -58,6 +58,23 @@ export class RecipesService implements OnModuleInit {
       this.logger.log(`Backfilled status='published' on ${result.modifiedCount} legacy recipe(s)`)
     }
     await this.backfillLegacyOwnership()
+    await this.backfillPublishedRevision()
+  }
+
+  // One-time backfill: recipes that were already status='published' before
+  // publishedRevision existed (or before this specific recipe's ownership
+  // backfill ran) have status='published' but no publishedRevision at all.
+  // Public visibility now keys off publishedRevision, not status, so without
+  // this they'd silently disappear from every listing despite still being
+  // marked published.
+  private async backfillPublishedRevision(): Promise<void> {
+    const result = await this.recipeModel.updateMany(
+      { status: 'published', publishedRevision: { $exists: false } },
+      [{ $set: { publishedRevision: '$currentRevision' } }],
+    )
+    if (result.modifiedCount > 0) {
+      this.logger.log(`Backfilled publishedRevision on ${result.modifiedCount} recipe(s) already marked published`)
+    }
   }
 
   // One-time backfill: recipes seeded before ownership existed have no
