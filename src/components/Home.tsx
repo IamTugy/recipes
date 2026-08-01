@@ -137,7 +137,7 @@ export default function Home() {
               </kbd>
             )}
           </div>
-          <button
+          <button type="button"
             onClick={surpriseMe}
             disabled={filtered.length === 0}
             className="shrink-0 flex items-center gap-1.5 px-4 h-11 rounded-lg text-xs font-semibold tracking-wide border border-tint/10 bg-tint/[0.03] hover:bg-tint/[0.07] text-cream/60 hover:text-cream/90 transition-colors disabled:opacity-30"
@@ -152,7 +152,7 @@ export default function Home() {
       {/* Category filter */}
       <div className="max-w-6xl mx-auto px-6 mb-6">
         <div className="flex gap-1 overflow-x-auto pb-1 scrollbar-none">
-          <button
+          <button type="button"
             onClick={() => setActiveCategory(null)}
             className={`shrink-0 px-4 py-2 text-xs tracking-wider font-medium transition-colors rounded-lg ${
               activeCategory === null
@@ -162,7 +162,7 @@ export default function Home() {
           >
             {tx.categories.all}
           </button>
-          <button
+          <button type="button"
             onClick={() => setShowFavoritesOnly(v => !v)}
             className={`shrink-0 flex items-center gap-1.5 px-4 py-2 text-xs tracking-wider font-medium transition-colors rounded-lg ${
               showFavoritesOnly
@@ -174,7 +174,7 @@ export default function Home() {
             <span>{lang === 'he' ? 'מועדפים' : 'Favorites'}</span>
           </button>
           {categories.map(cat => (
-            <button
+            <button type="button"
               key={cat}
               onClick={() => setActiveCategory(cat === activeCategory ? null : cat)}
               className={`shrink-0 flex items-center gap-1.5 px-4 py-2 text-xs tracking-wider font-medium transition-colors rounded-lg ${
@@ -194,7 +194,7 @@ export default function Home() {
       <div className="max-w-6xl mx-auto px-6 mb-6">
         <div className="flex gap-1.5">
           {difficulties.map(diff => (
-            <button
+            <button type="button"
               key={diff}
               onClick={() => setActiveDifficulty(diff === activeDifficulty ? null : diff)}
               className={`px-3 py-1.5 text-[11px] tracking-wider font-medium transition-colors rounded-lg border ${

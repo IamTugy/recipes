@@ -60,7 +60,7 @@ export default function RecipeCard({ recipe, index, searchQuery, isFavorite, onT
               {recipe.featured && (
                 <span className="tag-terra text-[10px] font-semibold px-2 py-0.5">{tx.featured}</span>
               )}
-              <button
+              <button type="button"
                 onClick={e => { e.preventDefault(); e.stopPropagation(); onToggleFavorite(recipe.id) }}
                 className={`h-7 w-7 flex items-center justify-center rounded-full backdrop-blur-sm border transition-colors ${
                   isFavorite
@@ -133,7 +133,7 @@ export default function RecipeCard({ recipe, index, searchQuery, isFavorite, onT
             {displayTags.length > 0 && (
               <div className="flex flex-wrap gap-1 mt-2.5">
                 {displayTags.slice(0, 3).map(tag => (
-                  <button
+                  <button type="button"
                     key={tag}
                     onClick={e => { e.preventDefault(); e.stopPropagation(); navigate(`/?tag=${encodeURIComponent(tag)}`) }}
                     className="tag text-[9px] px-2 py-0.5 hover:text-amber transition-colors"

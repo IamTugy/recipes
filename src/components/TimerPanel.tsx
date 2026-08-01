@@ -39,7 +39,7 @@ function TimerControls({ timer, onToggle, onReset, onRemove }: {
   return (
     <div className="flex items-center gap-0.5 shrink-0">
       {!timer.done && (
-        <button
+        <button type="button"
           onClick={() => onToggle(timer.id)}
           className="w-8 h-8 flex items-center justify-center rounded-lg text-cream/60 hover:text-cream hover:bg-tint/[0.06] transition-colors"
         >
@@ -49,10 +49,10 @@ function TimerControls({ timer, onToggle, onReset, onRemove }: {
           }
         </button>
       )}
-      <button onClick={() => onReset(timer.id)} className="w-8 h-8 flex items-center justify-center rounded-lg text-cream/30 hover:text-cream/60 hover:bg-tint/[0.06] transition-colors">
+      <button type="button" onClick={() => onReset(timer.id)} className="w-8 h-8 flex items-center justify-center rounded-lg text-cream/30 hover:text-cream/60 hover:bg-tint/[0.06] transition-colors">
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
       </button>
-      <button onClick={() => onRemove(timer.id)} className="w-8 h-8 flex items-center justify-center rounded-lg text-cream/30 hover:text-red-400 hover:bg-tint/[0.06] transition-colors">
+      <button type="button" onClick={() => onRemove(timer.id)} className="w-8 h-8 flex items-center justify-center rounded-lg text-cream/30 hover:text-red-400 hover:bg-tint/[0.06] transition-colors">
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
       </button>
     </div>
@@ -158,7 +158,7 @@ export default function TimerPanel({ timers, onToggle, onRemove, onReset }: Time
           <div className="px-4 h-16 flex items-center gap-3">
             {/* Prev arrow */}
             {sorted.length > 1 && (
-              <button
+              <button type="button"
                 onClick={() => setMobileIdx(i => (i - 1 + sorted.length) % sorted.length)}
                 className="w-7 h-7 flex items-center justify-center rounded-lg text-cream/30 hover:text-cream/60 hover:bg-tint/[0.06] transition-colors shrink-0"
               >
@@ -184,7 +184,7 @@ export default function TimerPanel({ timers, onToggle, onRemove, onReset }: Time
 
             {/* Next arrow */}
             {sorted.length > 1 && (
-              <button
+              <button type="button"
                 onClick={() => setMobileIdx(i => (i + 1) % sorted.length)}
                 className="w-7 h-7 flex items-center justify-center rounded-lg text-cream/30 hover:text-cream/60 hover:bg-tint/[0.06] transition-colors shrink-0"
               >

@@ -16,7 +16,7 @@ export default function Nav({ shoppingListCount, onOpenShoppingList }: NavProps)
   return (
     <nav className="print:hidden fixed top-0 inset-x-0 z-50 bg-bg/90 backdrop-blur-md border-b border-tint/[0.06]">
       <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between" dir="ltr">
-        <button
+        <button type="button"
           onClick={() => navigate('/')}
           aria-label={lang === 'he' ? 'לדף הבית' : 'Go to home'}
           className="font-serif text-lg font-medium text-cream/90 hover:text-cream tracking-wide transition-colors"
@@ -26,7 +26,7 @@ export default function Nav({ shoppingListCount, onOpenShoppingList }: NavProps)
 
         <div className="flex items-center gap-2">
           {/* Theme toggle */}
-          <button
+          <button type="button"
             onClick={toggleTheme}
             className="h-7 w-7 flex items-center justify-center rounded-lg text-cream/40 hover:text-cream/70 border border-tint/10 hover:bg-tint/[0.05] transition-colors"
             title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
@@ -44,7 +44,7 @@ export default function Nav({ shoppingListCount, onOpenShoppingList }: NavProps)
           </button>
 
           {/* Language toggle */}
-          <button
+          <button type="button"
             onClick={() => setLang(lang === 'he' ? 'en' : 'he')}
             className="flex items-center gap-1.5 px-3 h-7 rounded-lg text-xs font-semibold tracking-widest border border-tint/10 bg-tint/[0.03] hover:bg-tint/[0.07] transition-colors"
             title={lang === 'he' ? 'Switch to English' : 'עבור לעברית'}
@@ -55,7 +55,7 @@ export default function Nav({ shoppingListCount, onOpenShoppingList }: NavProps)
           </button>
 
           {/* Shopping list */}
-          <button
+          <button type="button"
             onClick={onOpenShoppingList}
             className="relative h-7 w-7 flex items-center justify-center rounded-lg text-cream/40 hover:text-cream/70 border border-tint/10 hover:bg-tint/[0.05] transition-colors"
             title={lang === 'he' ? 'רשימת קניות' : 'Shopping list'}

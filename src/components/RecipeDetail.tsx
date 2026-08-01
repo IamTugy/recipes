@@ -103,7 +103,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
         <div className="text-center">
           <p className="text-6xl mb-4">🍳</p>
           <p className="text-cream/60 text-lg">{tx.notFound}</p>
-          <button onClick={() => navigate('/')} className="btn-primary mt-6">
+          <button type="button" onClick={() => navigate('/')} className="btn-primary mt-6">
             {tx.backToRecipes}
           </button>
         </div>
@@ -205,7 +205,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
           <RecipePlaceholder recipe={recipe} />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/40 to-transparent" />
-        <button
+        <button type="button"
           onClick={() => navigate('/')}
           className={`print:hidden absolute top-4 ${lang === 'he' ? 'right-4' : 'left-4'} flex items-center gap-2 px-3 py-2 bg-black/40 backdrop-blur-sm text-white/80 hover:text-white rounded-xl text-sm transition-colors border border-white/10`}
         >
@@ -283,7 +283,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
 
           {/* Favorite / rating / share / print */}
           <div className="print:hidden flex items-center gap-4 mt-5 pt-5 border-t border-tint/[0.06]">
-            <button
+            <button type="button"
               onClick={() => toggleFavorite(recipe.id)}
               className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${
                 favoriteSlugs.has(recipe.id) ? 'text-amber' : 'text-cream/40 hover:text-cream/70'
@@ -297,7 +297,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
 
             <div className="flex items-center gap-1">
               {[1, 2, 3, 4, 5].map(n => (
-                <button key={n} onClick={() => rate(n)} className="text-lg leading-none">
+                <button type="button" key={n} onClick={() => rate(n)} className="text-lg leading-none">
                   <span className={n <= (userRating ?? 0) ? 'text-amber' : 'text-cream/20'}>★</span>
                 </button>
               ))}
@@ -319,7 +319,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
             )}
 
             {recipe.ingredients.length > 0 && (
-              <button
+              <button type="button"
                 onClick={addAllToShoppingList}
                 className="ms-auto flex items-center gap-1.5 text-sm font-medium text-cream/40 hover:text-cream/70 transition-colors"
               >
@@ -330,7 +330,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
               </button>
             )}
 
-            <button
+            <button type="button"
               onClick={share}
               className={`flex items-center gap-1.5 text-sm font-medium text-cream/40 hover:text-cream/70 transition-colors ${recipe.ingredients.length > 0 ? '' : 'ms-auto'}`}
             >
@@ -340,7 +340,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
               {shareState === 'copied' ? (lang === 'he' ? 'הועתק!' : 'Copied!') : (lang === 'he' ? 'שתף' : 'Share')}
             </button>
 
-            <button
+            <button type="button"
               onClick={() => window.print()}
               className="flex items-center gap-1.5 text-sm font-medium text-cream/40 hover:text-cream/70 transition-colors"
             >
@@ -358,7 +358,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
             <span className="text-cream/60 text-sm font-medium">{tx.portions}</span>
             <div className="flex gap-1.5 flex-wrap">
               {presetMultipliers.map(m => (
-                <button
+                <button type="button"
                   key={m}
                   onClick={() => handlePresetClick(m)}
                   className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
@@ -465,7 +465,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-serif text-xl font-bold text-cream">{tx.instructions}</h2>
               {cookMode.supported && (
-                <button
+                <button type="button"
                   onClick={cookMode.toggle}
                   className={`print:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
                     cookMode.active
@@ -562,7 +562,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                                         {existingTimer.done ? tx.timerDone : formatSeconds(existingTimer.remainingSeconds)}
                                       </div>
                                     ) : (
-                                      <button
+                                      <button type="button"
                                         onClick={() => startTimer(
                                           `${stepNum}: ${instruction.length > 40 ? instruction.slice(0, 40) + '…' : instruction}`,
                                           step.timerMinutes!,
@@ -612,7 +612,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
         {recipe.tags.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-2">
             {(lang === 'he' ? recipe.tags : (recipe.tagsEn ?? recipe.tags)).map(tag => (
-              <button
+              <button type="button"
                 key={tag}
                 onClick={() => navigate(`/?tag=${encodeURIComponent(tag)}`)}
                 className="tag hover:text-amber transition-colors"

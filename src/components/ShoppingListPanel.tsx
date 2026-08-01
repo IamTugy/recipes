@@ -53,7 +53,7 @@ export default function ShoppingListPanel({
               <h2 className="font-serif text-lg font-medium text-cream">
                 {lang === 'he' ? 'רשימת קניות' : 'Shopping List'}
               </h2>
-              <button
+              <button type="button"
                 onClick={onClose}
                 aria-label={lang === 'he' ? 'סגור' : 'Close'}
                 className="w-8 h-8 flex items-center justify-center rounded-lg text-cream/50 hover:text-cream hover:bg-tint/[0.06] transition-colors"
@@ -71,7 +71,7 @@ export default function ShoppingListPanel({
                     ? `${lastCleared.length} פריטים הוסרו`
                     : `${lastCleared.length} item${lastCleared.length === 1 ? '' : 's'} removed`}
                 </span>
-                <button onClick={onUndoClear} className="font-semibold text-amber hover:text-amber/80 transition-colors">
+                <button type="button" onClick={onUndoClear} className="font-semibold text-amber hover:text-amber/80 transition-colors">
                   {lang === 'he' ? 'בטל' : 'Undo'}
                 </button>
               </div>
@@ -89,7 +89,7 @@ export default function ShoppingListPanel({
                       key={item.id}
                       className="flex items-center gap-3 group py-1.5 border-b border-tint/[0.04] last:border-0"
                     >
-                      <button
+                      <button type="button"
                         onClick={() => onToggle(item.id)}
                         aria-label={item.checked
                           ? (lang === 'he' ? 'סמן כלא נאסף' : 'Mark as not collected')
@@ -106,7 +106,7 @@ export default function ShoppingListPanel({
                         </p>
                         <p className="text-[11px] text-cream/25 truncate">{item.recipeTitle}</p>
                       </div>
-                      <button
+                      <button type="button"
                         onClick={() => onRemove(item.id)}
                         aria-label={lang === 'he' ? 'הסר פריט' : 'Remove item'}
                         className="shrink-0 w-6 h-6 flex items-center justify-center rounded text-cream/20 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -123,16 +123,16 @@ export default function ShoppingListPanel({
 
             {items.length > 0 && (
               <div className="px-5 py-3 border-t border-tint/[0.06] space-y-2">
-                <button onClick={copyAsText} className="btn-ghost text-xs w-full">
+                <button type="button" onClick={copyAsText} className="btn-ghost text-xs w-full">
                   {copied
                     ? (lang === 'he' ? 'הועתק!' : 'Copied!')
                     : (lang === 'he' ? 'העתק כטקסט' : 'Copy as text')}
                 </button>
                 <div className="flex items-center gap-2">
-                  <button onClick={onClearChecked} className="btn-ghost text-xs flex-1">
+                  <button type="button" onClick={onClearChecked} className="btn-ghost text-xs flex-1">
                     {lang === 'he' ? 'נקה מסומנים' : 'Clear checked'}
                   </button>
-                  <button onClick={onClearAll} className="btn-ghost text-xs flex-1 text-red-400/80">
+                  <button type="button" onClick={onClearAll} className="btn-ghost text-xs flex-1 text-red-400/80">
                     {lang === 'he' ? 'נקה הכל' : 'Clear all'}
                   </button>
                 </div>
