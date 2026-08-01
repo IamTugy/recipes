@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # Polls GitHub for issues labeled "approved-for-claude" on this repo and runs
-# a `claude -p` session against each one in an isolated git worktree.
+# a `claude -p` session against each one in an isolated git worktree. Each
+# poll also checks every open claude/* PR for conflicts with main and has
+# Claude rebase+resolve them, so PRs don't silently rot while they wait for
+# review.
 #
 # This is the only piece of the feature-requests flow that can touch this
 # machine's shell/filesystem - the web app and backend never execute code
@@ -136,17 +139,68 @@ run_once() {
 
   if [ "$count" -eq 0 ]; then
     echo "[feature-request-worker] No approved issues pending."
-    return
-  fi
-
-  echo "$issues" | python3 -c "
+  else
+    echo "$issues" | python3 -c "
 import json, sys
 for issue in json.load(sys.stdin):
     print(f\"{issue['number']}\t{issue['title']}\t{issue['body'].replace(chr(10), chr(2))}\")" \
-  | while IFS=$'\t' read -r number title body_escaped; do
-    body=$(echo "$body_escaped" | tr '\002' '\n')
-    process_issue "$number" "$title" "$body" || echo "[feature-request-worker] FAILED on issue #$number, continuing"
+    | while IFS=$'\t' read -r number title body_escaped; do
+      body=$(echo "$body_escaped" | tr '\002' '\n')
+      process_issue "$number" "$title" "$body" || echo "[feature-request-worker] FAILED on issue #$number, continuing"
+    done
+  fi
+
+  check_prs_for_conflicts
+}
+
+# Open PRs go stale as other work lands on main. Rather than let them silently
+# rot until the owner notices at merge time, each poll also checks every open
+# claude/* PR for conflicts and has Claude rebase+resolve them - same
+# throwaway-worktree, PR-not-auto-merge safety model as new feature work.
+check_prs_for_conflicts() {
+  local conflicted
+  conflicted=$(gh pr list -R "$REPO" --state open --json number,headRefName,mergeable \
+    --jq '.[] | select(.headRefName | startswith("claude/")) | select(.mergeable == "CONFLICTING") | "\(.number)\t\(.headRefName)"')
+
+  if [ -z "$conflicted" ]; then
+    return
+  fi
+
+  echo "$conflicted" | while IFS=$'\t' read -r pr_number branch; do
+    resolve_conflict "$pr_number" "$branch" || echo "[feature-request-worker] FAILED resolving conflicts on PR #$pr_number, continuing"
   done
+}
+
+resolve_conflict() {
+  local pr_number="$1" branch="$2"
+  local worktree="$WORKTREES_DIR/${branch#claude/}"
+
+  echo "[feature-request-worker] PR #$pr_number ($branch) has conflicts with main, attempting to resolve"
+
+  if [ ! -d "$worktree" ]; then
+    git worktree add "$worktree" "$branch"
+  fi
+
+  git -C "$worktree" fetch origin main
+
+  if git -C "$worktree" rebase origin/main; then
+    echo "[feature-request-worker] PR #$pr_number rebased with no actual conflicts (GitHub's status was stale)"
+  else
+    (
+      cd "$worktree"
+      claude -p "This repository is mid-rebase (git rebase onto main), stopped on conflicts. Examine each conflicted file, merge both sides' intended changes correctly (do not just pick one side blindly), run the test suite and linter, then 'git add' the resolved files and 'git rebase --continue' until the rebase completes. If any conflict cannot be resolved correctly, run 'git rebase --abort' and explain why in your final output instead of leaving something broken committed." --dangerously-skip-permissions
+    ) || true
+  fi
+
+  if [ -n "$(git -C "$worktree" status --porcelain)" ] || [ -d "$worktree/.git/rebase-merge" ] || [ -d "$worktree/.git/rebase-apply" ]; then
+    echo "[feature-request-worker] PR #$pr_number worktree still dirty/mid-rebase after resolution attempt, not pushing"
+    gh pr comment "$pr_number" -R "$REPO" --body "Automatic conflict resolution didn't finish cleanly - needs manual attention at \`$worktree\` on the worker machine."
+    return
+  fi
+
+  git -C "$worktree" push --force-with-lease origin "$branch"
+  gh pr comment "$pr_number" -R "$REPO" --body "Rebased onto main and resolved conflicts automatically."
+  echo "[feature-request-worker] PR #$pr_number rebased and pushed cleanly"
 }
 
 if [ "${1:-}" = "--once" ]; then
