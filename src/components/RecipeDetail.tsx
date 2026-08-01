@@ -9,6 +9,7 @@ import { OWNER_USER_ID } from '../lib/admin'
 import { ApiError, apiFetch } from '../lib/api'
 import { useWakeLock } from '../hooks/useWakeLock'
 import { useFavorites } from '../hooks/useFavorites'
+import { useCookedRecipes } from '../hooks/useCookedRecipes'
 import { useCollections } from '../hooks/useCollections'
 import { useRecentlyViewed } from '../hooks/useRecentlyViewed'
 import { useNote } from '../hooks/useNote'
@@ -37,6 +38,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
   const { recipe, loading: recipeLoading } = useRecipe(id)
   const { recipes: allRecipes } = useRecipes()
   const { favoriteSlugs, toggle: toggleFavorite } = useFavorites()
+  const { cookedSlugs, toggle: toggleCooked } = useCookedRecipes()
   const { collections, create: createCollection, addRecipe: addRecipeToCollection, removeRecipe: removeRecipeFromCollection } = useCollections()
   const [wizardOpen, setWizardOpen] = useState(false)
   const [wizardIndex, setWizardIndex] = useState(0)
@@ -661,6 +663,22 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                 </span>
               )}
             </div>
+
+            <button type="button"
+              onClick={() => id && toggleCooked(id)}
+              aria-pressed={!!id && cookedSlugs.has(id)}
+              className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${
+                id && cookedSlugs.has(id) ? 'text-herb' : 'text-cream/40 hover:text-cream/70'
+              }`}
+            >
+              <span>{id && cookedSlugs.has(id) ? '✅' : '🍳'}</span>
+              {id && cookedSlugs.has(id)
+                ? (lang === 'he' ? 'בישלתי את זה' : 'Made it')
+                : (lang === 'he' ? 'סמן כבושל' : 'Mark as cooked')}
+              {!!recipe.cookCount && (
+                <span className="text-cream/30 text-xs">({recipe.cookCount})</span>
+              )}
+            </button>
 
             {!!recipe.viewCount && (
               <span className="flex items-center gap-1 text-cream/30 text-xs">

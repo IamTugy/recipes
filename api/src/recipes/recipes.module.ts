@@ -6,6 +6,7 @@ import { Rating, RatingSchema } from '../ratings/schemas/rating.schema'
 import { RecipesService } from './recipes.service'
 import { RecipesController } from './recipes.controller'
 import { ActivityLogModule } from '../activity-log/activity-log.module'
+import { CookLogModule } from '../cook-log/cook-log.module'
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { ActivityLogModule } from '../activity-log/activity-log.module'
       { name: Rating.name, schema: RatingSchema },
     ]),
     ActivityLogModule,
+    CookLogModule,
   ],
   providers: [RecipesService],
   controllers: [RecipesController],

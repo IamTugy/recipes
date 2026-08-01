@@ -5,6 +5,7 @@ import { Recipe, RecipeDocument } from './schemas/recipe.schema'
 import { RecipeRevision, RecipeRevisionDocument } from './schemas/recipe-revision.schema'
 import { Rating, RatingDocument } from '../ratings/schemas/rating.schema'
 import { ActivityLogService } from '../activity-log/activity-log.service'
+import { CookLogService } from '../cook-log/cook-log.service'
 import { SaveRecipeDraftDto } from './dto/save-recipe-draft.dto'
 
 function slugify(text: string): string {
@@ -34,6 +35,7 @@ export class RecipesService {
     @InjectModel(RecipeRevision.name) private readonly revisionModel: Model<RecipeRevisionDocument>,
     @InjectModel(Rating.name) private readonly ratingModel: Model<RatingDocument>,
     private readonly activityLogService: ActivityLogService,
+    private readonly cookLogService: CookLogService,
   ) {}
 
   private async ratingsBySlug(slugs: string[]): Promise<Map<string, { avg: number; count: number }>> {
@@ -49,6 +51,7 @@ export class RecipesService {
     recipes: T[],
     ratings: Map<string, { avg: number; count: number }>,
     views: Map<string, number>,
+    cooks: Map<string, number>,
   ) {
     return recipes.map(recipe => {
       const rating = ratings.get(recipe.slug)
@@ -57,6 +60,7 @@ export class RecipesService {
         averageRating: rating ? Math.round(rating.avg * 10) / 10 : null,
         ratingCount: rating?.count ?? 0,
         viewCount: views.get(recipe.slug) ?? 0,
+        cookCount: cooks.get(recipe.slug) ?? 0,
       }
     })
   }
@@ -65,21 +69,23 @@ export class RecipesService {
     const recipes = await this.recipeModel.find({ hidden: { $ne: true }, status: 'published' }).exec()
     const plain = recipes.map(r => r.toObject())
     const slugs = plain.map(r => r.slug)
-    const [ratings, views] = await Promise.all([
+    const [ratings, views, cooks] = await Promise.all([
       this.ratingsBySlug(slugs),
       this.activityLogService.viewCountsBySlug(slugs),
+      this.cookLogService.countsBySlug(slugs),
     ])
-    return this.attachRatingsAndViews(plain, ratings, views)
+    return this.attachRatingsAndViews(plain, ratings, views, cooks)
   }
 
   async findBySlug(slug: string) {
     const recipe = await this.recipeModel.findOne({ slug, hidden: { $ne: true }, status: 'published' }).exec()
     if (!recipe) return null
-    const [ratings, views] = await Promise.all([
+    const [ratings, views, cooks] = await Promise.all([
       this.ratingsBySlug([slug]),
       this.activityLogService.viewCountsBySlug([slug]),
+      this.cookLogService.countsBySlug([slug]),
     ])
-    return this.attachRatingsAndViews([recipe.toObject()], ratings, views)[0]
+    return this.attachRatingsAndViews([recipe.toObject()], ratings, views, cooks)[0]
   }
 
   // Bypasses the published-only filter for the owner previewing their own
@@ -89,13 +95,14 @@ export class RecipesService {
     if (!recipe) return null
     if (recipe.status !== 'published' && recipe.ownerId !== userId && !isAdmin) return null
     if (recipe.status === 'published') {
-      const [ratings, views] = await Promise.all([
+      const [ratings, views, cooks] = await Promise.all([
         this.ratingsBySlug([slug]),
         this.activityLogService.viewCountsBySlug([slug]),
+        this.cookLogService.countsBySlug([slug]),
       ])
-      return this.attachRatingsAndViews([recipe.toObject()], ratings, views)[0]
+      return this.attachRatingsAndViews([recipe.toObject()], ratings, views, cooks)[0]
     }
-    return { ...recipe.toObject(), averageRating: null, ratingCount: 0, viewCount: 0 }
+    return { ...recipe.toObject(), averageRating: null, ratingCount: 0, viewCount: 0, cookCount: 0 }
   }
 
   async findMine(userId: string) {

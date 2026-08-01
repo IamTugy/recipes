@@ -12,6 +12,7 @@ import { CollectionsModule } from './collections/collections.module'
 import { UploadsModule } from './uploads/uploads.module'
 import { FeatureRequestsModule } from './feature-requests/feature-requests.module'
 import { TranslationsModule } from './translations/translations.module'
+import { CookLogModule } from './cook-log/cook-log.module'
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { TranslationsModule } from './translations/translations.module'
     UploadsModule,
     FeatureRequestsModule,
     TranslationsModule,
+    CookLogModule,
   ],
   controllers: [HealthController],
 })

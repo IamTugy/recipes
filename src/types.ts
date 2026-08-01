@@ -67,6 +67,7 @@ export interface Recipe {
   averageRating?: number | null
   ratingCount?: number
   viewCount?: number
+  cookCount?: number
   createdAt?: string
   ownerId?: string
   status?: 'draft' | 'pending_review' | 'published' | 'rejected'

@@ -6,10 +6,15 @@ import { Recipe } from './schemas/recipe.schema'
 import { RecipeRevision } from './schemas/recipe-revision.schema'
 import { Rating } from '../ratings/schemas/rating.schema'
 import { ActivityLogService } from '../activity-log/activity-log.service'
+import { CookLogService } from '../cook-log/cook-log.service'
 
 describe('RecipesService', () => {
   function makeActivityLog(viewCounts: Map<string, number> = new Map()) {
     return { viewCountsBySlug: jest.fn().mockResolvedValue(viewCounts) }
+  }
+
+  function makeCookLog(cookCounts: Map<string, number> = new Map()) {
+    return { countsBySlug: jest.fn().mockResolvedValue(cookCounts) }
   }
 
   async function makeService(
@@ -17,6 +22,7 @@ describe('RecipesService', () => {
     revisionModel: Record<string, unknown> = {},
     ratingModel: Record<string, unknown> = { aggregate: jest.fn().mockResolvedValue([]) },
     activityLog = makeActivityLog(),
+    cookLog = makeCookLog(),
   ) {
     const moduleRef = await Test.createTestingModule({
       providers: [
@@ -25,6 +31,7 @@ describe('RecipesService', () => {
         { provide: getModelToken(RecipeRevision.name), useValue: revisionModel },
         { provide: getModelToken(Rating.name), useValue: ratingModel },
         { provide: ActivityLogService, useValue: activityLog },
+        { provide: CookLogService, useValue: cookLog },
       ],
     }).compile()
     return moduleRef.get(RecipesService)
@@ -51,7 +58,7 @@ describe('RecipesService', () => {
     const result = await service.findAll()
 
     expect(find).toHaveBeenCalledWith({ hidden: { $ne: true }, status: 'published' })
-    expect(result).toEqual([{ slug: 'a', averageRating: null, ratingCount: 0, viewCount: 0 }])
+    expect(result).toEqual([{ slug: 'a', averageRating: null, ratingCount: 0, viewCount: 0, cookCount: 0 }])
   })
 
   it('findAll attaches averageRating, ratingCount, and viewCount', async () => {
@@ -72,7 +79,7 @@ describe('RecipesService', () => {
     const result = await service.findBySlug('a')
 
     expect(findOne).toHaveBeenCalledWith({ slug: 'a', hidden: { $ne: true }, status: 'published' })
-    expect(result).toEqual({ slug: 'a', averageRating: 3, ratingCount: 1, viewCount: 7 })
+    expect(result).toEqual({ slug: 'a', averageRating: 3, ratingCount: 1, viewCount: 7, cookCount: 0 })
   })
 
   it('findBySlug excludes hidden or unpublished recipes', async () => {
