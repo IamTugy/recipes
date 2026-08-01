@@ -27,7 +27,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
   const navigate = useNavigate()
   const { lang } = useLanguage()
   const tx = t[lang]
-  const { recipe } = useRecipe(id)
+  const { recipe, loading: recipeLoading } = useRecipe(id)
   const { recipes: allRecipes } = useRecipes()
   const { favoriteSlugs, toggle: toggleFavorite } = useFavorites()
   const { addRecent } = useRecentlyViewed()
@@ -91,6 +91,10 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
   useEffect(() => {
     if (recipe) addRecent(recipe.id)
   }, [recipe, addRecent])
+
+  if (recipeLoading) {
+    return <div className="min-h-screen bg-bg pt-14" />
+  }
 
   if (!recipe) {
     return (
