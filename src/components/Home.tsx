@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import type { Category, Difficulty } from '../types'
 import { useRecipes, useTrending } from '../hooks/useRecipes'
 import { useFavorites } from '../hooks/useFavorites'
@@ -17,9 +17,18 @@ type SortOption = 'default' | 'rating' | 'quickest'
 
 export default function Home() {
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const { lang } = useLanguage()
   const tx = t[lang]
-  const [search, setSearch] = useState('')
+  const [search, setSearch] = useState(() => searchParams.get('tag') ?? '')
+
+  // Consume the ?tag= param once on load (clicking a tag elsewhere seeds the search box)
+  useEffect(() => {
+    if (searchParams.get('tag')) {
+      setSearchParams({}, { replace: true })
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const [activeCategory, setActiveCategory] = useState<Category | null>(null)
   const [activeDifficulty, setActiveDifficulty] = useState<Difficulty | null>(null)
   const { recipes, loading, error } = useRecipes()

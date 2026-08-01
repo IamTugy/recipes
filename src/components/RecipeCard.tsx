@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import type { Recipe } from '../types'
 import { formatTime } from '../utils/format'
@@ -22,6 +22,7 @@ const difficultyColor = {
 }
 
 export default function RecipeCard({ recipe, index, searchQuery, isFavorite, onToggleFavorite }: RecipeCardProps) {
+  const navigate = useNavigate()
   const { lang } = useLanguage()
   const tx = t[lang]
   const totalTime = recipe.prepTime + recipe.cookTime
@@ -137,7 +138,13 @@ export default function RecipeCard({ recipe, index, searchQuery, isFavorite, onT
             {displayTags.length > 0 && (
               <div className="flex flex-wrap gap-1 mt-2.5">
                 {displayTags.slice(0, 3).map(tag => (
-                  <span key={tag} className="tag text-[9px] px-2 py-0.5">{tag}</span>
+                  <button
+                    key={tag}
+                    onClick={e => { e.preventDefault(); e.stopPropagation(); navigate(`/?tag=${encodeURIComponent(tag)}`) }}
+                    className="tag text-[9px] px-2 py-0.5 hover:text-amber transition-colors"
+                  >
+                    {tag}
+                  </button>
                 ))}
               </div>
             )}

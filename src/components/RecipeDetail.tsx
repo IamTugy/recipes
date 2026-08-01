@@ -608,7 +608,13 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
         {recipe.tags.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-2">
             {(lang === 'he' ? recipe.tags : (recipe.tagsEn ?? recipe.tags)).map(tag => (
-              <span key={tag} className="tag">{tag}</span>
+              <button
+                key={tag}
+                onClick={() => navigate(`/?tag=${encodeURIComponent(tag)}`)}
+                className="tag hover:text-amber transition-colors"
+              >
+                {tag}
+              </button>
             ))}
           </div>
         )}
