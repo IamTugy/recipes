@@ -66,6 +66,8 @@ export default function App() {
         onRemove={shoppingList.remove}
         onClearChecked={shoppingList.clearChecked}
         onClearAll={shoppingList.clear}
+        lastCleared={shoppingList.lastCleared}
+        onUndoClear={shoppingList.undoClear}
       />
       <ScrollToTopButton raised={timers.length > 0} />
     </div>

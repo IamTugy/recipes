@@ -11,10 +11,12 @@ interface ShoppingListPanelProps {
   onRemove: (id: string) => void
   onClearChecked: () => void
   onClearAll: () => void
+  lastCleared: ShoppingListItem[] | null
+  onUndoClear: () => void
 }
 
 export default function ShoppingListPanel({
-  open, onClose, items, onToggle, onRemove, onClearChecked, onClearAll,
+  open, onClose, items, onToggle, onRemove, onClearChecked, onClearAll, lastCleared, onUndoClear,
 }: ShoppingListPanelProps) {
   const { lang } = useLanguage()
   const [copied, setCopied] = useState(false)
@@ -60,6 +62,19 @@ export default function ShoppingListPanel({
                 </svg>
               </button>
             </div>
+
+            {lastCleared && lastCleared.length > 0 && (
+              <div className="flex items-center justify-between gap-2 px-5 py-2 bg-amber/10 border-b border-amber/20 text-xs">
+                <span className="text-cream/70">
+                  {lang === 'he'
+                    ? `${lastCleared.length} פריטים הוסרו`
+                    : `${lastCleared.length} item${lastCleared.length === 1 ? '' : 's'} removed`}
+                </span>
+                <button onClick={onUndoClear} className="font-semibold text-amber hover:text-amber/80 transition-colors">
+                  {lang === 'he' ? 'בטל' : 'Undo'}
+                </button>
+              </div>
+            )}
 
             <div className="flex-1 overflow-y-auto px-5 py-4">
               {items.length === 0 ? (
