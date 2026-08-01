@@ -70,19 +70,27 @@ export default function Home() {
     if (search.trim()) {
       const q = search.toLowerCase()
       list = list.filter(r => {
+        const hasIngredient = r.ingredients.some(group =>
+          group.items.some(item => {
+            const name = lang === 'en' ? (item.nameEn ?? item.name) : item.name
+            return name.toLowerCase().includes(q)
+          })
+        )
         if (lang === 'en') {
           return (
             r.title.toLowerCase().includes(q) ||
             (r.descriptionEn ?? r.description).toLowerCase().includes(q) ||
             (r.tagsEn ?? r.tags).some(t => t.toLowerCase().includes(q)) ||
-            (r.cuisine?.toLowerCase().includes(q))
+            (r.cuisine?.toLowerCase().includes(q)) ||
+            hasIngredient
           )
         }
         return (
           (r.titleHe ?? r.title).toLowerCase().includes(q) ||
           r.description.toLowerCase().includes(q) ||
           r.tags.some(t => t.toLowerCase().includes(q)) ||
-          (r.cuisine?.toLowerCase().includes(q))
+          (r.cuisine?.toLowerCase().includes(q)) ||
+          hasIngredient
         )
       })
     }
