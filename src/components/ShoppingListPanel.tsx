@@ -21,8 +21,20 @@ export default function ShoppingListPanel({
   const { lang } = useLanguage()
   const [copied, setCopied] = useState(false)
 
+  const groups = new Map<string, ShoppingListItem[]>()
+  for (const item of items) {
+    const group = groups.get(item.recipeTitle) ?? []
+    group.push(item)
+    groups.set(item.recipeTitle, group)
+  }
+
   async function copyAsText() {
-    const text = items.map(item => `- ${item.amount ? `${item.amount} ` : ''}${item.name}`).join('\n')
+    const text = [...groups.entries()]
+      .map(([recipeTitle, groupItems]) => {
+        const lines = groupItems.map(item => `- ${item.amount ? `${item.amount} ` : ''}${item.name}`).join('\n')
+        return `${recipeTitle}\n${lines}`
+      })
+      .join('\n\n')
     try {
       await navigator.clipboard.writeText(text)
       setCopied(true)
@@ -83,41 +95,47 @@ export default function ShoppingListPanel({
                   {lang === 'he' ? 'הרשימה ריקה' : 'Your shopping list is empty'}
                 </p>
               ) : (
-                <ul className="space-y-1.5">
-                  {items.map(item => (
-                    <li
-                      key={item.id}
-                      className="flex items-center gap-3 group py-1.5 border-b border-tint/[0.04] last:border-0"
-                    >
-                      <button type="button"
-                        onClick={() => onToggle(item.id)}
-                        aria-label={item.checked
-                          ? (lang === 'he' ? 'סמן כלא נאסף' : 'Mark as not collected')
-                          : (lang === 'he' ? 'סמן כנאסף' : 'Mark as collected')}
-                        className={`shrink-0 h-8 w-8 sm:h-5 sm:w-5 rounded-md border flex items-center justify-center transition-colors ${
-                          item.checked ? 'bg-herb border-herb text-white' : 'border-tint/20 text-transparent'
-                        }`}
-                      >
-                        {item.checked && '✓'}
-                      </button>
-                      <div className="flex-1 min-w-0">
-                        <p className={`text-sm ${item.checked ? 'text-cream/30 line-through' : 'text-cream/85'}`}>
-                          {item.amount ? `${item.amount} ` : ''}{item.name}
-                        </p>
-                        <p className="text-[11px] text-cream/25 truncate">{item.recipeTitle}</p>
-                      </div>
-                      <button type="button"
-                        onClick={() => onRemove(item.id)}
-                        aria-label={lang === 'he' ? 'הסר פריט' : 'Remove item'}
-                        className="shrink-0 h-8 w-8 sm:h-6 sm:w-6 flex items-center justify-center rounded text-cream/30 sm:text-cream/20 hover:text-red-400 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
-                      >
-                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    </li>
+                <div className="space-y-5">
+                  {[...groups.entries()].map(([recipeTitle, groupItems]) => (
+                    <div key={recipeTitle}>
+                      <h3 className="text-[11px] font-semibold uppercase tracking-wider text-cream/30 mb-1.5 truncate">
+                        {recipeTitle}
+                      </h3>
+                      <ul className="space-y-1.5">
+                        {groupItems.map(item => (
+                          <li
+                            key={item.id}
+                            className="flex items-center gap-3 group py-1.5 border-b border-tint/[0.04] last:border-0"
+                          >
+                            <button type="button"
+                              onClick={() => onToggle(item.id)}
+                              aria-label={item.checked
+                                ? (lang === 'he' ? 'סמן כלא נאסף' : 'Mark as not collected')
+                                : (lang === 'he' ? 'סמן כנאסף' : 'Mark as collected')}
+                              className={`shrink-0 h-8 w-8 sm:h-5 sm:w-5 rounded-md border flex items-center justify-center transition-colors ${
+                                item.checked ? 'bg-herb border-herb text-white' : 'border-tint/20 text-transparent'
+                              }`}
+                            >
+                              {item.checked && '✓'}
+                            </button>
+                            <p className={`flex-1 min-w-0 text-sm truncate ${item.checked ? 'text-cream/30 line-through' : 'text-cream/85'}`}>
+                              {item.amount ? `${item.amount} ` : ''}{item.name}
+                            </p>
+                            <button type="button"
+                              onClick={() => onRemove(item.id)}
+                              aria-label={lang === 'he' ? 'הסר פריט' : 'Remove item'}
+                              className="shrink-0 h-8 w-8 sm:h-6 sm:w-6 flex items-center justify-center rounded text-cream/30 sm:text-cream/20 hover:text-red-400 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
+                            >
+                              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   ))}
-                </ul>
+                </div>
               )}
             </div>
 
