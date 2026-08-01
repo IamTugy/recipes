@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import RecipePlaceholder from './RecipePlaceholder'
+import RecipeDetailSkeleton from './RecipeDetailSkeleton'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useRecipe, useRecipes } from '../hooks/useRecipes'
@@ -93,7 +94,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
   }, [recipe, addRecent])
 
   if (recipeLoading) {
-    return <div className="min-h-screen bg-bg pt-14" />
+    return <RecipeDetailSkeleton />
   }
 
   if (!recipe) {
