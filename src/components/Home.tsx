@@ -109,7 +109,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-dvh bg-bg pt-14">
+    <div className="print:hidden min-h-dvh bg-bg pt-14">
 
       {/* Search + categories */}
       <div className="max-w-6xl mx-auto px-6 pt-10 pb-6">

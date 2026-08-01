@@ -46,7 +46,27 @@ export default function ShoppingListPanel({
   }
 
   return (
-    <AnimatePresence>
+    <>
+      {items.length > 0 && (
+        <div className="hidden print:block">
+          <h1 className="text-xl font-bold mb-4">{lang === 'he' ? 'רשימת קניות' : 'Shopping List'}</h1>
+          <div className="space-y-4">
+            {[...groups.entries()].map(([recipeTitle, groupItems]) => (
+              <div key={recipeTitle}>
+                <h2 className="text-sm font-semibold uppercase tracking-wider mb-1">{recipeTitle}</h2>
+                <ul className="space-y-1">
+                  {groupItems.map(item => (
+                    <li key={item.id} className="text-sm">
+                      ☐ {item.amount ? `${item.amount} ` : ''}{item.name}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      <AnimatePresence>
       {open && (
         <>
           <motion.div
@@ -147,11 +167,16 @@ export default function ShoppingListPanel({
 
             {items.length > 0 && (
               <div className="px-5 py-3 border-t border-tint/[0.06] space-y-2">
-                <button type="button" onClick={copyAsText} className="btn-ghost text-xs w-full">
-                  {copied
-                    ? (lang === 'he' ? 'הועתק!' : 'Copied!')
-                    : (lang === 'he' ? 'העתק כטקסט' : 'Copy as text')}
-                </button>
+                <div className="flex items-center gap-2">
+                  <button type="button" onClick={copyAsText} className="btn-ghost text-xs flex-1">
+                    {copied
+                      ? (lang === 'he' ? 'הועתק!' : 'Copied!')
+                      : (lang === 'he' ? 'העתק כטקסט' : 'Copy as text')}
+                  </button>
+                  <button type="button" onClick={() => window.print()} className="btn-ghost text-xs flex-1">
+                    {lang === 'he' ? 'הדפס' : 'Print'}
+                  </button>
+                </div>
                 <div className="flex items-center gap-2">
                   <button type="button" onClick={onClearChecked} className="btn-ghost text-xs flex-1">
                     {lang === 'he' ? 'נקה מסומנים' : 'Clear checked'}
@@ -165,6 +190,7 @@ export default function ShoppingListPanel({
           </motion.div>
         </>
       )}
-    </AnimatePresence>
+      </AnimatePresence>
+    </>
   )
 }
