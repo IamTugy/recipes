@@ -13,6 +13,7 @@ import { UploadsModule } from './uploads/uploads.module'
 import { FeatureRequestsModule } from './feature-requests/feature-requests.module'
 import { TranslationsModule } from './translations/translations.module'
 import { CookLogModule } from './cook-log/cook-log.module'
+import { MealPlanModule } from './meal-plan/meal-plan.module'
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { CookLogModule } from './cook-log/cook-log.module'
     FeatureRequestsModule,
     TranslationsModule,
     CookLogModule,
+    MealPlanModule,
   ],
   controllers: [HealthController],
 })

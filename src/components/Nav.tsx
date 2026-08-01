@@ -52,6 +52,18 @@ export default function Nav({ shoppingListCount, onOpenShoppingList }: NavProps)
             </svg>
           </button>
 
+          {/* Meal plan */}
+          <button type="button"
+            onClick={() => navigate('/meal-plan')}
+            className="h-10 w-10 sm:h-7 sm:w-7 flex items-center justify-center rounded-lg text-cream/40 hover:text-cream/70 border border-tint/10 hover:bg-tint/[0.05] transition-colors"
+            title={lang === 'he' ? 'תוכנית ארוחות' : 'Meal plan'}
+            aria-label={lang === 'he' ? 'תוכנית ארוחות' : 'Meal plan'}
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </button>
+
           {/* Theme cycle: light -> dark -> system */}
           <button type="button"
             onClick={cycleTheme}
