@@ -12,6 +12,13 @@ import RecipeStrip from './RecipeStrip'
 const categories: Category[] = ['breakfast', 'lunch', 'dinner', 'dessert', 'salad', 'soup', 'snack', 'bread', 'sauce']
 const difficulties: Difficulty[] = ['easy', 'medium', 'hard']
 
+const dietaryFilters = [
+  { key: 'vegetarian', label: { en: 'Vegetarian', he: 'צמחוני' }, keywords: ['vegetarian', 'צמחוני'] },
+  { key: 'vegan', label: { en: 'Vegan', he: 'טבעוני' }, keywords: ['vegan', 'טבעוני'] },
+  { key: 'gluten-free', label: { en: 'Gluten-free', he: 'ללא גלוטן' }, keywords: ['gluten-free', 'gluten free', 'ללא גלוטן'] },
+  { key: 'dairy-free', label: { en: 'Dairy-free', he: 'ללא חלב' }, keywords: ['dairy-free', 'dairy free', 'ללא חלב', 'ללא מוצרי חלב'] },
+] as const
+
 type SortOption = 'default' | 'rating' | 'quickest' | 'newest'
 
 export default function Home() {
@@ -30,6 +37,7 @@ export default function Home() {
   }, [])
   const [activeCategory, setActiveCategory] = useState<Category | null>(null)
   const [activeDifficulty, setActiveDifficulty] = useState<Difficulty | null>(null)
+  const [activeDietary, setActiveDietary] = useState<string | null>(null)
   const { recipes, loading, error } = useRecipes()
   const { favoriteSlugs, toggle: toggleFavorite } = useFavorites()
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false)
@@ -61,6 +69,15 @@ export default function Home() {
     if (showFavoritesOnly) list = list.filter(r => favoriteSlugs.has(r.id))
     if (activeCategory) list = list.filter(r => r.category === activeCategory)
     if (activeDifficulty) list = list.filter(r => r.difficulty === activeDifficulty)
+    if (activeDietary) {
+      const filter = dietaryFilters.find(f => f.key === activeDietary)
+      if (filter) {
+        list = list.filter(r => {
+          const allTags = [...r.tags, ...(r.tagsEn ?? [])].map(t => t.toLowerCase())
+          return filter.keywords.some(k => allTags.some(tag => tag.includes(k.toLowerCase())))
+        })
+      }
+    }
     if (search.trim()) {
       const q = search.toLowerCase()
       list = list.filter(r => {
@@ -96,7 +113,7 @@ export default function Home() {
       list = [...list].sort((a, b) => (b.createdAt ?? '').localeCompare(a.createdAt ?? ''))
     }
     return list
-  }, [search, activeCategory, activeDifficulty, lang, recipes, showFavoritesOnly, favoriteSlugs, sortBy])
+  }, [search, activeCategory, activeDifficulty, activeDietary, lang, recipes, showFavoritesOnly, favoriteSlugs, sortBy])
 
   function surpriseMe() {
     if (filtered.length === 0) return
@@ -205,7 +222,26 @@ export default function Home() {
         </div>
       </div>
 
-      {!loading && !search && !activeCategory && !activeDifficulty && !showFavoritesOnly && (
+      {/* Dietary filter */}
+      <div className="max-w-6xl mx-auto px-6 mb-6">
+        <div className="flex gap-1.5 flex-wrap">
+          {dietaryFilters.map(f => (
+            <button type="button"
+              key={f.key}
+              onClick={() => setActiveDietary(f.key === activeDietary ? null : f.key)}
+              className={`px-3 py-1.5 text-[11px] tracking-wider font-medium transition-colors rounded-lg border ${
+                activeDietary === f.key
+                  ? 'text-amber bg-amber/10 border-amber/20'
+                  : 'text-cream/35 hover:text-cream/60 border-tint/10'
+              }`}
+            >
+              {f.label[lang]}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {!loading && !search && !activeCategory && !activeDifficulty && !activeDietary && !showFavoritesOnly && (
         <>
           <RecipeStrip title={lang === 'he' ? '🔥 פופולרי השבוע' : '🔥 Trending this week'} recipes={trending} />
         </>
@@ -215,7 +251,7 @@ export default function Home() {
       <div className="max-w-6xl mx-auto px-6 pb-24">
         <div className="flex items-center justify-between mb-5">
           <p className="text-cream/25 text-xs tracking-wider">
-            {(search || activeCategory || activeDifficulty || showFavoritesOnly)
+            {(search || activeCategory || activeDifficulty || activeDietary || showFavoritesOnly)
               ? `${filtered.length} / ${recipes.length}`
               : `${recipes.length}`
             }
