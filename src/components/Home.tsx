@@ -127,6 +127,7 @@ export default function Home() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder={tx.searchPlaceholder}
+              aria-label={tx.searchPlaceholder}
               className={`input-field ${lang === 'he' ? 'pr-11 text-right' : 'pl-11'} w-full`}
               dir={lang === 'he' ? 'rtl' : 'ltr'}
             />

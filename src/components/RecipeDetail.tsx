@@ -379,6 +379,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                   value={customInput}
                   onChange={e => handleCustomInput(e.target.value)}
                   placeholder={lang === 'he' ? 'מנות' : 'qty'}
+                  aria-label={lang === 'he' ? 'מספר מנות מותאם אישית' : 'Custom number of servings'}
                   className="w-14 bg-transparent text-cream text-sm text-center outline-none placeholder-cream/30"
                   dir="ltr"
                 />
@@ -625,7 +626,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
         {/* Personal notes */}
         <div className="print:hidden mt-8 card p-5">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="font-serif text-lg font-bold text-cream flex items-center gap-2">
+            <h2 id="my-notes-heading" className="font-serif text-lg font-bold text-cream flex items-center gap-2">
               <span>📝</span> {lang === 'he' ? 'ההערות שלי' : 'My Notes'}
             </h2>
             {noteStatus !== 'idle' && (
@@ -635,6 +636,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
             )}
           </div>
           <textarea
+            aria-labelledby="my-notes-heading"
             value={noteInput}
             onChange={e => setNoteInput(e.target.value)}
             onBlur={() => saveNote(noteInput)}
