@@ -6,6 +6,7 @@ import { useRecipe, useRecipes } from '../hooks/useRecipes'
 import { useWakeLock } from '../hooks/useWakeLock'
 import { useFavorites } from '../hooks/useFavorites'
 import { useRecentlyViewed } from '../hooks/useRecentlyViewed'
+import { useNote } from '../hooks/useNote'
 import { useAuth } from '@clerk/react'
 import { formatTime, formatSeconds, scaleAmount } from '../utils/format'
 import { t, categoryEmoji, heUnit } from '../i18n'
@@ -30,6 +31,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
   const { recipes: allRecipes } = useRecipes()
   const { favoriteSlugs, toggle: toggleFavorite } = useFavorites()
   const { addRecent } = useRecentlyViewed()
+  const { text: savedNote, save: saveNote, status: noteStatus } = useNote(id)
   const { getToken } = useAuth()
 
   const [multiplier, setMultiplier] = useState(1)
@@ -37,7 +39,13 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
   const [checkedSteps, setCheckedSteps] = useState<Set<string>>(new Set())
   const [userRating, setUserRating] = useState<number | null>(null)
   const [shareState, setShareState] = useState<'idle' | 'copied'>('idle')
+  const [noteInput, setNoteInput] = useState('')
   const cookMode = useWakeLock()
+
+  // Sync the textarea once the saved note has loaded for this recipe
+  useEffect(() => {
+    setNoteInput(savedNote)
+  }, [savedNote])
 
   async function rate(score: number) {
     setUserRating(score)
@@ -542,6 +550,29 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
             ))}
           </div>
         )}
+
+        {/* Personal notes */}
+        <div className="print:hidden mt-8 card p-5">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="font-serif text-lg font-bold text-cream flex items-center gap-2">
+              <span>📝</span> {lang === 'he' ? 'ההערות שלי' : 'My Notes'}
+            </h2>
+            {noteStatus !== 'idle' && (
+              <span className="text-xs text-cream/30">
+                {noteStatus === 'saving' ? (lang === 'he' ? 'שומר...' : 'Saving...') : (lang === 'he' ? 'נשמר' : 'Saved')}
+              </span>
+            )}
+          </div>
+          <textarea
+            value={noteInput}
+            onChange={e => setNoteInput(e.target.value)}
+            onBlur={() => saveNote(noteInput)}
+            placeholder={lang === 'he' ? 'הוסף הערה פרטית למתכון הזה...' : 'Add a private note for this recipe...'}
+            rows={3}
+            className="w-full bg-tint/[0.03] border border-tint/10 rounded-lg p-3 text-sm text-cream/80 placeholder-cream/25 outline-none focus:border-amber/30 transition-colors resize-none"
+            dir={lang === 'he' ? 'rtl' : 'ltr'}
+          />
+        </div>
 
         {/* Related recipes */}
         {relatedRecipes.length > 0 && (
