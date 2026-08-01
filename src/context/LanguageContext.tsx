@@ -1,17 +1,6 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
+import { useState, useEffect, type ReactNode } from 'react'
 import type { Lang } from '../types'
-
-interface LanguageContextValue {
-  lang: Lang
-  setLang: (lang: Lang) => void
-  isHe: boolean
-}
-
-const LanguageContext = createContext<LanguageContextValue>({
-  lang: 'he',
-  setLang: () => {},
-  isHe: true,
-})
+import { LanguageContext } from './languageContextObject'
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>(() => {
@@ -34,8 +23,4 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       {children}
     </LanguageContext.Provider>
   )
-}
-
-export function useLanguage() {
-  return useContext(LanguageContext)
 }

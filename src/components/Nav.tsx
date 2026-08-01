@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { UserButton } from '@clerk/react'
-import { useLanguage } from '../context/LanguageContext'
-import { useTheme } from '../context/ThemeContext'
+import { useLanguage } from '../hooks/useLanguage'
+import { useTheme } from '../hooks/useTheme'
 
 interface NavProps {
   shoppingListCount: number

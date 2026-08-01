@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import type { Recipe } from '../types'
 import { formatTime } from '../utils/format'
 import { t, categoryEmoji } from '../i18n'
-import { useLanguage } from '../context/LanguageContext'
+import { useLanguage } from '../hooks/useLanguage'
 import Highlight from './Highlight'
 import RecipePlaceholder from './RecipePlaceholder'
 

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import type { Recipe } from '../types'
 import { categoryEmoji } from '../i18n'
-import { useLanguage } from '../context/LanguageContext'
+import { useLanguage } from '../hooks/useLanguage'
 
 interface RecipeStripProps {
   title: string

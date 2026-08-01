@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { TimerState } from '../types'
 import { formatSeconds } from '../utils/format'
-import { useLanguage } from '../context/LanguageContext'
+import { useLanguage } from '../hooks/useLanguage'
 
 interface TimerPanelProps {
   timers: TimerState[]

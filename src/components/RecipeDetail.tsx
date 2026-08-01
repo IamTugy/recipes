@@ -11,7 +11,7 @@ import { useNote } from '../hooks/useNote'
 import { useAuth } from '@clerk/react'
 import { formatTime, formatSeconds, scaleAmount } from '../utils/format'
 import { t, categoryEmoji, heUnit } from '../i18n'
-import { useLanguage } from '../context/LanguageContext'
+import { useLanguage } from '../hooks/useLanguage'
 import type { TimerState } from '../types'
 
 interface RecipeDetailProps {
