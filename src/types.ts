@@ -66,6 +66,7 @@ export interface Recipe {
   tipsEn?: string[]      // English tips
   averageRating?: number | null
   ratingCount?: number
+  viewCount?: number
 }
 
 export interface TimerState {
