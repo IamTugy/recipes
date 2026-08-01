@@ -8,6 +8,7 @@ import { useLanguage } from '../hooks/useLanguage'
 
 interface RecipeFormProps {
   existing?: Recipe
+  duplicateFrom?: Recipe
 }
 
 const CATEGORIES: Category[] = ['breakfast', 'lunch', 'dinner', 'dessert', 'salad', 'soup', 'snack', 'bread', 'sauce']
@@ -21,32 +22,34 @@ function emptyStepGroup(): StepGroup {
   return { title: '', items: [{ instruction: '' }] }
 }
 
-export default function RecipeForm({ existing }: RecipeFormProps) {
+export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps) {
   const navigate = useNavigate()
   const { getToken } = useAuth()
   const { lang } = useLanguage()
   const tx = t[lang]
   const isEditing = !!existing
+  const prefill = existing ?? duplicateFrom
+  const titlePrefix = duplicateFrom ? (lang === 'he' ? 'העתק של ' : 'Copy of ') : ''
 
-  const [title, setTitle] = useState(existing?.title ?? '')
-  const [titleHe, setTitleHe] = useState(existing?.titleHe ?? '')
-  const [category, setCategory] = useState<Category>(existing?.category ?? 'dinner')
-  const [difficulty, setDifficulty] = useState<Difficulty>(existing?.difficulty ?? 'easy')
-  const [cuisine, setCuisine] = useState(existing?.cuisine ?? '')
-  const [image, setImage] = useState(existing?.image ?? '')
-  const [description, setDescription] = useState(existing?.description ?? '')
-  const [descriptionEn, setDescriptionEn] = useState(existing?.descriptionEn ?? '')
-  const [prepTime, setPrepTime] = useState(existing?.prepTime ?? 15)
-  const [cookTime, setCookTime] = useState(existing?.cookTime ?? 30)
-  const [servings, setServings] = useState(existing?.servings ?? 4)
-  const [tags, setTags] = useState((existing?.tags ?? []).join(', '))
-  const [tips, setTips] = useState((existing?.tips ?? []).join('\n'))
-  const [featured, setFeatured] = useState(existing?.featured ?? false)
+  const [title, setTitle] = useState(prefill ? `${titlePrefix}${prefill.title}` : '')
+  const [titleHe, setTitleHe] = useState(prefill?.titleHe ? `${titlePrefix}${prefill.titleHe}` : '')
+  const [category, setCategory] = useState<Category>(prefill?.category ?? 'dinner')
+  const [difficulty, setDifficulty] = useState<Difficulty>(prefill?.difficulty ?? 'easy')
+  const [cuisine, setCuisine] = useState(prefill?.cuisine ?? '')
+  const [image, setImage] = useState(prefill?.image ?? '')
+  const [description, setDescription] = useState(prefill?.description ?? '')
+  const [descriptionEn, setDescriptionEn] = useState(prefill?.descriptionEn ?? '')
+  const [prepTime, setPrepTime] = useState(prefill?.prepTime ?? 15)
+  const [cookTime, setCookTime] = useState(prefill?.cookTime ?? 30)
+  const [servings, setServings] = useState(prefill?.servings ?? 4)
+  const [tags, setTags] = useState((prefill?.tags ?? []).join(', '))
+  const [tips, setTips] = useState((prefill?.tips ?? []).join('\n'))
+  const [featured, setFeatured] = useState(prefill?.featured ?? false)
   const [ingredientGroups, setIngredientGroups] = useState<IngredientGroup[]>(
-    existing?.ingredients?.length ? existing.ingredients : [emptyIngredientGroup()]
+    prefill?.ingredients?.length ? prefill.ingredients : [emptyIngredientGroup()]
   )
   const [stepGroups, setStepGroups] = useState<StepGroup[]>(
-    existing?.steps?.length ? existing.steps : [emptyStepGroup()]
+    prefill?.steps?.length ? prefill.steps : [emptyStepGroup()]
   )
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -164,7 +167,9 @@ export default function RecipeForm({ existing }: RecipeFormProps) {
         <h1 className="font-serif text-2xl font-bold text-cream">
           {isEditing
             ? (lang === 'he' ? 'עריכת מתכון' : 'Edit Recipe')
-            : (lang === 'he' ? 'מתכון חדש' : 'New Recipe')}
+            : duplicateFrom
+              ? (lang === 'he' ? 'שכפול מתכון' : 'Duplicate Recipe')
+              : (lang === 'he' ? 'מתכון חדש' : 'New Recipe')}
         </h1>
 
         {error && (
