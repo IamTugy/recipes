@@ -18,19 +18,19 @@ export default function App() {
   const { isLoaded, isSignedIn } = useAuth()
 
   if (!isLoaded) {
-    return <div className="min-h-screen bg-bg" />
+    return <div className="min-h-dvh bg-bg" />
   }
 
   if (!isSignedIn) {
     return (
-      <div className="min-h-screen bg-bg flex items-center justify-center px-6">
+      <div className="min-h-dvh bg-bg flex items-center justify-center px-6">
         <SignIn />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-bg">
+    <div className="min-h-dvh bg-bg">
       <Nav
         shoppingListCount={shoppingList.items.length}
         onOpenShoppingList={() => setShoppingListOpen(true)}

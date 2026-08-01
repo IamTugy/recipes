@@ -1,6 +1,6 @@
 export default function RecipeDetailSkeleton() {
   return (
-    <div className="min-h-screen bg-bg pt-14 animate-pulse">
+    <div className="min-h-dvh bg-bg pt-14 animate-pulse">
       {/* Hero image */}
       <div className="h-64 sm:h-96 bg-tint/[0.06]" />
 

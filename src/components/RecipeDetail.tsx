@@ -99,7 +99,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
 
   if (!recipe) {
     return (
-      <div className="min-h-screen bg-bg flex items-center justify-center pt-14">
+      <div className="min-h-dvh bg-bg flex items-center justify-center pt-14">
         <div className="text-center">
           <p className="text-6xl mb-4">🍳</p>
           <p className="text-cream/60 text-lg">{tx.notFound}</p>
@@ -192,7 +192,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
   const stepNums = recipe.steps.map(g => g.items.map(() => ++_n))
 
   return (
-    <div className="min-h-screen bg-bg pt-14" dir={lang === 'he' ? 'rtl' : 'ltr'}>
+    <div className="min-h-dvh bg-bg pt-14" dir={lang === 'he' ? 'rtl' : 'ltr'}>
       {/* Hero image */}
       <div className="relative h-64 sm:h-96 overflow-hidden">
         {recipe.image.includes('assets.tugy.dev') ? (
