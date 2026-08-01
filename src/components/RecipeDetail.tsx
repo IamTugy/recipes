@@ -3,6 +3,7 @@ import RecipePlaceholder from './RecipePlaceholder'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useRecipe, useRecipes } from '../hooks/useRecipes'
+import { useWakeLock } from '../hooks/useWakeLock'
 import { useFavorites } from '../hooks/useFavorites'
 import { useRecentlyViewed } from '../hooks/useRecentlyViewed'
 import { useAuth } from '@clerk/react'
@@ -36,6 +37,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
   const [checkedSteps, setCheckedSteps] = useState<Set<string>>(new Set())
   const [userRating, setUserRating] = useState<number | null>(null)
   const [shareState, setShareState] = useState<'idle' | 'copied'>('idle')
+  const cookMode = useWakeLock()
 
   async function rate(score: number) {
     setUserRating(score)
@@ -385,7 +387,26 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
 
           {/* Steps */}
           <div className="sm:col-span-3">
-            <h2 className="font-serif text-xl font-bold text-cream mb-4">{tx.instructions}</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-serif text-xl font-bold text-cream">{tx.instructions}</h2>
+              {cookMode.supported && (
+                <button
+                  onClick={cookMode.toggle}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                    cookMode.active
+                      ? 'bg-amber/10 border-amber/30 text-amber'
+                      : 'border-tint/10 text-cream/40 hover:text-cream/70'
+                  }`}
+                  title={lang === 'he' ? 'שמור על המסך דלוק בזמן בישול' : 'Keeps your screen awake while cooking'}
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                  {lang === 'he' ? 'מצב בישול' : 'Cook Mode'}
+                </button>
+              )}
+            </div>
             <div className="space-y-6">
               {recipe.steps.map((group, gi) => {
                 const groupTitle = lang === 'he' ? group.title : (group.titleEn ?? group.title)
@@ -426,7 +447,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p
-                                  className={`text-sm leading-relaxed transition-colors ${
+                                  className={`leading-relaxed transition-colors ${cookMode.active ? 'text-base' : 'text-sm'} ${
                                     checked ? 'text-cream/40 line-through' : 'text-cream/80'
                                   }`}
                                   dir={lang === 'he' ? 'rtl' : 'ltr'}
