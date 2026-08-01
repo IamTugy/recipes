@@ -34,42 +34,6 @@ export default function Nav({ shoppingListCount, onOpenShoppingList }: NavProps)
         </button>
 
         <div className="flex items-center gap-0.5 sm:gap-2 shrink-0">
-          {/* New recipe */}
-          <button type="button"
-            onClick={() => navigate('/recipes/new')}
-            className="h-10 w-10 sm:h-7 sm:w-7 flex items-center justify-center rounded-lg text-cream/40 hover:text-cream/70 border border-tint/10 hover:bg-tint/[0.05] transition-colors"
-            title={lang === 'he' ? 'מתכון חדש' : 'New recipe'}
-            aria-label={lang === 'he' ? 'מתכון חדש' : 'New recipe'}
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
-            </svg>
-          </button>
-
-          {/* Collections */}
-          <button type="button"
-            onClick={() => navigate('/collections')}
-            className="h-10 w-10 sm:h-7 sm:w-7 flex items-center justify-center rounded-lg text-cream/40 hover:text-cream/70 border border-tint/10 hover:bg-tint/[0.05] transition-colors"
-            title={lang === 'he' ? 'האוספים שלי' : 'My collections'}
-            aria-label={lang === 'he' ? 'האוספים שלי' : 'My collections'}
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14-7H5a2 2 0 00-2 2v14l4-2 3 2 3-2 3 2 3-2V6a2 2 0 00-2-2z" />
-            </svg>
-          </button>
-
-          {/* Meal plan */}
-          <button type="button"
-            onClick={() => navigate('/meal-plan')}
-            className="h-10 w-10 sm:h-7 sm:w-7 flex items-center justify-center rounded-lg text-cream/40 hover:text-cream/70 border border-tint/10 hover:bg-tint/[0.05] transition-colors"
-            title={lang === 'he' ? 'תוכנית ארוחות' : 'Meal plan'}
-            aria-label={lang === 'he' ? 'תוכנית ארוחות' : 'Meal plan'}
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-          </button>
-
           {/* Theme cycle: light -> dark -> system */}
           <button type="button"
             onClick={cycleTheme}
@@ -144,6 +108,21 @@ export default function Nav({ shoppingListCount, onOpenShoppingList }: NavProps)
 
           <UserButton>
             <UserButton.MenuItems>
+              <UserButton.Action
+                label={lang === 'he' ? 'מתכון חדש' : 'New Recipe'}
+                labelIcon={<span>➕</span>}
+                onClick={() => navigate('/recipes/new')}
+              />
+              <UserButton.Action
+                label={lang === 'he' ? 'האוספים שלי' : 'My Collections'}
+                labelIcon={<span>📚</span>}
+                onClick={() => navigate('/collections')}
+              />
+              <UserButton.Action
+                label={lang === 'he' ? 'תוכנית ארוחות' : 'Meal Plan'}
+                labelIcon={<span>🗓️</span>}
+                onClick={() => navigate('/meal-plan')}
+              />
               <UserButton.Action
                 label={lang === 'he' ? 'בקשות לתכונות חדשות' : 'Feature Requests'}
                 labelIcon={<span>💡</span>}
