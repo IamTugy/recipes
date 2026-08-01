@@ -34,4 +34,13 @@ export class ActivityLogService {
 
     return aggregates.map(a => a._id)
   }
+
+  async viewCountsBySlug(recipeIds: string[]): Promise<Map<string, number>> {
+    const aggregates = (await this.activityLogModel.aggregate([
+      { $match: { action: 'recipe_viewed', recipeId: { $in: recipeIds } } },
+      { $group: { _id: '$recipeId', count: { $sum: 1 } } },
+    ])) as TrendingAggregate[]
+
+    return new Map(aggregates.map(a => [a._id, a.count]))
+  }
 }

@@ -42,4 +42,25 @@ describe('ActivityLogService', () => {
       { $limit: 6 },
     ]))
   })
+
+  it('viewCountsBySlug returns an all-time view count per recipeId', async () => {
+    const aggregate = jest.fn().mockResolvedValue([
+      { _id: 'a', count: 12 },
+      { _id: 'b', count: 4 },
+    ])
+    const moduleRef = await Test.createTestingModule({
+      providers: [ActivityLogService, { provide: getModelToken(ActivityLog.name), useValue: { aggregate } }],
+    }).compile()
+
+    const service = moduleRef.get(ActivityLogService)
+    const result = await service.viewCountsBySlug(['a', 'b', 'c'])
+
+    expect(result.get('a')).toBe(12)
+    expect(result.get('b')).toBe(4)
+    expect(result.get('c')).toBeUndefined()
+    expect(aggregate).toHaveBeenCalledWith([
+      { $match: { action: 'recipe_viewed', recipeId: { $in: ['a', 'b', 'c'] } } },
+      { $group: { _id: '$recipeId', count: { $sum: 1 } } },
+    ])
+  })
 })

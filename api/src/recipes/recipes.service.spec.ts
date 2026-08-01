@@ -3,9 +3,14 @@ import { getModelToken } from '@nestjs/mongoose'
 import { RecipesService } from './recipes.service'
 import { Recipe } from './schemas/recipe.schema'
 import { Rating } from '../ratings/schemas/rating.schema'
+import { ActivityLogService } from '../activity-log/activity-log.service'
 
 describe('RecipesService', () => {
-  it('findAll returns all non-hidden recipes with no ratings attached', async () => {
+  function makeActivityLog(viewCounts: Map<string, number> = new Map()) {
+    return { viewCountsBySlug: jest.fn().mockResolvedValue(viewCounts) }
+  }
+
+  it('findAll returns all non-hidden recipes with no ratings or views attached', async () => {
     const exec = jest.fn().mockResolvedValue([{ slug: 'a', toObject: () => ({ slug: 'a' }) }])
     const find = jest.fn().mockReturnValue({ exec })
     const aggregate = jest.fn().mockResolvedValue([])
@@ -14,6 +19,7 @@ describe('RecipesService', () => {
         RecipesService,
         { provide: getModelToken(Recipe.name), useValue: { find, findOne: jest.fn() } },
         { provide: getModelToken(Rating.name), useValue: { aggregate } },
+        { provide: ActivityLogService, useValue: makeActivityLog() },
       ],
     }).compile()
 
@@ -21,10 +27,10 @@ describe('RecipesService', () => {
     const result = await service.findAll()
 
     expect(find).toHaveBeenCalledWith({ hidden: { $ne: true } })
-    expect(result).toEqual([{ slug: 'a', averageRating: null, ratingCount: 0 }])
+    expect(result).toEqual([{ slug: 'a', averageRating: null, ratingCount: 0, viewCount: 0 }])
   })
 
-  it('findAll attaches averageRating and ratingCount from the ratings collection', async () => {
+  it('findAll attaches averageRating, ratingCount, and viewCount', async () => {
     const recipesExec = jest.fn().mockResolvedValue([{ slug: 'a', toObject: () => ({ slug: 'a' }) }])
     const find = jest.fn().mockReturnValue({ exec: recipesExec })
     const aggregate = jest.fn().mockResolvedValue([{ _id: 'a', avg: 4.5, count: 2 }])
@@ -33,16 +39,17 @@ describe('RecipesService', () => {
         RecipesService,
         { provide: getModelToken(Recipe.name), useValue: { find, findOne: jest.fn() } },
         { provide: getModelToken(Rating.name), useValue: { aggregate } },
+        { provide: ActivityLogService, useValue: makeActivityLog(new Map([['a', 42]])) },
       ],
     }).compile()
 
     const service = moduleRef.get(RecipesService)
     const result = await service.findAll()
 
-    expect(result[0]).toMatchObject({ slug: 'a', averageRating: 4.5, ratingCount: 2 })
+    expect(result[0]).toMatchObject({ slug: 'a', averageRating: 4.5, ratingCount: 2, viewCount: 42 })
   })
 
-  it('findBySlug returns the matching recipe with ratings attached', async () => {
+  it('findBySlug returns the matching recipe with ratings and views attached', async () => {
     const exec = jest.fn().mockResolvedValue({ slug: 'a', toObject: () => ({ slug: 'a' }) })
     const findOne = jest.fn().mockReturnValue({ exec })
     const aggregate = jest.fn().mockResolvedValue([{ _id: 'a', avg: 3, count: 1 }])
@@ -51,6 +58,7 @@ describe('RecipesService', () => {
         RecipesService,
         { provide: getModelToken(Recipe.name), useValue: { find: jest.fn(), findOne } },
         { provide: getModelToken(Rating.name), useValue: { aggregate } },
+        { provide: ActivityLogService, useValue: makeActivityLog(new Map([['a', 7]])) },
       ],
     }).compile()
 
@@ -58,7 +66,7 @@ describe('RecipesService', () => {
     const result = await service.findBySlug('a')
 
     expect(findOne).toHaveBeenCalledWith({ slug: 'a', hidden: { $ne: true } })
-    expect(result).toEqual({ slug: 'a', averageRating: 3, ratingCount: 1 })
+    expect(result).toEqual({ slug: 'a', averageRating: 3, ratingCount: 1, viewCount: 7 })
   })
 
   it('findBySlug excludes hidden recipes', async () => {
@@ -72,6 +80,7 @@ describe('RecipesService', () => {
         RecipesService,
         { provide: getModelToken(Recipe.name), useValue: { find: jest.fn(), findOne } },
         { provide: getModelToken(Rating.name), useValue: { aggregate: jest.fn() } },
+        { provide: ActivityLogService, useValue: makeActivityLog() },
       ],
     }).compile()
 
