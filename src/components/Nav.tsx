@@ -100,7 +100,15 @@ export default function Nav({ shoppingListCount, onOpenShoppingList }: NavProps)
             )}
           </button>
 
-          <UserButton />
+          <UserButton>
+            <UserButton.MenuItems>
+              <UserButton.Action
+                label={lang === 'he' ? 'בקשות לתכונות חדשות' : 'Feature Requests'}
+                labelIcon={<span>💡</span>}
+                onClick={() => navigate('/feature-requests')}
+              />
+            </UserButton.MenuItems>
+          </UserButton>
         </div>
       </div>
     </nav>

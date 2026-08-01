@@ -8,6 +8,7 @@ import RecipeDetail from './components/RecipeDetail'
 import CollectionsPage from './components/CollectionsPage'
 import NewRecipePage from './components/NewRecipePage'
 import EditRecipePage from './components/EditRecipePage'
+import FeatureRequestsPage from './components/FeatureRequestsPage'
 import TimerPanel from './components/TimerPanel'
 import ShoppingListPanel from './components/ShoppingListPanel'
 import ScrollToTopButton from './components/ScrollToTopButton'
@@ -60,6 +61,7 @@ export default function App() {
         <Route path="/collections" element={<CollectionsPage />} />
         <Route path="/recipes/new" element={<NewRecipePage />} />
         <Route path="/recipe/:id/edit" element={<EditRecipePage />} />
+        <Route path="/feature-requests" element={<FeatureRequestsPage />} />
         <Route
           path="/recipe/:id"
           element={

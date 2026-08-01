@@ -1,0 +1,117 @@
+import { useState } from 'react'
+import { useAuth } from '@clerk/react'
+import { useFeatureRequests } from '../hooks/useFeatureRequests'
+import { useLanguage } from '../hooks/useLanguage'
+
+const OWNER_USER_ID = 'user_3HHok7VTx8lyXObDglJRi71DU6C'
+
+export default function FeatureRequestsPage() {
+  const { lang } = useLanguage()
+  const { userId } = useAuth()
+  const { requests, loading, create, approve } = useFeatureRequests()
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const isOwner = userId === OWNER_USER_ID
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!title.trim() || !description.trim()) return
+    setSubmitting(true)
+    const ok = await create(title.trim(), description.trim())
+    setSubmitting(false)
+    if (ok) {
+      setTitle('')
+      setDescription('')
+    }
+  }
+
+  return (
+    <div className="print:hidden min-h-dvh bg-bg pt-20 pb-16 px-4">
+      <div className="max-w-2xl mx-auto">
+        <h1 className="font-serif text-2xl font-bold text-cream mb-2">
+          {lang === 'he' ? 'בקשות לתכונות חדשות' : 'Feature Requests'}
+        </h1>
+        <p className="text-sm text-cream/40 mb-6">
+          {lang === 'he'
+            ? 'יש לכם רעיון לתכונה שכדאי להוסיף? שתפו אותו כאן.'
+            : "Have an idea for something the app should do? Suggest it here."}
+        </p>
+
+        <form onSubmit={handleSubmit} className="card p-5 space-y-3 mb-8">
+          <input
+            value={title}
+            onChange={e => setTitle(e.target.value)}
+            placeholder={lang === 'he' ? 'כותרת קצרה' : 'Short title'}
+            maxLength={120}
+            required
+            className="w-full bg-tint/[0.03] border border-tint/10 rounded-lg px-3 py-2 text-sm text-cream/80 placeholder-cream/25 outline-none focus:border-amber/30 transition-colors"
+          />
+          <textarea
+            value={description}
+            onChange={e => setDescription(e.target.value)}
+            placeholder={lang === 'he' ? 'תארו את הרעיון...' : 'Describe the idea...'}
+            rows={4}
+            maxLength={2000}
+            required
+            className="w-full bg-tint/[0.03] border border-tint/10 rounded-lg px-3 py-2 text-sm text-cream/80 placeholder-cream/25 outline-none focus:border-amber/30 transition-colors resize-none"
+          />
+          <button type="submit"
+            disabled={submitting || !title.trim() || !description.trim()}
+            className="btn-primary disabled:opacity-50"
+          >
+            {submitting
+              ? (lang === 'he' ? 'שולח...' : 'Submitting...')
+              : (lang === 'he' ? 'שלח בקשה' : 'Submit request')}
+          </button>
+        </form>
+
+        {loading ? (
+          <p className="text-cream/30 text-sm">{lang === 'he' ? 'טוען...' : 'Loading...'}</p>
+        ) : requests.length === 0 ? (
+          <p className="text-cream/30 text-sm">
+            {lang === 'he' ? 'אין עדיין בקשות' : 'No requests yet'}
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {requests.map(r => {
+              const approved = r.labels.includes('approved-for-claude')
+              return (
+                <div key={r.number} className="card p-4">
+                  <div className="flex items-start justify-between gap-3 mb-1">
+                    <h2 className="font-serif text-base font-medium text-cream">{r.title}</h2>
+                    <span className={`shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                      approved ? 'bg-herb/10 text-herb' : r.state === 'closed' ? 'bg-tint/10 text-cream/30' : 'bg-amber/10 text-amber'
+                    }`}>
+                      {approved
+                        ? (lang === 'he' ? 'אושר' : 'Approved')
+                        : r.state === 'closed'
+                          ? (lang === 'he' ? 'סגור' : 'Closed')
+                          : (lang === 'he' ? 'ממתין' : 'Pending')}
+                    </span>
+                  </div>
+                  <p className="text-sm text-cream/60 whitespace-pre-wrap mb-2">
+                    {r.body.split('\n---\n')[0]}
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <a href={r.htmlUrl} target="_blank" rel="noreferrer" className="text-xs text-cream/30 hover:text-cream/60 transition-colors">
+                      {lang === 'he' ? 'צפה ב-GitHub' : 'View on GitHub'} #{r.number}
+                    </a>
+                    {isOwner && !approved && r.state === 'open' && (
+                      <button type="button"
+                        onClick={() => approve(r.number)}
+                        className="text-xs font-semibold text-amber hover:text-amber/80 transition-colors"
+                      >
+                        {lang === 'he' ? 'אשר לביצוע' : 'Approve for Claude'}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}

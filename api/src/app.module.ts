@@ -10,6 +10,7 @@ import { RatingsModule } from './ratings/ratings.module'
 import { NotesModule } from './notes/notes.module'
 import { CollectionsModule } from './collections/collections.module'
 import { UploadsModule } from './uploads/uploads.module'
+import { FeatureRequestsModule } from './feature-requests/feature-requests.module'
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { UploadsModule } from './uploads/uploads.module'
     NotesModule,
     CollectionsModule,
     UploadsModule,
+    FeatureRequestsModule,
   ],
   controllers: [HealthController],
 })
