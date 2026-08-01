@@ -42,6 +42,8 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
   const [userRating, setUserRating] = useState<number | null>(null)
   const [shareState, setShareState] = useState<'idle' | 'copied'>('idle')
   const [noteInput, setNoteInput] = useState('')
+  const [reviews, setReviews] = useState<{ score: number; comment: string; createdAt: string }[]>([])
+  const [reviewComment, setReviewComment] = useState('')
   const cookMode = useWakeLock()
 
   // Sync the textarea once the saved note has loaded for this recipe
@@ -49,7 +51,20 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
     setNoteInput(savedNote)
   }, [savedNote])
 
-  async function rate(score: number) {
+  async function loadReviews() {
+    const token = await getToken()
+    const res = await fetch(`/api/ratings/${id}/reviews`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+    if (res.ok) setReviews(await res.json())
+  }
+
+  useEffect(() => {
+    if (id) loadReviews()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id])
+
+  async function submitRating(score: number, comment?: string) {
     setUserRating(score)
     const token = await getToken()
     await fetch(`/api/ratings/${id}`, {
@@ -58,8 +73,19 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
         'Content-Type': 'application/json',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-      body: JSON.stringify({ score }),
+      body: JSON.stringify({ score, comment }),
     })
+    loadReviews()
+  }
+
+  function rate(score: number) {
+    submitRating(score)
+  }
+
+  function postReview() {
+    if (!userRating) return
+    submitRating(userRating, reviewComment.trim() || undefined)
+    setReviewComment('')
   }
 
   async function share() {
@@ -645,6 +671,61 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
             className="w-full bg-tint/[0.03] border border-tint/10 rounded-lg p-3 text-sm text-cream/80 placeholder-cream/25 outline-none focus:border-amber/30 transition-colors resize-none"
             dir={lang === 'he' ? 'rtl' : 'ltr'}
           />
+        </div>
+
+        {/* Reviews */}
+        <div className="print:hidden mt-8 card p-5">
+          <h2 id="reviews-heading" className="font-serif text-lg font-bold text-cream mb-3 flex items-center gap-2">
+            <span>💬</span> {lang === 'he' ? 'ביקורות' : 'Reviews'}
+          </h2>
+          <div className="flex flex-col gap-2 mb-4">
+            <textarea
+              aria-labelledby="reviews-heading"
+              value={reviewComment}
+              onChange={e => setReviewComment(e.target.value)}
+              placeholder={
+                userRating
+                  ? (lang === 'he' ? 'שתפו מה חשבתם על המתכון...' : 'Share your thoughts on this recipe...')
+                  : (lang === 'he' ? 'דרגו את המתכון בכוכבים כדי לכתוב ביקורת' : 'Rate the recipe with stars above to write a review')
+              }
+              rows={2}
+              maxLength={500}
+              disabled={!userRating}
+              className="w-full bg-tint/[0.03] border border-tint/10 rounded-lg p-3 text-sm text-cream/80 placeholder-cream/25 outline-none focus:border-amber/30 transition-colors resize-none disabled:opacity-50"
+              dir={lang === 'he' ? 'rtl' : 'ltr'}
+            />
+            <button type="button"
+              onClick={postReview}
+              disabled={!userRating || !reviewComment.trim()}
+              className="self-start px-4 py-1.5 rounded-lg text-xs font-semibold bg-amber/90 text-bg hover:bg-amber transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {lang === 'he' ? 'פרסם ביקורת' : 'Post review'}
+            </button>
+          </div>
+          {reviews.length > 0 ? (
+            <ul className="space-y-4">
+              {reviews.map((r, i) => (
+                <li key={i} className="border-t border-tint/[0.06] pt-3 first:border-t-0 first:pt-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-amber text-sm leading-none">
+                      {'★'.repeat(r.score)}
+                      <span className="text-cream/15">{'★'.repeat(5 - r.score)}</span>
+                    </span>
+                    <span className="text-cream/25 text-[11px]">
+                      {new Date(r.createdAt).toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-US')}
+                    </span>
+                  </div>
+                  <p className="text-sm text-cream/70 leading-relaxed" dir={lang === 'he' ? 'rtl' : 'ltr'}>
+                    {r.comment}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-xs text-cream/25">
+              {lang === 'he' ? 'אין עדיין ביקורות. היו הראשונים!' : 'No reviews yet. Be the first!'}
+            </p>
+          )}
         </div>
 
         {/* Related recipes */}

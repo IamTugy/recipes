@@ -13,6 +13,9 @@ export class Rating {
 
   @Prop({ required: true, min: 1, max: 5 })
   score!: number
+
+  @Prop({ maxlength: 500 })
+  comment?: string
 }
 
 export const RatingSchema = SchemaFactory.createForClass(Rating)

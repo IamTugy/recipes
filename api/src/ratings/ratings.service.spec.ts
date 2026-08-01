@@ -20,4 +20,25 @@ describe('RatingsService', () => {
     )
     expect(result).toEqual({ score: 4 })
   })
+
+  it('reviewsForRecipe returns only reviews with a comment, newest first', async () => {
+    const exec = jest.fn().mockResolvedValue([
+      { score: 5, comment: 'Amazing', createdAt: new Date('2026-01-02') },
+    ])
+    const lean = jest.fn().mockReturnValue({ exec })
+    const limit = jest.fn().mockReturnValue({ lean })
+    const sort = jest.fn().mockReturnValue({ limit })
+    const find = jest.fn().mockReturnValue({ sort })
+    const moduleRef = await Test.createTestingModule({
+      providers: [RatingsService, { provide: getModelToken(Rating.name), useValue: { find } }],
+    }).compile()
+
+    const service = moduleRef.get(RatingsService)
+    const result = await service.reviewsForRecipe('a')
+
+    expect(find).toHaveBeenCalledWith({ recipeSlug: 'a', comment: { $exists: true, $ne: '' } })
+    expect(sort).toHaveBeenCalledWith({ createdAt: -1 })
+    expect(limit).toHaveBeenCalledWith(20)
+    expect(result).toEqual([{ score: 5, comment: 'Amazing', createdAt: new Date('2026-01-02') }])
+  })
 })
