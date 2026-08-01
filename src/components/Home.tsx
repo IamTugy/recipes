@@ -12,7 +12,7 @@ import RecipeStrip from './RecipeStrip'
 const categories: Category[] = ['breakfast', 'lunch', 'dinner', 'dessert', 'salad', 'soup', 'snack', 'bread', 'sauce']
 const difficulties: Difficulty[] = ['easy', 'medium', 'hard']
 
-type SortOption = 'default' | 'rating' | 'quickest'
+type SortOption = 'default' | 'rating' | 'quickest' | 'newest'
 
 export default function Home() {
   const navigate = useNavigate()
@@ -92,6 +92,8 @@ export default function Home() {
       list = [...list].sort((a, b) => (b.averageRating ?? -1) - (a.averageRating ?? -1))
     } else if (sortBy === 'quickest') {
       list = [...list].sort((a, b) => (a.prepTime + a.cookTime) - (b.prepTime + b.cookTime))
+    } else if (sortBy === 'newest') {
+      list = [...list].sort((a, b) => (b.createdAt ?? '').localeCompare(a.createdAt ?? ''))
     }
     return list
   }, [search, activeCategory, activeDifficulty, lang, recipes, showFavoritesOnly, favoriteSlugs, sortBy])
@@ -227,6 +229,7 @@ export default function Home() {
             <option value="default">{lang === 'he' ? 'ברירת מחדל' : 'Default order'}</option>
             <option value="rating">{lang === 'he' ? 'דירוג גבוה' : 'Top rated'}</option>
             <option value="quickest">{lang === 'he' ? 'הכי מהיר' : 'Quickest'}</option>
+            <option value="newest">{lang === 'he' ? 'חדש ביותר' : 'Newest'}</option>
           </select>
         </div>
 

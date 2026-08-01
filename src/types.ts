@@ -67,6 +67,7 @@ export interface Recipe {
   averageRating?: number | null
   ratingCount?: number
   viewCount?: number
+  createdAt?: string
 }
 
 export interface TimerState {
