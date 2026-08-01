@@ -408,6 +408,15 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                           <li
                             key={ii}
                             onClick={() => toggleIngredient(ingredientKey)}
+                            onKeyDown={e => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault()
+                                toggleIngredient(ingredientKey)
+                              }
+                            }}
+                            role="checkbox"
+                            aria-checked={checked}
+                            tabIndex={0}
                             className="flex gap-2 text-sm cursor-pointer"
                             dir={lang === 'he' ? 'rtl' : 'ltr'}
                           >
@@ -495,6 +504,15 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                                 : 'border-tint/5 bg-tint/[0.02] hover:border-tint/10'
                             }`}
                             onClick={() => toggleStep(stepKey)}
+                            onKeyDown={e => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault()
+                                toggleStep(stepKey)
+                              }
+                            }}
+                            role="checkbox"
+                            aria-checked={checked}
+                            tabIndex={0}
                           >
                             <div className="flex gap-3">
                               <div className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${

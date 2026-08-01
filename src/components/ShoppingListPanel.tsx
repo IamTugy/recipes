@@ -55,6 +55,7 @@ export default function ShoppingListPanel({
               </h2>
               <button
                 onClick={onClose}
+                aria-label={lang === 'he' ? 'סגור' : 'Close'}
                 className="w-8 h-8 flex items-center justify-center rounded-lg text-cream/50 hover:text-cream hover:bg-tint/[0.06] transition-colors"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -90,6 +91,9 @@ export default function ShoppingListPanel({
                     >
                       <button
                         onClick={() => onToggle(item.id)}
+                        aria-label={item.checked
+                          ? (lang === 'he' ? 'סמן כלא נאסף' : 'Mark as not collected')
+                          : (lang === 'he' ? 'סמן כנאסף' : 'Mark as collected')}
                         className={`shrink-0 w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${
                           item.checked ? 'bg-herb border-herb text-white' : 'border-tint/20 text-transparent'
                         }`}
@@ -104,6 +108,7 @@ export default function ShoppingListPanel({
                       </div>
                       <button
                         onClick={() => onRemove(item.id)}
+                        aria-label={lang === 'he' ? 'הסר פריט' : 'Remove item'}
                         className="shrink-0 w-6 h-6 flex items-center justify-center rounded text-cream/20 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
                       >
                         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
