@@ -18,8 +18,8 @@ export default {
         tint:    'rgb(var(--color-tint) / <alpha-value>)',
       },
       fontFamily: {
-        serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
-        sans:  ['Inter', 'Heebo', 'system-ui', 'sans-serif'],
+        serif: ['"Cormorant Garamond"', '"Frank Ruhl Libre"', 'Georgia', 'serif'],
+        sans:  ['Inter', 'Rubik', 'system-ui', 'sans-serif'],
         mono:  ['"JetBrains Mono"', 'monospace'],
       },
       borderRadius: { '2xl': '1rem', '3xl': '1.5rem', '4xl': '2rem' },
