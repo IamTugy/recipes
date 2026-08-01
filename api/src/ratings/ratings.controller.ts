@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Put, Req } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Put, Req } from '@nestjs/common'
 import { Request } from 'express'
 import { RatingsService } from './ratings.service'
 import { RateRecipeDto } from './dto/rate-recipe.dto'
@@ -29,5 +29,11 @@ export class RatingsController {
     @Req() req: Request & { userId: string },
   ) {
     return this.ratingsService.rate(req.userId, slug, body.score, body.comment, body.photoUrl)
+  }
+
+  @Delete(':slug')
+  async remove(@Param('slug') slug: string, @Req() req: Request & { userId: string }) {
+    await this.ratingsService.deleteRating(req.userId, slug)
+    return { deleted: true }
   }
 }

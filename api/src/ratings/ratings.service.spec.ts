@@ -54,6 +54,18 @@ describe('RatingsService', () => {
     )
   })
 
+  it("deleteRating deletes only the requesting user's rating for a recipe", async () => {
+    const deleteOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue({}) })
+    const moduleRef = await Test.createTestingModule({
+      providers: [RatingsService, { provide: getModelToken(Rating.name), useValue: { deleteOne } }],
+    }).compile()
+
+    const service = moduleRef.get(RatingsService)
+    await service.deleteRating('user_1', 'a')
+
+    expect(deleteOne).toHaveBeenCalledWith({ userId: 'user_1', recipeSlug: 'a' })
+  })
+
   it("myRating returns the user's own score and comment for a recipe", async () => {
     const exec = jest.fn().mockResolvedValue({ score: 4, comment: 'Pretty good' })
     const lean = jest.fn().mockReturnValue({ exec })
@@ -83,7 +95,7 @@ describe('RatingsService', () => {
 
   it('reviewsForRecipe returns only reviews with a comment, newest first', async () => {
     const exec = jest.fn().mockResolvedValue([
-      { score: 5, comment: 'Amazing', createdAt: new Date('2026-01-02') },
+      { userId: 'user_1', score: 5, comment: 'Amazing', createdAt: new Date('2026-01-02') },
     ])
     const lean = jest.fn().mockReturnValue({ exec })
     const limit = jest.fn().mockReturnValue({ lean })
@@ -99,7 +111,7 @@ describe('RatingsService', () => {
     expect(find).toHaveBeenCalledWith({ recipeSlug: 'a', comment: { $exists: true, $ne: '' } })
     expect(sort).toHaveBeenCalledWith({ createdAt: -1 })
     expect(limit).toHaveBeenCalledWith(20)
-    expect(result).toEqual([{ score: 5, comment: 'Amazing', photoUrl: null, createdAt: new Date('2026-01-02') }])
+    expect(result).toEqual([{ userId: 'user_1', score: 5, comment: 'Amazing', photoUrl: null, createdAt: new Date('2026-01-02') }])
   })
 
   it('distributionForRecipe returns a count per score, defaulting missing scores to 0', async () => {

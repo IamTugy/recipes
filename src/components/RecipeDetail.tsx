@@ -52,7 +52,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
   }, [collectionMenuOpen])
   const { addRecent } = useRecentlyViewed()
   const { text: savedNote, save: saveNote, status: noteStatus } = useNote(id)
-  const { getToken } = useAuth()
+  const { getToken, userId: currentUserId } = useAuth()
 
   const [multiplier, setMultiplier] = useState(1)
   const [customInput, setCustomInput] = useState('')
@@ -61,12 +61,13 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
   const [userRating, setUserRating] = useState<number | null>(null)
   const [shareState, setShareState] = useState<'idle' | 'copied'>('idle')
   const [noteInput, setNoteInput] = useState('')
-  const [reviews, setReviews] = useState<{ score: number; comment: string; photoUrl: string | null; createdAt: string }[]>([])
+  const [reviews, setReviews] = useState<{ userId: string; score: number; comment: string; photoUrl: string | null; createdAt: string }[]>([])
   const [reviewComment, setReviewComment] = useState('')
   const [reviewPhotoUrl, setReviewPhotoUrl] = useState<string | null>(null)
   const [reviewPhotoUploading, setReviewPhotoUploading] = useState(false)
   const [distribution, setDistribution] = useState<Record<1 | 2 | 3 | 4 | 5, number> | null>(null)
   const [hasPostedReview, setHasPostedReview] = useState(false)
+  const [isEditingReview, setIsEditingReview] = useState(false)
   const cookMode = useWakeLock()
 
   // Sync the textarea once the saved note has loaded for this recipe
@@ -165,6 +166,23 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
     if (!userRating) return
     submitRating(userRating, reviewComment.trim(), reviewPhotoUrl ?? undefined)
     setHasPostedReview(true)
+    setIsEditingReview(false)
+  }
+
+  async function deleteMyReview() {
+    const confirmMsg = lang === 'he' ? 'למחוק את הביקורת שלכם?' : 'Delete your review?'
+    if (!window.confirm(confirmMsg)) return
+    const token = await getToken()
+    await fetch(`/api/ratings/${id}`, {
+      method: 'DELETE',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+    setUserRating(null)
+    setReviewComment('')
+    setReviewPhotoUrl(null)
+    setHasPostedReview(false)
+    setIsEditingReview(false)
+    loadReviews()
   }
 
   async function share() {
@@ -920,6 +938,41 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
               })}
             </div>
           )}
+          {hasPostedReview && !isEditingReview ? (
+            <div className="flex flex-col gap-2 mb-4 border border-tint/10 rounded-lg p-3">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-xs font-semibold text-cream/40">
+                  {lang === 'he' ? 'הביקורת שלכם' : 'Your review'}
+                </span>
+                <div className="flex items-center gap-1">
+                  <button type="button"
+                    onClick={() => setIsEditingReview(true)}
+                    aria-label={lang === 'he' ? 'ערוך ביקורת' : 'Edit review'}
+                    className="h-7 w-7 flex items-center justify-center rounded-lg text-cream/40 hover:text-cream/70 transition-colors"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </button>
+                  <button type="button"
+                    onClick={deleteMyReview}
+                    aria-label={lang === 'he' ? 'מחק ביקורת' : 'Delete review'}
+                    className="h-7 w-7 flex items-center justify-center rounded-lg text-cream/40 hover:text-red-400 transition-colors"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <p className="text-sm text-cream/70 leading-relaxed" dir={lang === 'he' ? 'rtl' : 'ltr'}>
+                {reviewComment}
+              </p>
+              {reviewPhotoUrl && (
+                <img src={reviewPhotoUrl} alt="" className="w-24 h-24 object-cover rounded-lg" />
+              )}
+            </div>
+          ) : (
           <div className="flex flex-col gap-2 mb-4">
             <textarea
               aria-labelledby="reviews-heading"
@@ -980,9 +1033,12 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
               </button>
             </div>
           </div>
-          {reviews.length > 0 ? (
+          )}
+          {(() => {
+            const otherReviews = reviews.filter(r => r.userId !== currentUserId)
+            return otherReviews.length > 0 ? (
             <ul className="space-y-4">
-              {reviews.map((r, i) => (
+              {otherReviews.map((r, i) => (
                 <li key={i} className="border-t border-tint/[0.06] pt-3 first:border-t-0 first:pt-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-amber text-sm leading-none">
@@ -1002,11 +1058,14 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                 </li>
               ))}
             </ul>
-          ) : (
-            <p className="text-xs text-cream/25">
-              {lang === 'he' ? 'אין עדיין ביקורות. היו הראשונים!' : 'No reviews yet. Be the first!'}
-            </p>
-          )}
+            ) : (
+              <p className="text-xs text-cream/25">
+                {hasPostedReview
+                  ? (lang === 'he' ? 'אין עדיין ביקורות נוספות' : 'No other reviews yet')
+                  : (lang === 'he' ? 'אין עדיין ביקורות. היו הראשונים!' : 'No reviews yet. Be the first!')}
+              </p>
+            )
+          })()}
         </div>
 
         {/* Related recipes */}

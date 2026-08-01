@@ -17,6 +17,10 @@ export class RatingsService {
     return { score: doc!.score }
   }
 
+  async deleteRating(userId: string, recipeSlug: string): Promise<void> {
+    await this.ratingModel.deleteOne({ userId, recipeSlug }).exec()
+  }
+
   async myRating(userId: string, recipeSlug: string): Promise<{ score: number; comment: string | null; photoUrl: string | null } | null> {
     const doc = await this.ratingModel.findOne({ userId, recipeSlug }).lean().exec()
     if (!doc) return null
@@ -35,7 +39,7 @@ export class RatingsService {
     return distribution
   }
 
-  async reviewsForRecipe(recipeSlug: string, limit = 20): Promise<{ score: number; comment: string; photoUrl: string | null; createdAt: Date }[]> {
+  async reviewsForRecipe(recipeSlug: string, limit = 20): Promise<{ userId: string; score: number; comment: string; photoUrl: string | null; createdAt: Date }[]> {
     const docs = await this.ratingModel
       .find({ recipeSlug, comment: { $exists: true, $ne: '' } })
       .sort({ createdAt: -1 })
@@ -43,6 +47,7 @@ export class RatingsService {
       .lean()
       .exec()
     return docs.map(d => ({
+      userId: d.userId,
       score: d.score,
       comment: d.comment!,
       photoUrl: d.photoUrl ?? null,
