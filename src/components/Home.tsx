@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import type { Category, Difficulty } from '../types'
 import { useRecipes, useTrending } from '../hooks/useRecipes'
 import { useFavorites } from '../hooks/useFavorites'
@@ -8,6 +8,7 @@ import { t, categoryEmoji } from '../i18n'
 import { useLanguage } from '../context/LanguageContext'
 import RecipeCard from './RecipeCard'
 import RecipeCardSkeleton from './RecipeCardSkeleton'
+import RecipeStrip from './RecipeStrip'
 
 const categories: Category[] = ['breakfast', 'lunch', 'dinner', 'dessert', 'salad', 'soup', 'snack', 'bread', 'sauce']
 const difficulties: Difficulty[] = ['easy', 'medium', 'hard']
@@ -190,85 +191,18 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Trending */}
-      {!loading && trending.length > 0 && !search && !activeCategory && !showFavoritesOnly && (
-        <div className="max-w-6xl mx-auto px-6 mb-8">
-          <p className="text-cream/25 text-xs tracking-wider mb-3">
-            {lang === 'he' ? '🔥 פופולרי השבוע' : '🔥 Trending this week'}
-          </p>
-          <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-none">
-            {trending.map(r => {
-              const title = lang === 'he' ? (r.titleHe ?? r.title) : r.title
-              return (
-                <Link key={r.id} to={`/recipe/${r.id}`} className="shrink-0 w-32 group">
-                  <div className="relative h-20 w-32 rounded-lg overflow-hidden mb-1.5">
-                    {r.image.includes('assets.tugy.dev') ? (
-                      <img
-                        src={r.image}
-                        alt={title}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-tint/[0.05] flex items-center justify-center text-2xl">
-                        {categoryEmoji[r.category]}
-                      </div>
-                    )}
-                  </div>
-                  <p className="text-xs text-cream/70 group-hover:text-amber transition-colors line-clamp-1" dir={lang === 'he' ? 'rtl' : 'ltr'}>
-                    {title}
-                  </p>
-                </Link>
-              )
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Recently viewed */}
-      {!loading && recentRecipes.length > 0 && !search && !activeCategory && !showFavoritesOnly && (
-        <div className="max-w-6xl mx-auto px-6 mb-8">
-          <p className="text-cream/25 text-xs tracking-wider mb-3">
-            {lang === 'he' ? 'נצפו לאחרונה' : 'Recently viewed'}
-          </p>
-          <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-none">
-            {recentRecipes.map(r => {
-              const title = lang === 'he' ? (r.titleHe ?? r.title) : r.title
-              return (
-                <Link
-                  key={r.id}
-                  to={`/recipe/${r.id}`}
-                  className="shrink-0 w-32 group"
-                >
-                  <div className="relative h-20 w-32 rounded-lg overflow-hidden mb-1.5">
-                    {r.image.includes('assets.tugy.dev') ? (
-                      <img
-                        src={r.image}
-                        alt={title}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-tint/[0.05] flex items-center justify-center text-2xl">
-                        {categoryEmoji[r.category]}
-                      </div>
-                    )}
-                  </div>
-                  <p className="text-xs text-cream/70 group-hover:text-amber transition-colors line-clamp-1" dir={lang === 'he' ? 'rtl' : 'ltr'}>
-                    {title}
-                  </p>
-                </Link>
-              )
-            })}
-          </div>
-        </div>
+      {!loading && !search && !activeCategory && !activeDifficulty && !showFavoritesOnly && (
+        <>
+          <RecipeStrip title={lang === 'he' ? '🔥 פופולרי השבוע' : '🔥 Trending this week'} recipes={trending} />
+          <RecipeStrip title={lang === 'he' ? 'נצפו לאחרונה' : 'Recently viewed'} recipes={recentRecipes} />
+        </>
       )}
 
       {/* Recipe grid */}
       <div className="max-w-6xl mx-auto px-6 pb-24">
         <div className="flex items-center justify-between mb-5">
           <p className="text-cream/25 text-xs tracking-wider">
-            {(search || activeCategory)
+            {(search || activeCategory || activeDifficulty || showFavoritesOnly)
               ? `${filtered.length} / ${recipes.length}`
               : `${recipes.length}`
             }
