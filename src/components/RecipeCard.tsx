@@ -34,9 +34,10 @@ export default function RecipeCard({ recipe, index, searchQuery, isFavorite, onT
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.04, duration: 0.35 }}
+      className="h-full"
     >
-      <Link to={`/recipe/${recipe.id}`} className="block group">
-        <div className="card overflow-hidden">
+      <Link to={`/recipe/${recipe.id}`} className="block group h-full">
+        <div className="card overflow-hidden h-full flex flex-col">
           {/* Image */}
           <div className="relative h-52 sm:h-60 overflow-hidden">
             {recipe.image.includes('assets.tugy.dev') ? (
@@ -78,7 +79,7 @@ export default function RecipeCard({ recipe, index, searchQuery, isFavorite, onT
           </div>
 
           {/* Content */}
-          <div className="p-4">
+          <div className="p-4 flex flex-col flex-1">
             <h3
               className="font-serif text-lg font-medium text-cream leading-snug mb-0.5 group-hover:text-amber transition-colors line-clamp-1"
               dir={lang === 'he' ? 'rtl' : 'ltr'}
@@ -101,7 +102,7 @@ export default function RecipeCard({ recipe, index, searchQuery, isFavorite, onT
             </p>
 
             {/* Meta row */}
-            <div className="flex items-center gap-3 text-[11px] text-cream/35 border-t border-tint/[0.04] pt-3">
+            <div className="mt-auto flex items-center gap-3 text-[11px] text-cream/35 border-t border-tint/[0.04] pt-3">
               <span className="flex items-center gap-1">
                 <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0114 0z" />

@@ -3,7 +3,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import type { Category, Difficulty } from '../types'
 import { useRecipes, useTrending } from '../hooks/useRecipes'
 import { useFavorites } from '../hooks/useFavorites'
-import { useRecentlyViewed } from '../hooks/useRecentlyViewed'
 import { t, categoryEmoji } from '../i18n'
 import { useLanguage } from '../hooks/useLanguage'
 import RecipeCard from './RecipeCard'
@@ -35,7 +34,6 @@ export default function Home() {
   const { favoriteSlugs, toggle: toggleFavorite } = useFavorites()
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false)
   const [sortBy, setSortBy] = useState<SortOption>('default')
-  const { recentIds } = useRecentlyViewed()
   const { trending } = useTrending()
   const searchInputRef = useRef<HTMLInputElement>(null)
 
@@ -57,10 +55,6 @@ export default function Home() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
 
-  const recentRecipes = useMemo(
-    () => recentIds.map(id => recipes.find(r => r.id === id)).filter((r): r is NonNullable<typeof r> => !!r),
-    [recentIds, recipes],
-  )
 
   const filtered = useMemo(() => {
     let list = recipes.filter(r => !r.hidden)
@@ -212,7 +206,6 @@ export default function Home() {
       {!loading && !search && !activeCategory && !activeDifficulty && !showFavoritesOnly && (
         <>
           <RecipeStrip title={lang === 'he' ? '🔥 פופולרי השבוע' : '🔥 Trending this week'} recipes={trending} />
-          <RecipeStrip title={lang === 'he' ? 'נצפו לאחרונה' : 'Recently viewed'} recipes={recentRecipes} />
         </>
       )}
 
