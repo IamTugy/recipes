@@ -61,8 +61,10 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
   const [userRating, setUserRating] = useState<number | null>(null)
   const [shareState, setShareState] = useState<'idle' | 'copied'>('idle')
   const [noteInput, setNoteInput] = useState('')
-  const [reviews, setReviews] = useState<{ score: number; comment: string; createdAt: string }[]>([])
+  const [reviews, setReviews] = useState<{ score: number; comment: string; photoUrl: string | null; createdAt: string }[]>([])
   const [reviewComment, setReviewComment] = useState('')
+  const [reviewPhotoUrl, setReviewPhotoUrl] = useState<string | null>(null)
+  const [reviewPhotoUploading, setReviewPhotoUploading] = useState(false)
   const [distribution, setDistribution] = useState<Record<1 | 2 | 3 | 4 | 5, number> | null>(null)
   const [hasPostedReview, setHasPostedReview] = useState(false)
   const cookMode = useWakeLock()
@@ -88,9 +90,10 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
     const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {}
     const res = await fetch(`/api/ratings/${id}/mine`, { headers })
     if (!res.ok) return
-    const mine: { score: number; comment: string | null } | null = await res.json()
+    const mine: { score: number; comment: string | null; photoUrl: string | null } | null = await res.json()
     setUserRating(mine?.score ?? null)
     setReviewComment(mine?.comment ?? '')
+    setReviewPhotoUrl(mine?.photoUrl ?? null)
     setHasPostedReview(!!mine?.comment)
   }
 
@@ -102,7 +105,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
 
-  async function submitRating(score: number, comment?: string) {
+  async function submitRating(score: number, comment?: string, photoUrl?: string) {
     setUserRating(score)
     const token = await getToken()
     await fetch(`/api/ratings/${id}`, {
@@ -111,13 +114,43 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
         'Content-Type': 'application/json',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-      body: JSON.stringify({ score, comment }),
+      body: JSON.stringify({ score, comment, photoUrl }),
     })
     loadReviews()
   }
 
   function rate(score: number) {
     submitRating(score)
+  }
+
+  async function handlePhotoSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file || !id) return
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) return
+
+    setReviewPhotoUploading(true)
+    try {
+      const token = await getToken()
+      const presignRes = await fetch('/api/uploads/presign', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ recipeSlug: id, contentType: file.type }),
+      })
+      if (!presignRes.ok) return
+      const { uploadUrl, publicUrl } = await presignRes.json()
+      const uploadResult = await fetch(uploadUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': file.type },
+        body: file,
+      })
+      if (uploadResult.ok) setReviewPhotoUrl(publicUrl)
+    } finally {
+      setReviewPhotoUploading(false)
+    }
   }
 
   async function createAndAddCollection() {
@@ -130,7 +163,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
 
   function postReview() {
     if (!userRating) return
-    submitRating(userRating, reviewComment.trim())
+    submitRating(userRating, reviewComment.trim(), reviewPhotoUrl ?? undefined)
     setHasPostedReview(true)
   }
 
@@ -903,15 +936,49 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
               className="w-full bg-tint/[0.03] border border-tint/10 rounded-lg p-3 text-sm text-cream/80 placeholder-cream/25 outline-none focus:border-amber/30 transition-colors resize-none disabled:opacity-50"
               dir={lang === 'he' ? 'rtl' : 'ltr'}
             />
-            <button type="button"
-              onClick={postReview}
-              disabled={!userRating || !reviewComment.trim()}
-              className="self-start px-4 py-1.5 rounded-lg text-xs font-semibold bg-amber/90 text-bg hover:bg-amber transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              {hasPostedReview
-                ? (lang === 'he' ? 'עדכן ביקורת' : 'Update review')
-                : (lang === 'he' ? 'פרסם ביקורת' : 'Post review')}
-            </button>
+            {reviewPhotoUrl && (
+              <div className="relative w-24 h-24">
+                <img src={reviewPhotoUrl} alt="" className="w-full h-full object-cover rounded-lg" />
+                <button type="button"
+                  onClick={() => setReviewPhotoUrl(null)}
+                  aria-label={lang === 'he' ? 'הסר תמונה' : 'Remove photo'}
+                  className="absolute -top-1.5 -right-1.5 h-5 w-5 flex items-center justify-center rounded-full bg-black/60 text-white text-[10px] hover:bg-black/80"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+            <div className="flex items-center gap-2">
+              <label className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-tint/10 transition-colors ${
+                userRating ? 'text-cream/40 hover:text-cream/70 cursor-pointer' : 'text-cream/20 cursor-not-allowed'
+              }`}>
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                {reviewPhotoUploading
+                  ? (lang === 'he' ? 'מעלה...' : 'Uploading...')
+                  : reviewPhotoUrl
+                    ? (lang === 'he' ? 'החלף תמונה' : 'Replace photo')
+                    : (lang === 'he' ? 'הוסף תמונה' : 'Add photo')}
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={handlePhotoSelect}
+                  disabled={!userRating || reviewPhotoUploading}
+                  className="hidden"
+                />
+              </label>
+              <button type="button"
+                onClick={postReview}
+                disabled={!userRating || !reviewComment.trim() || reviewPhotoUploading}
+                className="px-4 py-1.5 rounded-lg text-xs font-semibold bg-amber/90 text-bg hover:bg-amber transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {hasPostedReview
+                  ? (lang === 'he' ? 'עדכן ביקורת' : 'Update review')
+                  : (lang === 'he' ? 'פרסם ביקורת' : 'Post review')}
+              </button>
+            </div>
           </div>
           {reviews.length > 0 ? (
             <ul className="space-y-4">
@@ -929,6 +996,9 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                   <p className="text-sm text-cream/70 leading-relaxed" dir={lang === 'he' ? 'rtl' : 'ltr'}>
                     {r.comment}
                   </p>
+                  {r.photoUrl && (
+                    <img src={r.photoUrl} alt="" className="mt-2 w-28 h-28 object-cover rounded-lg" />
+                  )}
                 </li>
               ))}
             </ul>

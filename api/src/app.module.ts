@@ -9,6 +9,7 @@ import { FavoritesModule } from './favorites/favorites.module'
 import { RatingsModule } from './ratings/ratings.module'
 import { NotesModule } from './notes/notes.module'
 import { CollectionsModule } from './collections/collections.module'
+import { UploadsModule } from './uploads/uploads.module'
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { CollectionsModule } from './collections/collections.module'
     RatingsModule,
     NotesModule,
     CollectionsModule,
+    UploadsModule,
   ],
   controllers: [HealthController],
 })

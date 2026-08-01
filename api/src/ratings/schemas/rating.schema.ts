@@ -16,6 +16,9 @@ export class Rating {
 
   @Prop({ maxlength: 500 })
   comment?: string
+
+  @Prop()
+  photoUrl?: string
 }
 
 export const RatingSchema = SchemaFactory.createForClass(Rating)

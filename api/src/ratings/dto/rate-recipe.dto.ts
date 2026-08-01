@@ -1,4 +1,4 @@
-import { IsInt, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator'
+import { IsInt, IsOptional, IsString, Matches, Max, MaxLength, Min } from 'class-validator'
 
 export class RateRecipeDto {
   @IsInt()
@@ -10,4 +10,11 @@ export class RateRecipeDto {
   @IsString()
   @MaxLength(500)
   comment?: string
+
+  @IsOptional()
+  @IsString()
+  @Matches(/^https:\/\/recipes-assets\.tugy\.dev\/reviews\//, {
+    message: 'photoUrl must point to an uploaded review photo',
+  })
+  photoUrl?: string
 }

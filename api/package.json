@@ -11,6 +11,8 @@
     "seed": "node dist/recipes/seed-recipes.js"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1101.0",
+    "@aws-sdk/s3-request-presigner": "^3.1101.0",
     "@clerk/backend": "^1.13.0",
     "@nestjs/common": "^10.4.0",
     "@nestjs/config": "^3.3.0",

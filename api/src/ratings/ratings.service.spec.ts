@@ -37,6 +37,23 @@ describe('RatingsService', () => {
     )
   })
 
+  it('rate includes photoUrl in the update when provided', async () => {
+    const findOneAndUpdate = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue({ score: 5 }) })
+    const moduleRef = await Test.createTestingModule({
+      providers: [RatingsService, { provide: getModelToken(Rating.name), useValue: { findOneAndUpdate } }],
+    }).compile()
+
+    const service = moduleRef.get(RatingsService)
+    const photoUrl = 'https://recipes-assets.tugy.dev/reviews/a/photo.jpg'
+    await service.rate('user_1', 'a', 5, 'Loved it', photoUrl)
+
+    expect(findOneAndUpdate).toHaveBeenCalledWith(
+      { userId: 'user_1', recipeSlug: 'a' },
+      { $set: { userId: 'user_1', recipeSlug: 'a', score: 5, comment: 'Loved it', photoUrl } },
+      { upsert: true, new: true },
+    )
+  })
+
   it("myRating returns the user's own score and comment for a recipe", async () => {
     const exec = jest.fn().mockResolvedValue({ score: 4, comment: 'Pretty good' })
     const lean = jest.fn().mockReturnValue({ exec })
@@ -49,7 +66,7 @@ describe('RatingsService', () => {
     const result = await service.myRating('user_1', 'a')
 
     expect(findOne).toHaveBeenCalledWith({ userId: 'user_1', recipeSlug: 'a' })
-    expect(result).toEqual({ score: 4, comment: 'Pretty good' })
+    expect(result).toEqual({ score: 4, comment: 'Pretty good', photoUrl: null })
   })
 
   it('myRating returns null when the user has not rated the recipe', async () => {
@@ -82,7 +99,7 @@ describe('RatingsService', () => {
     expect(find).toHaveBeenCalledWith({ recipeSlug: 'a', comment: { $exists: true, $ne: '' } })
     expect(sort).toHaveBeenCalledWith({ createdAt: -1 })
     expect(limit).toHaveBeenCalledWith(20)
-    expect(result).toEqual([{ score: 5, comment: 'Amazing', createdAt: new Date('2026-01-02') }])
+    expect(result).toEqual([{ score: 5, comment: 'Amazing', photoUrl: null, createdAt: new Date('2026-01-02') }])
   })
 
   it('distributionForRecipe returns a count per score, defaulting missing scores to 0', async () => {

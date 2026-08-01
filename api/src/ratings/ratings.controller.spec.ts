@@ -7,7 +7,7 @@ describe('RatingsController', () => {
     ratingsService.rate.mockResolvedValue({ score: 5 })
     const controller = new RatingsController(ratingsService as any)
     const result = await controller.rate('a', { score: 5 }, { userId: 'user_1' } as any)
-    expect(ratingsService.rate).toHaveBeenCalledWith('user_1', 'a', 5, undefined)
+    expect(ratingsService.rate).toHaveBeenCalledWith('user_1', 'a', 5, undefined, undefined)
     expect(result).toEqual({ score: 5 })
   })
 
@@ -15,7 +15,15 @@ describe('RatingsController', () => {
     ratingsService.rate.mockResolvedValue({ score: 4 })
     const controller = new RatingsController(ratingsService as any)
     await controller.rate('a', { score: 4, comment: 'Great recipe!' }, { userId: 'user_1' } as any)
-    expect(ratingsService.rate).toHaveBeenCalledWith('user_1', 'a', 4, 'Great recipe!')
+    expect(ratingsService.rate).toHaveBeenCalledWith('user_1', 'a', 4, 'Great recipe!', undefined)
+  })
+
+  it('PUT /ratings/:slug passes an optional photoUrl through', async () => {
+    ratingsService.rate.mockResolvedValue({ score: 5 })
+    const controller = new RatingsController(ratingsService as any)
+    const photoUrl = 'https://recipes-assets.tugy.dev/reviews/a/photo.jpg'
+    await controller.rate('a', { score: 5, comment: 'Great!', photoUrl }, { userId: 'user_1' } as any)
+    expect(ratingsService.rate).toHaveBeenCalledWith('user_1', 'a', 5, 'Great!', photoUrl)
   })
 
   it("GET /ratings/:slug/mine returns the current user's own rating", async () => {

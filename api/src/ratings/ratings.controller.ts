@@ -28,6 +28,6 @@ export class RatingsController {
     @Body() body: RateRecipeDto,
     @Req() req: Request & { userId: string },
   ) {
-    return this.ratingsService.rate(req.userId, slug, body.score, body.comment)
+    return this.ratingsService.rate(req.userId, slug, body.score, body.comment, body.photoUrl)
   }
 }
