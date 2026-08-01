@@ -289,7 +289,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
     const items = recipe!.ingredients.flatMap(group =>
       group.items.map(item => {
         const itemName = lang === 'he' ? item.name : (item.nameEn ?? item.name)
-        if (item.amount == null) return { name: itemName, amount: '' }
+        if (!item.amount) return { name: itemName, amount: '' }
         const scaled = item.amount * multiplier
         const amt = scaleAmount(item.amount, multiplier)
         const unit = lang === 'he' ? heUnit(item.unit, scaled) : item.unit
@@ -369,7 +369,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
   return (
     <div className="min-h-dvh bg-bg pt-14" dir={lang === 'he' ? 'rtl' : 'ltr'}>
       {/* Hero image */}
-      <div className="relative h-64 sm:h-96 overflow-hidden">
+      <div className="print:hidden relative h-64 sm:h-96 overflow-hidden">
         {recipe.image.includes('assets.tugy.dev') ? (
           <img
             src={recipe.image}
@@ -394,7 +394,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
         </button>
       </div>
 
-      <div className="max-w-3xl mx-auto px-4 -mt-16 relative pb-24">
+      <div className="max-w-3xl mx-auto px-4 -mt-16 print:mt-4 relative pb-24">
         {/* Header card */}
         <div className="card p-6 mb-6">
           <div className="flex flex-wrap items-center gap-2 mb-3">
@@ -696,15 +696,16 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                             dir={lang === 'he' ? 'rtl' : 'ltr'}
                           >
                             <span
-                              className={`shrink-0 w-4 h-4 mt-0.5 rounded border flex items-center justify-center transition-colors ${
+                              className={`print:hidden shrink-0 w-4 h-4 mt-0.5 rounded border flex items-center justify-center transition-colors ${
                                 checked ? 'bg-herb border-herb text-white' : 'border-tint/20 text-transparent'
                               }`}
                             >
                               {checked && '✓'}
                             </span>
+                            <span className="hidden print:inline shrink-0 mt-0.5">•</span>
                             <span className={`font-semibold shrink-0 w-14 text-right transition-colors ${checked ? 'text-cream/30 line-through' : 'text-cream/90'}`} dir={lang === 'he' ? 'rtl' : 'ltr'}>
                               {(() => {
-                                if (item.amount == null) return null
+                                if (!item.amount) return null
                                 const scaled = item.amount * multiplier
                                 const amt = scaleAmount(item.amount, multiplier)
                                 const unit = lang === 'he' ? heUnit(item.unit, scaled) : item.unit
@@ -828,7 +829,12 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                                 )}
 
                                 {step.timerMinutes && !checked && (
-                                  <div className="mt-3" onClick={e => e.stopPropagation()}>
+                                  <p className="hidden print:block mt-2 text-xs text-cream/50">
+                                    ⏱ {lang === 'he' ? `${step.timerMinutes} דקות` : `${step.timerMinutes} min`}
+                                  </p>
+                                )}
+                                {step.timerMinutes && !checked && (
+                                  <div className="print:hidden mt-3" onClick={e => e.stopPropagation()}>
                                     {existingTimer ? (
                                       <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-mono font-semibold border ${
                                         existingTimer.done
