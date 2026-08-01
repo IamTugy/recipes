@@ -8,6 +8,7 @@ import { RecipesModule } from './recipes/recipes.module'
 import { FavoritesModule } from './favorites/favorites.module'
 import { RatingsModule } from './ratings/ratings.module'
 import { NotesModule } from './notes/notes.module'
+import { CollectionsModule } from './collections/collections.module'
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { NotesModule } from './notes/notes.module'
     FavoritesModule,
     RatingsModule,
     NotesModule,
+    CollectionsModule,
   ],
   controllers: [HealthController],
 })

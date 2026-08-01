@@ -5,6 +5,7 @@ import { useAuth, SignIn } from '@clerk/react'
 import Nav from './components/Nav'
 import Home from './components/Home'
 import RecipeDetail from './components/RecipeDetail'
+import CollectionsPage from './components/CollectionsPage'
 import TimerPanel from './components/TimerPanel'
 import ShoppingListPanel from './components/ShoppingListPanel'
 import ScrollToTopButton from './components/ScrollToTopButton'
@@ -37,6 +38,7 @@ export default function App() {
       />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/collections" element={<CollectionsPage />} />
         <Route
           path="/recipe/:id"
           element={

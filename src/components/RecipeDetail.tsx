@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import RecipePlaceholder from './RecipePlaceholder'
 import RecipeDetailSkeleton from './RecipeDetailSkeleton'
 import { Link, useNavigate, useParams } from 'react-router-dom'
@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import { useRecipe, useRecipes } from '../hooks/useRecipes'
 import { useWakeLock } from '../hooks/useWakeLock'
 import { useFavorites } from '../hooks/useFavorites'
+import { useCollections } from '../hooks/useCollections'
 import { useRecentlyViewed } from '../hooks/useRecentlyViewed'
 import { useNote } from '../hooks/useNote'
 import { useAuth } from '@clerk/react'
@@ -31,6 +32,21 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
   const { recipe, loading: recipeLoading } = useRecipe(id)
   const { recipes: allRecipes } = useRecipes()
   const { favoriteSlugs, toggle: toggleFavorite } = useFavorites()
+  const { collections, create: createCollection, addRecipe: addRecipeToCollection, removeRecipe: removeRecipeFromCollection } = useCollections()
+  const [collectionMenuOpen, setCollectionMenuOpen] = useState(false)
+  const [newCollectionName, setNewCollectionName] = useState('')
+  const collectionMenuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!collectionMenuOpen) return
+    function handleClickOutside(e: MouseEvent) {
+      if (collectionMenuRef.current && !collectionMenuRef.current.contains(e.target as Node)) {
+        setCollectionMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [collectionMenuOpen])
   const { addRecent } = useRecentlyViewed()
   const { text: savedNote, save: saveNote, status: noteStatus } = useNote(id)
   const { getToken } = useAuth()
@@ -84,6 +100,14 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
 
   function rate(score: number) {
     submitRating(score)
+  }
+
+  async function createAndAddCollection() {
+    const name = newCollectionName.trim()
+    if (!name || !id) return
+    const created = await createCollection(name)
+    if (created) await addRecipeToCollection(created._id, id)
+    setNewCollectionName('')
   }
 
   function postReview() {
@@ -324,6 +348,67 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
               </svg>
               {lang === 'he' ? 'מועדף' : 'Favorite'}
             </button>
+
+            <div className="relative" ref={collectionMenuRef}>
+              <button type="button"
+                onClick={() => setCollectionMenuOpen(v => !v)}
+                className="flex items-center gap-1.5 text-sm font-medium text-cream/40 hover:text-cream/70 transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14-7H5a2 2 0 00-2 2v14l4-2 3 2 3-2 3 2 3-2V6a2 2 0 00-2-2z" />
+                </svg>
+                {lang === 'he' ? 'שמור לאוסף' : 'Save to collection'}
+              </button>
+              {collectionMenuOpen && (
+                <div className="absolute z-20 top-full mt-2 w-64 card p-3 shadow-xl" dir={lang === 'he' ? 'rtl' : 'ltr'}>
+                  {collections.length === 0 ? (
+                    <p className="text-xs text-cream/30 mb-2">
+                      {lang === 'he' ? 'אין עדיין אוספים' : 'No collections yet'}
+                    </p>
+                  ) : (
+                    <ul className="space-y-1 mb-2 max-h-40 overflow-y-auto">
+                      {collections.map(col => {
+                        const inCollection = id ? col.recipeSlugs.includes(id) : false
+                        return (
+                          <li key={col._id}>
+                            <label className="flex items-center gap-2 text-sm text-cream/70 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={inCollection}
+                                onChange={() => {
+                                  if (!id) return
+                                  if (inCollection) removeRecipeFromCollection(col._id, id)
+                                  else addRecipeToCollection(col._id, id)
+                                }}
+                              />
+                              {col.name}
+                            </label>
+                          </li>
+                        )
+                      })}
+                    </ul>
+                  )}
+                  <div className="flex gap-1.5">
+                    <input
+                      value={newCollectionName}
+                      onChange={e => setNewCollectionName(e.target.value)}
+                      onKeyDown={e => { if (e.key === 'Enter') createAndAddCollection() }}
+                      placeholder={lang === 'he' ? 'אוסף חדש...' : 'New collection...'}
+                      maxLength={60}
+                      aria-label={lang === 'he' ? 'שם אוסף חדש' : 'New collection name'}
+                      className="flex-1 bg-tint/[0.03] border border-tint/10 rounded-md px-2 py-1 text-xs text-cream/80 placeholder-cream/25 outline-none focus:border-amber/30 transition-colors"
+                    />
+                    <button type="button"
+                      onClick={createAndAddCollection}
+                      disabled={!newCollectionName.trim()}
+                      className="px-2 py-1 rounded-md text-[11px] font-semibold bg-amber/90 text-bg hover:bg-amber transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      {lang === 'he' ? 'הוסף' : 'Add'}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
 
             <div className="flex items-center">
               {[1, 2, 3, 4, 5].map(n => (

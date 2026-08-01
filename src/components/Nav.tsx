@@ -25,6 +25,18 @@ export default function Nav({ shoppingListCount, onOpenShoppingList }: NavProps)
         </button>
 
         <div className="flex items-center gap-0.5 sm:gap-2 shrink-0">
+          {/* Collections */}
+          <button type="button"
+            onClick={() => navigate('/collections')}
+            className="h-10 w-10 sm:h-7 sm:w-7 flex items-center justify-center rounded-lg text-cream/40 hover:text-cream/70 border border-tint/10 hover:bg-tint/[0.05] transition-colors"
+            title={lang === 'he' ? 'האוספים שלי' : 'My collections'}
+            aria-label={lang === 'he' ? 'האוספים שלי' : 'My collections'}
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14-7H5a2 2 0 00-2 2v14l4-2 3 2 3-2 3 2 3-2V6a2 2 0 00-2-2z" />
+            </svg>
+          </button>
+
           {/* Theme cycle: light -> dark -> system */}
           <button type="button"
             onClick={cycleTheme}
