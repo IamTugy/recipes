@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import { useAuth, SignIn } from '@clerk/react'
@@ -9,6 +9,7 @@ import CollectionsPage from './components/CollectionsPage'
 import TimerPanel from './components/TimerPanel'
 import ShoppingListPanel from './components/ShoppingListPanel'
 import ScrollToTopButton from './components/ScrollToTopButton'
+import KeyboardShortcutsHelp from './components/KeyboardShortcutsHelp'
 import { useTimers } from './hooks/useTimers'
 import { useShoppingList } from './hooks/useShoppingList'
 
@@ -16,7 +17,23 @@ export default function App() {
   const { timers, addTimer, toggleTimer, removeTimer, resetTimer } = useTimers()
   const shoppingList = useShoppingList()
   const [shoppingListOpen, setShoppingListOpen] = useState(false)
+  const [shortcutsHelpOpen, setShortcutsHelpOpen] = useState(false)
   const { isLoaded, isSignedIn } = useAuth()
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      const target = e.target as HTMLElement
+      const isTyping = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable
+      if (e.key === '?' && !isTyping) {
+        e.preventDefault()
+        setShortcutsHelpOpen(v => !v)
+      } else if (e.key === 'Escape') {
+        setShortcutsHelpOpen(false)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   if (!isLoaded) {
     return <div className="min-h-dvh bg-bg" />
@@ -72,6 +89,7 @@ export default function App() {
         onUndoClear={shoppingList.undoClear}
       />
       <ScrollToTopButton raised={timers.length > 0} />
+      <KeyboardShortcutsHelp open={shortcutsHelpOpen} onClose={() => setShortcutsHelpOpen(false)} />
     </div>
   )
 }
