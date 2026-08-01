@@ -19,6 +19,9 @@ export class Rating {
 
   @Prop()
   photoUrl?: string
+
+  @Prop({ type: [String], default: [] })
+  upvotes!: string[]
 }
 
 export const RatingSchema = SchemaFactory.createForClass(Rating)

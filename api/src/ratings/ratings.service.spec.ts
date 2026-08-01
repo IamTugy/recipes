@@ -95,7 +95,7 @@ describe('RatingsService', () => {
 
   it('reviewsForRecipe returns only reviews with a comment, newest first', async () => {
     const exec = jest.fn().mockResolvedValue([
-      { userId: 'user_1', score: 5, comment: 'Amazing', createdAt: new Date('2026-01-02') },
+      { _id: 'r1', userId: 'user_1', score: 5, comment: 'Amazing', upvotes: ['user_2'], createdAt: new Date('2026-01-02') },
     ])
     const lean = jest.fn().mockReturnValue({ exec })
     const limit = jest.fn().mockReturnValue({ lean })
@@ -111,7 +111,47 @@ describe('RatingsService', () => {
     expect(find).toHaveBeenCalledWith({ recipeSlug: 'a', comment: { $exists: true, $ne: '' } })
     expect(sort).toHaveBeenCalledWith({ createdAt: -1 })
     expect(limit).toHaveBeenCalledWith(20)
-    expect(result).toEqual([{ userId: 'user_1', score: 5, comment: 'Amazing', photoUrl: null, createdAt: new Date('2026-01-02') }])
+    expect(result).toEqual([{ id: 'r1', userId: 'user_1', score: 5, comment: 'Amazing', photoUrl: null, upvotes: ['user_2'], createdAt: new Date('2026-01-02') }])
+  })
+
+  it('toggleUpvote adds the user to upvotes when not already present', async () => {
+    const rating = { upvotes: [], save: jest.fn().mockResolvedValue(undefined) }
+    const findById = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(rating) })
+    const moduleRef = await Test.createTestingModule({
+      providers: [RatingsService, { provide: getModelToken(Rating.name), useValue: { findById } }],
+    }).compile()
+
+    const service = moduleRef.get(RatingsService)
+    const result = await service.toggleUpvote('user_1', 'r1')
+
+    expect(findById).toHaveBeenCalledWith('r1')
+    expect(rating.upvotes).toEqual(['user_1'])
+    expect(rating.save).toHaveBeenCalled()
+    expect(result).toEqual({ upvoted: true, count: 1 })
+  })
+
+  it('toggleUpvote removes the user from upvotes when already present', async () => {
+    const rating = { upvotes: ['user_1'], save: jest.fn().mockResolvedValue(undefined) }
+    const findById = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(rating) })
+    const moduleRef = await Test.createTestingModule({
+      providers: [RatingsService, { provide: getModelToken(Rating.name), useValue: { findById } }],
+    }).compile()
+
+    const service = moduleRef.get(RatingsService)
+    const result = await service.toggleUpvote('user_1', 'r1')
+
+    expect(rating.upvotes).toEqual([])
+    expect(result).toEqual({ upvoted: false, count: 0 })
+  })
+
+  it('toggleUpvote throws when the review does not exist', async () => {
+    const findById = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(null) })
+    const moduleRef = await Test.createTestingModule({
+      providers: [RatingsService, { provide: getModelToken(Rating.name), useValue: { findById } }],
+    }).compile()
+
+    const service = moduleRef.get(RatingsService)
+    await expect(service.toggleUpvote('user_1', 'missing')).rejects.toThrow('Review not found')
   })
 
   it('distributionForRecipe returns a count per score, defaulting missing scores to 0', async () => {

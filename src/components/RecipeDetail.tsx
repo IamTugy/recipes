@@ -15,6 +15,7 @@ import { formatTime, formatSeconds, scaleAmount } from '../utils/format'
 import { t, categoryEmoji, heUnit, difficultyColor } from '../i18n'
 import { useLanguage } from '../hooks/useLanguage'
 import { useToast } from '../hooks/useToast'
+import ReviewItem, { type Review } from './ReviewItem'
 import type { TimerState } from '../types'
 
 interface RecipeDetailProps {
@@ -63,7 +64,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
   const [userRating, setUserRating] = useState<number | null>(null)
   const [shareState, setShareState] = useState<'idle' | 'copied'>('idle')
   const [noteInput, setNoteInput] = useState('')
-  const [reviews, setReviews] = useState<{ userId: string; score: number; comment: string; photoUrl: string | null; createdAt: string }[]>([])
+  const [reviews, setReviews] = useState<Review[]>([])
   const [reviewComment, setReviewComment] = useState('')
   const [reviewPhotoUrl, setReviewPhotoUrl] = useState<string | null>(null)
   const [reviewPhotoUploading, setReviewPhotoUploading] = useState(false)
@@ -1101,46 +1102,18 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
             const otherReviews = reviews.filter(r => r.userId !== currentUserId)
             return otherReviews.length > 0 ? (
             <ul className="space-y-4">
-              {otherReviews.map((r, i) => {
-                const translation = translations[r.userId]
-                const showingTranslation = !!translation?.showing
-                return (
-                <li key={i} className="border-t border-tint/[0.06] pt-3 first:border-t-0 first:pt-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-amber text-sm leading-none">
-                      {'★'.repeat(r.score)}
-                      <span className="text-cream/15">{'★'.repeat(5 - r.score)}</span>
-                    </span>
-                    <span className="text-cream/25 text-[11px]">
-                      {new Date(r.createdAt).toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-US')}
-                    </span>
-                  </div>
-                  <p className="text-sm text-cream/70 leading-relaxed" dir={showingTranslation ? (lang === 'he' ? 'rtl' : 'ltr') : undefined}>
-                    {showingTranslation ? (translation?.loading ? (lang === 'he' ? 'מתרגם...' : 'Translating...') : translation?.text) : r.comment}
-                  </p>
-                  {r.comment.trim() && (
-                    <button
-                      type="button"
-                      onClick={() => toggleTranslateReview(r.userId, r.comment)}
-                      disabled={translation?.loading}
-                      className="mt-1 text-[11px] text-cream/40 hover:text-cream/70 underline underline-offset-2 disabled:opacity-50"
-                    >
-                      {showingTranslation
-                        ? (lang === 'he' ? 'הצג מקור' : 'Show original')
-                        : (lang === 'he' ? 'תרגם' : 'Translate')}
-                    </button>
-                  )}
-                  {r.photoUrl && (
-                    <img
-                      src={r.photoUrl}
-                      alt=""
-                      onClick={() => setLightboxUrl(r.photoUrl)}
-                      className="mt-2 w-28 h-28 object-cover rounded-lg cursor-zoom-in"
-                    />
-                  )}
-                </li>
-                )
-              })}
+              {otherReviews.map(r => (
+                <ReviewItem
+                  key={r.id}
+                  recipeSlug={id!}
+                  review={r}
+                  lang={lang}
+                  getToken={getToken}
+                  onOpenLightbox={setLightboxUrl}
+                  translation={translations[r.userId]}
+                  onToggleTranslate={() => toggleTranslateReview(r.userId, r.comment)}
+                />
+              ))}
             </ul>
             ) : (
               <p className="text-xs text-cream/25">

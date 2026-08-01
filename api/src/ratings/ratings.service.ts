@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { Rating, RatingDocument } from './schemas/rating.schema'
@@ -39,7 +39,7 @@ export class RatingsService {
     return distribution
   }
 
-  async reviewsForRecipe(recipeSlug: string, limit = 20): Promise<{ userId: string; score: number; comment: string; photoUrl: string | null; createdAt: Date }[]> {
+  async reviewsForRecipe(recipeSlug: string, limit = 20): Promise<{ id: string; userId: string; score: number; comment: string; photoUrl: string | null; upvotes: string[]; createdAt: Date }[]> {
     const docs = await this.ratingModel
       .find({ recipeSlug, comment: { $exists: true, $ne: '' } })
       .sort({ createdAt: -1 })
@@ -47,11 +47,24 @@ export class RatingsService {
       .lean()
       .exec()
     return docs.map(d => ({
+      id: String(d._id),
       userId: d.userId,
       score: d.score,
       comment: d.comment!,
       photoUrl: d.photoUrl ?? null,
+      upvotes: d.upvotes ?? [],
       createdAt: (d as unknown as { createdAt: Date }).createdAt,
     }))
+  }
+
+  async toggleUpvote(userId: string, ratingId: string): Promise<{ upvoted: boolean; count: number }> {
+    const rating = await this.ratingModel.findById(ratingId).exec()
+    if (!rating) throw new NotFoundException('Review not found')
+    const idx = rating.upvotes.indexOf(userId)
+    const upvoted = idx === -1
+    if (upvoted) rating.upvotes.push(userId)
+    else rating.upvotes.splice(idx, 1)
+    await rating.save()
+    return { upvoted, count: rating.upvotes.length }
   }
 }
