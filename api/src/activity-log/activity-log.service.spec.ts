@@ -20,4 +20,26 @@ describe('ActivityLogService', () => {
       metadata: undefined,
     })
   })
+
+  it('trendingSlugs returns recipeIds ordered by view count within the window', async () => {
+    const aggregate = jest.fn().mockResolvedValue([
+      { _id: 'a', count: 5 },
+      { _id: 'b', count: 3 },
+    ])
+    const moduleRef = await Test.createTestingModule({
+      providers: [ActivityLogService, { provide: getModelToken(ActivityLog.name), useValue: { aggregate } }],
+    }).compile()
+
+    const service = moduleRef.get(ActivityLogService)
+    const result = await service.trendingSlugs(6, 7)
+
+    expect(result).toEqual(['a', 'b'])
+    const pipeline = aggregate.mock.calls[0][0]
+    expect(pipeline[0].$match.action).toBe('recipe_viewed')
+    expect(pipeline).toEqual(expect.arrayContaining([
+      { $group: { _id: '$recipeId', count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 6 },
+    ]))
+  })
 })

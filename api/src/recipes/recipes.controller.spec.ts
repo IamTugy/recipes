@@ -28,4 +28,17 @@ describe('RecipesController', () => {
     const controller = new RecipesController(recipesService as any, { record: jest.fn() } as any)
     await expect(controller.findOne('missing', { userId: 'user_1' } as any)).rejects.toThrow(NotFoundException)
   })
+
+  it('GET /recipes/trending returns recipes for the trending slugs, skipping any since-deleted ones', async () => {
+    const activityLog = { record: jest.fn(), trendingSlugs: jest.fn().mockResolvedValue(['a', 'gone', 'b']) }
+    recipesService.findBySlug.mockImplementation((slug: string) =>
+      slug === 'gone' ? Promise.resolve(null) : Promise.resolve({ slug })
+    )
+    const controller = new RecipesController(recipesService as any, activityLog as any)
+
+    const result = await controller.trending()
+
+    expect(activityLog.trendingSlugs).toHaveBeenCalled()
+    expect(result).toEqual([{ slug: 'a' }, { slug: 'b' }])
+  })
 })

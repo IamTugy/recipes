@@ -15,6 +15,13 @@ export class RecipesController {
     return this.recipesService.findAll()
   }
 
+  @Get('trending')
+  async trending() {
+    const slugs = await this.activityLog.trendingSlugs()
+    const recipes = await Promise.all(slugs.map(slug => this.recipesService.findBySlug(slug)))
+    return recipes.filter((r): r is NonNullable<typeof r> => !!r)
+  }
+
   @Get(':slug')
   async findOne(@Param('slug') slug: string, @Req() req: Request & { userId: string }) {
     const recipe = await this.recipesService.findBySlug(slug)
