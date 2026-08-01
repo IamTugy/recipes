@@ -68,6 +68,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
   const [distribution, setDistribution] = useState<Record<1 | 2 | 3 | 4 | 5, number> | null>(null)
   const [hasPostedReview, setHasPostedReview] = useState(false)
   const [isEditingReview, setIsEditingReview] = useState(false)
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null)
   const cookMode = useWakeLock()
 
   // Sync the textarea once the saved note has loaded for this recipe
@@ -227,6 +228,8 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
   const stepsCount = recipe?.steps.reduce((n, g) => n + g.items.length, 0) ?? 0
   const wizardRef = useRef<HTMLDivElement>(null)
   useFocusTrap(wizardRef, wizardOpen)
+  const lightboxRef = useRef<HTMLDivElement>(null)
+  useFocusTrap(lightboxRef, !!lightboxUrl)
 
   useEffect(() => {
     if (!wizardOpen) return
@@ -238,6 +241,15 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
     document.addEventListener('keydown', handleKey)
     return () => document.removeEventListener('keydown', handleKey)
   }, [wizardOpen, stepsCount])
+
+  useEffect(() => {
+    if (!lightboxUrl) return
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') setLightboxUrl(null)
+    }
+    document.addEventListener('keydown', handleKey)
+    return () => document.removeEventListener('keydown', handleKey)
+  }, [lightboxUrl])
 
   if (recipeLoading) {
     return <RecipeDetailSkeleton />
@@ -969,7 +981,12 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                 {reviewComment}
               </p>
               {reviewPhotoUrl && (
-                <img src={reviewPhotoUrl} alt="" className="w-24 h-24 object-cover rounded-lg" />
+                <img
+                  src={reviewPhotoUrl}
+                  alt=""
+                  onClick={() => setLightboxUrl(reviewPhotoUrl)}
+                  className="w-24 h-24 object-cover rounded-lg cursor-zoom-in"
+                />
               )}
             </div>
           ) : (
@@ -991,7 +1008,12 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
             />
             {reviewPhotoUrl && (
               <div className="relative w-24 h-24">
-                <img src={reviewPhotoUrl} alt="" className="w-full h-full object-cover rounded-lg" />
+                <img
+                  src={reviewPhotoUrl}
+                  alt=""
+                  onClick={() => setLightboxUrl(reviewPhotoUrl)}
+                  className="w-full h-full object-cover rounded-lg cursor-zoom-in"
+                />
                 <button type="button"
                   onClick={() => setReviewPhotoUrl(null)}
                   aria-label={lang === 'he' ? 'הסר תמונה' : 'Remove photo'}
@@ -1053,7 +1075,12 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                     {r.comment}
                   </p>
                   {r.photoUrl && (
-                    <img src={r.photoUrl} alt="" className="mt-2 w-28 h-28 object-cover rounded-lg" />
+                    <img
+                      src={r.photoUrl}
+                      alt=""
+                      onClick={() => setLightboxUrl(r.photoUrl)}
+                      className="mt-2 w-28 h-28 object-cover rounded-lg cursor-zoom-in"
+                    />
                   )}
                 </li>
               ))}
@@ -1190,6 +1217,31 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
           </div>
         )
       })()}
+
+      {/* Photo lightbox */}
+      {lightboxUrl && (
+        <div
+          ref={lightboxRef}
+          role="dialog"
+          aria-modal="true"
+          className="print:hidden fixed inset-0 z-[70] bg-black/90 flex items-center justify-center p-4"
+          onClick={() => setLightboxUrl(null)}
+        >
+          <button type="button"
+            onClick={() => setLightboxUrl(null)}
+            aria-label={lang === 'he' ? 'סגור' : 'Close'}
+            className="absolute top-4 right-4 h-10 w-10 flex items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
+          >
+            ✕
+          </button>
+          <img
+            src={lightboxUrl}
+            alt=""
+            onClick={e => e.stopPropagation()}
+            className="max-w-full max-h-full object-contain rounded-lg"
+          />
+        </div>
+      )}
     </div>
   )
 }
