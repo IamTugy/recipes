@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@clerk/react'
 import type { Category, Difficulty, IngredientGroup, Recipe, StepGroup } from '../types'
@@ -55,6 +55,39 @@ export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps)
   )
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [photoUploading, setPhotoUploading] = useState(false)
+  const uploadSlugRef = useRef(existing?.id ?? `new-${Date.now()}`)
+
+  async function handlePhotoSelected(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      showToast(lang === 'he' ? 'סוג קובץ לא נתמך' : 'Unsupported file type', 'error')
+      return
+    }
+    setPhotoUploading(true)
+    try {
+      const token = await getToken()
+      const presignRes = await fetch('/api/uploads/presign', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ recipeSlug: uploadSlugRef.current, contentType: file.type, purpose: 'recipe' }),
+      })
+      if (!presignRes.ok) throw new Error('presign failed')
+      const { uploadUrl, publicUrl } = await presignRes.json()
+      const uploadResult = await fetch(uploadUrl, { method: 'PUT', headers: { 'Content-Type': file.type }, body: file })
+      if (!uploadResult.ok) throw new Error('upload failed')
+      setImage(publicUrl)
+    } catch {
+      showToast(lang === 'he' ? 'העלאת התמונה נכשלה' : 'Photo upload failed', 'error')
+    } finally {
+      setPhotoUploading(false)
+    }
+  }
 
   function updateIngredientGroup(gi: number, patch: Partial<IngredientGroup>) {
     setIngredientGroups(prev => prev.map((g, i) => (i === gi ? { ...g, ...patch } : g)))
@@ -223,8 +256,31 @@ export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps)
           </div>
 
           <div>
-            <label className={labelClass}>{lang === 'he' ? 'קישור לתמונה' : 'Image URL'}</label>
-            <input value={image} onChange={e => setImage(e.target.value)} className={inputClass} placeholder="https://assets.tugy.dev/..." />
+            <label className={labelClass}>{lang === 'he' ? 'תמונה' : 'Photo'}</label>
+            <label className="relative block w-full h-48 rounded-xl overflow-hidden border border-tint/10 bg-tint/[0.03] cursor-pointer group">
+              <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handlePhotoSelected} disabled={photoUploading} className="hidden" />
+              {image ? (
+                <img src={image} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-cream/25">
+                  <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M14 8h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <span className="text-xs">{lang === 'he' ? 'העלה תמונה' : 'Upload a photo'}</span>
+                </div>
+              )}
+              <div className={`absolute inset-0 flex items-center justify-center bg-black/50 transition-opacity ${
+                photoUploading ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+              }`}>
+                <span className="text-xs font-semibold text-white">
+                  {photoUploading
+                    ? (lang === 'he' ? 'מעלה...' : 'Uploading...')
+                    : image
+                      ? (lang === 'he' ? 'החלף תמונה' : 'Swap photo')
+                      : (lang === 'he' ? 'העלה תמונה' : 'Upload photo')}
+                </span>
+              </div>
+            </label>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

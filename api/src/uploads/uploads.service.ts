@@ -29,9 +29,10 @@ export class UploadsService {
     })
   }
 
-  async presignReviewPhotoUpload(recipeSlug: string, contentType: string): Promise<{ uploadUrl: string; publicUrl: string }> {
+  async presignPhotoUpload(recipeSlug: string, contentType: string, purpose: 'review' | 'recipe' = 'review'): Promise<{ uploadUrl: string; publicUrl: string }> {
     const extension = EXTENSION_BY_CONTENT_TYPE[contentType]
-    const key = `reviews/${recipeSlug}/${randomUUID()}.${extension}`
+    const folder = purpose === 'recipe' ? 'recipes' : 'reviews'
+    const key = `${folder}/${recipeSlug}/${randomUUID()}.${extension}`
 
     const command = new PutObjectCommand({
       Bucket: this.bucket,

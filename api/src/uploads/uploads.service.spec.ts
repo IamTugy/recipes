@@ -23,18 +23,25 @@ describe('UploadsService', () => {
     return moduleRef.get(UploadsService)
   }
 
-  it('returns a signed upload URL and a public URL under reviews/<slug>/ for the recipe', async () => {
+  it('returns a signed upload URL and a public URL under reviews/<slug>/ by default', async () => {
     const service = await makeService()
-    const result = await service.presignReviewPhotoUpload('tomato-soup', 'image/jpeg')
+    const result = await service.presignPhotoUpload('tomato-soup', 'image/jpeg')
 
     expect(result.uploadUrl).toBe('https://r2.example.com/signed-put-url')
     expect(result.publicUrl).toMatch(/^https:\/\/recipes-assets\.tugy\.dev\/reviews\/tomato-soup\/[^/]+\.jpg$/)
   })
 
+  it('uses the recipes/<slug>/ folder when purpose is "recipe"', async () => {
+    const service = await makeService()
+    const result = await service.presignPhotoUpload('tomato-soup', 'image/jpeg', 'recipe')
+
+    expect(result.publicUrl).toMatch(/^https:\/\/recipes-assets\.tugy\.dev\/recipes\/tomato-soup\/[^/]+\.jpg$/)
+  })
+
   it('maps content types to the correct file extension', async () => {
     const service = await makeService()
-    const png = await service.presignReviewPhotoUpload('tomato-soup', 'image/png')
-    const webp = await service.presignReviewPhotoUpload('tomato-soup', 'image/webp')
+    const png = await service.presignPhotoUpload('tomato-soup', 'image/png')
+    const webp = await service.presignPhotoUpload('tomato-soup', 'image/webp')
 
     expect(png.publicUrl).toMatch(/\.png$/)
     expect(webp.publicUrl).toMatch(/\.webp$/)

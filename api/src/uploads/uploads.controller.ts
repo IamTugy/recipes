@@ -8,6 +8,6 @@ export class UploadsController {
 
   @Post('presign')
   async presign(@Body() body: PresignUploadDto) {
-    return this.uploadsService.presignReviewPhotoUpload(body.recipeSlug, body.contentType)
+    return this.uploadsService.presignPhotoUpload(body.recipeSlug, body.contentType, body.purpose)
   }
 }

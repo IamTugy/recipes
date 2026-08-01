@@ -51,7 +51,7 @@ export function submitForReview(slug: string) {
 export async function presignAndUploadPhoto(recipeSlug: string, imageBase64: string, contentType: string): Promise<string> {
   const { uploadUrl, publicUrl } = await request<{ uploadUrl: string; publicUrl: string }>('/uploads/presign', {
     method: 'POST',
-    body: JSON.stringify({ recipeSlug, contentType }),
+    body: JSON.stringify({ recipeSlug, contentType, purpose: 'recipe' }),
   })
   const buffer = Buffer.from(imageBase64, 'base64')
   const putRes = await fetch(uploadUrl, {
