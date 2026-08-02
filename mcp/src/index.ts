@@ -5,8 +5,10 @@ import express from 'express'
 import { z } from 'zod'
 import {
   createRecipe,
-  getRecipe,
+  getMyRecipe,
+  getPublicRecipe,
   listMyRecipes,
+  listPublicRecipes,
   presignAndUploadPhoto,
   RecipesApiError,
   submitForReview,
@@ -93,15 +95,46 @@ function createServer(): McpServer {
   )
 
   server.registerTool(
-    'get_recipe',
+    'get_my_recipe',
     {
-      title: 'Get a recipe',
-      description: 'Fetches a single recipe by its slug.',
+      title: 'Get one of my recipes',
+      description: 'Fetches a single recipe you own by its slug, including drafts, pending review, and rejected ones.',
       inputSchema: { slug: z.string() },
     },
     async ({ slug }) => {
       try {
-        return textResult(JSON.stringify(await getRecipe(slug), null, 2))
+        return textResult(JSON.stringify(await getMyRecipe(slug), null, 2))
+      } catch (err) {
+        return errorResult(err)
+      }
+    },
+  )
+
+  server.registerTool(
+    'list_recipes',
+    {
+      title: 'Browse published recipes',
+      description: 'Lists every published recipe on the site. No login required.',
+    },
+    async () => {
+      try {
+        return textResult(JSON.stringify(await listPublicRecipes(), null, 2))
+      } catch (err) {
+        return errorResult(err)
+      }
+    },
+  )
+
+  server.registerTool(
+    'get_recipe',
+    {
+      title: 'Get a published recipe',
+      description: 'Fetches a single published recipe by its slug. No login required.',
+      inputSchema: { slug: z.string() },
+    },
+    async ({ slug }) => {
+      try {
+        return textResult(JSON.stringify(await getPublicRecipe(slug), null, 2))
       } catch (err) {
         return errorResult(err)
       }
@@ -204,13 +237,23 @@ async function main() {
   const app = express()
   app.use(express.json({ limit: '15mb' }))
 
+  const PUBLIC_TOOLS = new Set(['list_recipes', 'get_recipe'])
+
   app.post('/mcp', async (req, res) => {
     const apiKey = process.env.RECIPES_API_KEY
     const authHeader = req.headers.authorization
-    if (!apiKey || authHeader !== `Bearer ${apiKey}`) {
+    const isAuthed = !!apiKey && authHeader === `Bearer ${apiKey}`
+
+    const body = req.body as { method?: string; params?: { name?: string } } | undefined
+    const isToolCall = body?.method === 'tools/call'
+    const toolName = isToolCall ? body?.params?.name : undefined
+    const requiresAuth = isToolCall && !PUBLIC_TOOLS.has(toolName ?? '')
+
+    if (requiresAuth && !isAuthed) {
       res.status(401).json({ error: 'Unauthorized' })
       return
     }
+
     const server = createServer()
     const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined })
     res.on('close', () => {

@@ -11,11 +11,11 @@ export class RecipesApiError extends Error {
   }
 }
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
+async function request<T>(path: string, init?: RequestInit, bearer: string = API_KEY!): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, {
     ...init,
     headers: {
-      Authorization: `Bearer ${API_KEY}`,
+      Authorization: `Bearer ${bearer}`,
       ...(init?.body ? { 'Content-Type': 'application/json' } : {}),
       ...init?.headers,
     },
@@ -32,8 +32,16 @@ export function listMyRecipes() {
   return request<unknown[]>('/recipes/mine')
 }
 
-export function getRecipe(slug: string) {
+export function getMyRecipe(slug: string) {
   return request<unknown>(`/recipes/${encodeURIComponent(slug)}`)
+}
+
+export function listPublicRecipes() {
+  return request<unknown[]>('/recipes')
+}
+
+export function getPublicRecipe(slug: string) {
+  return request<unknown>(`/recipes/public/${encodeURIComponent(slug)}`)
 }
 
 export function createRecipe(body: Record<string, unknown>) {
