@@ -1,3 +1,5 @@
+import { randomBytes } from 'node:crypto'
+import { Redis as RedisClient } from 'ioredis'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js'
@@ -14,6 +16,12 @@ import {
   submitForReview,
   updateRecipe,
 } from './recipesApi.js'
+import { createOAuthStore } from './oauthStore.js'
+import { verifyPkce } from './pkce.js'
+
+function randomToken(bytes: number): string {
+  return randomBytes(bytes).toString('base64url')
+}
 
 const CATEGORIES = ['breakfast', 'lunch', 'dinner', 'dessert', 'salad', 'soup', 'snack', 'bread', 'sauce'] as const
 const DIFFICULTIES = ['easy', 'medium', 'hard'] as const
@@ -76,7 +84,7 @@ function errorResult(err: unknown) {
   return { content: [{ type: 'text' as const, text: message }], isError: true }
 }
 
-function createServer(): McpServer {
+function createServer(bearerToken?: string): McpServer {
   const server = new McpServer({ name: 'recipes-mcp', version: '1.0.0' })
 
   server.registerTool(
@@ -87,7 +95,7 @@ function createServer(): McpServer {
     },
     async () => {
       try {
-        return textResult(JSON.stringify(await listMyRecipes(), null, 2))
+        return textResult(JSON.stringify(await listMyRecipes(bearerToken), null, 2))
       } catch (err) {
         return errorResult(err)
       }
@@ -103,7 +111,7 @@ function createServer(): McpServer {
     },
     async ({ slug }) => {
       try {
-        return textResult(JSON.stringify(await getMyRecipe(slug), null, 2))
+        return textResult(JSON.stringify(await getMyRecipe(slug, bearerToken), null, 2))
       } catch (err) {
         return errorResult(err)
       }
@@ -150,7 +158,7 @@ function createServer(): McpServer {
     },
     async (fields) => {
       try {
-        const recipe = await createRecipe(fields)
+        const recipe = await createRecipe(fields, bearerToken)
         return textResult(`Created draft recipe with slug "${recipe.slug}". Use upload_recipe_photo to attach a photo, then submit_recipe_for_review when ready.`)
       } catch (err) {
         return errorResult(err)
@@ -167,7 +175,7 @@ function createServer(): McpServer {
     },
     async ({ slug, ...fields }) => {
       try {
-        await updateRecipe(slug, fields)
+        await updateRecipe(slug, fields, bearerToken)
         return textResult(`Updated recipe "${slug}".`)
       } catch (err) {
         return errorResult(err)
@@ -188,8 +196,8 @@ function createServer(): McpServer {
     },
     async ({ slug, imageBase64, contentType }) => {
       try {
-        const publicUrl = await presignAndUploadPhoto(slug, imageBase64, contentType)
-        await updateRecipe(slug, { image: publicUrl })
+        const publicUrl = await presignAndUploadPhoto(slug, imageBase64, contentType, bearerToken)
+        await updateRecipe(slug, { image: publicUrl }, bearerToken)
         // Echo the photo back as an image content block, not just a URL -
         // clients that render tool results inline (Claude, and increasingly
         // others) show the actual uploaded photo in the chat as confirmation.
@@ -214,7 +222,7 @@ function createServer(): McpServer {
     },
     async ({ slug }) => {
       try {
-        await submitForReview(slug)
+        await submitForReview(slug, bearerToken)
         return textResult(`Submitted "${slug}" for review.`)
       } catch (err) {
         return errorResult(err)
@@ -234,27 +242,187 @@ async function main() {
     return
   }
 
+  const redis = new RedisClient(process.env.REDIS_URL ?? 'redis://redis.apps.svc.cluster.local:6379')
+  const oauthStore = createOAuthStore(redis)
+
+  const MCP_PUBLIC_URL = process.env.MCP_PUBLIC_URL ?? 'https://mcp.tugy.dev'
+  const CLERK_FRONTEND_API = process.env.CLERK_FRONTEND_API
+  const CLERK_OAUTH_CLIENT_ID = process.env.CLERK_OAUTH_CLIENT_ID
+  const CLERK_OAUTH_CLIENT_SECRET = process.env.CLERK_OAUTH_CLIENT_SECRET
+
   const app = express()
   app.use(express.json({ limit: '15mb' }))
 
   const PUBLIC_TOOLS = new Set(['list_recipes', 'get_recipe'])
 
+  app.get('/.well-known/oauth-authorization-server', (_req, res) => {
+    res.json({
+      issuer: MCP_PUBLIC_URL,
+      authorization_endpoint: `${MCP_PUBLIC_URL}/authorize`,
+      token_endpoint: `${MCP_PUBLIC_URL}/token`,
+      registration_endpoint: `${MCP_PUBLIC_URL}/register`,
+      response_types_supported: ['code'],
+      grant_types_supported: ['authorization_code'],
+      code_challenge_methods_supported: ['S256'],
+      token_endpoint_auth_methods_supported: ['none', 'client_secret_post'],
+    })
+  })
+
+  app.post('/register', async (req, res) => {
+    const redirectUris = req.body?.redirect_uris
+    if (!Array.isArray(redirectUris) || redirectUris.length === 0 || !redirectUris.every((u: unknown) => typeof u === 'string')) {
+      res.status(400).json({ error: 'invalid_client_metadata', error_description: 'redirect_uris must be a non-empty array of strings' })
+      return
+    }
+    const { clientId, clientSecret } = await oauthStore.registerClient({ redirectUris, clientName: req.body?.client_name })
+    res.status(201).json({ client_id: clientId, client_secret: clientSecret, redirect_uris: redirectUris })
+  })
+
+  app.get('/authorize', async (req, res) => {
+    if (!CLERK_FRONTEND_API || !CLERK_OAUTH_CLIENT_ID) {
+      res.status(503).send('OAuth login is not configured on this server yet')
+      return
+    }
+    const { client_id: clientId, redirect_uri: redirectUri, code_challenge: codeChallenge, code_challenge_method: codeChallengeMethod, state: clientState } = req.query as Record<string, string | undefined>
+
+    if (!clientId || !redirectUri || !codeChallenge || !clientState) {
+      res.status(400).send('Missing required parameters: client_id, redirect_uri, code_challenge, state')
+      return
+    }
+    if (codeChallengeMethod && codeChallengeMethod !== 'S256') {
+      res.status(400).send('Only S256 code_challenge_method is supported')
+      return
+    }
+    const client = await oauthStore.getClient(clientId)
+    if (!client || !client.redirectUris.includes(redirectUri)) {
+      res.status(400).send('Unknown client_id or redirect_uri does not match registration')
+      return
+    }
+
+    const proxyState = randomToken(24)
+    await oauthStore.storePendingAuthorization(proxyState, { clientId, redirectUri, codeChallenge, clientState })
+
+    const clerkAuthorizeUrl = new URL(`${CLERK_FRONTEND_API}/oauth/authorize`)
+    clerkAuthorizeUrl.searchParams.set('response_type', 'code')
+    clerkAuthorizeUrl.searchParams.set('client_id', CLERK_OAUTH_CLIENT_ID)
+    clerkAuthorizeUrl.searchParams.set('redirect_uri', `${MCP_PUBLIC_URL}/oauth_callback`)
+    clerkAuthorizeUrl.searchParams.set('scope', 'openid email profile')
+    clerkAuthorizeUrl.searchParams.set('state', proxyState)
+    res.redirect(clerkAuthorizeUrl.toString())
+  })
+
+  app.get('/oauth_callback', async (req, res) => {
+    const { code, state: proxyState, error } = req.query as Record<string, string | undefined>
+    if (error) {
+      res.status(400).send(`Clerk returned an error: ${error}`)
+      return
+    }
+    if (!code || !proxyState) {
+      res.status(400).send('Missing code or state from Clerk callback')
+      return
+    }
+
+    const pending = await oauthStore.takePendingAuthorization(proxyState)
+    if (!pending) {
+      res.status(400).send('Unknown or expired authorization state')
+      return
+    }
+
+    let clerkAccessToken: string
+    try {
+      const tokenRes = await fetch(`${CLERK_FRONTEND_API}/oauth/token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          grant_type: 'authorization_code',
+          code,
+          redirect_uri: `${MCP_PUBLIC_URL}/oauth_callback`,
+          client_id: CLERK_OAUTH_CLIENT_ID!,
+          client_secret: CLERK_OAUTH_CLIENT_SECRET!,
+        }),
+      })
+      if (!tokenRes.ok) throw new Error(await tokenRes.text())
+      const tokenBody = await tokenRes.json() as { access_token: string }
+      clerkAccessToken = tokenBody.access_token
+    } catch (err) {
+      const redirectUrl = new URL(pending.redirectUri)
+      redirectUrl.searchParams.set('error', 'server_error')
+      redirectUrl.searchParams.set('error_description', err instanceof Error ? err.message : String(err))
+      redirectUrl.searchParams.set('state', pending.clientState)
+      res.redirect(redirectUrl.toString())
+      return
+    }
+
+    const proxyCode = randomToken(24)
+    await oauthStore.storeAuthCode(proxyCode, {
+      clerkAccessToken,
+      codeChallenge: pending.codeChallenge,
+      redirectUri: pending.redirectUri,
+      clientId: pending.clientId,
+    })
+
+    const redirectUrl = new URL(pending.redirectUri)
+    redirectUrl.searchParams.set('code', proxyCode)
+    redirectUrl.searchParams.set('state', pending.clientState)
+    res.redirect(redirectUrl.toString())
+  })
+
+  app.post('/token', express.urlencoded({ extended: false }), async (req, res) => {
+    const { grant_type: grantType, code, redirect_uri: redirectUri, client_id: clientId, code_verifier: codeVerifier } = req.body as Record<string, string | undefined>
+
+    if (grantType !== 'authorization_code') {
+      res.status(400).json({ error: 'unsupported_grant_type' })
+      return
+    }
+    if (!code || !redirectUri || !clientId || !codeVerifier) {
+      res.status(400).json({ error: 'invalid_request' })
+      return
+    }
+
+    const authCode = await oauthStore.takeAuthCode(code)
+    if (!authCode) {
+      res.status(400).json({ error: 'invalid_grant', error_description: 'Unknown or expired code' })
+      return
+    }
+    if (authCode.clientId !== clientId || authCode.redirectUri !== redirectUri) {
+      res.status(400).json({ error: 'invalid_grant', error_description: 'client_id or redirect_uri mismatch' })
+      return
+    }
+    if (!verifyPkce(codeVerifier, authCode.codeChallenge)) {
+      res.status(400).json({ error: 'invalid_grant', error_description: 'PKCE verification failed' })
+      return
+    }
+
+    res.json({
+      access_token: authCode.clerkAccessToken,
+      token_type: 'bearer',
+      expires_in: 3600,
+    })
+  })
+
   app.post('/mcp', async (req, res) => {
     const apiKey = process.env.RECIPES_API_KEY
     const authHeader = req.headers.authorization
-    const isAuthed = !!apiKey && authHeader === `Bearer ${apiKey}`
+    const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice('Bearer '.length) : undefined
+    const isAuthed = !!apiKey && bearerToken === apiKey
 
     const body = req.body as { method?: string; params?: { name?: string } } | undefined
     const isToolCall = body?.method === 'tools/call'
     const toolName = isToolCall ? body?.params?.name : undefined
     const requiresAuth = isToolCall && !PUBLIC_TOOLS.has(toolName ?? '')
 
-    if (requiresAuth && !isAuthed) {
+    // Either the legacy shared secret, or an OAuth access token minted by
+    // our own /token endpoint, authorizes a private tool call. Both are
+    // just checked as "is bearerToken present" here - the legacy secret is
+    // forwarded to recipes-api as-is (matching today's behavior exactly),
+    // and an OAuth token is forwarded as-is too since recipes-api is the
+    // actual source of truth for whether a Clerk token is valid.
+    if (requiresAuth && !bearerToken) {
       res.status(401).json({ error: 'Unauthorized' })
       return
     }
 
-    const server = createServer()
+    const server = createServer(isAuthed ? apiKey : bearerToken)
     const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined })
     res.on('close', () => {
       transport.close()

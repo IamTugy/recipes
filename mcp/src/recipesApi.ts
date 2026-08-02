@@ -28,12 +28,12 @@ async function request<T>(path: string, init?: RequestInit, bearer: string = API
   return res.json() as Promise<T>
 }
 
-export function listMyRecipes() {
-  return request<unknown[]>('/recipes/mine')
+export function listMyRecipes(bearer?: string) {
+  return request<unknown[]>('/recipes/mine', undefined, bearer)
 }
 
-export function getMyRecipe(slug: string) {
-  return request<unknown>(`/recipes/${encodeURIComponent(slug)}`)
+export function getMyRecipe(slug: string, bearer?: string) {
+  return request<unknown>(`/recipes/${encodeURIComponent(slug)}`, undefined, bearer)
 }
 
 export function listPublicRecipes() {
@@ -44,23 +44,23 @@ export function getPublicRecipe(slug: string) {
   return request<unknown>(`/recipes/public/${encodeURIComponent(slug)}`)
 }
 
-export function createRecipe(body: Record<string, unknown>) {
-  return request<{ slug: string }>('/recipes', { method: 'POST', body: JSON.stringify(body) })
+export function createRecipe(body: Record<string, unknown>, bearer?: string) {
+  return request<{ slug: string }>('/recipes', { method: 'POST', body: JSON.stringify(body) }, bearer)
 }
 
-export function updateRecipe(slug: string, body: Record<string, unknown>) {
-  return request<{ slug: string }>(`/recipes/${encodeURIComponent(slug)}`, { method: 'PUT', body: JSON.stringify(body) })
+export function updateRecipe(slug: string, body: Record<string, unknown>, bearer?: string) {
+  return request<{ slug: string }>(`/recipes/${encodeURIComponent(slug)}`, { method: 'PUT', body: JSON.stringify(body) }, bearer)
 }
 
-export function submitForReview(slug: string) {
-  return request<unknown>(`/recipes/${encodeURIComponent(slug)}/submit`, { method: 'POST' })
+export function submitForReview(slug: string, bearer?: string) {
+  return request<unknown>(`/recipes/${encodeURIComponent(slug)}/submit`, { method: 'POST' }, bearer)
 }
 
-export async function presignAndUploadPhoto(recipeSlug: string, imageBase64: string, contentType: string): Promise<string> {
+export async function presignAndUploadPhoto(recipeSlug: string, imageBase64: string, contentType: string, bearer?: string): Promise<string> {
   const { uploadUrl, publicUrl } = await request<{ uploadUrl: string; publicUrl: string }>('/uploads/presign', {
     method: 'POST',
     body: JSON.stringify({ recipeSlug, contentType, purpose: 'recipe' }),
-  })
+  }, bearer)
   const buffer = Buffer.from(imageBase64, 'base64')
   const putRes = await fetch(uploadUrl, {
     method: 'PUT',
