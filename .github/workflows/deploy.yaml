@@ -19,10 +19,15 @@ jobs:
         include:
           - app: recipes
             dockerfile: Dockerfile
+            platforms: linux/amd64,linux/arm64
           - app: recipes-api
             dockerfile: api/Dockerfile
+            platforms: linux/amd64,linux/arm64
           - app: recipes-mcp
             dockerfile: mcp/Dockerfile
+            # Cluster nodes are arm64-only; skip the emulated amd64 leg,
+            # which hung indefinitely on this small image's first build.
+            platforms: linux/arm64
     steps:
       - uses: actions/checkout@v4
 
@@ -76,7 +81,7 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          platforms: linux/amd64,linux/arm64
+          platforms: ${{ matrix.platforms }}
           build-args: |
             VITE_CLERK_PUBLISHABLE_KEY=${{ matrix.app == 'recipes' && vars.CLERK_PUBLISHABLE_KEY || '' }}
           cache-from: type=registry,ref=${{ env.DOCKERHUB_USER }}/${{ matrix.app }}:buildcache
