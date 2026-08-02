@@ -254,13 +254,15 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
   const [viewingRevision, setViewingRevision] = useState<RecipeRevision | null>(null)
   const [revisions, setRevisions] = useState<RecipeRevision[] | null>(null)
 
-  async function loadRevisions() {
-    if (!id) return
+  async function loadRevisions(): Promise<RecipeRevision[]> {
+    if (!id) return []
     try {
       const data = await apiFetch<RecipeRevision[]>(`/recipes/${id}/revisions`, getToken)
       setRevisions(data)
+      return data
     } catch {
       setRevisions([])
+      return []
     }
   }
 
@@ -365,6 +367,17 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
     : recipe
   const isViewingNonLatestRevision = viewingRevision != null
     && viewingRevision.revisionNumber !== (canEdit ? recipe.currentRevision : recipe.publishedRevision)
+
+  // Ratings/favorites/reviews are about the published recipe specifically -
+  // a non-owner always sees that (gated server-side), but the owner might be
+  // looking at a private draft-in-progress that nobody has rated yet, or an
+  // older/newer revision than what's actually live. Only show the social
+  // features when what's on screen really is the published content.
+  const isViewingPublishedContent = recipe.publishedRevision != null && (
+    !canEdit || (viewingRevision
+      ? viewingRevision.revisionNumber === recipe.publishedRevision
+      : recipe.status === 'published' && recipe.currentRevision === recipe.publishedRevision)
+  )
 
   const totalTime = displayRecipe.prepTime + displayRecipe.cookTime
   const scaledServings = Math.round(displayRecipe.servings * multiplier)
@@ -619,7 +632,23 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
 
           {/* Favorite / rating / share / print */}
           <div className="print:hidden flex flex-wrap items-center gap-x-4 gap-y-3 mt-5 pt-5 border-t border-tint/[0.06]">
-            <button type="button"
+            {canEdit && recipe.publishedRevision != null && !isViewingPublishedContent && (
+              <button type="button"
+                onClick={async () => {
+                  setRevisionsOpen(true)
+                  const revs = revisions ?? await loadRevisions()
+                  const live = revs.find(r => r.revisionNumber === recipe.publishedRevision)
+                  if (live) setViewingRevision(live)
+                }}
+                className="flex items-center gap-1.5 text-sm font-medium text-herb hover:text-herb/80 transition-colors"
+              >
+                <span>🌐</span>
+                {lang === 'he' ? 'צפה בגרסה המפורסמת' : 'View published version'}
+              </button>
+            )}
+
+            {isViewingPublishedContent && (
+              <button type="button"
               onClick={() => toggleFavorite(recipe.id)}
               className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${
                 favoriteSlugs.has(recipe.id) ? 'text-amber' : 'text-cream/40 hover:text-cream/70'
@@ -630,6 +659,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
               </svg>
               {lang === 'he' ? 'מועדף' : 'Favorite'}
             </button>
+            )}
 
             <div className="relative" ref={collectionMenuRef}>
               <button type="button"
@@ -692,18 +722,20 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
               )}
             </div>
 
-            <div className="flex items-center">
-              {[1, 2, 3, 4, 5].map(n => (
-                <button type="button" key={n} onClick={() => rate(n)} className="text-lg leading-none p-1.5">
-                  <span className={n <= (userRating ?? 0) ? 'text-amber' : 'text-cream/20'}>★</span>
-                </button>
-              ))}
-              {!!recipe.averageRating && (
-                <span className="text-cream/40 text-xs ms-1">
-                  {recipe.averageRating} ({recipe.ratingCount})
-                </span>
-              )}
-            </div>
+            {isViewingPublishedContent && (
+              <div className="flex items-center">
+                {[1, 2, 3, 4, 5].map(n => (
+                  <button type="button" key={n} onClick={() => rate(n)} className="text-lg leading-none p-1.5">
+                    <span className={n <= (userRating ?? 0) ? 'text-amber' : 'text-cream/20'}>★</span>
+                  </button>
+                ))}
+                {!!recipe.averageRating && (
+                  <span className="text-cream/40 text-xs ms-1">
+                    {recipe.averageRating} ({recipe.ratingCount})
+                  </span>
+                )}
+              </div>
+            )}
 
             <button type="button"
               onClick={() => id && toggleCooked(id)}
@@ -1118,6 +1150,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
         </div>
 
         {/* Reviews */}
+        {isViewingPublishedContent && (
         <div className="print:hidden mt-8 card p-5">
           <h2 id="reviews-heading" className="font-serif text-lg font-bold text-cream mb-3 flex items-center gap-2">
             <span>💬</span> {lang === 'he' ? 'ביקורות' : 'Reviews'}
@@ -1272,6 +1305,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
             )
           })()}
         </div>
+        )}
 
         {/* Revision history - hidden while a submission is under review, since
             there's exactly one candidate version to look at in that moment */}
