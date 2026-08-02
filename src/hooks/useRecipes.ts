@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '@clerk/react'
 import type { Recipe } from '../types'
 import { apiFetch, ApiError } from '../lib/api'
+import { notifyRecipeStatusChanged, onRecipeStatusChanged } from '../lib/recipeEvents'
 
 interface ApiRecipe extends Omit<Recipe, 'id'> {
   slug: string
@@ -68,19 +69,27 @@ async function postAction(path: string, getToken: () => Promise<string | null>, 
 }
 
 export async function submitForReview(slug: string, getToken: () => Promise<string | null>): Promise<Recipe> {
-  return toRecipe(await postAction(`/recipes/${slug}/submit`, getToken))
+  const recipe = toRecipe(await postAction(`/recipes/${slug}/submit`, getToken))
+  notifyRecipeStatusChanged()
+  return recipe
 }
 
 export async function cancelSubmission(slug: string, getToken: () => Promise<string | null>): Promise<Recipe> {
-  return toRecipe(await postAction(`/recipes/${slug}/cancel-submission`, getToken))
+  const recipe = toRecipe(await postAction(`/recipes/${slug}/cancel-submission`, getToken))
+  notifyRecipeStatusChanged()
+  return recipe
 }
 
 export async function approveSubmission(slug: string, getToken: () => Promise<string | null>): Promise<Recipe> {
-  return toRecipe(await postAction(`/recipes/${slug}/approve`, getToken))
+  const recipe = toRecipe(await postAction(`/recipes/${slug}/approve`, getToken))
+  notifyRecipeStatusChanged()
+  return recipe
 }
 
 export async function rejectSubmission(slug: string, comment: string, getToken: () => Promise<string | null>): Promise<Recipe> {
-  return toRecipe(await postAction(`/recipes/${slug}/reject`, getToken, { comment }))
+  const recipe = toRecipe(await postAction(`/recipes/${slug}/reject`, getToken, { comment }))
+  notifyRecipeStatusChanged()
+  return recipe
 }
 
 export function useMyRecipes(enabled = true) {
@@ -88,18 +97,24 @@ export function useMyRecipes(enabled = true) {
   const [recipes, setRecipes] = useState<Recipe[]>([])
   const [loading, setLoading] = useState(true)
 
+  function reload() {
+    return apiFetch<ApiRecipe[]>('/recipes/mine', getToken).then(data => setRecipes(data.map(toRecipe)))
+  }
+
   useEffect(() => {
     if (!isLoaded || !isSignedIn || !enabled) return
     let cancelled = false
 
-    apiFetch<ApiRecipe[]>('/recipes/mine', getToken)
-      .then(data => { if (!cancelled) setRecipes(data.map(toRecipe)) })
+    reload()
+      .catch(() => { /* stale badge/list is a minor annoyance, not worth surfacing an error for */ })
       .finally(() => { if (!cancelled) setLoading(false) })
 
-    return () => { cancelled = true }
+    const unsubscribe = onRecipeStatusChanged(() => { reload().catch(() => {}) })
+    return () => { cancelled = true; unsubscribe() }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoaded, isSignedIn, enabled, getToken])
 
-  return { recipes, loading }
+  return { recipes, loading, reload }
 }
 
 export function usePendingSubmissions(enabled = true) {
@@ -119,7 +134,8 @@ export function usePendingSubmissions(enabled = true) {
       .catch(() => { /* handled by the caller retrying, no need to surface here */ })
       .finally(() => { if (!cancelled) setLoading(false) })
 
-    return () => { cancelled = true }
+    const unsubscribe = onRecipeStatusChanged(() => { reload().catch(() => {}) })
+    return () => { cancelled = true; unsubscribe() }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoaded, isSignedIn, enabled, getToken])
 
