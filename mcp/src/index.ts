@@ -157,7 +157,15 @@ function createServer(): McpServer {
       try {
         const publicUrl = await presignAndUploadPhoto(slug, imageBase64, contentType)
         await updateRecipe(slug, { image: publicUrl })
-        return textResult(`Uploaded photo and set it on recipe "${slug}": ${publicUrl}`)
+        // Echo the photo back as an image content block, not just a URL -
+        // clients that render tool results inline (Claude, and increasingly
+        // others) show the actual uploaded photo in the chat as confirmation.
+        return {
+          content: [
+            { type: 'text' as const, text: `Uploaded photo and set it on recipe "${slug}": ${publicUrl}` },
+            { type: 'image' as const, data: imageBase64, mimeType: contentType },
+          ],
+        }
       } catch (err) {
         return errorResult(err)
       }

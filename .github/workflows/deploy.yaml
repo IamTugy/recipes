@@ -21,6 +21,8 @@ jobs:
             dockerfile: Dockerfile
           - app: recipes-api
             dockerfile: api/Dockerfile
+          - app: recipes-mcp
+            dockerfile: mcp/Dockerfile
     steps:
       - uses: actions/checkout@v4
 
@@ -119,8 +121,10 @@ jobs:
         run: |
           RECIPES_IMAGE="$(cat image-tags/recipes.tag)"
           RECIPES_API_IMAGE="$(cat image-tags/recipes-api.tag)"
+          RECIPES_MCP_IMAGE="$(cat image-tags/recipes-mcp.tag)"
           echo "recipes_image=$RECIPES_IMAGE" >> "$GITHUB_OUTPUT"
           echo "recipes_api_image=$RECIPES_API_IMAGE" >> "$GITHUB_OUTPUT"
+          echo "recipes_mcp_image=$RECIPES_MCP_IMAGE" >> "$GITHUB_OUTPUT"
 
       - name: Generate a token
         id: generate-token
@@ -137,4 +141,5 @@ jobs:
         run: |
           gh workflow run -R IamTugy/server deploy-recipes.yaml \
             -f "recipes_image=${{ steps.tags.outputs.recipes_image }}" \
-            -f "recipes_api_image=${{ steps.tags.outputs.recipes_api_image }}"
+            -f "recipes_api_image=${{ steps.tags.outputs.recipes_api_image }}" \
+            -f "recipes_mcp_image=${{ steps.tags.outputs.recipes_mcp_image }}"

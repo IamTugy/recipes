@@ -50,27 +50,48 @@ equivalent):
 
 ## Running remotely (HTTP) - for connectors that need a URL (e.g. ChatGPT, Gemini)
 
-Set `PORT` and the server switches to HTTP mode, exposing a single endpoint
-at `POST /mcp` (Streamable HTTP transport, stateless). Requests must carry
-`Authorization: Bearer <RECIPES_API_KEY>`.
+Deployed and live at **`https://mcp.tugy.dev/mcp`** (Streamable HTTP
+transport, stateless). Requests must carry `Authorization: Bearer
+<RECIPES_API_KEY>` - the key is the same one issued to the `recipes-api`
+deployment, sealed as the `recipes-mcp-apikey` secret in the `apps`
+namespace (`server` repo, `k8s/apps/recipes-mcp/`). Inside the cluster it
+talks to `recipes-api` directly over the internal service DNS
+(`http://recipes-api.apps.svc.cluster.local:80`), not the public API - no
+`/api` prefix needed there since that's an nginx rewrite specific to the
+public route.
 
-```bash
-PORT=3000 RECIPES_API_KEY=... RECIPES_API_BASE_URL=https://recipes.tugy.dev/api npm start
-```
+The pipeline builds and pushes the image automatically on every push to
+`main` (added to the matrix in `.github/workflows/deploy.yaml`), same as
+`recipes` and `recipes-api`; the server repo's `deploy-recipes.yaml` bumps
+the deployment's image tag and applies the manifests. No DNS record was
+needed - `*.tugy.dev` already wildcards to the Cloudflare Tunnel, and the
+tunnel's ingress config forwards every hostname to the same Traefik
+instance, which is what actually does the per-subdomain routing.
 
-A `Dockerfile` is included for containerized deployment. This is **not yet
-wired into the cluster's CI/CD** - deploying it for real (a subdomain like
-`mcp.tugy.dev`, a Cloudflare DNS record, an ingress, and a sealed secret for
-`RECIPES_API_KEY`) needs a DNS change and secret provisioning that's safer
-done deliberately rather than unattended. Do that manually when you're ready:
+To point a Gemini/ChatGPT connector at it: give it the URL above and the
+API key as a bearer token. (Exact steps for adding a custom remote MCP
+connector vary by client and change often - check that client's current
+docs rather than trusting anything written here to stay accurate.)
 
-1. Generate a random `RECIPES_API_KEY` and add it to the `recipes-api`
-   deployment's env (sealed secret, same pattern as its other secrets).
-2. Build and push the image (`docker build -t <registry>/recipes-mcp:<tag> mcp/`).
-3. Add a Cloudflare DNS record for `mcp.tugy.dev` pointing at the tunnel,
-   same as the other subdomains.
-4. Add a `k8s/apps/recipes-mcp/` deployment + service + ingress in the
-   `server` repo, mirroring `k8s/apps/recipes-api/`, with `PORT=3000` and the
-   same `RECIPES_API_KEY` secret mounted.
-5. Point the ChatGPT/Gemini connector config at `https://mcp.tugy.dev/mcp`
-   with the API key as its bearer token.
+## Generated UI in chat - notes for later
+
+MCP tool results aren't limited to plain text. Content blocks can also be
+`image` (base64 + mimeType) - `upload_recipe_photo` already returns one, so
+a client that renders tool results inline shows the actual uploaded photo
+back in the chat, not just a URL. Worth knowing about when brainstorming
+richer integrations:
+
+- **Structured/`outputSchema` results**: `registerTool` supports an
+  `outputSchema` alongside `inputSchema` - a tool can return
+  `structuredContent` (e.g. the full parsed recipe) that a UI-aware client
+  could render as a formatted card instead of raw JSON/text.
+- **Resources**: MCP servers can expose `resources` (e.g.
+  `recipe://<slug>`) that a client can fetch and render distinctly from
+  tool-call text - could back a "preview this recipe" experience.
+- **Multiple content blocks per result**: a single tool call can return
+  text + image + (in principle) other blocks together, which is how
+  today's photo-upload confirmation works.
+
+None of this is implemented beyond the image block on photo upload - it's
+here so the next round of "what should we add" starts from what the
+protocol actually supports, rather than guessing.
