@@ -116,7 +116,7 @@ export default function Nav({ shoppingListCount, onOpenShoppingList }: NavProps)
               <UserButton.Action
                 label={lang === 'he' ? 'שפה' : 'Language'}
                 labelIcon={
-                  <span className="flex items-center gap-1 text-xs font-semibold tracking-widest">
+                  <span className="flex items-center gap-1 text-xs font-semibold tracking-widest mr-2 min-w-[2.75rem]">
                     <span className={lang === 'he' ? 'text-amber' : 'text-cream/35'}>עב</span>
                     <span className="text-cream/15">|</span>
                     <span className={lang === 'en' ? 'text-amber' : 'text-cream/35'}>EN</span>
