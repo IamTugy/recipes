@@ -14,8 +14,11 @@ export class Recipe {
   @Prop()
   titleHe?: string
 
-  @Prop({ required: true })
-  category!: string
+  // Everything below is required to *submit* a recipe for review
+  // (enforced in RecipesService.missingRequiredFields), but a draft can be
+  // saved with just a title - none of it is required at the schema level.
+  @Prop()
+  category?: string
 
   @Prop({ type: [String], default: [] })
   tags!: string[]
@@ -26,31 +29,31 @@ export class Recipe {
   @Prop()
   cuisine?: string
 
-  @Prop({ required: true })
-  image!: string
+  @Prop()
+  image?: string
 
-  @Prop({ required: true })
-  description!: string
+  @Prop()
+  description?: string
 
   @Prop()
   descriptionEn?: string
 
-  @Prop({ required: true })
-  prepTime!: number
+  @Prop()
+  prepTime?: number
 
-  @Prop({ required: true })
-  cookTime!: number
+  @Prop()
+  cookTime?: number
 
-  @Prop({ required: true })
-  servings!: number
+  @Prop()
+  servings?: number
 
-  @Prop({ required: true })
-  difficulty!: string
+  @Prop()
+  difficulty?: string
 
-  @Prop({ type: MongooseSchema.Types.Mixed, required: true })
+  @Prop({ type: MongooseSchema.Types.Mixed, default: [] })
   ingredients!: unknown[]
 
-  @Prop({ type: MongooseSchema.Types.Mixed, required: true })
+  @Prop({ type: MongooseSchema.Types.Mixed, default: [] })
   steps!: unknown[]
 
   @Prop()
