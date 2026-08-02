@@ -251,7 +251,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
 
   const [submitting, setSubmitting] = useState(false)
   const [revisionsOpen, setRevisionsOpen] = useState(false)
-  const [openRevision, setOpenRevision] = useState<number | null>(null)
+  const [viewingRevision, setViewingRevision] = useState<RecipeRevision | null>(null)
   const [revisions, setRevisions] = useState<RecipeRevision[] | null>(null)
 
   async function loadRevisions() {
@@ -303,6 +303,9 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
       setCheckedIngredients(saved ? new Set(JSON.parse(saved)) : new Set())
     } catch { setCheckedIngredients(new Set()) }
     window.scrollTo({ top: 0, behavior: 'instant' })
+    setViewingRevision(null)
+    setRevisionsOpen(false)
+    setRevisions(null)
   }, [id])
 
   // Track this recipe as recently viewed once it has loaded
@@ -354,24 +357,32 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
     )
   }
 
-  const totalTime = recipe.prepTime + recipe.cookTime
-  const scaledServings = Math.round(recipe.servings * multiplier)
+  // Browsing an older revision swaps in that revision's content for
+  // everything content-related (title, image, ingredients, steps, ...)
+  // while status/ownership/ratings/etc keep coming from the live recipe.
+  const displayRecipe: typeof recipe = viewingRevision
+    ? { ...recipe, ...(viewingRevision.snapshot as Partial<typeof recipe>) }
+    : recipe
+  const isViewingNonLatestRevision = viewingRevision != null && viewingRevision.revisionNumber !== recipe.publishedRevision
 
-  const displayTitle = lang === 'he' ? (recipe.titleHe ?? recipe.title) : recipe.title
-  const displaySubtitle = lang === 'he' ? recipe.title : recipe.titleHe
+  const totalTime = displayRecipe.prepTime + displayRecipe.cookTime
+  const scaledServings = Math.round(displayRecipe.servings * multiplier)
+
+  const displayTitle = lang === 'he' ? (displayRecipe.titleHe ?? displayRecipe.title) : displayRecipe.title
+  const displaySubtitle = lang === 'he' ? displayRecipe.title : displayRecipe.titleHe
   const displayDescription = lang === 'he'
-    ? recipe.description
-    : (recipe.descriptionEn ?? recipe.description)
+    ? displayRecipe.description
+    : (displayRecipe.descriptionEn ?? displayRecipe.description)
   const displayTips = lang === 'he'
-    ? (recipe.tips ?? [])
-    : (recipe.tipsEn ?? recipe.tips ?? [])
+    ? (displayRecipe.tips ?? [])
+    : (displayRecipe.tipsEn ?? displayRecipe.tips ?? [])
 
   const relatedRecipes = allRecipes
-    .filter(r => r.id !== recipe.id && r.category === recipe.category && !r.hidden)
+    .filter(r => r.id !== recipe.id && r.category === displayRecipe.category && !r.hidden)
     .slice(0, 4)
 
   function addAllToShoppingList() {
-    const items = recipe!.ingredients.flatMap(group =>
+    const items = displayRecipe.ingredients.flatMap(group =>
       group.items.map(item => {
         const itemName = lang === 'he' ? item.name : (item.nameEn ?? item.name)
         if (!item.amount) return { name: itemName, amount: '' }
@@ -433,9 +444,9 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
 
   // Precompute sequential step numbers to avoid mutable counter inside render
   let _n = 0
-  const stepNums = recipe.steps.map(g => g.items.map(() => ++_n))
+  const stepNums = displayRecipe.steps.map(g => g.items.map(() => ++_n))
 
-  const flatSteps = recipe.steps.flatMap((group, gi) =>
+  const flatSteps = displayRecipe.steps.flatMap((group, gi) =>
     group.items.map((step, si) => ({
       groupIdx: gi,
       stepIdx: si,
@@ -456,14 +467,14 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
     <div className="min-h-dvh bg-bg pt-14" dir={lang === 'he' ? 'rtl' : 'ltr'}>
       {/* Hero image */}
       <div className="print:hidden relative h-64 sm:h-96 overflow-hidden">
-        {recipe.image.includes('assets.tugy.dev') ? (
+        {displayRecipe.image.includes('assets.tugy.dev') ? (
           <img
-            src={recipe.image}
+            src={displayRecipe.image}
             alt={displayTitle}
             className="w-full h-full object-cover"
           />
         ) : (
-          <RecipePlaceholder recipe={recipe} />
+          <RecipePlaceholder recipe={displayRecipe} />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/40 to-transparent" />
         <button type="button"
@@ -484,12 +495,17 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
         {/* Header card */}
         <div className="card p-6 mb-6">
           <div className="flex flex-wrap items-center gap-2 mb-3">
-            <span className="tag">{categoryEmoji[recipe.category]} {tx.categories[recipe.category]}</span>
-            {recipe.cuisine && <span className="tag">{recipe.cuisine}</span>}
-            <span className={`tag font-semibold ${difficultyColor[recipe.difficulty]}`}>
-              {tx.difficulty[recipe.difficulty]}
+            <span className="tag">{categoryEmoji[displayRecipe.category]} {tx.categories[displayRecipe.category]}</span>
+            {displayRecipe.cuisine && <span className="tag">{displayRecipe.cuisine}</span>}
+            <span className={`tag font-semibold ${difficultyColor[displayRecipe.difficulty]}`}>
+              {tx.difficulty[displayRecipe.difficulty]}
             </span>
-            {recipe.featured && <span className="tag-terra text-xs font-semibold">{tx.featured}</span>}
+            {displayRecipe.featured && <span className="tag-terra text-xs font-semibold">{tx.featured}</span>}
+            {isViewingNonLatestRevision && (
+              <span className="tag font-semibold bg-amber/10 text-amber">
+                {lang === 'he' ? `צופה בגרסה v${viewingRevision!.revisionNumber}` : `Viewing v${viewingRevision!.revisionNumber}`}
+              </span>
+            )}
             {recipe.status && recipe.status !== 'published' && canEdit && (
               <span className={`tag font-semibold ${
                 recipe.status === 'draft' ? 'bg-tint/10 text-cream/40'
@@ -546,6 +562,11 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
             >
               {displaySubtitle}
             </p>
+          )}
+          {recipe.status === 'published' && recipe.ownerName && (
+            <Link to={`/chef/${recipe.ownerId}`} className="inline-block text-cream/30 hover:text-cream/60 text-xs mb-3 transition-colors">
+              {lang === 'he' ? `פורסם על ידי ${recipe.ownerName}` : `Published by ${recipe.ownerName}`}
+            </Link>
           )}
           <p
             className="text-cream/70 text-base leading-relaxed mb-5"
@@ -686,6 +707,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
             <button type="button"
               onClick={() => id && toggleCooked(id)}
               aria-pressed={!!id && cookedSlugs.has(id)}
+              title={lang === 'he' ? 'סמנו שבישלתם את המתכון הזה בפועל, כדי לעקוב אחרי מה שכבר הכנתם' : "Mark that you've actually cooked this recipe, to keep track of what you've made"}
               className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${
                 id && cookedSlugs.has(id) ? 'text-herb' : 'text-cream/40 hover:text-cream/70'
               }`}
@@ -700,7 +722,10 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
             </button>
 
             {!!recipe.viewCount && (
-              <span className="flex items-center gap-1 text-cream/30 text-xs">
+              <span
+                className="flex items-center gap-1 text-cream/30 text-xs"
+                title={lang === 'he' ? 'מספר המבקרים הייחודיים, נספר פעם אחת ליום לכל אדם' : 'Unique visitors, counted once per person per day'}
+              >
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -712,11 +737,13 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
             {recipe.status === 'published' && recipe.ownerId && (
               <Link to={`/chef/${recipe.ownerId}`} className="flex items-center gap-1 text-cream/30 hover:text-cream/60 text-xs transition-colors">
                 <span>👤</span>
-                {lang === 'he' ? 'עוד מהשף הזה' : "More from this chef"}
+                {recipe.ownerName
+                  ? (lang === 'he' ? `עוד מ${recipe.ownerName}` : `More from ${recipe.ownerName}`)
+                  : (lang === 'he' ? 'עוד מהשף הזה' : "More from this chef")}
               </Link>
             )}
 
-            {recipe.ingredients.length > 0 && (
+            {displayRecipe.ingredients.length > 0 && (
               <button type="button"
                 onClick={addAllToShoppingList}
                 className="flex items-center gap-1.5 text-sm font-medium text-cream/40 hover:text-cream/70 transition-colors"
@@ -816,10 +843,10 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
 
         <div className="grid grid-cols-1 sm:grid-cols-5 gap-6">
           {/* Ingredients */}
-          {recipe.ingredients.length > 0 && <div className="sm:col-span-2">
+          {displayRecipe.ingredients.length > 0 && <div className="sm:col-span-2">
             <h2 className="font-serif text-xl font-bold text-cream mb-4">{tx.ingredients}</h2>
             <div className="space-y-4">
-              {recipe.ingredients.map((group, gi) => {
+              {displayRecipe.ingredients.map((group, gi) => {
                 const groupLabel = lang === 'he' ? group.group : (group.groupEn ?? group.group)
                 return (
                   <div key={gi}>
@@ -920,7 +947,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
               </div>
             </div>
             <div className="space-y-6">
-              {recipe.steps.map((group, gi) => {
+              {displayRecipe.steps.map((group, gi) => {
                 const groupTitle = lang === 'he' ? group.title : (group.titleEn ?? group.title)
                 return (
                   <div key={gi}>
@@ -1051,9 +1078,9 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
         )}
 
         {/* Tags */}
-        {recipe.tags.length > 0 && (
+        {displayRecipe.tags.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-2">
-            {(lang === 'he' ? recipe.tags : (recipe.tagsEn ?? recipe.tags)).map(tag => (
+            {(lang === 'he' ? displayRecipe.tags : (displayRecipe.tagsEn ?? displayRecipe.tags)).map(tag => (
               <button type="button"
                 key={tag}
                 onClick={() => navigate(`/?tag=${encodeURIComponent(tag)}`)}
@@ -1248,14 +1275,24 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
         {/* Revision history */}
         {!!recipe.currentRevision && (
           <div className="print:hidden mt-6">
-            <button type="button"
-              onClick={() => { setRevisionsOpen(v => !v); if (!revisionsOpen && revisions === null) loadRevisions() }}
-              className="text-xs font-medium text-cream/35 hover:text-cream/60 transition-colors"
-            >
-              {revisionsOpen
-                ? (lang === 'he' ? 'הסתר היסטוריית גרסאות' : 'Hide revision history')
-                : (lang === 'he' ? 'הצג היסטוריית גרסאות' : 'Show revision history')}
-            </button>
+            <div className="flex items-center gap-3">
+              <button type="button"
+                onClick={() => { setRevisionsOpen(v => !v); if (!revisionsOpen && revisions === null) loadRevisions() }}
+                className="text-xs font-medium text-cream/35 hover:text-cream/60 transition-colors"
+              >
+                {revisionsOpen
+                  ? (lang === 'he' ? 'הסתר היסטוריית גרסאות' : 'Hide revision history')
+                  : (lang === 'he' ? 'הצג היסטוריית גרסאות' : 'Show revision history')}
+              </button>
+              {viewingRevision && (
+                <button type="button"
+                  onClick={() => setViewingRevision(null)}
+                  className="text-xs font-semibold text-amber hover:text-amber/80 transition-colors"
+                >
+                  {lang === 'he' ? 'חזרה לגרסה הנוכחית' : 'Back to current version'}
+                </button>
+              )}
+            </div>
             {revisionsOpen && revisions && (
               revisions.length === 0 ? (
                 <p className="mt-3 text-xs text-cream/25">
@@ -1264,19 +1301,15 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
               ) : (
                 <ul className="mt-3 space-y-2">
                   {revisions.map(rev => {
-                    const isOpen = openRevision === rev.revisionNumber
                     const isCurrentlyLive = rev.revisionNumber === recipe.publishedRevision
-                    const ingredientCount = Array.isArray(rev.snapshot.ingredients)
-                      ? (rev.snapshot.ingredients as { items: unknown[] }[]).reduce((n, g) => n + (g.items?.length ?? 0), 0)
-                      : 0
-                    const stepCount = Array.isArray(rev.snapshot.steps)
-                      ? (rev.snapshot.steps as { items: unknown[] }[]).reduce((n, g) => n + (g.items?.length ?? 0), 0)
-                      : 0
+                    const isSelected = viewingRevision?.revisionNumber === rev.revisionNumber
                     return (
-                      <li key={rev.revisionNumber} className={`card p-3 text-xs text-cream/50 ${isCurrentlyLive ? 'border border-amber/30' : ''}`}>
+                      <li key={rev.revisionNumber}>
                         <button type="button"
-                          onClick={() => setOpenRevision(isOpen ? null : rev.revisionNumber)}
-                          className="w-full text-start flex items-center justify-between gap-2"
+                          onClick={() => setViewingRevision(isSelected ? null : rev)}
+                          className={`card w-full p-3 text-xs text-cream/50 flex items-center justify-between gap-2 text-start transition-colors ${
+                            isSelected ? 'border border-amber/50' : isCurrentlyLive ? 'border border-amber/30' : ''
+                          }`}
                         >
                           <span>
                             <span className="font-semibold text-cream/70">v{rev.revisionNumber}</span>
@@ -1286,27 +1319,13 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                             {(rev.snapshot.title as string) ?? ''}
                           </span>
                           <span className="flex items-center gap-1.5 shrink-0">
-                            {isCurrentlyLive ? (
+                            {isCurrentlyLive && (
                               <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-amber/10 text-amber">
                                 {lang === 'he' ? 'הגרסה הפעילה' : 'Currently live'}
-                              </span>
-                            ) : rev.published && (
-                              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-herb/10 text-herb">
-                                {lang === 'he' ? 'פורסם בעבר' : 'Previously published'}
                               </span>
                             )}
                           </span>
                         </button>
-                        {isOpen && (
-                          <div className="mt-2 pt-2 border-t border-tint/[0.06] space-y-1 text-cream/40">
-                            <p>{(rev.snapshot.description as string) ?? ''}</p>
-                            <p>
-                              {lang === 'he'
-                                ? `${ingredientCount} רכיבים · ${stepCount} שלבים`
-                                : `${ingredientCount} ingredients · ${stepCount} steps`}
-                            </p>
-                          </div>
-                        )}
                       </li>
                     )
                   })}

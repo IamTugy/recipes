@@ -65,9 +65,8 @@ export class RecipesController {
   }
 
   @Get(':slug/revisions')
-  async listRevisions(@Param('slug') slug: string, @Req() req: Request & { userId: string }) {
-    const includeDrafts = await this.recipesService.canViewDraftRevisions(slug, req.userId, this.isAdmin(req.userId))
-    return this.recipesService.listRevisions(slug, includeDrafts)
+  async listRevisions(@Param('slug') slug: string) {
+    return this.recipesService.listRevisions(slug)
   }
 
   @Post()

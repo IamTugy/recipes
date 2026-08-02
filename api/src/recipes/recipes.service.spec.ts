@@ -8,6 +8,7 @@ import { RecipeRevision } from './schemas/recipe-revision.schema'
 import { Rating } from '../ratings/schemas/rating.schema'
 import { ActivityLogService } from '../activity-log/activity-log.service'
 import { CookLogService } from '../cook-log/cook-log.service'
+import { UsersService } from '../users/users.service'
 
 describe('RecipesService', () => {
   function makeActivityLog(viewCounts: Map<string, number> = new Map()) {
@@ -16,6 +17,10 @@ describe('RecipesService', () => {
 
   function makeCookLog(cookCounts: Map<string, number> = new Map()) {
     return { countsBySlug: jest.fn().mockResolvedValue(cookCounts) }
+  }
+
+  function makeUsers() {
+    return { namesByIds: jest.fn().mockResolvedValue({}) }
   }
 
   function noUnownedRecipes(overrides: Record<string, unknown> = {}) {
@@ -33,6 +38,7 @@ describe('RecipesService', () => {
     activityLog = makeActivityLog(),
     cookLog = makeCookLog(),
     config: Record<string, unknown> = { get: jest.fn().mockReturnValue('owner_1') },
+    usersService = makeUsers(),
   ) {
     const moduleRef = await Test.createTestingModule({
       providers: [
@@ -42,6 +48,7 @@ describe('RecipesService', () => {
         { provide: getModelToken(Rating.name), useValue: ratingModel },
         { provide: ActivityLogService, useValue: activityLog },
         { provide: CookLogService, useValue: cookLog },
+        { provide: UsersService, useValue: usersService },
         { provide: ConfigService, useValue: config },
       ],
     }).compile()
@@ -157,7 +164,7 @@ describe('RecipesService', () => {
     const result = await service.findAll()
 
     expect(find).toHaveBeenCalledWith({ hidden: { $ne: true }, publishedRevision: { $ne: null } })
-    expect(result).toEqual([{ slug: 'a', averageRating: null, ratingCount: 0, viewCount: 0, cookCount: 0 }])
+    expect(result).toEqual([{ slug: 'a', averageRating: null, ratingCount: 0, viewCount: 0, cookCount: 0, ownerName: null }])
   })
 
   it('findAll overlays the published-revision snapshot instead of live in-progress edits', async () => {
@@ -187,7 +194,7 @@ describe('RecipesService', () => {
     const result = await service.findPublishedByOwner('user_1')
 
     expect(find).toHaveBeenCalledWith({ ownerId: 'user_1', hidden: { $ne: true }, publishedRevision: { $ne: null } })
-    expect(result).toEqual([{ slug: 'a', averageRating: null, ratingCount: 0, viewCount: 0, cookCount: 0 }])
+    expect(result).toEqual([{ slug: 'a', averageRating: null, ratingCount: 0, viewCount: 0, cookCount: 0, ownerName: null }])
   })
 
   it('findBySlug returns the matching published recipe with ratings and views attached', async () => {
@@ -198,7 +205,7 @@ describe('RecipesService', () => {
     const result = await service.findBySlug('a')
 
     expect(findOne).toHaveBeenCalledWith({ slug: 'a', hidden: { $ne: true }, publishedRevision: { $ne: null } })
-    expect(result).toEqual({ slug: 'a', averageRating: 3, ratingCount: 1, viewCount: 7, cookCount: 0 })
+    expect(result).toEqual({ slug: 'a', averageRating: 3, ratingCount: 1, viewCount: 7, cookCount: 0, ownerName: null })
   })
 
   it('findBySlug excludes hidden or never-published recipes', async () => {
@@ -435,47 +442,18 @@ describe('RecipesService', () => {
     expect(recipe.save).toHaveBeenCalled()
   })
 
-  it('canViewDraftRevisions is true for an admin regardless of ownership', async () => {
-    const service = await makeService({})
-    await expect(service.canViewDraftRevisions('a', 'anyone', true)).resolves.toBe(true)
-  })
-
-  it("canViewDraftRevisions is true for the recipe's owner", async () => {
-    const lean = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue({ ownerId: 'user_1' }) })
-    const select = jest.fn().mockReturnValue({ lean })
-    const findOne = jest.fn().mockReturnValue({ select })
-    const service = await makeService({ findOne })
-    await expect(service.canViewDraftRevisions('a', 'user_1', false)).resolves.toBe(true)
-  })
-
-  it('canViewDraftRevisions is false for anyone else', async () => {
-    const lean = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue({ ownerId: 'user_1' }) })
-    const select = jest.fn().mockReturnValue({ lean })
-    const findOne = jest.fn().mockReturnValue({ select })
-    const service = await makeService({ findOne })
-    await expect(service.canViewDraftRevisions('a', 'user_2', false)).resolves.toBe(false)
-  })
-
-  it('listRevisions returns every revision, newest first, when includeDrafts is true', async () => {
-    const revisions = [{ revisionNumber: 2, authorId: 'admin_1', snapshot: {}, published: false, createdAt: new Date('2026-01-02') }]
+  it('listRevisions returns only published revisions, newest first', async () => {
+    const revisions = [{ revisionNumber: 2, authorId: 'admin_1', snapshot: {}, published: true, createdAt: new Date('2026-01-02') }]
     const exec = jest.fn().mockResolvedValue(revisions)
     const lean = jest.fn().mockReturnValue({ exec })
     const sort = jest.fn().mockReturnValue({ lean })
     const find = jest.fn().mockReturnValue({ sort })
     const service = await makeService({}, { find })
-    const result = await service.listRevisions('a', true)
-
-    expect(find).toHaveBeenCalledWith({ recipeSlug: 'a' })
-    expect(sort).toHaveBeenCalledWith({ revisionNumber: -1 })
-    expect(result).toEqual([{ revisionNumber: 2, authorId: 'admin_1', snapshot: {}, published: false, publishedAt: new Date('2026-01-02') }])
-  })
-
-  it('listRevisions only returns published revisions when includeDrafts is false', async () => {
-    const find = jest.fn().mockReturnValue({ sort: () => ({ lean: () => ({ exec: jest.fn().mockResolvedValue([]) }) }) })
-    const service = await makeService({}, { find })
-    await service.listRevisions('a', false)
+    const result = await service.listRevisions('a')
 
     expect(find).toHaveBeenCalledWith({ recipeSlug: 'a', published: true })
+    expect(sort).toHaveBeenCalledWith({ revisionNumber: -1 })
+    expect(result).toEqual([{ revisionNumber: 2, authorId: 'admin_1', snapshot: {}, published: true, publishedAt: new Date('2026-01-02') }])
   })
 
   it('remove deletes a never-published recipe when the requester is its owner', async () => {

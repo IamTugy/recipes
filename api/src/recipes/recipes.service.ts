@@ -7,6 +7,7 @@ import { RecipeRevision, RecipeRevisionDocument } from './schemas/recipe-revisio
 import { Rating, RatingDocument } from '../ratings/schemas/rating.schema'
 import { ActivityLogService } from '../activity-log/activity-log.service'
 import { CookLogService } from '../cook-log/cook-log.service'
+import { UsersService } from '../users/users.service'
 import { SaveRecipeDraftDto } from './dto/save-recipe-draft.dto'
 
 function slugify(text: string): string {
@@ -39,6 +40,7 @@ export class RecipesService implements OnModuleInit {
     @InjectModel(Rating.name) private readonly ratingModel: Model<RatingDocument>,
     private readonly activityLogService: ActivityLogService,
     private readonly cookLogService: CookLogService,
+    private readonly usersService: UsersService,
     private readonly config: ConfigService,
   ) {}
 
@@ -135,12 +137,14 @@ export class RecipesService implements OnModuleInit {
     return new Map(aggregates.map(a => [a._id, { avg: a.avg, count: a.count }]))
   }
 
-  private attachRatingsAndViews<T extends { slug: string }>(
+  private async attachRatingsAndViews<T extends { slug: string; ownerId?: string }>(
     recipes: T[],
     ratings: Map<string, { avg: number; count: number }>,
     views: Map<string, number>,
     cooks: Map<string, number>,
   ) {
+    const ownerIds = [...new Set(recipes.map(r => r.ownerId).filter((v): v is string => !!v))]
+    const names = await this.usersService.namesByIds(ownerIds)
     return recipes.map(recipe => {
       const rating = ratings.get(recipe.slug)
       return {
@@ -149,6 +153,7 @@ export class RecipesService implements OnModuleInit {
         ratingCount: rating?.count ?? 0,
         viewCount: views.get(recipe.slug) ?? 0,
         cookCount: cooks.get(recipe.slug) ?? 0,
+        ownerName: recipe.ownerId ? names[recipe.ownerId] ?? null : null,
       }
     })
   }
@@ -202,7 +207,7 @@ export class RecipesService implements OnModuleInit {
       this.cookLogService.countsBySlug([slug]),
     ])
     const plain = await this.overlayPublishedSnapshot(recipe)
-    return this.attachRatingsAndViews([plain], ratings, views, cooks)[0]
+    return (await this.attachRatingsAndViews([plain], ratings, views, cooks))[0]
   }
 
   // Bypasses the published-only filter for the owner previewing their own
@@ -222,9 +227,10 @@ export class RecipesService implements OnModuleInit {
         this.activityLogService.viewCountsBySlug([slug]),
         this.cookLogService.countsBySlug([slug]),
       ])
-      return this.attachRatingsAndViews([base], ratings, views, cooks)[0]
+      return (await this.attachRatingsAndViews([base], ratings, views, cooks))[0]
     }
-    return { ...recipe.toObject(), averageRating: null, ratingCount: 0, viewCount: 0, cookCount: 0 }
+    const ownerName = recipe.ownerId ? (await this.usersService.namesByIds([recipe.ownerId]))[recipe.ownerId] ?? null : null
+    return { ...recipe.toObject(), averageRating: null, ratingCount: 0, viewCount: 0, cookCount: 0, ownerName }
   }
 
   async findMine(userId: string) {
@@ -351,16 +357,12 @@ export class RecipesService implements OnModuleInit {
     return recipe
   }
 
-  async canViewDraftRevisions(slug: string, userId: string, isAdmin: boolean): Promise<boolean> {
-    if (isAdmin) return true
-    const recipe = await this.recipeModel.findOne({ slug }).select('ownerId').lean().exec()
-    return !!recipe && recipe.ownerId === userId
-  }
-
-  async listRevisions(slug: string, includeDrafts: boolean) {
-    const filter: Record<string, unknown> = { recipeSlug: slug }
-    if (!includeDrafts) filter.published = true
-    const revisions = await this.revisionModel.find(filter).sort({ revisionNumber: -1 }).lean().exec()
+  // The recipe's history is its published trajectory - only ever-approved
+  // revisions show up here, for anyone, including the owner. Drafts in
+  // progress are visible directly on the recipe (findBySlugForUser), not
+  // through this list.
+  async listRevisions(slug: string) {
+    const revisions = await this.revisionModel.find({ recipeSlug: slug, published: true }).sort({ revisionNumber: -1 }).lean().exec()
     return revisions.map(r => ({
       revisionNumber: r.revisionNumber,
       authorId: r.authorId,

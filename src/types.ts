@@ -70,6 +70,7 @@ export interface Recipe {
   cookCount?: number
   createdAt?: string
   ownerId?: string
+  ownerName?: string | null
   status?: 'draft' | 'pending_review' | 'published' | 'rejected'
   reviewComment?: string
   currentRevision?: number
