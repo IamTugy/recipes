@@ -254,6 +254,22 @@ async function main() {
   const app = express()
   app.use(express.json({ limit: '15mb' }))
 
+  // OAuth clients (ChatGPT, Gemini) may run their token exchange directly
+  // from the browser rather than server-to-server. Without CORS headers,
+  // the browser silently blocks that fetch before it ever reaches us -
+  // the auth code gets minted but never redeemed, and the client just
+  // reports a generic connection failure.
+  app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*')
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+    if (req.method === 'OPTIONS') {
+      res.sendStatus(204)
+      return
+    }
+    next()
+  })
+
   const PUBLIC_TOOLS = new Set(['list_recipes', 'get_recipe'])
 
   app.get('/.well-known/oauth-authorization-server', (_req, res) => {
