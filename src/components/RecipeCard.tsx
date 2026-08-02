@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import type { Recipe } from '../types'
-import { formatTime } from '../utils/format'
+import { formatTime, isRecentlyAdded } from '../utils/format'
 import { t, categoryEmoji, difficultyColor } from '../i18n'
 import { useLanguage } from '../hooks/useLanguage'
 import Highlight from './Highlight'
@@ -30,6 +30,7 @@ export default function RecipeCard({ recipe, index, searchQuery, isFavorite, onT
     ? recipe.description
     : (recipe.descriptionEn ?? recipe.description)
   const displayTags = lang === 'he' ? recipe.tags : (recipe.tagsEn ?? recipe.tags)
+  const isNew = isRecentlyAdded(recipe.createdAt)
 
   return (
     <motion.div
@@ -54,11 +55,20 @@ export default function RecipeCard({ recipe, index, searchQuery, isFavorite, onT
               <RecipePlaceholder recipe={recipe} />
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-card/95 via-card/30 to-transparent" />
-            <div className="absolute top-3 left-3">
+            <div className="absolute top-3 left-3 flex items-center gap-1.5">
               <span className="tag flex items-center gap-1">
                 <span>{categoryEmoji[recipe.category]}</span>
                 <span>{tx.categories[recipe.category]}</span>
               </span>
+              {isNew && (
+                <span className="flex items-center gap-1 bg-amber/90 text-bg text-[10px] font-semibold px-2 py-0.5 rounded-full">
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-bg/70" />
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-bg" />
+                  </span>
+                  {tx.newRecipe}
+                </span>
+              )}
             </div>
             <div className="absolute top-3 right-3 flex items-center gap-1.5">
               {statusBadge && (

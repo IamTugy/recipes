@@ -1,3 +1,9 @@
+export function isRecentlyAdded(createdAt: string | undefined): boolean {
+  if (!createdAt) return false
+  const sevenDaysMs = 7 * 24 * 60 * 60 * 1000
+  return Date.now() - new Date(createdAt).getTime() < sevenDaysMs
+}
+
 export function formatTime(minutes: number): string {
   if (minutes < 60) return `${minutes}m`
   const h = Math.floor(minutes / 60)
