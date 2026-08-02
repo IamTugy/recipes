@@ -286,10 +286,13 @@ export class RecipesService implements OnModuleInit {
   // previously could leave the live document's fields out of sync with
   // whichever revision number ended up stored on it.
   async updateDraft(slug: string, userId: string, isAdmin: boolean, dto: SaveRecipeDraftDto): Promise<RecipeDocument> {
-    await this.getEditableOrThrow(slug, userId, isAdmin)
-    const updated = await this.recipeModel
-      .findOneAndUpdate({ slug }, { $set: dto, $inc: { currentRevision: 1 } }, { new: true })
-      .exec()
+    const recipe = await this.getEditableOrThrow(slug, userId, isAdmin)
+    // Editing a rejected recipe means the owner is addressing the feedback -
+    // clear the rejected state so it isn't stuck showing "rejected" forever.
+    const wasRejected = recipe.status === 'rejected'
+    const update: Record<string, unknown> = { $set: { ...dto, ...(wasRejected ? { status: 'draft' } : {}) }, $inc: { currentRevision: 1 } }
+    if (wasRejected) update.$unset = { reviewComment: '' }
+    const updated = await this.recipeModel.findOneAndUpdate({ slug }, update, { new: true }).exec()
     if (!updated) throw new NotFoundException(`Recipe '${slug}' not found`)
     await this.saveNewRevision(updated, userId)
     return updated

@@ -316,6 +316,25 @@ describe('RecipesService', () => {
     expect(result).toBe(updated)
   })
 
+  it('updateDraft resets a rejected recipe back to draft and clears the review comment', async () => {
+    const existing = { slug: 'a', ownerId: 'user_1', status: 'rejected' }
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(existing) })
+    const updated = { slug: 'a', status: 'draft', currentRevision: 2 }
+    const findOneAndUpdate = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(updated) })
+    const service = await makeService({ findOne, findOneAndUpdate }, { create: jest.fn().mockResolvedValue({}) })
+    await service.updateDraft('a', 'user_1', false, minimalDto as any)
+
+    expect(findOneAndUpdate).toHaveBeenCalledWith(
+      { slug: 'a' },
+      {
+        $set: { ...minimalDto, status: 'draft' },
+        $inc: { currentRevision: 1 },
+        $unset: { reviewComment: '' },
+      },
+      { new: true },
+    )
+  })
+
   it('updateDraft is allowed on an already-published recipe (creates a new draft revision without touching what is live)', async () => {
     const existing = { slug: 'a', ownerId: 'user_1', status: 'published' }
     const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(existing) })
