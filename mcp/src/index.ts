@@ -293,7 +293,7 @@ async function main() {
       response_types_supported: ['code'],
       grant_types_supported: ['authorization_code'],
       code_challenge_methods_supported: ['S256'],
-      token_endpoint_auth_methods_supported: ['none', 'client_secret_post'],
+      token_endpoint_auth_methods_supported: ['none', 'client_secret_post', 'client_secret_basic'],
       scopes_supported: ['openid', 'email', 'profile'],
     })
   })
@@ -426,23 +426,38 @@ async function main() {
   })
 
   app.post('/token', express.urlencoded({ extended: false }), async (req, res) => {
-    const { grant_type: grantType, code, redirect_uri: redirectUri, client_id: clientId, code_verifier: codeVerifier } = req.body as Record<string, string | undefined>
+    const { grant_type: grantType, code, redirect_uri: redirectUri, code_verifier: codeVerifier } = req.body as Record<string, string | undefined>
+
+    // Some clients (e.g. ChatGPT) authenticate via HTTP Basic auth
+    // (Authorization: Basic base64(client_id:client_secret)) instead of
+    // putting client_id in the request body, even though our metadata
+    // advertises client_secret_post/none only - support both.
+    let clientId = (req.body as Record<string, string | undefined>).client_id
+    const authHeader = req.headers.authorization
+    if (!clientId && authHeader?.startsWith('Basic ')) {
+      const decoded = Buffer.from(authHeader.slice('Basic '.length), 'base64').toString('utf8')
+      clientId = decoded.split(':')[0]
+    }
 
     if (grantType !== 'authorization_code') {
+      console.log(`[token] rejected: unsupported_grant_type (got "${grantType}")`)
       res.status(400).json({ error: 'unsupported_grant_type' })
       return
     }
     if (!code || !redirectUri || !clientId || !codeVerifier) {
+      console.log(`[token] rejected: invalid_request - code=${!!code} redirectUri=${!!redirectUri} clientId=${!!clientId} codeVerifier=${!!codeVerifier}`)
       res.status(400).json({ error: 'invalid_request' })
       return
     }
 
     const authCode = await oauthStore.takeAuthCode(code)
     if (!authCode) {
+      console.log(`[token] rejected: invalid_grant - unknown or expired code`)
       res.status(400).json({ error: 'invalid_grant', error_description: 'Unknown or expired code' })
       return
     }
     if (authCode.clientId !== clientId || authCode.redirectUri !== redirectUri) {
+      console.log(`[token] rejected: invalid_grant - clientId match=${authCode.clientId === clientId} (got "${clientId}", expected "${authCode.clientId}") redirectUri match=${authCode.redirectUri === redirectUri} (got "${redirectUri}", expected "${authCode.redirectUri}")`)
       res.status(400).json({ error: 'invalid_grant', error_description: 'client_id or redirect_uri mismatch' })
       return
     }
