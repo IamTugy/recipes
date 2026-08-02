@@ -34,38 +34,28 @@ export default function Nav({ shoppingListCount, onOpenShoppingList }: NavProps)
         </button>
 
         <div className="flex items-center gap-0.5 sm:gap-2 shrink-0">
-          {/* Theme cycle: light -> dark -> system */}
+          {/* Create recipe */}
           <button type="button"
-            onClick={cycleTheme}
+            onClick={() => navigate('/recipes/new')}
             className="h-10 w-10 sm:h-7 sm:w-7 flex items-center justify-center rounded-lg text-cream/40 hover:text-cream/70 border border-tint/10 hover:bg-tint/[0.05] transition-colors"
-            title={mode === 'light' ? 'Switch to dark mode' : mode === 'dark' ? 'Switch to system theme' : 'Switch to light mode'}
-            aria-label={mode === 'light' ? 'Switch to dark mode' : mode === 'dark' ? 'Switch to system theme' : 'Switch to light mode'}
+            title={lang === 'he' ? 'מתכון חדש' : 'New Recipe'}
+            aria-label={lang === 'he' ? 'מתכון חדש' : 'New Recipe'}
           >
-            {mode === 'light' ? (
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-              </svg>
-            ) : mode === 'dark' ? (
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-            ) : (
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <rect x="2" y="4" width="20" height="13" rx="2" strokeWidth={1.5} />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 21h8M12 17v4" />
-              </svg>
-            )}
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
+            </svg>
           </button>
 
-          {/* Language toggle */}
+          {/* My Recipes */}
           <button type="button"
-            onClick={() => setLang(lang === 'he' ? 'en' : 'he')}
-            className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 h-10 sm:h-7 rounded-lg text-xs font-semibold tracking-widest border border-tint/10 bg-tint/[0.03] hover:bg-tint/[0.07] transition-colors"
-            title={lang === 'he' ? 'Switch to English' : 'עבור לעברית'}
+            onClick={() => navigate('/my-recipes')}
+            className="h-10 w-10 sm:h-7 sm:w-7 flex items-center justify-center rounded-lg text-cream/40 hover:text-cream/70 border border-tint/10 hover:bg-tint/[0.05] transition-colors"
+            title={lang === 'he' ? 'המתכונים שלי' : 'My Recipes'}
+            aria-label={lang === 'he' ? 'המתכונים שלי' : 'My Recipes'}
           >
-            <span className={lang === 'he' ? 'text-amber' : 'text-cream/35'}>עב</span>
-            <span className="text-cream/15">|</span>
-            <span className={lang === 'en' ? 'text-amber' : 'text-cream/35'}>EN</span>
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
           </button>
 
           {/* Attention: pending submissions (admin) or rejected-with-feedback (owner) */}
@@ -109,11 +99,6 @@ export default function Nav({ shoppingListCount, onOpenShoppingList }: NavProps)
           <UserButton>
             <UserButton.MenuItems>
               <UserButton.Action
-                label={lang === 'he' ? 'מתכון חדש' : 'New Recipe'}
-                labelIcon={<span>➕</span>}
-                onClick={() => navigate('/recipes/new')}
-              />
-              <UserButton.Action
                 label={lang === 'he' ? 'האוספים שלי' : 'My Collections'}
                 labelIcon={<span>📚</span>}
                 onClick={() => navigate('/collections')}
@@ -129,9 +114,14 @@ export default function Nav({ shoppingListCount, onOpenShoppingList }: NavProps)
                 onClick={() => navigate('/feature-requests')}
               />
               <UserButton.Action
-                label={lang === 'he' ? 'המתכונים שלי' : 'My Recipes'}
-                labelIcon={<span>📖</span>}
-                onClick={() => navigate('/my-recipes')}
+                label={lang === 'he' ? 'עבור לעברית' : 'Switch to English'}
+                labelIcon={<span>🌐</span>}
+                onClick={() => setLang(lang === 'he' ? 'en' : 'he')}
+              />
+              <UserButton.Action
+                label={mode === 'light' ? 'Switch to dark mode' : mode === 'dark' ? 'Switch to system theme' : 'Switch to light mode'}
+                labelIcon={<span>{mode === 'light' ? '🌙' : mode === 'dark' ? '🖥️' : '☀️'}</span>}
+                onClick={cycleTheme}
               />
               {isAdmin && (
                 <UserButton.Action
