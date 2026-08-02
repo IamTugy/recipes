@@ -35,6 +35,21 @@ describe('RecipesController', () => {
     await expect(controller.findAll()).resolves.toEqual([{ slug: 'a' }])
   })
 
+  it('GET /recipes/public/:slug returns the recipe when ever-published and not hidden', async () => {
+    recipesService.findBySlug.mockResolvedValue({ slug: 'a', title: 'A' })
+    const controller = makeController()
+
+    await expect(controller.findPublic('a')).resolves.toEqual({ slug: 'a', title: 'A' })
+    expect(recipesService.findBySlug).toHaveBeenCalledWith('a')
+  })
+
+  it('GET /recipes/public/:slug throws 404 when never published, hidden, or missing', async () => {
+    recipesService.findBySlug.mockResolvedValue(null)
+    const controller = makeController()
+
+    await expect(controller.findPublic('missing')).rejects.toThrow(NotFoundException)
+  })
+
   it('GET /recipes/:slug returns the recipe and logs a view when it has ever been published', async () => {
     recipesService.findBySlugForUser.mockResolvedValue({ slug: 'a', status: 'published', publishedRevision: 1 })
     const controller = makeController()

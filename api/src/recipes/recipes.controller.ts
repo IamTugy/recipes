@@ -52,6 +52,15 @@ export class RecipesController {
     return this.recipesService.listPendingSubmissions()
   }
 
+  @Get('public/:slug')
+  async findPublic(@Param('slug') slug: string) {
+    const recipe = await this.recipesService.findBySlug(slug)
+    if (!recipe) {
+      throw new NotFoundException(`Recipe '${slug}' not found`)
+    }
+    return recipe
+  }
+
   @Get(':slug')
   async findOne(@Param('slug') slug: string, @Req() req: Request & { userId: string }) {
     const recipe = await this.recipesService.findBySlugForUser(slug, req.userId, this.isAdmin(req.userId))
