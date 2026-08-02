@@ -279,13 +279,20 @@ export class RecipesService implements OnModuleInit {
     return recipe
   }
 
+  // Uses an atomic $inc for currentRevision rather than read-modify-write,
+  // so two concurrent saves (e.g. a double-click, or a photo upload
+  // followed immediately by Save) each get their own distinct revision
+  // number instead of racing to increment the same stale value - which
+  // previously could leave the live document's fields out of sync with
+  // whichever revision number ended up stored on it.
   async updateDraft(slug: string, userId: string, isAdmin: boolean, dto: SaveRecipeDraftDto): Promise<RecipeDocument> {
-    const recipe = await this.getEditableOrThrow(slug, userId, isAdmin)
-    recipe.set(dto)
-    recipe.currentRevision += 1
-    await recipe.save()
-    await this.saveNewRevision(recipe, userId)
-    return recipe
+    await this.getEditableOrThrow(slug, userId, isAdmin)
+    const updated = await this.recipeModel
+      .findOneAndUpdate({ slug }, { $set: dto, $inc: { currentRevision: 1 } }, { new: true })
+      .exec()
+    if (!updated) throw new NotFoundException(`Recipe '${slug}' not found`)
+    await this.saveNewRevision(updated, userId)
+    return updated
   }
 
   async submitForReview(slug: string, userId: string, isAdmin: boolean): Promise<RecipeDocument> {

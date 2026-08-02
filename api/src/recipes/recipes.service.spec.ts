@@ -298,28 +298,34 @@ describe('RecipesService', () => {
     expect(create).toHaveBeenCalledWith(expect.objectContaining({ slug: 'tomato-soup-2' }))
   })
 
-  it('updateDraft sets the recipe fields, bumps the revision counter, and saves a new snapshot', async () => {
-    const recipe: any = { slug: 'tomato-soup', ownerId: 'user_1', status: 'draft', currentRevision: 1, set: jest.fn(), save: jest.fn().mockResolvedValue(undefined) }
-    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
+  it('updateDraft atomically increments the revision counter and saves a new snapshot', async () => {
+    const existing = { slug: 'tomato-soup', ownerId: 'user_1', status: 'draft' }
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(existing) })
+    const updated = { slug: 'tomato-soup', currentRevision: 2, ...minimalDto }
+    const findOneAndUpdate = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(updated) })
     const revisionCreate = jest.fn().mockResolvedValue({})
-    const service = await makeService({ findOne }, { create: revisionCreate })
+    const service = await makeService({ findOne, findOneAndUpdate }, { create: revisionCreate })
     const result = await service.updateDraft('tomato-soup', 'user_1', false, minimalDto as any)
 
-    expect(recipe.set).toHaveBeenCalledWith(minimalDto)
-    expect(recipe.currentRevision).toBe(2)
-    expect(recipe.save).toHaveBeenCalled()
+    expect(findOneAndUpdate).toHaveBeenCalledWith(
+      { slug: 'tomato-soup' },
+      { $set: minimalDto, $inc: { currentRevision: 1 } },
+      { new: true },
+    )
     expect(revisionCreate).toHaveBeenCalledWith(expect.objectContaining({ recipeSlug: 'tomato-soup', revisionNumber: 2, authorId: 'user_1' }))
-    expect(result).toBe(recipe)
+    expect(result).toBe(updated)
   })
 
   it('updateDraft is allowed on an already-published recipe (creates a new draft revision without touching what is live)', async () => {
-    const recipe: any = { slug: 'a', ownerId: 'user_1', status: 'published', publishedRevision: 1, currentRevision: 1, set: jest.fn(), save: jest.fn().mockResolvedValue(undefined) }
-    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
-    const service = await makeService({ findOne }, { create: jest.fn().mockResolvedValue({}) })
-    await service.updateDraft('a', 'user_1', false, minimalDto as any)
+    const existing = { slug: 'a', ownerId: 'user_1', status: 'published' }
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(existing) })
+    const updated = { slug: 'a', publishedRevision: 1, currentRevision: 2 }
+    const findOneAndUpdate = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(updated) })
+    const service = await makeService({ findOne, findOneAndUpdate }, { create: jest.fn().mockResolvedValue({}) })
+    const result = await service.updateDraft('a', 'user_1', false, minimalDto as any)
 
-    expect(recipe.currentRevision).toBe(2)
-    expect(recipe.publishedRevision).toBe(1)
+    expect(result.currentRevision).toBe(2)
+    expect(result.publishedRevision).toBe(1)
   })
 
   it('updateDraft throws NotFoundException when the recipe does not exist', async () => {

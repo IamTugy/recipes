@@ -363,7 +363,8 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
   const displayRecipe: typeof recipe = viewingRevision
     ? { ...recipe, ...(viewingRevision.snapshot as Partial<typeof recipe>) }
     : recipe
-  const isViewingNonLatestRevision = viewingRevision != null && viewingRevision.revisionNumber !== recipe.publishedRevision
+  const isViewingNonLatestRevision = viewingRevision != null
+    && viewingRevision.revisionNumber !== (canEdit ? recipe.currentRevision : recipe.publishedRevision)
 
   const totalTime = displayRecipe.prepTime + displayRecipe.cookTime
   const scaledServings = Math.round(displayRecipe.servings * multiplier)
@@ -1272,8 +1273,9 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
           })()}
         </div>
 
-        {/* Revision history */}
-        {!!recipe.currentRevision && (
+        {/* Revision history - hidden while a submission is under review, since
+            there's exactly one candidate version to look at in that moment */}
+        {!!recipe.currentRevision && recipe.status !== 'pending_review' && (
           <div className="print:hidden mt-6">
             <div className="flex items-center gap-3">
               <button type="button"
@@ -1301,14 +1303,18 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
               ) : (
                 <ul className="mt-3 space-y-2">
                   {revisions.map(rev => {
-                    const isCurrentlyLive = rev.revisionNumber === recipe.publishedRevision
+                    // Owners/admins default to their latest saved revision
+                    // (which may not be published yet); everyone else
+                    // defaults to whatever is actually live on the site.
+                    const isLatest = rev.revisionNumber === (canEdit ? recipe.currentRevision : recipe.publishedRevision)
+                    const isLive = rev.revisionNumber === recipe.publishedRevision
                     const isSelected = viewingRevision?.revisionNumber === rev.revisionNumber
                     return (
                       <li key={rev.revisionNumber}>
                         <button type="button"
                           onClick={() => setViewingRevision(isSelected ? null : rev)}
                           className={`card w-full p-3 text-xs text-cream/50 flex items-center justify-between gap-2 text-start transition-colors ${
-                            isSelected ? 'border border-amber/50' : isCurrentlyLive ? 'border border-amber/30' : ''
+                            isSelected ? 'border border-amber/50' : isLatest ? 'border border-amber/30' : ''
                           }`}
                         >
                           <span>
@@ -1319,9 +1325,14 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                             {(rev.snapshot.title as string) ?? ''}
                           </span>
                           <span className="flex items-center gap-1.5 shrink-0">
-                            {isCurrentlyLive && (
+                            {isLive && (
+                              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-herb/10 text-herb">
+                                {lang === 'he' ? 'חי באתר' : 'Live on site'}
+                              </span>
+                            )}
+                            {isLatest && !isLive && (
                               <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-amber/10 text-amber">
-                                {lang === 'he' ? 'הגרסה הפעילה' : 'Currently live'}
+                                {lang === 'he' ? 'הגרסה האחרונה' : 'Latest'}
                               </span>
                             )}
                           </span>
