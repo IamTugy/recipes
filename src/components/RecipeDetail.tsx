@@ -603,8 +603,8 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
           {/* Meta grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
-              { label: tx.prep, value: formatTime(recipe.prepTime), icon: '🔪' },
-              { label: tx.cook, value: formatTime(recipe.cookTime), icon: '🔥' },
+              { label: tx.prep, value: formatTime(displayRecipe.prepTime), icon: '🔪' },
+              { label: tx.cook, value: formatTime(displayRecipe.cookTime), icon: '🔥' },
               { label: tx.total, value: formatTime(totalTime), icon: '⏱' },
               { label: tx.servings, value: scaledServings.toString(), icon: '🍽' },
             ].map(item => (
