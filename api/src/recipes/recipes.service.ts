@@ -357,12 +357,20 @@ export class RecipesService implements OnModuleInit {
     return recipe
   }
 
-  // The recipe's history is its published trajectory - only ever-approved
-  // revisions show up here, for anyone, including the owner. Drafts in
-  // progress are visible directly on the recipe (findBySlugForUser), not
-  // through this list.
-  async listRevisions(slug: string) {
-    const revisions = await this.revisionModel.find({ recipeSlug: slug, published: true }).sort({ revisionNumber: -1 }).lean().exec()
+  async canViewDraftRevisions(slug: string, userId: string, isAdmin: boolean): Promise<boolean> {
+    if (isAdmin) return true
+    const recipe = await this.recipeModel.findOne({ slug }).select('ownerId').lean().exec()
+    return !!recipe && recipe.ownerId === userId
+  }
+
+  // A random visitor only ever sees the recipe's published trajectory. The
+  // owner/admin also sees their own drafts-in-progress here, so an edit
+  // that hasn't been submitted/approved yet still shows up as the latest
+  // entry instead of silently missing from the list.
+  async listRevisions(slug: string, includeDrafts: boolean) {
+    const filter: Record<string, unknown> = { recipeSlug: slug }
+    if (!includeDrafts) filter.published = true
+    const revisions = await this.revisionModel.find(filter).sort({ revisionNumber: -1 }).lean().exec()
     return revisions.map(r => ({
       revisionNumber: r.revisionNumber,
       authorId: r.authorId,
