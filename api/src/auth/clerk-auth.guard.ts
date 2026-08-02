@@ -2,6 +2,7 @@ import { CanActivate, ExecutionContext, Injectable, Logger, UnauthorizedExceptio
 import { Reflector } from '@nestjs/core'
 import { ConfigService } from '@nestjs/config'
 import { verifyToken, createClerkClient } from '@clerk/backend'
+import { jwtVerify } from 'jose'
 import { UsersService } from '../users/users.service'
 import { IS_PUBLIC_KEY } from './public.decorator'
 
@@ -42,6 +43,23 @@ export class ClerkAuthGuard implements CanActivate {
     if (apiKey && token === apiKey) {
       request.userId = this.config.get<string>('OWNER_USER_ID')
       return true
+    }
+
+    // The MCP server's OAuth proxy signs its own short-lived JWT (carrying
+    // just a verified Clerk userId claim) for write-tool calls made on
+    // behalf of a signed-in third-party user, since Clerk's own OAuth
+    // access tokens use a token format verifyToken() below doesn't accept.
+    const mcpJwtSecret = this.config.get<string>('MCP_JWT_SECRET')
+    if (mcpJwtSecret) {
+      try {
+        const { payload } = await jwtVerify(token, new TextEncoder().encode(mcpJwtSecret))
+        if (typeof payload.userId === 'string') {
+          request.userId = payload.userId
+          return true
+        }
+      } catch {
+        // Not one of our MCP-issued JWTs - fall through to normal Clerk verification below.
+      }
     }
 
     let userId: string

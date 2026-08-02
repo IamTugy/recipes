@@ -108,6 +108,35 @@ describe('ClerkAuthGuard', () => {
     expect(usersService.upsertFromClerk).not.toHaveBeenCalled()
   })
 
+  it('accepts an MCP-issued JWT and sets userId from its claim', async () => {
+    const { SignJWT } = await import('jose')
+    const secret = new TextEncoder().encode('test-mcp-secret')
+    const token = await new SignJWT({ userId: 'user_from_mcp' })
+      .setProtectedHeader({ alg: 'HS256' })
+      .sign(secret)
+
+    const config = { get: (key: string) => (key === 'MCP_JWT_SECRET' ? 'test-mcp-secret' : key === 'CLERK_SECRET_KEY' ? 'sk_test_xxx' : undefined) }
+    const guard = new ClerkAuthGuard(reflector as any, config as any, usersService as any)
+    const context = contextWithHeader(`Bearer ${token}`)
+    const req = context.switchToHttp().getRequest()
+
+    await expect(guard.canActivate(context)).resolves.toBe(true)
+    expect(req.userId).toBe('user_from_mcp')
+    expect(verifyToken).not.toHaveBeenCalled()
+  })
+
+  it('falls through to normal Clerk verification when MCP_JWT_SECRET is set but the token is not one of ours', async () => {
+    ;(verifyToken as jest.Mock).mockResolvedValue({ sub: 'user_1' })
+    const config = { get: (key: string) => (key === 'MCP_JWT_SECRET' ? 'test-mcp-secret' : key === 'CLERK_SECRET_KEY' ? 'sk_test_xxx' : undefined) }
+    const guard = new ClerkAuthGuard(reflector as any, config as any, usersService as any)
+    const context = contextWithHeader('Bearer some-clerk-session-token')
+    const req = context.switchToHttp().getRequest()
+
+    await expect(guard.canActivate(context)).resolves.toBe(true)
+    expect(req.userId).toBe('user_1')
+    expect(verifyToken).toHaveBeenCalled()
+  })
+
   it('falls through to normal Clerk verification when the token does not match the API key', async () => {
     ;(verifyToken as jest.Mock).mockResolvedValue({ sub: 'user_1' })
     const apiKeyConfig = { get: (key: string) => (key === 'RECIPES_API_KEY' ? 'secret123' : key === 'OWNER_USER_ID' ? 'owner_1' : 'sk_test_xxx') }

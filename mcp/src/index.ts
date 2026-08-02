@@ -16,6 +16,7 @@ import {
   submitForReview,
   updateRecipe,
 } from './recipesApi.js'
+import { createRemoteJWKSet, jwtVerify, SignJWT } from 'jose'
 import { createOAuthStore } from './oauthStore.js'
 import { verifyPkce } from './pkce.js'
 
@@ -328,6 +329,13 @@ async function main() {
       return
     }
 
+    // Clerk's OAuth access token is an RFC 9068 "at+jwt" token, not the
+    // session-token format recipes-api's ClerkAuthGuard verifies via Clerk's
+    // verifyToken() - that call rejects it outright. Instead we verify it
+    // ourselves against Clerk's own JWKS (proving it's a real, currently
+    // valid token for a real user), then mint our own HS256 JWT carrying
+    // just the verified userId, which ClerkAuthGuard has a second path to
+    // accept.
     let clerkAccessToken: string
     try {
       const tokenRes = await fetch(`${CLERK_FRONTEND_API}/oauth/token`, {
@@ -343,7 +351,17 @@ async function main() {
       })
       if (!tokenRes.ok) throw new Error(await tokenRes.text())
       const tokenBody = await tokenRes.json() as { access_token: string }
-      clerkAccessToken = tokenBody.access_token
+
+      const jwks = createRemoteJWKSet(new URL(`${CLERK_FRONTEND_API}/.well-known/jwks.json`))
+      const { payload } = await jwtVerify(tokenBody.access_token, jwks)
+      const clerkUserId = payload.sub!
+
+      const mcpJwtSecret = new TextEncoder().encode(process.env.MCP_JWT_SECRET!)
+      clerkAccessToken = await new SignJWT({ userId: clerkUserId })
+        .setProtectedHeader({ alg: 'HS256' })
+        .setIssuedAt()
+        .setExpirationTime('1h')
+        .sign(mcpJwtSecret)
     } catch (err) {
       const redirectUrl = new URL(pending.redirectUri)
       redirectUrl.searchParams.set('error', 'server_error')
