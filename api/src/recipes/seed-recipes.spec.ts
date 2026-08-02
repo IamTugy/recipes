@@ -93,4 +93,23 @@ describe('seedRecipes idempotency', () => {
     await mongoose.disconnect()
     expect(slugs).toEqual(['seed-one', 'seed-two'])
   }, 60000)
+
+  it('does not overwrite a live edit made after the initial seed', async () => {
+    await seedRecipes(mongoUri, tmpDir)
+
+    await mongoose.connect(mongoUri)
+    await mongoose.connection.collection('recipes').updateOne(
+      { slug: 'seed-one' },
+      { $set: { image: 'https://recipes-assets.tugy.dev/recipes/seed-one/uploaded.jpg', title: 'User Edited Title' } },
+    )
+    await mongoose.disconnect()
+
+    await seedRecipes(mongoUri, tmpDir)
+
+    await mongoose.connect(mongoUri)
+    const doc = await mongoose.connection.collection('recipes').findOne({ slug: 'seed-one' })
+    await mongoose.disconnect()
+    expect(doc?.image).toBe('https://recipes-assets.tugy.dev/recipes/seed-one/uploaded.jpg')
+    expect(doc?.title).toBe('User Edited Title')
+  }, 60000)
 })

@@ -23,8 +23,14 @@ export async function seedRecipes(mongoUri: string, dataDir: string): Promise<nu
   const RecipeModel = mongoose.models[Recipe.name] ?? mongoose.model(Recipe.name, RecipeSchema)
   const recipes = parseRecipeFiles(dataDir)
 
+  // $setOnInsert only applies these fields when a NEW document is created -
+  // an existing recipe (including any live edits a user made through the
+  // app: photo, text, ownership, revision counters) is left untouched. This
+  // seed runs as an initContainer on every pod restart/deploy, so a plain
+  // replace here would silently wipe user edits back to the static YAML on
+  // every redeploy.
   for (const recipe of recipes) {
-    await RecipeModel.findOneAndUpdate({ slug: recipe.slug }, recipe, { upsert: true })
+    await RecipeModel.findOneAndUpdate({ slug: recipe.slug }, { $setOnInsert: recipe }, { upsert: true })
   }
 
   await mongoose.disconnect()
