@@ -269,6 +269,17 @@ async function main() {
     })
   })
 
+  // RFC 9728 Protected Resource Metadata - this is what a spec-compliant
+  // MCP client (ChatGPT, Claude, etc.) fetches FIRST to discover which
+  // authorization server protects this resource. Without it, clients can't
+  // complete the trust chain even if login/consent visually succeeds.
+  app.get('/.well-known/oauth-protected-resource', (_req, res) => {
+    res.json({
+      resource: `${MCP_PUBLIC_URL}/mcp`,
+      authorization_servers: [MCP_PUBLIC_URL],
+    })
+  })
+
   app.post('/register', async (req, res) => {
     const redirectUris = req.body?.redirect_uris
     if (!Array.isArray(redirectUris) || redirectUris.length === 0 || !redirectUris.every((u: unknown) => typeof u === 'string')) {
@@ -436,6 +447,7 @@ async function main() {
     // and an OAuth token is forwarded as-is too since recipes-api is the
     // actual source of truth for whether a Clerk token is valid.
     if (requiresAuth && !bearerToken) {
+      res.setHeader('WWW-Authenticate', `Bearer resource_metadata="${MCP_PUBLIC_URL}/.well-known/oauth-protected-resource"`)
       res.status(401).json({ error: 'Unauthorized' })
       return
     }
