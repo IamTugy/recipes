@@ -340,7 +340,7 @@ export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps)
               </div>
               {group.items.map((item, ii) => (
                 <div key={ii} className="grid grid-cols-12 gap-2 items-center">
-                  <input type="number" value={item.amount ?? ''} onChange={e => updateIngredientItem(gi, ii, { amount: Number(e.target.value) })} className={`${inputClass} col-span-2`} placeholder={lang === 'he' ? 'כמות' : 'Qty'} />
+                  <input type="number" step="any" value={item.amount ?? ''} onChange={e => updateIngredientItem(gi, ii, { amount: Number(e.target.value) })} className={`${inputClass} col-span-2`} placeholder={lang === 'he' ? 'כמות' : 'Qty'} />
                   <input value={item.unit ?? ''} onChange={e => updateIngredientItem(gi, ii, { unit: e.target.value })} className={`${inputClass} col-span-2`} placeholder={lang === 'he' ? 'יחידה' : 'Unit'} />
                   <input value={item.name} onChange={e => updateIngredientItem(gi, ii, { name: e.target.value })} className={`${inputClass} col-span-4`} placeholder={lang === 'he' ? 'שם (עברית)' : 'Name (Hebrew)'} />
                   <input value={item.nameEn ?? ''} onChange={e => updateIngredientItem(gi, ii, { nameEn: e.target.value })} className={`${inputClass} col-span-3`} placeholder={lang === 'he' ? 'שם (אנגלית)' : 'Name (English)'} />

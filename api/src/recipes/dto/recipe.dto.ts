@@ -4,6 +4,7 @@ import {
   IsBoolean,
   IsIn,
   IsInt,
+  IsNumber,
   IsOptional,
   IsString,
   Min,
@@ -15,7 +16,9 @@ const CATEGORIES = ['breakfast', 'lunch', 'dinner', 'dessert', 'salad', 'soup', 
 const DIFFICULTIES = ['easy', 'medium', 'hard']
 
 export class IngredientItemDto {
-  @IsInt()
+  // Not IsInt: fractional amounts are common and valid ("חצי כף" = 0.5 tbsp,
+  // 1.5 cups, etc.) - requiring an integer rejected every recipe using them.
+  @IsNumber()
   @Min(0)
   @IsOptional()
   amount?: number
