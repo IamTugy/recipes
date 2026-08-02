@@ -630,8 +630,45 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
             ))}
           </div>
 
-          {/* Favorite / rating / share / print */}
-          <div className="print:hidden flex flex-wrap items-center gap-x-4 gap-y-3 mt-5 pt-5 border-t border-tint/[0.06]">
+          {/* Primary actions: mark as cooked + rating get the strongest visual weight */}
+          {isViewingPublishedContent && (
+            <div className="print:hidden flex flex-wrap items-center gap-4 mt-5 pt-5 border-t border-tint/[0.06]">
+              <button type="button"
+                onClick={() => id && toggleCooked(id)}
+                aria-pressed={!!id && cookedSlugs.has(id)}
+                title={lang === 'he' ? 'סמנו שבישלתם את המתכון הזה בפועל, כדי לעקוב אחרי מה שכבר הכנתם' : "Mark that you've actually cooked this recipe, to keep track of what you've made"}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
+                  id && cookedSlugs.has(id)
+                    ? 'bg-herb text-white'
+                    : 'bg-amber text-bg hover:bg-amber/90'
+                }`}
+              >
+                <span className="text-lg leading-none">{id && cookedSlugs.has(id) ? '✅' : '🍳'}</span>
+                {id && cookedSlugs.has(id)
+                  ? (lang === 'he' ? 'בישלתי את זה' : 'Made it')
+                  : (lang === 'he' ? 'סמן כבושל' : 'Mark as cooked')}
+                {!!recipe.cookCount && (
+                  <span className="opacity-70 text-xs">({recipe.cookCount})</span>
+                )}
+              </button>
+
+              <div className="flex items-center">
+                {[1, 2, 3, 4, 5].map(n => (
+                  <button type="button" key={n} onClick={() => rate(n)} className="text-2xl leading-none p-1">
+                    <span className={n <= (userRating ?? 0) ? 'text-amber' : 'text-cream/20'}>★</span>
+                  </button>
+                ))}
+                {!!recipe.averageRating && (
+                  <span className="text-cream/40 text-xs ms-1.5">
+                    {recipe.averageRating} ({recipe.ratingCount})
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Favorite / share / print / other actions */}
+          <div className={`print:hidden flex flex-wrap items-center gap-x-4 gap-y-3 ${isViewingPublishedContent ? 'mt-4' : 'mt-5 pt-5 border-t border-tint/[0.06]'}`}>
             {canEdit && recipe.publishedRevision != null && !isViewingPublishedContent && (
               <button type="button"
                 onClick={async () => {
@@ -721,38 +758,6 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                 </div>
               )}
             </div>
-
-            {isViewingPublishedContent && (
-              <div className="flex items-center">
-                {[1, 2, 3, 4, 5].map(n => (
-                  <button type="button" key={n} onClick={() => rate(n)} className="text-lg leading-none p-1.5">
-                    <span className={n <= (userRating ?? 0) ? 'text-amber' : 'text-cream/20'}>★</span>
-                  </button>
-                ))}
-                {!!recipe.averageRating && (
-                  <span className="text-cream/40 text-xs ms-1">
-                    {recipe.averageRating} ({recipe.ratingCount})
-                  </span>
-                )}
-              </div>
-            )}
-
-            <button type="button"
-              onClick={() => id && toggleCooked(id)}
-              aria-pressed={!!id && cookedSlugs.has(id)}
-              title={lang === 'he' ? 'סמנו שבישלתם את המתכון הזה בפועל, כדי לעקוב אחרי מה שכבר הכנתם' : "Mark that you've actually cooked this recipe, to keep track of what you've made"}
-              className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${
-                id && cookedSlugs.has(id) ? 'text-herb' : 'text-cream/40 hover:text-cream/70'
-              }`}
-            >
-              <span>{id && cookedSlugs.has(id) ? '✅' : '🍳'}</span>
-              {id && cookedSlugs.has(id)
-                ? (lang === 'he' ? 'בישלתי את זה' : 'Made it')
-                : (lang === 'he' ? 'סמן כבושל' : 'Mark as cooked')}
-              {!!recipe.cookCount && (
-                <span className="text-cream/30 text-xs">({recipe.cookCount})</span>
-              )}
-            </button>
 
             {!!recipe.viewCount && (
               <span
@@ -876,7 +881,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
 
         <div className="grid grid-cols-1 sm:grid-cols-5 gap-6">
           {/* Ingredients */}
-          {displayRecipe.ingredients.length > 0 && <div className="sm:col-span-2">
+          {displayRecipe.ingredients.length > 0 && <div className="sm:col-span-2 card p-5 bg-amber/[0.04] border-amber/10 h-fit">
             <h2 className="font-serif text-xl font-bold text-cream mb-4">{tx.ingredients}</h2>
             <div className="space-y-4">
               {displayRecipe.ingredients.map((group, gi) => {
@@ -1021,8 +1026,8 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                             tabIndex={0}
                           >
                             <div className="flex gap-3">
-                              <div className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${
-                                checked ? 'bg-herb text-white' : 'bg-tint/10 text-cream/50'
+                              <div className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-base font-bold transition-colors ${
+                                checked ? 'bg-herb text-white' : 'bg-amber text-bg'
                               }`}>
                                 {checked ? '✓' : stepNum}
                               </div>
