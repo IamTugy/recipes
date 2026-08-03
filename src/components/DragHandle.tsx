@@ -1,6 +1,8 @@
+import type { DraggableAttributes, DraggableSyntheticListeners } from '@dnd-kit/core'
+
 interface DragHandleProps {
-  attributes: Record<string, unknown>
-  listeners: Record<string, unknown> | undefined
+  attributes: DraggableAttributes
+  listeners: DraggableSyntheticListeners
   className?: string
 }
 

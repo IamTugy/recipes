@@ -47,9 +47,14 @@ function emptyStepGroup(): LocalStepGroup {
   return keyStepGroup({ title: '', items: [{ instruction: '' }] })
 }
 
-function stripKeys(groups: LocalIngredientGroup[]): IngredientGroup[]
-function stripKeys(groups: LocalStepGroup[]): StepGroup[]
-function stripKeys(groups: (LocalIngredientGroup | LocalStepGroup)[]): (IngredientGroup | StepGroup)[] {
+function stripIngredientKeys(groups: LocalIngredientGroup[]): IngredientGroup[] {
+  return groups.map(({ _key, items, ...rest }) => ({
+    ...rest,
+    items: items.map(({ _key, ...item }) => item),
+  }))
+}
+
+function stripStepKeys(groups: LocalStepGroup[]): StepGroup[] {
   return groups.map(({ _key, items, ...rest }) => ({
     ...rest,
     items: items.map(({ _key, ...item }) => item),
@@ -123,7 +128,7 @@ export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps)
     }
   }
 
-  function updateIngredientGroup(gi: number, patch: Partial<IngredientGroup>) {
+  function updateIngredientGroup(gi: number, patch: Partial<Omit<IngredientGroup, 'items'>>) {
     setIngredientGroups(prev => prev.map((g, i) => (i === gi ? { ...g, ...patch } : g)))
   }
 
@@ -175,7 +180,7 @@ export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps)
     }))
   }
 
-  function updateStepGroup(gi: number, patch: Partial<StepGroup>) {
+  function updateStepGroup(gi: number, patch: Partial<Omit<StepGroup, 'items'>>) {
     setStepGroups(prev => prev.map((g, i) => (i === gi ? { ...g, ...patch } : g)))
   }
 
@@ -247,12 +252,12 @@ export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps)
         tags: tags.split(',').map(s => s.trim()).filter(Boolean),
         tips: tips.split('\n').map(s => s.trim()).filter(Boolean),
         featured,
-        ingredients: stripKeys(
+        ingredients: stripIngredientKeys(
           ingredientGroups
             .map(g => ({ ...g, items: g.items.filter(item => item.name.trim() !== '') }))
             .filter(g => g.items.length > 0)
         ),
-        steps: stripKeys(
+        steps: stripStepKeys(
           stepGroups
             .map(g => ({ ...g, items: g.items.filter(item => item.instruction.trim() !== '') }))
             .filter(g => g.items.length > 0)

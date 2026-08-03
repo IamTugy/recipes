@@ -1,11 +1,12 @@
 import type { ReactNode } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
+import type { DraggableAttributes, DraggableSyntheticListeners } from '@dnd-kit/core'
 import { CSS } from '@dnd-kit/utilities'
 
 interface SortableRowProps {
   id: string
   className?: string
-  children: (handleProps: { attributes: Record<string, unknown>; listeners: Record<string, unknown> | undefined }) => ReactNode
+  children: (handleProps: { attributes: DraggableAttributes; listeners: DraggableSyntheticListeners }) => ReactNode
 }
 
 export default function SortableRow({ id, className, children }: SortableRowProps) {
