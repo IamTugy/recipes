@@ -154,7 +154,7 @@ function createServer(bearerToken?: string): McpServer {
     'create_recipe',
     {
       title: 'Create a recipe draft',
-      description: 'Creates a new private draft recipe owned by the authenticated user. Only title is required; fill in as much as you can from the source (e.g. a photo of a recipe).',
+      description: 'Creates a new private draft recipe owned by the authenticated user. Only title is required, but fill in as much as you can from the source (e.g. a photo of a recipe) - always provide BOTH the Hebrew and English fields (title/titleHe, description/descriptionEn, tags/tagsEn, and nameEn/instructionEn on every ingredient and step) rather than leaving one language blank, and always follow up with upload_recipe_photo before calling submit_recipe_for_review - a recipe cannot go live without a real photo.',
       inputSchema: recipeFieldsSchema,
     },
     async (fields) => {
@@ -171,7 +171,7 @@ function createServer(bearerToken?: string): McpServer {
     'update_recipe',
     {
       title: 'Update a recipe',
-      description: 'Updates an existing recipe owned by the authenticated user. Only provided fields are changed; the recipe must not be pending review.',
+      description: 'Updates an existing recipe owned by the authenticated user. Only provided fields are changed; the recipe must not be pending review. If the recipe is missing a photo or the English (or Hebrew) translation of any field, fill those in here rather than leaving them blank.',
       inputSchema: { slug: z.string(), ...Object.fromEntries(Object.entries(recipeFieldsSchema).map(([k, v]) => [k, v.optional()])) },
     },
     async ({ slug, ...fields }) => {
@@ -218,7 +218,7 @@ function createServer(bearerToken?: string): McpServer {
     'submit_recipe_for_review',
     {
       title: 'Submit a recipe for review',
-      description: 'Submits a complete draft recipe for admin review. All fields must be filled in and a real photo uploaded, or this fails listing what is missing.',
+      description: 'Submits a complete draft recipe for admin review. All fields must be filled in (both Hebrew and English) and a real photo uploaded via upload_recipe_photo, or this fails listing what is missing - call upload_recipe_photo and update_recipe first if it does.',
       inputSchema: { slug: z.string() },
     },
     async ({ slug }) => {

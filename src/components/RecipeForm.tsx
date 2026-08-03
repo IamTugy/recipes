@@ -8,6 +8,7 @@ import { createRecipe, updateRecipe, type RecipeInput } from '../hooks/useRecipe
 import { t, categoryEmoji } from '../i18n'
 import { useLanguage } from '../hooks/useLanguage'
 import { useToast } from '../hooks/useToast'
+import { translateText } from '../lib/translate'
 import SortableRow from './SortableRow'
 import DragHandle from './DragHandle'
 
@@ -84,6 +85,7 @@ export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps)
   const [servings, setServings] = useState(prefill?.servings ?? 4)
   const [tags, setTags] = useState((prefill?.tags ?? []).join(', '))
   const [tips, setTips] = useState((prefill?.tips ?? []).join('\n'))
+  const [tipsEn, setTipsEn] = useState((prefill?.tipsEn ?? []).join('\n'))
   const [featured, setFeatured] = useState(prefill?.featured ?? false)
   const [ingredientGroups, setIngredientGroups] = useState<LocalIngredientGroup[]>(
     prefill?.ingredients?.length ? prefill.ingredients.map(keyIngredientGroup) : [emptyIngredientGroup()]
@@ -93,6 +95,21 @@ export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps)
   )
   const [saving, setSaving] = useState(false)
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }))
+
+  // Auto-fills the other-language field shortly after the user pauses
+  // typing, but only when that field is still empty - it never overwrites
+  // something the user already typed or a previous auto-fill.
+  const translateTimers = useRef(new Map<string, ReturnType<typeof setTimeout>>())
+  function scheduleAutoTranslate(key: string, text: string, targetLang: 'he' | 'en', apply: (translated: string) => void) {
+    const existing = translateTimers.current.get(key)
+    if (existing) clearTimeout(existing)
+    if (!text.trim()) return
+    const timer = setTimeout(async () => {
+      const translated = await translateText(text, targetLang, getToken)
+      if (translated) apply(translated)
+    }, 900)
+    translateTimers.current.set(key, timer)
+  }
   const [error, setError] = useState<string | null>(null)
   const [photoUploading, setPhotoUploading] = useState(false)
   const uploadSlugRef = useRef(existing?.id ?? `new-${Date.now()}`)
@@ -251,6 +268,7 @@ export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps)
         servings,
         tags: tags.split(',').map(s => s.trim()).filter(Boolean),
         tips: tips.split('\n').map(s => s.trim()).filter(Boolean),
+        tipsEn: tipsEn.split('\n').map(s => s.trim()).filter(Boolean),
         featured,
         ingredients: stripIngredientKeys(
           ingredientGroups
@@ -303,11 +321,11 @@ export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps)
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className={labelClass}>{lang === 'he' ? 'כותרת (אנגלית)' : 'Title (English)'}</label>
-              <input required value={title} onChange={e => setTitle(e.target.value)} className={inputClass} />
+              <input required value={title} onChange={e => { const v = e.target.value; setTitle(v); if (!titleHe.trim()) scheduleAutoTranslate('title', v, 'he', setTitleHe) }} className={inputClass} />
             </div>
             <div>
               <label className={labelClass}>{lang === 'he' ? 'כותרת (עברית)' : 'Title (Hebrew)'}</label>
-              <input value={titleHe} onChange={e => setTitleHe(e.target.value)} className={inputClass} dir="rtl" />
+              <input value={titleHe} onChange={e => { const v = e.target.value; setTitleHe(v); if (!title.trim()) scheduleAutoTranslate('titleHe', v, 'en', setTitle) }} className={inputClass} dir="rtl" />
             </div>
           </div>
 
@@ -371,11 +389,11 @@ export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps)
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className={labelClass}>{lang === 'he' ? 'תיאור (עברית)' : 'Description (Hebrew)'}</label>
-              <textarea required value={description} onChange={e => setDescription(e.target.value)} rows={2} className={inputClass} dir="rtl" />
+              <textarea required value={description} onChange={e => { const v = e.target.value; setDescription(v); if (!descriptionEn.trim()) scheduleAutoTranslate('description', v, 'en', setDescriptionEn) }} rows={2} className={inputClass} dir="rtl" />
             </div>
             <div>
               <label className={labelClass}>{lang === 'he' ? 'תיאור (אנגלית)' : 'Description (English)'}</label>
-              <textarea value={descriptionEn} onChange={e => setDescriptionEn(e.target.value)} rows={2} className={inputClass} />
+              <textarea value={descriptionEn} onChange={e => { const v = e.target.value; setDescriptionEn(v); if (!description.trim()) scheduleAutoTranslate('descriptionEn', v, 'he', setDescription) }} rows={2} className={inputClass} />
             </div>
           </div>
 
@@ -399,9 +417,15 @@ export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps)
             <input value={tags} onChange={e => setTags(e.target.value)} className={inputClass} />
           </div>
 
-          <div>
-            <label className={labelClass}>{lang === 'he' ? 'טיפים (שורה לכל טיפ)' : 'Tips (one per line)'}</label>
-            <textarea value={tips} onChange={e => setTips(e.target.value)} rows={2} className={inputClass} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className={labelClass}>{lang === 'he' ? 'טיפים (עברית, שורה לכל טיפ)' : 'Tips (Hebrew, one per line)'}</label>
+              <textarea value={tips} onChange={e => { const v = e.target.value; setTips(v); if (!tipsEn.trim()) scheduleAutoTranslate('tips', v, 'en', setTipsEn) }} rows={2} className={inputClass} dir="rtl" />
+            </div>
+            <div>
+              <label className={labelClass}>{lang === 'he' ? 'טיפים (אנגלית, שורה לכל טיפ)' : 'Tips (English, one per line)'}</label>
+              <textarea value={tipsEn} onChange={e => { const v = e.target.value; setTipsEn(v); if (!tips.trim()) scheduleAutoTranslate('tipsEn', v, 'he', setTips) }} rows={2} className={inputClass} />
+            </div>
           </div>
         </div>
 
@@ -438,8 +462,8 @@ export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps)
                                   <div className="grid grid-cols-12 gap-2 items-center flex-1">
                                     <input type="number" step="any" value={item.amount ?? ''} onChange={e => updateIngredientItem(gi, ii, { amount: Number(e.target.value) })} className={`${inputClass} col-span-2`} placeholder={lang === 'he' ? 'כמות' : 'Qty'} />
                                     <input value={item.unit ?? ''} onChange={e => updateIngredientItem(gi, ii, { unit: e.target.value })} className={`${inputClass} col-span-2`} placeholder={lang === 'he' ? 'יחידה' : 'Unit'} />
-                                    <input value={item.name} onChange={e => updateIngredientItem(gi, ii, { name: e.target.value })} className={`${inputClass} col-span-4`} placeholder={lang === 'he' ? 'שם (עברית)' : 'Name (Hebrew)'} />
-                                    <input value={item.nameEn ?? ''} onChange={e => updateIngredientItem(gi, ii, { nameEn: e.target.value })} className={`${inputClass} col-span-3`} placeholder={lang === 'he' ? 'שם (אנגלית)' : 'Name (English)'} />
+                                    <input value={item.name} onChange={e => { const v = e.target.value; updateIngredientItem(gi, ii, { name: v }); if (!(item.nameEn ?? '').trim()) scheduleAutoTranslate(`ing-${item._key}`, v, 'en', translated => updateIngredientItem(gi, ii, { nameEn: translated })) }} className={`${inputClass} col-span-4`} placeholder={lang === 'he' ? 'שם (עברית)' : 'Name (Hebrew)'} />
+                                    <input value={item.nameEn ?? ''} onChange={e => { const v = e.target.value; updateIngredientItem(gi, ii, { nameEn: v }); if (!item.name.trim()) scheduleAutoTranslate(`ingEn-${item._key}`, v, 'he', translated => updateIngredientItem(gi, ii, { name: translated })) }} className={`${inputClass} col-span-3`} placeholder={lang === 'he' ? 'שם (אנגלית)' : 'Name (English)'} />
                                     <button type="button" onClick={() => removeIngredientItem(gi, ii)} className="col-span-1 text-red-400/60 hover:text-red-400 text-xs">✕</button>
                                   </div>
                                 </div>
@@ -496,7 +520,7 @@ export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps)
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                       <textarea
                                         value={step.instruction}
-                                        onChange={e => updateStepItem(gi, si, { instruction: e.target.value })}
+                                        onChange={e => { const v = e.target.value; updateStepItem(gi, si, { instruction: v }); if (!(step.instructionEn ?? '').trim()) scheduleAutoTranslate(`step-${step._key}`, v, 'en', translated => updateStepItem(gi, si, { instructionEn: translated })) }}
                                         placeholder={lang === 'he' ? `שלב ${si + 1} (עברית)` : `Step ${si + 1} (Hebrew)`}
                                         rows={2}
                                         className={inputClass}
@@ -504,7 +528,7 @@ export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps)
                                       />
                                       <textarea
                                         value={step.instructionEn ?? ''}
-                                        onChange={e => updateStepItem(gi, si, { instructionEn: e.target.value })}
+                                        onChange={e => { const v = e.target.value; updateStepItem(gi, si, { instructionEn: v }); if (!step.instruction.trim()) scheduleAutoTranslate(`stepEn-${step._key}`, v, 'he', translated => updateStepItem(gi, si, { instruction: translated })) }}
                                         placeholder={lang === 'he' ? `שלב ${si + 1} (אנגלית)` : `Step ${si + 1} (English)`}
                                         rows={2}
                                         className={inputClass}

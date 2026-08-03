@@ -13,6 +13,7 @@ import { useCookedRecipes } from '../hooks/useCookedRecipes'
 import { useCollections } from '../hooks/useCollections'
 import { useRecentlyViewed } from '../hooks/useRecentlyViewed'
 import { useNote } from '../hooks/useNote'
+import { useTranslatedRecipe } from '../hooks/useTranslatedRecipe'
 import { useAuth } from '@clerk/react'
 import { formatTime, formatSeconds, scaleAmount } from '../utils/format'
 import { t, categoryEmoji, heUnit, difficultyColor } from '../i18n'
@@ -362,9 +363,12 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
   // Browsing an older revision swaps in that revision's content for
   // everything content-related (title, image, ingredients, steps, ...)
   // while status/ownership/ratings/etc keep coming from the live recipe.
-  const displayRecipe: typeof recipe = viewingRevision
+  const rawDisplayRecipe: typeof recipe = viewingRevision
     ? { ...recipe, ...(viewingRevision.snapshot as Partial<typeof recipe>) }
     : recipe
+  // Auto-fills whichever language the recipe wasn't written in, purely
+  // for display - the underlying data/edit form is untouched.
+  const displayRecipe = useTranslatedRecipe(rawDisplayRecipe, getToken)
   const isViewingNonLatestRevision = viewingRevision != null
     && viewingRevision.revisionNumber !== (canEdit ? recipe.currentRevision : recipe.publishedRevision)
 
