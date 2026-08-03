@@ -5,7 +5,7 @@ import { GoogleGenAI } from '@google/genai'
 @Injectable()
 export class GeminiService {
   private client: GoogleGenAI | null = null
-  private readonly model = 'gemini-2.5-flash'
+  private readonly model = 'gemini-3.5-flash'
 
   constructor(private readonly config: ConfigService) {}
 

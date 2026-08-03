@@ -20,7 +20,7 @@ describe('GeminiService', () => {
     const result = await service.generateStructured<{ title: string }>('extract this')
     expect(result).toEqual({ title: 'Soup' })
     expect(mockGenerateContent).toHaveBeenCalledWith({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3.5-flash',
       contents: 'extract this',
       config: { responseMimeType: 'application/json' },
     })
@@ -47,6 +47,6 @@ describe('GeminiService', () => {
     const service = new GeminiService(config as unknown as ConfigService)
 
     await expect(service.generateText('say hi')).resolves.toBe('hello there')
-    expect(mockGenerateContent).toHaveBeenCalledWith({ model: 'gemini-2.5-flash', contents: 'say hi' })
+    expect(mockGenerateContent).toHaveBeenCalledWith({ model: 'gemini-3.5-flash', contents: 'say hi' })
   })
 })
