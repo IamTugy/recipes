@@ -125,10 +125,15 @@ export default function RecipeImportPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          <button type="button" onClick={handleExtract} disabled={!canSubmit} className="btn-primary disabled:opacity-50">
-            {loading ? (lang === 'he' ? 'מייבא...' : 'Importing...') : (lang === 'he' ? 'ייבוא' : 'Import')}
+          <button type="button" onClick={handleExtract} disabled={!canSubmit} className="btn-primary disabled:opacity-50 flex items-center gap-2">
+            {loading && (
+              <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            )}
+            {loading ? (lang === 'he' ? 'ה-AI מנתח את המתכון...' : 'AI is reading the recipe...') : (lang === 'he' ? 'ייבוא' : 'Import')}
           </button>
-          <button type="button" onClick={() => navigate('/recipes/new/blank')} className="btn-ghost">
+          <button type="button" onClick={() => navigate('/recipes/new/blank')} disabled={loading} className="btn-ghost disabled:opacity-50">
             {lang === 'he' ? 'התחל מדף ריק' : 'Start from scratch instead'}
           </button>
         </div>
