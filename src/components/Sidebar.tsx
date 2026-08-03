@@ -160,7 +160,7 @@ export default function Sidebar({ sidebar }: SidebarProps) {
   return (
     <>
       {/* Desktop pinned sidebar */}
-      <aside className={`print:hidden hidden sm:flex sm:flex-col fixed top-14 bottom-0 start-0 z-30 border-e border-tint/[0.06] bg-bg transition-[width] duration-200 ${collapsed ? 'w-16' : 'w-60'}`}>
+      <aside className={`print:hidden hidden sm:flex sm:flex-col fixed top-14 bottom-0 left-0 z-30 border-r border-tint/[0.06] bg-bg transition-[width] duration-200 ${collapsed ? 'w-16' : 'w-60'}`}>
         {collapsed ? (
           <div className="flex flex-col h-full">
             <div className="flex-1 overflow-hidden">{content(false)}</div>
@@ -192,11 +192,11 @@ export default function Sidebar({ sidebar }: SidebarProps) {
               ref={panelRef}
               role="dialog"
               aria-modal="true"
-              initial={{ x: lang === 'he' ? '100%' : '-100%' }}
+              initial={{ x: '-100%' }}
               animate={{ x: 0 }}
-              exit={{ x: lang === 'he' ? '100%' : '-100%' }}
+              exit={{ x: '-100%' }}
               transition={{ type: 'tween', duration: 0.25 }}
-              className="print:hidden sm:hidden fixed top-0 bottom-0 start-0 w-72 bg-bg z-50 shadow-2xl"
+              className="print:hidden sm:hidden fixed top-0 bottom-0 left-0 w-72 bg-bg z-50 shadow-2xl"
             >
               {content(true, () => setMobileOpen(false))}
             </motion.div>

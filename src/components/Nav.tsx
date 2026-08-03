@@ -19,7 +19,7 @@ export default function Nav({ shoppingListCount, onOpenShoppingList, onToggleMob
           <button type="button"
             onClick={onToggleMobileSidebar}
             aria-label={lang === 'he' ? 'תפריט' : 'Menu'}
-            className="sm:hidden h-10 w-10 flex items-center justify-center rounded-lg text-cream/60 hover:text-cream/90 hover:bg-tint/[0.05] transition-colors shrink-0"
+            className="sm:hidden h-10 w-10 flex items-center justify-center rounded-lg text-cream/60 hover:text-cream/90 transition-colors shrink-0"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
