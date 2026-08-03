@@ -1,11 +1,15 @@
 import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@clerk/react'
-import type { Category, Difficulty, IngredientGroup, Recipe, StepGroup } from '../types'
+import { DndContext, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
+import { SortableContext, arrayMove, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import type { Category, Difficulty, IngredientGroup, IngredientItem, Recipe, StepGroup, StepItem } from '../types'
 import { createRecipe, updateRecipe, type RecipeInput } from '../hooks/useRecipes'
 import { t, categoryEmoji } from '../i18n'
 import { useLanguage } from '../hooks/useLanguage'
 import { useToast } from '../hooks/useToast'
+import SortableRow from './SortableRow'
+import DragHandle from './DragHandle'
 
 interface RecipeFormProps {
   existing?: Recipe
@@ -15,12 +19,41 @@ interface RecipeFormProps {
 const CATEGORIES: Category[] = ['breakfast', 'lunch', 'dinner', 'dessert', 'salad', 'soup', 'snack', 'bread', 'sauce']
 const DIFFICULTIES: Difficulty[] = ['easy', 'medium', 'hard']
 
-function emptyIngredientGroup(): IngredientGroup {
-  return { group: '', items: [{ amount: 0, unit: '', name: '' }] }
+// The editor needs a stable identity per row to drive drag-and-drop
+// reordering, but the underlying Recipe data model has no id field on
+// ingredient/step groups or items - _key is client-only state, stripped
+// out again before the payload is sent to the API.
+type Keyed<T> = T & { _key: string }
+type LocalIngredientGroup = Omit<IngredientGroup, 'items'> & { _key: string; items: Keyed<IngredientItem>[] }
+type LocalStepGroup = Omit<StepGroup, 'items'> & { _key: string; items: Keyed<StepItem>[] }
+
+function makeKey(): string {
+  return Math.random().toString(36).slice(2)
 }
 
-function emptyStepGroup(): StepGroup {
-  return { title: '', items: [{ instruction: '' }] }
+function keyIngredientGroup(g: IngredientGroup): LocalIngredientGroup {
+  return { ...g, _key: makeKey(), items: g.items.map(item => ({ ...item, _key: makeKey() })) }
+}
+
+function keyStepGroup(g: StepGroup): LocalStepGroup {
+  return { ...g, _key: makeKey(), items: g.items.map(item => ({ ...item, _key: makeKey() })) }
+}
+
+function emptyIngredientGroup(): LocalIngredientGroup {
+  return keyIngredientGroup({ group: '', items: [{ amount: 0, unit: '', name: '' }] })
+}
+
+function emptyStepGroup(): LocalStepGroup {
+  return keyStepGroup({ title: '', items: [{ instruction: '' }] })
+}
+
+function stripKeys(groups: LocalIngredientGroup[]): IngredientGroup[]
+function stripKeys(groups: LocalStepGroup[]): StepGroup[]
+function stripKeys(groups: (LocalIngredientGroup | LocalStepGroup)[]): (IngredientGroup | StepGroup)[] {
+  return groups.map(({ _key, items, ...rest }) => ({
+    ...rest,
+    items: items.map(({ _key, ...item }) => item),
+  }))
 }
 
 export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps) {
@@ -47,13 +80,14 @@ export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps)
   const [tags, setTags] = useState((prefill?.tags ?? []).join(', '))
   const [tips, setTips] = useState((prefill?.tips ?? []).join('\n'))
   const [featured, setFeatured] = useState(prefill?.featured ?? false)
-  const [ingredientGroups, setIngredientGroups] = useState<IngredientGroup[]>(
-    prefill?.ingredients?.length ? prefill.ingredients : [emptyIngredientGroup()]
+  const [ingredientGroups, setIngredientGroups] = useState<LocalIngredientGroup[]>(
+    prefill?.ingredients?.length ? prefill.ingredients.map(keyIngredientGroup) : [emptyIngredientGroup()]
   )
-  const [stepGroups, setStepGroups] = useState<StepGroup[]>(
-    prefill?.steps?.length ? prefill.steps : [emptyStepGroup()]
+  const [stepGroups, setStepGroups] = useState<LocalStepGroup[]>(
+    prefill?.steps?.length ? prefill.steps.map(keyStepGroup) : [emptyStepGroup()]
   )
   const [saving, setSaving] = useState(false)
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }))
   const [error, setError] = useState<string | null>(null)
   const [photoUploading, setPhotoUploading] = useState(false)
   const uploadSlugRef = useRef(existing?.id ?? `new-${Date.now()}`)
@@ -102,7 +136,7 @@ export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps)
 
   function addIngredientItem(gi: number) {
     setIngredientGroups(prev => prev.map((g, i) => (
-      i === gi ? { ...g, items: [...g.items, { amount: 0, unit: '', name: '' }] } : g
+      i === gi ? { ...g, items: [...g.items, { amount: 0, unit: '', name: '', _key: makeKey() }] } : g
     )))
   }
 
@@ -120,6 +154,27 @@ export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps)
     setIngredientGroups(prev => prev.filter((_, i) => i !== gi))
   }
 
+  function reorderIngredientGroups(event: DragEndEvent) {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+    setIngredientGroups(prev => {
+      const oldIndex = prev.findIndex(g => g._key === active.id)
+      const newIndex = prev.findIndex(g => g._key === over.id)
+      return arrayMove(prev, oldIndex, newIndex)
+    })
+  }
+
+  function reorderIngredientItems(gi: number, event: DragEndEvent) {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+    setIngredientGroups(prev => prev.map((g, i) => {
+      if (i !== gi) return g
+      const oldIndex = g.items.findIndex(item => item._key === active.id)
+      const newIndex = g.items.findIndex(item => item._key === over.id)
+      return { ...g, items: arrayMove(g.items, oldIndex, newIndex) }
+    }))
+  }
+
   function updateStepGroup(gi: number, patch: Partial<StepGroup>) {
     setStepGroups(prev => prev.map((g, i) => (i === gi ? { ...g, ...patch } : g)))
   }
@@ -133,7 +188,7 @@ export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps)
 
   function addStepItem(gi: number) {
     setStepGroups(prev => prev.map((g, i) => (
-      i === gi ? { ...g, items: [...g.items, { instruction: '' }] } : g
+      i === gi ? { ...g, items: [...g.items, { instruction: '', _key: makeKey() }] } : g
     )))
   }
 
@@ -149,6 +204,27 @@ export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps)
 
   function removeStepGroup(gi: number) {
     setStepGroups(prev => prev.filter((_, i) => i !== gi))
+  }
+
+  function reorderStepGroups(event: DragEndEvent) {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+    setStepGroups(prev => {
+      const oldIndex = prev.findIndex(g => g._key === active.id)
+      const newIndex = prev.findIndex(g => g._key === over.id)
+      return arrayMove(prev, oldIndex, newIndex)
+    })
+  }
+
+  function reorderStepItems(gi: number, event: DragEndEvent) {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+    setStepGroups(prev => prev.map((g, i) => {
+      if (i !== gi) return g
+      const oldIndex = g.items.findIndex(item => item._key === active.id)
+      const newIndex = g.items.findIndex(item => item._key === over.id)
+      return { ...g, items: arrayMove(g.items, oldIndex, newIndex) }
+    }))
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -171,12 +247,16 @@ export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps)
         tags: tags.split(',').map(s => s.trim()).filter(Boolean),
         tips: tips.split('\n').map(s => s.trim()).filter(Boolean),
         featured,
-        ingredients: ingredientGroups
-          .map(g => ({ ...g, items: g.items.filter(item => item.name.trim() !== '') }))
-          .filter(g => g.items.length > 0),
-        steps: stepGroups
-          .map(g => ({ ...g, items: g.items.filter(item => item.instruction.trim() !== '') }))
-          .filter(g => g.items.length > 0),
+        ingredients: stripKeys(
+          ingredientGroups
+            .map(g => ({ ...g, items: g.items.filter(item => item.name.trim() !== '') }))
+            .filter(g => g.items.length > 0)
+        ),
+        steps: stripKeys(
+          stepGroups
+            .map(g => ({ ...g, items: g.items.filter(item => item.instruction.trim() !== '') }))
+            .filter(g => g.items.length > 0)
+        ),
       }
 
       if (isEditing) {
@@ -323,35 +403,55 @@ export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps)
         {/* Ingredients */}
         <div className="card p-5 space-y-4">
           <h2 className="font-serif text-lg font-bold text-cream">{tx.ingredients}</h2>
-          {ingredientGroups.map((group, gi) => (
-            <div key={gi} className="border border-tint/10 rounded-xl p-4 space-y-3">
-              <div className="flex items-center gap-2">
-                <input
-                  value={group.group ?? ''}
-                  onChange={e => updateIngredientGroup(gi, { group: e.target.value })}
-                  placeholder={lang === 'he' ? 'שם הקבוצה (אופציונלי)' : 'Group name (optional)'}
-                  className={`${inputClass} flex-1`}
-                />
-                {ingredientGroups.length > 1 && (
-                  <button type="button" onClick={() => removeIngredientGroup(gi)} className="text-xs text-red-400/70 hover:text-red-400 shrink-0">
-                    {lang === 'he' ? 'הסר קבוצה' : 'Remove group'}
-                  </button>
-                )}
-              </div>
-              {group.items.map((item, ii) => (
-                <div key={ii} className="grid grid-cols-12 gap-2 items-center">
-                  <input type="number" step="any" value={item.amount ?? ''} onChange={e => updateIngredientItem(gi, ii, { amount: Number(e.target.value) })} className={`${inputClass} col-span-2`} placeholder={lang === 'he' ? 'כמות' : 'Qty'} />
-                  <input value={item.unit ?? ''} onChange={e => updateIngredientItem(gi, ii, { unit: e.target.value })} className={`${inputClass} col-span-2`} placeholder={lang === 'he' ? 'יחידה' : 'Unit'} />
-                  <input value={item.name} onChange={e => updateIngredientItem(gi, ii, { name: e.target.value })} className={`${inputClass} col-span-4`} placeholder={lang === 'he' ? 'שם (עברית)' : 'Name (Hebrew)'} />
-                  <input value={item.nameEn ?? ''} onChange={e => updateIngredientItem(gi, ii, { nameEn: e.target.value })} className={`${inputClass} col-span-3`} placeholder={lang === 'he' ? 'שם (אנגלית)' : 'Name (English)'} />
-                  <button type="button" onClick={() => removeIngredientItem(gi, ii)} className="col-span-1 text-red-400/60 hover:text-red-400 text-xs">✕</button>
-                </div>
+          <DndContext sensors={sensors} onDragEnd={reorderIngredientGroups}>
+            <SortableContext items={ingredientGroups.map(g => g._key)} strategy={verticalListSortingStrategy}>
+              {ingredientGroups.map((group, gi) => (
+                <SortableRow key={group._key} id={group._key} className="border border-tint/10 rounded-xl p-4 space-y-3">
+                  {({ attributes, listeners }) => (
+                    <>
+                      <div className="flex items-center gap-2">
+                        <DragHandle attributes={attributes} listeners={listeners} />
+                        <input
+                          value={group.group ?? ''}
+                          onChange={e => updateIngredientGroup(gi, { group: e.target.value })}
+                          placeholder={lang === 'he' ? 'שם הקבוצה (אופציונלי)' : 'Group name (optional)'}
+                          className={`${inputClass} flex-1`}
+                        />
+                        {ingredientGroups.length > 1 && (
+                          <button type="button" onClick={() => removeIngredientGroup(gi)} className="text-xs text-red-400/70 hover:text-red-400 shrink-0">
+                            {lang === 'he' ? 'הסר קבוצה' : 'Remove group'}
+                          </button>
+                        )}
+                      </div>
+                      <DndContext sensors={sensors} onDragEnd={event => reorderIngredientItems(gi, event)}>
+                        <SortableContext items={group.items.map(item => item._key)} strategy={verticalListSortingStrategy}>
+                          {group.items.map((item, ii) => (
+                            <SortableRow key={item._key} id={item._key}>
+                              {({ attributes: itemAttrs, listeners: itemListeners }) => (
+                                <div className="flex items-center gap-2">
+                                  <DragHandle attributes={itemAttrs} listeners={itemListeners} />
+                                  <div className="grid grid-cols-12 gap-2 items-center flex-1">
+                                    <input type="number" step="any" value={item.amount ?? ''} onChange={e => updateIngredientItem(gi, ii, { amount: Number(e.target.value) })} className={`${inputClass} col-span-2`} placeholder={lang === 'he' ? 'כמות' : 'Qty'} />
+                                    <input value={item.unit ?? ''} onChange={e => updateIngredientItem(gi, ii, { unit: e.target.value })} className={`${inputClass} col-span-2`} placeholder={lang === 'he' ? 'יחידה' : 'Unit'} />
+                                    <input value={item.name} onChange={e => updateIngredientItem(gi, ii, { name: e.target.value })} className={`${inputClass} col-span-4`} placeholder={lang === 'he' ? 'שם (עברית)' : 'Name (Hebrew)'} />
+                                    <input value={item.nameEn ?? ''} onChange={e => updateIngredientItem(gi, ii, { nameEn: e.target.value })} className={`${inputClass} col-span-3`} placeholder={lang === 'he' ? 'שם (אנגלית)' : 'Name (English)'} />
+                                    <button type="button" onClick={() => removeIngredientItem(gi, ii)} className="col-span-1 text-red-400/60 hover:text-red-400 text-xs">✕</button>
+                                  </div>
+                                </div>
+                              )}
+                            </SortableRow>
+                          ))}
+                        </SortableContext>
+                      </DndContext>
+                      <button type="button" onClick={() => addIngredientItem(gi)} className="text-xs text-amber hover:text-amber/80">
+                        + {lang === 'he' ? 'הוסף רכיב' : 'Add ingredient'}
+                      </button>
+                    </>
+                  )}
+                </SortableRow>
               ))}
-              <button type="button" onClick={() => addIngredientItem(gi)} className="text-xs text-amber hover:text-amber/80">
-                + {lang === 'he' ? 'הוסף רכיב' : 'Add ingredient'}
-              </button>
-            </div>
-          ))}
+            </SortableContext>
+          </DndContext>
           <button type="button" onClick={addIngredientGroup} className="btn-ghost text-xs">
             + {lang === 'he' ? 'הוסף קבוצת רכיבים' : 'Add ingredient group'}
           </button>
@@ -360,57 +460,86 @@ export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps)
         {/* Steps */}
         <div className="card p-5 space-y-4">
           <h2 className="font-serif text-lg font-bold text-cream">{tx.instructions}</h2>
-          {stepGroups.map((group, gi) => (
-            <div key={gi} className="border border-tint/10 rounded-xl p-4 space-y-3">
-              <div className="flex items-center gap-2">
-                <input
-                  value={group.title ?? ''}
-                  onChange={e => updateStepGroup(gi, { title: e.target.value })}
-                  placeholder={lang === 'he' ? 'שם השלב (אופציונלי)' : 'Section title (optional)'}
-                  className={`${inputClass} flex-1`}
-                />
-                {stepGroups.length > 1 && (
-                  <button type="button" onClick={() => removeStepGroup(gi)} className="text-xs text-red-400/70 hover:text-red-400 shrink-0">
-                    {lang === 'he' ? 'הסר קבוצה' : 'Remove group'}
-                  </button>
-                )}
-              </div>
-              {group.items.map((step, si) => (
-                <div key={si} className="flex flex-col gap-2 border-t border-tint/[0.06] pt-3 first:border-t-0 first:pt-0">
-                  <div className="flex gap-2">
-                    <textarea
-                      value={step.instruction}
-                      onChange={e => updateStepItem(gi, si, { instruction: e.target.value })}
-                      placeholder={lang === 'he' ? `שלב ${si + 1} (עברית)` : `Step ${si + 1} (Hebrew)`}
-                      rows={2}
-                      className={`${inputClass} flex-1`}
-                      dir="rtl"
-                    />
-                    <button type="button" onClick={() => removeStepItem(gi, si)} className="text-red-400/60 hover:text-red-400 text-xs shrink-0">✕</button>
-                  </div>
-                  <div className="flex gap-2">
-                    <input
-                      type="number"
-                      min={1}
-                      value={step.timerMinutes ?? ''}
-                      onChange={e => updateStepItem(gi, si, { timerMinutes: e.target.value ? Number(e.target.value) : undefined })}
-                      placeholder={lang === 'he' ? 'טיימר (דק׳)' : 'Timer (min)'}
-                      className={`${inputClass} w-32`}
-                    />
-                    <input
-                      value={step.tip ?? ''}
-                      onChange={e => updateStepItem(gi, si, { tip: e.target.value })}
-                      placeholder={lang === 'he' ? 'טיפ (אופציונלי)' : 'Tip (optional)'}
-                      className={`${inputClass} flex-1`}
-                    />
-                  </div>
-                </div>
+          <DndContext sensors={sensors} onDragEnd={reorderStepGroups}>
+            <SortableContext items={stepGroups.map(g => g._key)} strategy={verticalListSortingStrategy}>
+              {stepGroups.map((group, gi) => (
+                <SortableRow key={group._key} id={group._key} className="border border-tint/10 rounded-xl p-4 space-y-3">
+                  {({ attributes, listeners }) => (
+                    <>
+                      <div className="flex items-center gap-2">
+                        <DragHandle attributes={attributes} listeners={listeners} />
+                        <input
+                          value={group.title ?? ''}
+                          onChange={e => updateStepGroup(gi, { title: e.target.value })}
+                          placeholder={lang === 'he' ? 'שם השלב (אופציונלי)' : 'Section title (optional)'}
+                          className={`${inputClass} flex-1`}
+                        />
+                        {stepGroups.length > 1 && (
+                          <button type="button" onClick={() => removeStepGroup(gi)} className="text-xs text-red-400/70 hover:text-red-400 shrink-0">
+                            {lang === 'he' ? 'הסר קבוצה' : 'Remove group'}
+                          </button>
+                        )}
+                      </div>
+                      <DndContext sensors={sensors} onDragEnd={event => reorderStepItems(gi, event)}>
+                        <SortableContext items={group.items.map(item => item._key)} strategy={verticalListSortingStrategy}>
+                          {group.items.map((step, si) => (
+                            <SortableRow key={step._key} id={step._key} className="border-t border-tint/[0.06] pt-3 first:border-t-0 first:pt-0">
+                              {({ attributes: itemAttrs, listeners: itemListeners }) => (
+                                <div className="flex gap-2">
+                                  <DragHandle attributes={itemAttrs} listeners={itemListeners} className="mt-2" />
+                                  <div className="flex flex-col gap-2 flex-1">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                      <textarea
+                                        value={step.instruction}
+                                        onChange={e => updateStepItem(gi, si, { instruction: e.target.value })}
+                                        placeholder={lang === 'he' ? `שלב ${si + 1} (עברית)` : `Step ${si + 1} (Hebrew)`}
+                                        rows={2}
+                                        className={inputClass}
+                                        dir="rtl"
+                                      />
+                                      <textarea
+                                        value={step.instructionEn ?? ''}
+                                        onChange={e => updateStepItem(gi, si, { instructionEn: e.target.value })}
+                                        placeholder={lang === 'he' ? `שלב ${si + 1} (אנגלית)` : `Step ${si + 1} (English)`}
+                                        rows={2}
+                                        className={inputClass}
+                                      />
+                                    </div>
+                                    <div className="flex justify-end">
+                                      <button type="button" onClick={() => removeStepItem(gi, si)} className="text-red-400/60 hover:text-red-400 text-xs shrink-0">✕ {lang === 'he' ? 'הסר שלב' : 'Remove step'}</button>
+                                    </div>
+                                    <div className="flex gap-2">
+                                      <input
+                                        type="number"
+                                        min={1}
+                                        value={step.timerMinutes ?? ''}
+                                        onChange={e => updateStepItem(gi, si, { timerMinutes: e.target.value ? Number(e.target.value) : undefined })}
+                                        placeholder={lang === 'he' ? 'טיימר (דק׳)' : 'Timer (min)'}
+                                        className={`${inputClass} w-32`}
+                                      />
+                                      <input
+                                        value={step.tip ?? ''}
+                                        onChange={e => updateStepItem(gi, si, { tip: e.target.value })}
+                                        placeholder={lang === 'he' ? 'טיפ (אופציונלי)' : 'Tip (optional)'}
+                                        className={`${inputClass} flex-1`}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                            </SortableRow>
+                          ))}
+                        </SortableContext>
+                      </DndContext>
+                      <button type="button" onClick={() => addStepItem(gi)} className="text-xs text-amber hover:text-amber/80">
+                        + {lang === 'he' ? 'הוסף שלב' : 'Add step'}
+                      </button>
+                    </>
+                  )}
+                </SortableRow>
               ))}
-              <button type="button" onClick={() => addStepItem(gi)} className="text-xs text-amber hover:text-amber/80">
-                + {lang === 'he' ? 'הוסף שלב' : 'Add step'}
-              </button>
-            </div>
-          ))}
+            </SortableContext>
+          </DndContext>
           <button type="button" onClick={addStepGroup} className="btn-ghost text-xs">
             + {lang === 'he' ? 'הוסף קבוצת שלבים' : 'Add step group'}
           </button>
