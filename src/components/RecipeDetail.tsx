@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useFocusTrap } from '../hooks/useFocusTrap'
 import RecipePlaceholder from './RecipePlaceholder'
 import RecipeDetailSkeleton from './RecipeDetailSkeleton'
+import Breadcrumbs from './Breadcrumbs'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useRecipe, useRecipes, deleteRecipe, submitForReview, cancelSubmission } from '../hooks/useRecipes'
@@ -526,6 +527,11 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
       </div>
 
       <div className="max-w-3xl mx-auto px-4 -mt-16 print:mt-4 relative pb-24">
+        <Breadcrumbs crumbs={[
+          { label: lang === 'he' ? 'בית' : 'Home', href: '/' },
+          { label: tx.categories[displayRecipe.category] },
+          { label: displayTitle },
+        ]} />
         {/* Header card */}
         <div className="card p-6 mb-6">
           <div className="flex flex-wrap items-center gap-2 mb-3">
