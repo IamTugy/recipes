@@ -1,0 +1,208 @@
+import { type ReactNode, useRef } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { useAuth } from '@clerk/react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { useLanguage } from '../hooks/useLanguage'
+import { useTheme } from '../hooks/useTheme'
+import { useFocusTrap } from '../hooks/useFocusTrap'
+import { useMyRecipes, usePendingSubmissions } from '../hooks/useRecipes'
+import { OWNER_USER_ID } from '../lib/admin'
+import type { useSidebar } from '../hooks/useSidebar'
+
+interface SidebarProps {
+  sidebar: ReturnType<typeof useSidebar>
+}
+
+interface SidebarLinkDef {
+  key: string
+  label: string
+  path: string
+  icon: ReactNode
+  badge?: number
+}
+
+export default function Sidebar({ sidebar }: SidebarProps) {
+  const { collapsed, setCollapsed, mobileOpen, setMobileOpen } = sidebar
+  const navigate = useNavigate()
+  const location = useLocation()
+  const { lang, setLang } = useLanguage()
+  const { mode, cycleTheme } = useTheme()
+  const { userId } = useAuth()
+  const isAdmin = userId === OWNER_USER_ID
+  const { recipes: pendingSubmissions } = usePendingSubmissions(isAdmin)
+  const { recipes: myRecipes } = useMyRecipes(!isAdmin)
+  const attentionCount = isAdmin
+    ? pendingSubmissions.length
+    : myRecipes.filter(r => r.status === 'rejected').length
+  const panelRef = useRef<HTMLDivElement>(null)
+  useFocusTrap(panelRef, mobileOpen)
+
+  const recipeLinks: SidebarLinkDef[] = [
+    {
+      key: 'home', label: lang === 'he' ? 'בית' : 'Home', path: '/',
+      icon: (
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7m-14 0v8a1 1 0 001 1h4a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h4a1 1 0 001-1v-8m-16 0l2-2" />
+        </svg>
+      ),
+    },
+    {
+      key: 'my-recipes', label: lang === 'he' ? 'המתכונים שלי' : 'My Recipes', path: '/my-recipes',
+      icon: (
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        </svg>
+      ),
+      badge: !isAdmin && attentionCount > 0 ? attentionCount : undefined,
+    },
+    { key: 'collections', label: lang === 'he' ? 'האוספים שלי' : 'My Collections', path: '/collections', icon: <span className="w-4 h-4 flex items-center justify-center text-sm">📚</span> },
+    { key: 'meal-plan', label: lang === 'he' ? 'תוכנית ארוחות' : 'Meal Plan', path: '/meal-plan', icon: <span className="w-4 h-4 flex items-center justify-center text-sm">🗓️</span> },
+  ]
+
+  const moreLinks: SidebarLinkDef[] = [
+    { key: 'feature-requests', label: lang === 'he' ? 'בקשות לתכונות חדשות' : 'Feature Requests', path: '/feature-requests', icon: <span className="w-4 h-4 flex items-center justify-center text-sm">💡</span> },
+    ...(isAdmin ? [{
+      key: 'admin-submissions',
+      label: lang === 'he' ? 'תור אישורים' : 'Review Queue',
+      path: '/admin/submissions',
+      icon: <span className="w-4 h-4 flex items-center justify-center text-sm">✅</span>,
+      badge: attentionCount > 0 ? attentionCount : undefined,
+    }] : []),
+  ]
+
+  function renderLink(link: SidebarLinkDef, showLabel: boolean, onNavigate?: () => void) {
+    const active = location.pathname === link.path
+    return (
+      <button
+        key={link.key}
+        type="button"
+        onClick={() => { navigate(link.path); onNavigate?.() }}
+        title={link.label}
+        className={`relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors w-full ${
+          active ? 'bg-amber/10 text-amber' : 'text-cream/60 hover:text-cream/90 hover:bg-tint/[0.05]'
+        }`}
+      >
+        <span className="shrink-0">{link.icon}</span>
+        {showLabel && <span className="truncate">{link.label}</span>}
+        {link.badge !== undefined && (
+          <span className={`shrink-0 min-w-[16px] h-4 px-1 rounded-full bg-amber text-bg text-[9px] font-bold flex items-center justify-center ${showLabel ? 'ms-auto' : 'absolute top-0 end-0'}`}>
+            {link.badge}
+          </span>
+        )}
+      </button>
+    )
+  }
+
+  function content(showLabel: boolean, onNavigate?: () => void) {
+    return (
+      <div className="flex flex-col h-full">
+        <div className="p-3">
+          <button
+            type="button"
+            onClick={() => { navigate('/recipes/new'); onNavigate?.() }}
+            title={lang === 'he' ? 'מתכון חדש' : 'New Recipe'}
+            className={`flex items-center gap-2 w-full rounded-lg border border-tint/10 hover:bg-tint/[0.05] text-cream/80 px-3 py-2 text-sm font-medium transition-colors ${showLabel ? '' : 'justify-center'}`}
+          >
+            <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            {showLabel && (lang === 'he' ? 'מתכון חדש' : 'New Recipe')}
+          </button>
+        </div>
+
+        <nav className="flex-1 overflow-y-auto px-3 space-y-4">
+          <div className="space-y-1">
+            {showLabel && <div className="px-3 text-[10px] font-semibold uppercase tracking-wider text-cream/30 mb-1">{lang === 'he' ? 'מתכונים' : 'Recipes'}</div>}
+            {recipeLinks.map(link => renderLink(link, showLabel, onNavigate))}
+          </div>
+          <div className="space-y-1">
+            {showLabel && <div className="px-3 text-[10px] font-semibold uppercase tracking-wider text-cream/30 mb-1">{lang === 'he' ? 'עוד' : 'More'}</div>}
+            {moreLinks.map(link => renderLink(link, showLabel, onNavigate))}
+          </div>
+        </nav>
+
+        <div className="p-3 border-t border-tint/[0.06] space-y-1">
+          <button
+            type="button"
+            onClick={() => setLang(lang === 'he' ? 'en' : 'he')}
+            title={lang === 'he' ? 'English' : 'עברית'}
+            className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm w-full text-cream/60 hover:text-cream/90 hover:bg-tint/[0.05] transition-colors ${showLabel ? '' : 'justify-center'}`}
+          >
+            <span className="w-4 h-4 flex items-center justify-center text-sm shrink-0">🌐</span>
+            {showLabel && (lang === 'he' ? 'English' : 'עברית')}
+          </button>
+          <button
+            type="button"
+            onClick={cycleTheme}
+            title={mode === 'light' ? 'Switch to dark mode' : mode === 'dark' ? 'Switch to system theme' : 'Switch to light mode'}
+            className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm w-full text-cream/60 hover:text-cream/90 hover:bg-tint/[0.05] transition-colors ${showLabel ? '' : 'justify-center'}`}
+          >
+            <span className="w-4 h-4 flex items-center justify-center text-sm shrink-0">{mode === 'light' ? '🌙' : mode === 'dark' ? '🖥️' : '☀️'}</span>
+            {showLabel && (mode === 'light' ? (lang === 'he' ? 'מצב כהה' : 'Dark mode') : mode === 'dark' ? (lang === 'he' ? 'לפי המערכת' : 'System theme') : (lang === 'he' ? 'מצב בהיר' : 'Light mode'))}
+          </button>
+          {showLabel && (
+            <button
+              type="button"
+              onClick={() => setCollapsed(true)}
+              className="hidden sm:flex items-center gap-3 rounded-lg px-3 py-2 text-sm w-full text-cream/40 hover:text-cream/70 hover:bg-tint/[0.05] transition-colors"
+            >
+              <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d={lang === 'he' ? 'M8.25 4.5l7.5 7.5-7.5 7.5' : 'M15.75 4.5l-7.5 7.5 7.5 7.5'} />
+              </svg>
+              {lang === 'he' ? 'כווץ' : 'Collapse'}
+            </button>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <>
+      {/* Desktop pinned sidebar */}
+      <aside className={`print:hidden hidden sm:flex sm:flex-col fixed top-14 bottom-0 start-0 z-30 border-e border-tint/[0.06] bg-bg transition-[width] duration-200 ${collapsed ? 'w-16' : 'w-60'}`}>
+        {collapsed ? (
+          <div className="flex flex-col h-full">
+            <div className="flex-1 overflow-hidden">{content(false)}</div>
+            <div className="p-3 border-t border-tint/[0.06]">
+              <button
+                type="button"
+                onClick={() => setCollapsed(false)}
+                className="flex items-center justify-center w-full rounded-lg px-3 py-2 text-cream/40 hover:text-cream/70 hover:bg-tint/[0.05] transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d={lang === 'he' ? 'M15.75 4.5l-7.5 7.5 7.5 7.5' : 'M8.25 4.5l7.5 7.5-7.5 7.5'} />
+                </svg>
+              </button>
+            </div>
+          </div>
+        ) : content(true)}
+      </aside>
+
+      {/* Mobile drawer */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setMobileOpen(false)}
+              className="print:hidden sm:hidden fixed inset-0 bg-black/40 z-40"
+            />
+            <motion.div
+              ref={panelRef}
+              role="dialog"
+              aria-modal="true"
+              initial={{ x: lang === 'he' ? '100%' : '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: lang === 'he' ? '100%' : '-100%' }}
+              transition={{ type: 'tween', duration: 0.25 }}
+              className="print:hidden sm:hidden fixed top-0 bottom-0 start-0 w-72 bg-bg z-50 shadow-2xl"
+            >
+              {content(true, () => setMobileOpen(false))}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </>
+  )
+}
