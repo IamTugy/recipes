@@ -13,6 +13,7 @@ import { translateText } from '../lib/translate'
 import SortableRow from './SortableRow'
 import DragHandle from './DragHandle'
 import PhotoUploadField from './PhotoUploadField'
+import Breadcrumbs from './Breadcrumbs'
 
 interface RecipeFormProps {
   existing?: Recipe
@@ -311,9 +312,23 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
   const inputClass = 'w-full bg-tint/[0.03] border border-tint/10 rounded-lg px-3 py-2 text-sm text-cream/80 placeholder-cream/25 outline-none focus:border-amber/30 transition-colors'
   const labelClass = 'block text-xs font-semibold text-cream/50 mb-1'
 
+  const displayTitle = (lang === 'he' ? titleHe : title) || title || titleHe
+
   return (
     <div className="min-h-dvh bg-bg pt-20 pb-16 px-4">
       <form onSubmit={handleSubmit} className="max-w-3xl mx-auto space-y-6">
+        <Breadcrumbs crumbs={
+          isEditing
+            ? [
+                { label: lang === 'he' ? 'בית' : 'Home', href: '/' },
+                { label: displayTitle || (lang === 'he' ? 'מתכון' : 'Recipe'), href: `/recipe/${existing!.id}` },
+                { label: lang === 'he' ? 'עריכה' : 'Edit' },
+              ]
+            : [
+                { label: lang === 'he' ? 'בית' : 'Home', href: '/' },
+                { label: lang === 'he' ? 'מתכון חדש' : 'New Recipe' },
+              ]
+        } />
         <h1 className="font-serif text-2xl font-bold text-cream">
           {isEditing
             ? (lang === 'he' ? 'עריכת מתכון' : 'Edit Recipe')
