@@ -8,6 +8,9 @@ import { RecipesController } from './recipes.controller'
 import { ActivityLogModule } from '../activity-log/activity-log.module'
 import { CookLogModule } from '../cook-log/cook-log.module'
 import { UsersModule } from '../users/users.module'
+import { AiModule } from '../ai/ai.module'
+import { RecipeImportController } from './import/recipe-import.controller'
+import { RecipeImportService } from './import/recipe-import.service'
 
 @Module({
   imports: [
@@ -19,9 +22,10 @@ import { UsersModule } from '../users/users.module'
     ActivityLogModule,
     CookLogModule,
     UsersModule,
+    AiModule,
   ],
-  providers: [RecipesService],
-  controllers: [RecipesController],
+  providers: [RecipesService, RecipeImportService],
+  controllers: [RecipesController, RecipeImportController],
   exports: [RecipesService],
 })
 export class RecipesModule {}
