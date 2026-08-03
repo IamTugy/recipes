@@ -17,13 +17,13 @@ const EXTRACTION_PROMPT = `You are extracting a cooking recipe from raw text int
   "cookTime": "number, minutes",
   "servings": "number",
   "difficulty": "one of: easy, medium, hard",
-  "ingredients": [{ "group": "Hebrew group name or empty string", "groupEn": "English group name or empty string", "items": [{ "amount": "number", "unit": "string", "name": "Hebrew ingredient name", "nameEn": "English ingredient name" }] }],
+  "ingredients": [{ "group": "Hebrew group name or empty string", "groupEn": "English group name or empty string", "items": [{ "amount": "number", "unit": "one of: g, kg, ml, l, cup, tbsp, tsp, cm, mm, pcs, cloves, bunch, sprigs, or empty string if the ingredient has no unit (e.g. \"1 onion\")", "name": "Hebrew ingredient name", "nameEn": "English ingredient name" }] }],
   "steps": [{ "title": "Hebrew section title or empty string", "titleEn": "English section title or empty string", "items": [{ "instruction": "Hebrew step text", "instructionEn": "English step text", "timerMinutes": "number if this step mentions a specific duration" }] }],
   "tips": ["Hebrew tips"],
   "tipsEn": ["English tips"]
 }
 
-Always fill in both the Hebrew and English version of every text field, translating as needed if the source is only in one language. Respond with ONLY the JSON object, no other text.
+Always fill in both the Hebrew and English version of every text field, translating as needed if the source is only in one language. The "unit" field is displayed translated by the app itself, so it must always be one of the exact tokens listed above (in English), never a translated or free-form word. Respond with ONLY the JSON object, no other text.
 
 Source text:
 `
@@ -43,13 +43,13 @@ const JSON_LD_TO_RECIPE_PROMPT = `You are converting a schema.org Recipe JSON-LD
   "cookTime": "number, minutes",
   "servings": "number",
   "difficulty": "one of: easy, medium, hard",
-  "ingredients": [{ "group": "Hebrew group name or empty string", "groupEn": "English group name or empty string", "items": [{ "amount": "number", "unit": "string", "name": "Hebrew ingredient name", "nameEn": "English ingredient name" }] }],
+  "ingredients": [{ "group": "Hebrew group name or empty string", "groupEn": "English group name or empty string", "items": [{ "amount": "number", "unit": "one of: g, kg, ml, l, cup, tbsp, tsp, cm, mm, pcs, cloves, bunch, sprigs, or empty string if the ingredient has no unit (e.g. \"1 onion\")", "name": "Hebrew ingredient name", "nameEn": "English ingredient name" }] }],
   "steps": [{ "title": "Hebrew section title or empty string", "titleEn": "English section title or empty string", "items": [{ "instruction": "Hebrew step text", "instructionEn": "English step text", "timerMinutes": "number if mentioned" }] }],
   "tips": ["Hebrew tips"],
   "tipsEn": ["English tips"]
 }
 
-The source is normally in English - translate every field into Hebrew as well as keeping the English version. Respond with ONLY the JSON object, no other text.
+The source is normally in English - translate every field into Hebrew as well as keeping the English version. The "unit" field is displayed translated by the app itself, so it must always be one of the exact tokens listed above (in English), never a translated or free-form word. Respond with ONLY the JSON object, no other text.
 
 Source JSON-LD:
 `
