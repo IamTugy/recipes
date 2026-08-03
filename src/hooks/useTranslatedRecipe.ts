@@ -6,13 +6,14 @@ import type { Recipe } from '../types'
 // language on the fly for display - never persisted, just shown. Runs
 // once per distinct recipe content; falls back to the untranslated
 // recipe immediately and swaps in translated text once ready.
-export function useTranslatedRecipe(recipe: Recipe, getToken: () => Promise<string | null>): Recipe {
-  const [translated, setTranslated] = useState<Recipe>(recipe)
-  const signature = JSON.stringify(recipe)
+export function useTranslatedRecipe(recipe: Recipe | undefined, getToken: () => Promise<string | null>): Recipe | undefined {
+  const [translated, setTranslated] = useState<Recipe | undefined>(recipe)
+  const signature = recipe ? JSON.stringify(recipe) : ''
 
   useEffect(() => {
     let cancelled = false
     setTranslated(recipe)
+    if (!recipe) return
 
     async function run() {
       const clone: Recipe = JSON.parse(JSON.stringify(recipe))

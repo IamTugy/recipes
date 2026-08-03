@@ -342,11 +342,24 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
     return () => document.removeEventListener('keydown', handleKey)
   }, [lightboxUrl])
 
+  // Browsing an older revision swaps in that revision's content for
+  // everything content-related (title, image, ingredients, steps, ...)
+  // while status/ownership/ratings/etc keep coming from the live recipe.
+  // Computed unconditionally (recipe may still be loading/missing here) so
+  // useTranslatedRecipe below is called on every render - hooks can never
+  // sit after an early return.
+  const rawDisplayRecipe: typeof recipe | undefined = recipe
+    ? (viewingRevision ? { ...recipe, ...(viewingRevision.snapshot as Partial<typeof recipe>) } : recipe)
+    : undefined
+  // Auto-fills whichever language the recipe wasn't written in, purely
+  // for display - the underlying data/edit form is untouched.
+  const displayRecipe = useTranslatedRecipe(rawDisplayRecipe, getToken)
+
   if (recipeLoading) {
     return <RecipeDetailSkeleton />
   }
 
-  if (!recipe) {
+  if (!recipe || !displayRecipe) {
     return (
       <div className="min-h-dvh bg-bg flex items-center justify-center pt-14">
         <div className="text-center">
@@ -359,16 +372,6 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
       </div>
     )
   }
-
-  // Browsing an older revision swaps in that revision's content for
-  // everything content-related (title, image, ingredients, steps, ...)
-  // while status/ownership/ratings/etc keep coming from the live recipe.
-  const rawDisplayRecipe: typeof recipe = viewingRevision
-    ? { ...recipe, ...(viewingRevision.snapshot as Partial<typeof recipe>) }
-    : recipe
-  // Auto-fills whichever language the recipe wasn't written in, purely
-  // for display - the underlying data/edit form is untouched.
-  const displayRecipe = useTranslatedRecipe(rawDisplayRecipe, getToken)
   const isViewingNonLatestRevision = viewingRevision != null
     && viewingRevision.revisionNumber !== (canEdit ? recipe.currentRevision : recipe.publishedRevision)
 
@@ -400,7 +403,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
     .slice(0, 4)
 
   function addAllToShoppingList() {
-    const items = displayRecipe.ingredients.flatMap(group =>
+    const items = displayRecipe!.ingredients.flatMap(group =>
       group.items.map(item => {
         const itemName = lang === 'he' ? item.name : (item.nameEn ?? item.name)
         if (!item.amount) return { name: itemName, amount: '' }

@@ -49,17 +49,17 @@ function emptyStepGroup(): LocalStepGroup {
 }
 
 function stripIngredientKeys(groups: LocalIngredientGroup[]): IngredientGroup[] {
-  return groups.map(({ _key, items, ...rest }) => ({
-    ...rest,
-    items: items.map(({ _key, ...item }) => item),
-  }))
+  return groups.map(g => ({ group: g.group, groupEn: g.groupEn, items: g.items.map(item => omitKey(item)) }))
 }
 
 function stripStepKeys(groups: LocalStepGroup[]): StepGroup[] {
-  return groups.map(({ _key, items, ...rest }) => ({
-    ...rest,
-    items: items.map(({ _key, ...item }) => item),
-  }))
+  return groups.map(g => ({ title: g.title, titleEn: g.titleEn, items: g.items.map(item => omitKey(item)) }))
+}
+
+function omitKey<T extends { _key: string }>(item: T): Omit<T, '_key'> {
+  const copy: Record<string, unknown> = { ...item }
+  delete copy._key
+  return copy as Omit<T, '_key'>
 }
 
 export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps) {

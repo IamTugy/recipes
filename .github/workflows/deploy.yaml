@@ -49,6 +49,35 @@ jobs:
           npm test
           npm run test:e2e
 
+      # Gate the frontend image on the react-hooks lint rules specifically
+      # (not the full lint suite, which has a large backlog of pre-existing
+      # issues unrelated to correctness) - this class of bug throws at
+      # runtime in production but tsc alone doesn't catch it.
+      - name: Set up Node
+        if: matrix.app == 'recipes'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Check for React Hooks rule violations
+        if: matrix.app == 'recipes'
+        run: |
+          npm ci
+          npx eslint 'src/**/*.{ts,tsx}' --format json > eslint-report.json || true
+          node -e "
+            const fs = require('fs');
+            const results = JSON.parse(fs.readFileSync('eslint-report.json', 'utf8'));
+            const hookIssues = results.flatMap(r => r.messages.filter(m => m.ruleId && m.ruleId.startsWith('react-hooks/')).map(m => ({ file: r.filePath, line: m.line, message: m.message })));
+            if (hookIssues.length > 0) {
+              console.error('React Hooks rule violations found:');
+              console.error(JSON.stringify(hookIssues, null, 2));
+              process.exit(1);
+            }
+            console.log('No react-hooks violations found.');
+          "
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
