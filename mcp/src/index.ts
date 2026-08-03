@@ -252,18 +252,6 @@ async function main() {
   const CLERK_OAUTH_CLIENT_SECRET = process.env.CLERK_OAUTH_CLIENT_SECRET
 
   const app = express()
-
-  // Temporary diagnostic logging for the OAuth connect flow - remove once
-  // the ChatGPT connector issue is resolved.
-  app.use((req, res, next) => {
-    const start = Date.now()
-    console.log(`[req] ${req.method} ${req.path} origin=${req.headers.origin ?? '-'} auth=${req.headers.authorization ? 'present' : '-'}`)
-    res.on('finish', () => {
-      console.log(`[res] ${req.method} ${req.path} -> ${res.statusCode} (${Date.now() - start}ms)`)
-    })
-    next()
-  })
-
   app.use(express.json({ limit: '15mb' }))
 
   // OAuth clients (ChatGPT, Gemini) may run their token exchange directly
