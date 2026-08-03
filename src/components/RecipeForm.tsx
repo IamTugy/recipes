@@ -4,6 +4,7 @@ import { useAuth } from '@clerk/react'
 import { DndContext, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
 import { SortableContext, arrayMove, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import type { Category, Difficulty, IngredientGroup, IngredientItem, Recipe, StepGroup, StepItem } from '../types'
+import type { ImportedRecipe } from '../lib/recipeImport'
 import { createRecipe, updateRecipe, type RecipeInput } from '../hooks/useRecipes'
 import { t, categoryEmoji } from '../i18n'
 import { useLanguage } from '../hooks/useLanguage'
@@ -15,6 +16,7 @@ import DragHandle from './DragHandle'
 interface RecipeFormProps {
   existing?: Recipe
   duplicateFrom?: Recipe
+  importedDraft?: ImportedRecipe
 }
 
 const CATEGORIES: Category[] = ['breakfast', 'lunch', 'dinner', 'dessert', 'salad', 'soup', 'snack', 'bread', 'sauce']
@@ -79,14 +81,14 @@ function RegenerateButton({ lang, busy, onClick }: { lang: 'he' | 'en'; busy: bo
   )
 }
 
-export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps) {
+export default function RecipeForm({ existing, duplicateFrom, importedDraft }: RecipeFormProps) {
   const navigate = useNavigate()
   const { getToken } = useAuth()
   const { lang } = useLanguage()
   const { showToast } = useToast()
   const tx = t[lang]
   const isEditing = !!existing
-  const prefill = existing ?? duplicateFrom
+  const prefill = existing ?? duplicateFrom ?? importedDraft
   const titlePrefix = duplicateFrom ? (lang === 'he' ? 'העתק של ' : 'Copy of ') : ''
 
   const [title, setTitle] = useState(prefill ? `${titlePrefix}${prefill.title}` : '')

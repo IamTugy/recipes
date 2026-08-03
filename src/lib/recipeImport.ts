@@ -8,13 +8,15 @@ export interface ImportedRecipe {
   tags?: string[]
   tagsEn?: string[]
   cuisine?: string
+  image?: string
   description?: string
   descriptionEn?: string
   prepTime?: number
   cookTime?: number
   servings?: number
   difficulty?: Difficulty
-  ingredients?: { group?: string; groupEn?: string; items: { amount?: number; unit?: string; name: string; nameEn?: string }[] }[]
+  featured?: boolean
+  ingredients?: { group?: string; groupEn?: string; items: { amount: number; unit: string; name: string; nameEn?: string }[] }[]
   steps?: { title?: string; titleEn?: string; items: { instruction: string; instructionEn?: string; timerMinutes?: number }[] }[]
   tips?: string[]
   tipsEn?: string[]
