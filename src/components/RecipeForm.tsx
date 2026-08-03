@@ -62,6 +62,23 @@ function omitKey<T extends { _key: string }>(item: T): Omit<T, '_key'> {
   return copy as Omit<T, '_key'>
 }
 
+function RegenerateButton({ lang, busy, onClick }: { lang: 'he' | 'en'; busy: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={busy}
+      title={lang === 'he' ? 'תרגם מחדש' : 'Regenerate translation'}
+      aria-label={lang === 'he' ? 'תרגם מחדש' : 'Regenerate translation'}
+      className="shrink-0 text-cream/30 hover:text-amber disabled:opacity-40 transition-colors"
+    >
+      <svg className={`w-3.5 h-3.5 ${busy ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+      </svg>
+    </button>
+  )
+}
+
 export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps) {
   const navigate = useNavigate()
   const { getToken } = useAuth()
@@ -110,6 +127,28 @@ export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps)
     }, 900)
     translateTimers.current.set(key, timer)
   }
+
+  // Manual "regenerate translation" button - unlike auto-fill, this always
+  // overwrites the target field, using whichever source field currently
+  // has content (Hebrew takes priority if both are filled).
+  const [regenerating, setRegenerating] = useState<Set<string>>(new Set())
+  async function regenerateTranslation(key: string, heText: string, enText: string, setHe: (v: string) => void, setEn: (v: string) => void) {
+    const existing = translateTimers.current.get(key)
+    if (existing) clearTimeout(existing)
+    setRegenerating(prev => new Set(prev).add(key))
+    try {
+      if (heText.trim()) {
+        const translated = await translateText(heText, 'en', getToken)
+        if (translated) setEn(translated)
+      } else if (enText.trim()) {
+        const translated = await translateText(enText, 'he', getToken)
+        if (translated) setHe(translated)
+      }
+    } finally {
+      setRegenerating(prev => { const next = new Set(prev); next.delete(key); return next })
+    }
+  }
+
   const [error, setError] = useState<string | null>(null)
   const [photoUploading, setPhotoUploading] = useState(false)
   const uploadSlugRef = useRef(existing?.id ?? `new-${Date.now()}`)
@@ -324,7 +363,10 @@ export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps)
               <input required value={title} onChange={e => { const v = e.target.value; setTitle(v); if (!titleHe.trim()) scheduleAutoTranslate('title', v, 'he', setTitleHe) }} className={inputClass} />
             </div>
             <div>
-              <label className={labelClass}>{lang === 'he' ? 'כותרת (עברית)' : 'Title (Hebrew)'}</label>
+              <div className="flex items-center justify-between mb-1">
+                <label className={labelClass}>{lang === 'he' ? 'כותרת (עברית)' : 'Title (Hebrew)'}</label>
+                <RegenerateButton lang={lang} busy={regenerating.has('title')} onClick={() => regenerateTranslation('title', titleHe, title, setTitleHe, setTitle)} />
+              </div>
               <input value={titleHe} onChange={e => { const v = e.target.value; setTitleHe(v); if (!title.trim()) scheduleAutoTranslate('titleHe', v, 'en', setTitle) }} className={inputClass} dir="rtl" />
             </div>
           </div>
@@ -392,7 +434,10 @@ export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps)
               <textarea required value={description} onChange={e => { const v = e.target.value; setDescription(v); if (!descriptionEn.trim()) scheduleAutoTranslate('description', v, 'en', setDescriptionEn) }} rows={2} className={inputClass} dir="rtl" />
             </div>
             <div>
-              <label className={labelClass}>{lang === 'he' ? 'תיאור (אנגלית)' : 'Description (English)'}</label>
+              <div className="flex items-center justify-between mb-1">
+                <label className={labelClass}>{lang === 'he' ? 'תיאור (אנגלית)' : 'Description (English)'}</label>
+                <RegenerateButton lang={lang} busy={regenerating.has('description')} onClick={() => regenerateTranslation('description', description, descriptionEn, setDescription, setDescriptionEn)} />
+              </div>
               <textarea value={descriptionEn} onChange={e => { const v = e.target.value; setDescriptionEn(v); if (!description.trim()) scheduleAutoTranslate('descriptionEn', v, 'he', setDescription) }} rows={2} className={inputClass} />
             </div>
           </div>
@@ -423,7 +468,10 @@ export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps)
               <textarea value={tips} onChange={e => { const v = e.target.value; setTips(v); if (!tipsEn.trim()) scheduleAutoTranslate('tips', v, 'en', setTipsEn) }} rows={2} className={inputClass} dir="rtl" />
             </div>
             <div>
-              <label className={labelClass}>{lang === 'he' ? 'טיפים (אנגלית, שורה לכל טיפ)' : 'Tips (English, one per line)'}</label>
+              <div className="flex items-center justify-between mb-1">
+                <label className={labelClass}>{lang === 'he' ? 'טיפים (אנגלית, שורה לכל טיפ)' : 'Tips (English, one per line)'}</label>
+                <RegenerateButton lang={lang} busy={regenerating.has('tips')} onClick={() => regenerateTranslation('tips', tips, tipsEn, setTips, setTipsEn)} />
+              </div>
               <textarea value={tipsEn} onChange={e => { const v = e.target.value; setTipsEn(v); if (!tips.trim()) scheduleAutoTranslate('tipsEn', v, 'he', setTips) }} rows={2} className={inputClass} />
             </div>
           </div>
@@ -466,6 +514,11 @@ export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps)
                                     <input value={item.nameEn ?? ''} onChange={e => { const v = e.target.value; updateIngredientItem(gi, ii, { nameEn: v }); if (!item.name.trim()) scheduleAutoTranslate(`ingEn-${item._key}`, v, 'he', translated => updateIngredientItem(gi, ii, { name: translated })) }} className={`${inputClass} col-span-3`} placeholder={lang === 'he' ? 'שם (אנגלית)' : 'Name (English)'} />
                                     <button type="button" onClick={() => removeIngredientItem(gi, ii)} className="col-span-1 text-red-400/60 hover:text-red-400 text-xs">✕</button>
                                   </div>
+                                  <RegenerateButton
+                                    lang={lang}
+                                    busy={regenerating.has(`ing-${item._key}`)}
+                                    onClick={() => regenerateTranslation(`ing-${item._key}`, item.name, item.nameEn ?? '', v => updateIngredientItem(gi, ii, { name: v }), v => updateIngredientItem(gi, ii, { nameEn: v }))}
+                                  />
                                 </div>
                               )}
                             </SortableRow>
@@ -534,7 +587,12 @@ export default function RecipeForm({ existing, duplicateFrom }: RecipeFormProps)
                                         className={inputClass}
                                       />
                                     </div>
-                                    <div className="flex justify-end">
+                                    <div className="flex justify-between items-center">
+                                      <RegenerateButton
+                                        lang={lang}
+                                        busy={regenerating.has(`step-${step._key}`)}
+                                        onClick={() => regenerateTranslation(`step-${step._key}`, step.instruction, step.instructionEn ?? '', v => updateStepItem(gi, si, { instruction: v }), v => updateStepItem(gi, si, { instructionEn: v }))}
+                                      />
                                       <button type="button" onClick={() => removeStepItem(gi, si)} className="text-red-400/60 hover:text-red-400 text-xs shrink-0">✕ {lang === 'he' ? 'הסר שלב' : 'Remove step'}</button>
                                     </div>
                                     <div className="flex gap-2">
