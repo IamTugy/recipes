@@ -160,7 +160,7 @@ export default function CollectionsPage({ onAddToShoppingList }: CollectionsPage
                         <div key={slug} className="group relative">
                           <Link to={`/recipe/${slug}`}>
                             <div className="relative h-24 rounded-xl overflow-hidden mb-2 bg-tint/[0.04]">
-                              {r.image.includes('assets.tugy.dev') && (
+                              {r.image?.includes('assets.tugy.dev') && (
                                 <img src={r.image} alt={title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
                               )}
                             </div>

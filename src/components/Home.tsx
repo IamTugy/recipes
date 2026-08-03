@@ -98,7 +98,7 @@ export default function Home() {
         }
         return (
           (r.titleHe ?? r.title).toLowerCase().includes(q) ||
-          r.description.toLowerCase().includes(q) ||
+          (r.description ?? '').toLowerCase().includes(q) ||
           r.tags.some(t => t.toLowerCase().includes(q)) ||
           (r.cuisine?.toLowerCase().includes(q)) ||
           hasIngredient

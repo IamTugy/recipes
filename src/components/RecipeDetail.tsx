@@ -481,7 +481,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
     <div className="min-h-dvh bg-bg pt-14" dir={lang === 'he' ? 'rtl' : 'ltr'}>
       {/* Hero image */}
       <div className="print:hidden relative h-64 sm:h-96 overflow-hidden">
-        {displayRecipe.image.includes('assets.tugy.dev') ? (
+        {displayRecipe.image?.includes('assets.tugy.dev') ? (
           <img
             src={displayRecipe.image}
             alt={displayTitle}
@@ -1397,7 +1397,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                 return (
                   <Link key={r.id} to={`/recipe/${r.id}`} className="group">
                     <div className="relative h-24 rounded-xl overflow-hidden mb-2">
-                      {r.image.includes('assets.tugy.dev') ? (
+                      {r.image?.includes('assets.tugy.dev') ? (
                         <img
                           src={r.image}
                           alt={title}

@@ -22,7 +22,7 @@ export default function RecipeStrip({ title, recipes }: RecipeStripProps) {
           return (
             <Link key={r.id} to={`/recipe/${r.id}`} className="shrink-0 w-32 group">
               <div className="relative h-20 w-32 rounded-lg overflow-hidden mb-1.5">
-                {r.image.includes('assets.tugy.dev') ? (
+                {r.image?.includes('assets.tugy.dev') ? (
                   <img
                     src={r.image}
                     alt={recipeTitle}

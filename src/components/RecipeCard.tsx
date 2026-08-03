@@ -43,7 +43,7 @@ export default function RecipeCard({ recipe, index, searchQuery, isFavorite, onT
         <div className="card overflow-hidden h-full flex flex-col">
           {/* Image */}
           <div className="relative h-52 sm:h-60 overflow-hidden">
-            {recipe.image.includes('assets.tugy.dev') ? (
+            {recipe.image?.includes('assets.tugy.dev') ? (
               <img
                 src={recipe.image}
                 alt={displayTitle}

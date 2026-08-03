@@ -53,7 +53,7 @@ export default function MyRecipesPage() {
       list = list.filter(r =>
         r.title.toLowerCase().includes(q) ||
         (r.titleHe ?? '').toLowerCase().includes(q) ||
-        r.description.toLowerCase().includes(q)
+        (r.description ?? '').toLowerCase().includes(q)
       )
     }
     return list
@@ -238,7 +238,7 @@ export default function MyRecipesPage() {
                     className="card w-full flex items-center gap-3 p-2 text-start"
                   >
                     <div className="w-12 h-12 rounded-lg overflow-hidden shrink-0">
-                      {r.image.includes('assets.tugy.dev') ? (
+                      {r.image?.includes('assets.tugy.dev') ? (
                         <img src={r.image} alt="" className="w-full h-full object-cover" />
                       ) : (
                         <RecipePlaceholder recipe={r} />
