@@ -20,6 +20,7 @@ import { t, categoryEmoji, heUnit, difficultyColor } from '../i18n'
 import { useLanguage } from '../hooks/useLanguage'
 import { useToast } from '../hooks/useToast'
 import ReviewItem, { type Review } from './ReviewItem'
+import ConfirmDialog from './ConfirmDialog'
 import type { TimerState, RecipeRevision } from '../types'
 
 interface RecipeDetailProps {
@@ -241,13 +242,25 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
     } catch { /* clipboard unavailable */ }
   }
 
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+
   async function handleDeleteRecipe() {
     if (!id) return
-    const confirmMsg = lang === 'he' ? 'למחוק את המתכון הזה לצמיתות?' : 'Permanently delete this recipe?'
-    if (!window.confirm(confirmMsg)) return
-    await deleteRecipe(id, getToken)
-    navigate('/')
-    showToast(lang === 'he' ? 'המתכון נמחק' : 'Recipe deleted')
+    setDeleting(true)
+    try {
+      await deleteRecipe(id, getToken)
+      navigate('/')
+      showToast(lang === 'he' ? 'המתכון נמחק' : 'Recipe deleted')
+    } catch (err) {
+      const message = err instanceof ApiError && err.status === 403
+        ? (lang === 'he' ? 'אין הרשאה למחוק מתכון זה' : 'You don\'t have permission to delete this recipe')
+        : (lang === 'he' ? 'מחיקת המתכון נכשלה. נסו שוב.' : 'Failed to delete the recipe. Please try again.')
+      showToast(message, 'error')
+    } finally {
+      setDeleting(false)
+      setDeleteConfirmOpen(false)
+    }
   }
 
   const [submitting, setSubmitting] = useState(false)
@@ -833,7 +846,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
 
             {(isAdmin || (isOwner && recipe.publishedRevision == null)) && (
               <button type="button"
-                onClick={handleDeleteRecipe}
+                onClick={() => setDeleteConfirmOpen(true)}
                 className="flex items-center gap-1.5 text-sm font-medium text-cream/40 hover:text-red-400 transition-colors"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -1539,6 +1552,18 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
           />
         </div>
       )}
+
+      <ConfirmDialog
+        open={deleteConfirmOpen}
+        title={lang === 'he' ? 'מחיקת מתכון' : 'Delete recipe'}
+        message={lang === 'he' ? 'למחוק את המתכון הזה לצמיתות? לא ניתן לבטל פעולה זו.' : 'Permanently delete this recipe? This cannot be undone.'}
+        confirmLabel={deleting ? (lang === 'he' ? 'מוחק...' : 'Deleting...') : (lang === 'he' ? 'מחק' : 'Delete')}
+        cancelLabel={lang === 'he' ? 'ביטול' : 'Cancel'}
+        danger
+        busy={deleting}
+        onConfirm={handleDeleteRecipe}
+        onCancel={() => setDeleteConfirmOpen(false)}
+      />
     </div>
   )
 }
