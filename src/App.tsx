@@ -7,6 +7,8 @@ import Home from './components/Home'
 import RecipeDetail from './components/RecipeDetail'
 import CollectionsPage from './components/CollectionsPage'
 import NewRecipePage from './components/NewRecipePage'
+import RecipeImportPage from './components/RecipeImportPage'
+import RecipeForm from './components/RecipeForm'
 import EditRecipePage from './components/EditRecipePage'
 import FeatureRequestsPage from './components/FeatureRequestsPage'
 import MyRecipesPage from './components/MyRecipesPage'
@@ -64,6 +66,8 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/collections" element={<CollectionsPage onAddToShoppingList={shoppingList.addItems} />} />
         <Route path="/recipes/new" element={<NewRecipePage />} />
+        <Route path="/recipes/new/blank" element={<RecipeForm />} />
+        <Route path="/recipes/import" element={<RecipeImportPage />} />
         <Route path="/recipe/:id/edit" element={<EditRecipePage />} />
         <Route path="/feature-requests" element={<FeatureRequestsPage />} />
         <Route path="/my-recipes" element={<MyRecipesPage />} />
