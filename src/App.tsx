@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
-import { useAuth } from '@clerk/react'
+import { useAuth, SignIn } from '@clerk/react'
 import Nav from './components/Nav'
 import Sidebar from './components/Sidebar'
-import LandingPage from './components/LandingPage'
 import Home from './components/Home'
 import RecipeDetail from './components/RecipeDetail'
 import CollectionsPage from './components/CollectionsPage'
@@ -53,7 +52,11 @@ export default function App() {
   }
 
   if (!isSignedIn) {
-    return <LandingPage />
+    return (
+      <div className="min-h-dvh bg-bg flex items-center justify-center px-6">
+        <SignIn />
+      </div>
+    )
   }
 
   return (
