@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import { useAuth, SignIn } from '@clerk/react'
 import Nav from './components/Nav'
+import Sidebar from './components/Sidebar'
 import Home from './components/Home'
 import RecipeDetail from './components/RecipeDetail'
 import CollectionsPage from './components/CollectionsPage'
@@ -21,10 +22,12 @@ import ScrollToTopButton from './components/ScrollToTopButton'
 import KeyboardShortcutsHelp from './components/KeyboardShortcutsHelp'
 import { useTimers } from './hooks/useTimers'
 import { useShoppingList } from './hooks/useShoppingList'
+import { useSidebar } from './hooks/useSidebar'
 
 export default function App() {
   const { timers, addTimer, toggleTimer, removeTimer, resetTimer } = useTimers()
   const shoppingList = useShoppingList()
+  const sidebar = useSidebar()
   const [shoppingListOpen, setShoppingListOpen] = useState(false)
   const [shortcutsHelpOpen, setShortcutsHelpOpen] = useState(false)
   const { isLoaded, isSignedIn } = useAuth()
@@ -61,30 +64,34 @@ export default function App() {
       <Nav
         shoppingListCount={shoppingList.items.length}
         onOpenShoppingList={() => setShoppingListOpen(true)}
+        onToggleMobileSidebar={() => sidebar.setMobileOpen(o => !o)}
       />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/collections" element={<CollectionsPage onAddToShoppingList={shoppingList.addItems} />} />
-        <Route path="/recipes/new" element={<NewRecipePage />} />
-        <Route path="/recipes/new/blank" element={<RecipeForm />} />
-        <Route path="/recipes/import" element={<RecipeImportPage />} />
-        <Route path="/recipe/:id/edit" element={<EditRecipePage />} />
-        <Route path="/feature-requests" element={<FeatureRequestsPage />} />
-        <Route path="/my-recipes" element={<MyRecipesPage />} />
-        <Route path="/admin/submissions" element={<AdminSubmissionsPage />} />
-        <Route path="/meal-plan" element={<MealPlanPage onAddToShoppingList={shoppingList.addItems} />} />
-        <Route path="/chef/:userId" element={<ChefProfilePage />} />
-        <Route
-          path="/recipe/:id"
-          element={
-            <RecipeDetail
-              onAddTimer={addTimer}
-              timers={timers}
-              onAddToShoppingList={shoppingList.addItems}
-            />
-          }
-        />
-      </Routes>
+      <Sidebar sidebar={sidebar} />
+      <div className={`transition-[padding] duration-200 ${sidebar.collapsed ? 'sm:ps-16' : 'sm:ps-60'}`}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/collections" element={<CollectionsPage onAddToShoppingList={shoppingList.addItems} />} />
+          <Route path="/recipes/new" element={<NewRecipePage />} />
+          <Route path="/recipes/new/blank" element={<RecipeForm />} />
+          <Route path="/recipes/import" element={<RecipeImportPage />} />
+          <Route path="/recipe/:id/edit" element={<EditRecipePage />} />
+          <Route path="/feature-requests" element={<FeatureRequestsPage />} />
+          <Route path="/my-recipes" element={<MyRecipesPage />} />
+          <Route path="/admin/submissions" element={<AdminSubmissionsPage />} />
+          <Route path="/meal-plan" element={<MealPlanPage onAddToShoppingList={shoppingList.addItems} />} />
+          <Route path="/chef/:userId" element={<ChefProfilePage />} />
+          <Route
+            path="/recipe/:id"
+            element={
+              <RecipeDetail
+                onAddTimer={addTimer}
+                timers={timers}
+                onAddToShoppingList={shoppingList.addItems}
+              />
+            }
+          />
+        </Routes>
+      </div>
       <AnimatePresence>
         {timers.length > 0 && (
           <TimerPanel
