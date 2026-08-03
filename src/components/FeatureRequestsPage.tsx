@@ -4,7 +4,7 @@ import { useFeatureRequests } from '../hooks/useFeatureRequests'
 import { useLanguage } from '../hooks/useLanguage'
 import { useToast } from '../hooks/useToast'
 
-const OWNER_USER_ID = 'user_3HHok7VTx8lyXObDglJRi71DU6C'
+const OWNER_USER_ID = 'user_3HPJ4j3dNkQv27nDh4WpuFAL4KB'
 
 type RequestStatus = 'pending' | 'approved' | 'in-progress' | 'needs-input' | 'pr-open' | 'closed'
 
