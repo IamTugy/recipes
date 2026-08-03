@@ -444,9 +444,21 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
                         <DragHandle attributes={attributes} listeners={listeners} />
                         <input
                           value={group.group ?? ''}
-                          onChange={e => updateIngredientGroup(gi, { group: e.target.value })}
-                          placeholder={lang === 'he' ? 'שם הקבוצה (אופציונלי)' : 'Group name (optional)'}
+                          onChange={e => { const v = e.target.value; updateIngredientGroup(gi, { group: v }); if (!(group.groupEn ?? '').trim()) scheduleAutoTranslate(`ing-group-${group._key}`, v, 'en', translated => updateIngredientGroup(gi, { groupEn: translated })) }}
+                          placeholder={lang === 'he' ? 'שם הקבוצה (עברית, אופציונלי)' : 'Group name (Hebrew, optional)'}
                           className={`${inputClass} flex-1`}
+                          dir="rtl"
+                        />
+                        <input
+                          value={group.groupEn ?? ''}
+                          onChange={e => { const v = e.target.value; updateIngredientGroup(gi, { groupEn: v }); if (!(group.group ?? '').trim()) scheduleAutoTranslate(`ing-groupEn-${group._key}`, v, 'he', translated => updateIngredientGroup(gi, { group: translated })) }}
+                          placeholder={lang === 'he' ? 'שם הקבוצה (אנגלית, אופציונלי)' : 'Group name (English, optional)'}
+                          className={`${inputClass} flex-1`}
+                        />
+                        <RegenerateButton
+                          lang={lang}
+                          busy={regenerating.has(`ing-group-${group._key}`)}
+                          onClick={() => regenerateTranslation(`ing-group-${group._key}`, group.group ?? '', group.groupEn ?? '', v => updateIngredientGroup(gi, { group: v }), v => updateIngredientGroup(gi, { groupEn: v }))}
                         />
                         {ingredientGroups.length > 1 && (
                           <button type="button" onClick={() => removeIngredientGroup(gi)} className="text-xs text-red-400/70 hover:text-red-400 shrink-0">
@@ -506,9 +518,21 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
                         <DragHandle attributes={attributes} listeners={listeners} />
                         <input
                           value={group.title ?? ''}
-                          onChange={e => updateStepGroup(gi, { title: e.target.value })}
-                          placeholder={lang === 'he' ? 'שם השלב (אופציונלי)' : 'Section title (optional)'}
+                          onChange={e => { const v = e.target.value; updateStepGroup(gi, { title: v }); if (!(group.titleEn ?? '').trim()) scheduleAutoTranslate(`step-group-${group._key}`, v, 'en', translated => updateStepGroup(gi, { titleEn: translated })) }}
+                          placeholder={lang === 'he' ? 'שם השלב (עברית, אופציונלי)' : 'Section title (Hebrew, optional)'}
                           className={`${inputClass} flex-1`}
+                          dir="rtl"
+                        />
+                        <input
+                          value={group.titleEn ?? ''}
+                          onChange={e => { const v = e.target.value; updateStepGroup(gi, { titleEn: v }); if (!(group.title ?? '').trim()) scheduleAutoTranslate(`step-groupEn-${group._key}`, v, 'he', translated => updateStepGroup(gi, { title: translated })) }}
+                          placeholder={lang === 'he' ? 'שם השלב (אנגלית, אופציונלי)' : 'Section title (English, optional)'}
+                          className={`${inputClass} flex-1`}
+                        />
+                        <RegenerateButton
+                          lang={lang}
+                          busy={regenerating.has(`step-group-${group._key}`)}
+                          onClick={() => regenerateTranslation(`step-group-${group._key}`, group.title ?? '', group.titleEn ?? '', v => updateStepGroup(gi, { title: v }), v => updateStepGroup(gi, { titleEn: v }))}
                         />
                         {stepGroups.length > 1 && (
                           <button type="button" onClick={() => removeStepGroup(gi)} className="text-xs text-red-400/70 hover:text-red-400 shrink-0">

@@ -905,7 +905,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
             <h2 className="font-serif text-xl font-bold text-cream mb-4">{tx.ingredients}</h2>
             <div className="space-y-4">
               {displayRecipe.ingredients.map((group, gi) => {
-                const groupLabel = lang === 'he' ? group.group : (group.groupEn ?? group.group)
+                const groupLabel = lang === 'he' ? (group.group || group.groupEn) : (group.groupEn || group.group)
                 return (
                   <div key={gi}>
                     {groupLabel && (
@@ -1006,7 +1006,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
             </div>
             <div className="space-y-6">
               {displayRecipe.steps.map((group, gi) => {
-                const groupTitle = lang === 'he' ? group.title : (group.titleEn ?? group.title)
+                const groupTitle = lang === 'he' ? (group.title || group.titleEn) : (group.titleEn || group.title)
                 return (
                   <div key={gi}>
                     {groupTitle && (
