@@ -270,7 +270,7 @@ describe('RecipesService', () => {
     const service = await makeService({ find })
     const result = await service.findMine('user_1')
 
-    expect(find).toHaveBeenCalledWith({ ownerId: 'user_1' })
+    expect(find).toHaveBeenCalledWith({ ownerId: 'user_1', deletedAt: { $exists: false } })
     expect(sort).toHaveBeenCalledWith({ updatedAt: -1 })
     expect(result).toEqual([{ slug: 'a' }])
   })
@@ -351,6 +351,20 @@ describe('RecipesService', () => {
     const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(null) })
     const service = await makeService({ findOne })
     await expect(service.updateDraft('missing', 'user_1', false, minimalDto as any)).rejects.toThrow(NotFoundException)
+  })
+
+  it('updateDraft looks up the recipe excluding soft-deleted ones', async () => {
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(null) })
+    const service = await makeService({ findOne })
+    await expect(service.updateDraft('a', 'user_1', false, minimalDto as any)).rejects.toThrow(NotFoundException)
+    expect(findOne).toHaveBeenCalledWith({ slug: 'a', deletedAt: { $exists: false } })
+  })
+
+  it('findBySlugForUser looks up the recipe excluding soft-deleted ones', async () => {
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(null) })
+    const service = await makeService({ findOne })
+    await service.findBySlugForUser('a', 'user_1', false)
+    expect(findOne).toHaveBeenCalledWith({ slug: 'a', deletedAt: { $exists: false } })
   })
 
   it('updateDraft throws ForbiddenException when a non-owner, non-admin tries to edit', async () => {
@@ -510,32 +524,46 @@ describe('RecipesService', () => {
     expect(find).toHaveBeenCalledWith({ recipeSlug: 'a', published: true })
   })
 
-  it('remove deletes a never-published recipe when the requester is its owner', async () => {
-    const recipe = { status: 'draft', ownerId: 'user_1', publishedRevision: undefined }
-    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
-    const deleteOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue({}) })
-    const service = await makeService({ findOne, deleteOne })
-    await service.remove('tomato-soup', 'user_1', false)
-
-    expect(deleteOne).toHaveBeenCalledWith({ slug: 'tomato-soup' })
-  })
-
-  it('remove throws ForbiddenException when a non-admin tries to delete an ever-published recipe, even if currently rejected', async () => {
-    const recipe = { status: 'rejected', ownerId: 'user_1', publishedRevision: 1 }
+  it('remove soft-deletes a never-published recipe when the requester is its owner', async () => {
+    const recipe: { status: string; ownerId: string; publishedRevision: undefined; save: jest.Mock; deletedAt?: Date } =
+      { status: 'draft', ownerId: 'user_1', publishedRevision: undefined, save: jest.fn().mockResolvedValue(undefined) }
     const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
     const deleteOne = jest.fn()
     const service = await makeService({ findOne, deleteOne })
-    await expect(service.remove('tomato-soup', 'user_1', false)).rejects.toThrow(ForbiddenException)
+    await service.remove('tomato-soup', 'user_1', false)
+
     expect(deleteOne).not.toHaveBeenCalled()
+    expect(recipe.save).toHaveBeenCalled()
+    expect(recipe.deletedAt).toBeInstanceOf(Date)
   })
 
-  it('remove allows an admin to delete an ever-published recipe', async () => {
-    const recipe = { status: 'published', ownerId: 'user_1', publishedRevision: 1 }
+  it('remove throws ForbiddenException for an ever-published recipe regardless of admin status, and never deletes it', async () => {
+    const recipe = { status: 'rejected', ownerId: 'user_1', publishedRevision: 1, save: jest.fn() }
     const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
-    const deleteOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue({}) })
+    const deleteOne = jest.fn()
     const service = await makeService({ findOne, deleteOne })
-    await service.remove('tomato-soup', 'admin_1', true)
 
-    expect(deleteOne).toHaveBeenCalledWith({ slug: 'tomato-soup' })
+    await expect(service.remove('tomato-soup', 'user_1', false)).rejects.toThrow(ForbiddenException)
+    await expect(service.remove('tomato-soup', 'admin_1', true)).rejects.toThrow(ForbiddenException)
+    expect(deleteOne).not.toHaveBeenCalled()
+    expect(recipe.save).not.toHaveBeenCalled()
+  })
+
+  it('remove throws BadRequestException when the recipe is pending review', async () => {
+    const recipe = { status: 'pending_review', ownerId: 'user_1', publishedRevision: undefined, save: jest.fn() }
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
+    const service = await makeService({ findOne })
+
+    await expect(service.remove('tomato-soup', 'user_1', false)).rejects.toThrow(BadRequestException)
+    expect(recipe.save).not.toHaveBeenCalled()
+  })
+
+  it('remove throws ForbiddenException when a non-owner, non-admin tries to soft-delete a draft', async () => {
+    const recipe = { status: 'draft', ownerId: 'user_1', publishedRevision: undefined, save: jest.fn() }
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
+    const service = await makeService({ findOne })
+
+    await expect(service.remove('tomato-soup', 'user_2', false)).rejects.toThrow(ForbiddenException)
+    expect(recipe.save).not.toHaveBeenCalled()
   })
 })

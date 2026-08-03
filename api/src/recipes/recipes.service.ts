@@ -215,7 +215,7 @@ export class RecipesService implements OnModuleInit {
   // one sees their live in-progress content. Anyone else viewing a recipe
   // that has ever been published sees the pinned public snapshot instead.
   async findBySlugForUser(slug: string, userId: string, isAdmin: boolean) {
-    const recipe = await this.recipeModel.findOne({ slug }).exec()
+    const recipe = await this.recipeModel.findOne({ slug, deletedAt: { $exists: false } }).exec()
     if (!recipe) return null
     const isOwnerOrAdmin = isAdmin || recipe.ownerId === userId
     if (recipe.publishedRevision == null && !isOwnerOrAdmin) return null
@@ -234,7 +234,7 @@ export class RecipesService implements OnModuleInit {
   }
 
   async findMine(userId: string) {
-    const recipes = await this.recipeModel.find({ ownerId: userId }).sort({ updatedAt: -1 }).exec()
+    const recipes = await this.recipeModel.find({ ownerId: userId, deletedAt: { $exists: false } }).sort({ updatedAt: -1 }).exec()
     return recipes.map(r => r.toObject())
   }
 
@@ -268,7 +268,7 @@ export class RecipesService implements OnModuleInit {
   }
 
   private async getEditableOrThrow(slug: string, userId: string, isAdmin: boolean): Promise<RecipeDocument> {
-    const recipe = await this.recipeModel.findOne({ slug }).exec()
+    const recipe = await this.recipeModel.findOne({ slug, deletedAt: { $exists: false } }).exec()
     if (!recipe) throw new NotFoundException(`Recipe '${slug}' not found`)
     if (recipe.ownerId && recipe.ownerId !== userId && !isAdmin) {
       throw new ForbiddenException('Only the owner or an admin can edit this recipe')
@@ -390,14 +390,24 @@ export class RecipesService implements OnModuleInit {
     }))
   }
 
+  // Never a hard delete: a recipe that has ever been published cannot be
+  // deleted at all (by anyone, including admins - once it's been public,
+  // it stays recoverable by design), and everything else is soft-deleted
+  // (deletedAt set) rather than removed from the database, so a mistaken
+  // delete is always reversible by clearing that field.
   async remove(slug: string, userId: string, isAdmin: boolean): Promise<void> {
     const recipe = await this.recipeModel.findOne({ slug }).exec()
     if (!recipe) return
     if (recipe.publishedRevision != null) {
-      if (!isAdmin) throw new ForbiddenException('Only an admin can delete a published recipe')
-    } else if (recipe.ownerId && recipe.ownerId !== userId && !isAdmin) {
+      throw new ForbiddenException('A recipe that has ever been published can never be deleted')
+    }
+    if (recipe.status === 'pending_review') {
+      throw new BadRequestException('This recipe is locked while its publish request is pending review')
+    }
+    if (recipe.ownerId && recipe.ownerId !== userId && !isAdmin) {
       throw new ForbiddenException('Only the owner or an admin can delete this recipe')
     }
-    await this.recipeModel.deleteOne({ slug }).exec()
+    recipe.deletedAt = new Date()
+    await recipe.save()
   }
 }

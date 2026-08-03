@@ -93,6 +93,13 @@ export class Recipe {
   // last-approved snapshot until a new edit is submitted and approved again.
   @Prop()
   publishedRevision?: number
+
+  // Soft-delete marker. Recipes are never hard-deleted - a "deleted" recipe
+  // just gets this timestamp set and disappears from every listing/lookup,
+  // while its document and full revision history stay in the database and
+  // can be restored by clearing this field.
+  @Prop({ index: true })
+  deletedAt?: Date
 }
 
 export const RecipeSchema = SchemaFactory.createForClass(Recipe)
