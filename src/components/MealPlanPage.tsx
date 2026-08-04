@@ -5,6 +5,7 @@ import { useRecipes } from '../hooks/useRecipes'
 import { useLanguage } from '../hooks/useLanguage'
 import { useToast } from '../hooks/useToast'
 import { heUnit } from '../i18n'
+import AppSelect from './ui/AppSelect'
 
 interface MealPlanPageProps {
   onAddToShoppingList: (items: { name: string; amount: string }[], recipeTitle: string) => void
@@ -165,23 +166,23 @@ export default function MealPlanPage({ onAddToShoppingList }: MealPlanPageProps)
 
                   {pickerOpenFor === iso && (
                     <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-tint/[0.06] pt-3">
-                      <select
+                      <AppSelect
                         value={pickerSlug}
-                        onChange={e => setPickerSlug(e.target.value)}
-                        className="bg-tint/[0.03] border border-tint/10 rounded-lg px-2 py-1.5 text-xs text-cream/80 outline-none focus:border-amber/30"
-                      >
-                        <option value="">{lang === 'he' ? 'בחר מתכון...' : 'Select recipe...'}</option>
-                        {recipes.map(r => (
-                          <option key={r.id} value={r.id}>{lang === 'he' ? (r.titleHe ?? r.title) : r.title}</option>
-                        ))}
-                      </select>
-                      <select
+                        onValueChange={setPickerSlug}
+                        triggerClassName="bg-tint/[0.03] border border-tint/10 rounded-lg px-2 py-1.5 text-xs text-cream/80 outline-none focus:border-amber/30"
+                        popupClassName="max-h-56"
+                        aria-label={lang === 'he' ? 'בחר מתכון' : 'Select recipe'}
+                        options={[
+                          { value: '', label: lang === 'he' ? 'בחר מתכון...' : 'Select recipe...' },
+                          ...recipes.map(r => ({ value: r.id, label: lang === 'he' ? (r.titleHe ?? r.title) : r.title })),
+                        ]}
+                      />
+                      <AppSelect
                         value={pickerMealType}
-                        onChange={e => setPickerMealType(e.target.value as MealType)}
-                        className="bg-tint/[0.03] border border-tint/10 rounded-lg px-2 py-1.5 text-xs text-cream/80 outline-none focus:border-amber/30"
-                      >
-                        {MEAL_TYPES.map(mt => <option key={mt} value={mt}>{mealTypeLabel[mt]}</option>)}
-                      </select>
+                        onValueChange={value => setPickerMealType(value as MealType)}
+                        triggerClassName="bg-tint/[0.03] border border-tint/10 rounded-lg px-2 py-1.5 text-xs text-cream/80 outline-none focus:border-amber/30"
+                        options={MEAL_TYPES.map(mt => ({ value: mt, label: mealTypeLabel[mt] }))}
+                      />
                       <button type="button" disabled={!pickerSlug} onClick={() => handleAdd(iso)} className="btn-primary text-xs disabled:opacity-40">
                         {lang === 'he' ? 'הוסף' : 'Add'}
                       </button>
