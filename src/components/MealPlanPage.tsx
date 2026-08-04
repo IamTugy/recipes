@@ -4,11 +4,10 @@ import { useMealPlan, type MealType } from '../hooks/useMealPlan'
 import { useRecipes } from '../hooks/useRecipes'
 import { useLanguage } from '../hooks/useLanguage'
 import { useToast } from '../hooks/useToast'
-import { heUnit } from '../i18n'
 import AppSelect from './ui/AppSelect'
 
 interface MealPlanPageProps {
-  onAddToShoppingList: (items: { name: string; amount: string }[], recipeTitle: string) => void
+  onAddToShoppingList: (items: { name: string; amount: number | null; unit: string }[]) => void
 }
 
 const MEAL_TYPES: MealType[] = ['breakfast', 'lunch', 'dinner', 'snack']
@@ -70,23 +69,19 @@ export default function MealPlanPage({ onAddToShoppingList }: MealPlanPageProps)
   }
 
   function addWeekToShoppingList() {
-    const items: { name: string; amount: string }[] = []
-    let count = 0
+    const items: { name: string; amount: number | null; unit: string }[] = []
     for (const entry of entries) {
       const recipe = recipeFor(entry.recipeSlug)
       if (!recipe) continue
       for (const group of recipe.ingredients) {
         for (const item of group.items) {
           const itemName = lang === 'he' ? item.name : (item.nameEn ?? item.name)
-          if (!item.amount) { items.push({ name: itemName, amount: '' }); count++; continue }
-          const unit = lang === 'he' ? heUnit(item.unit, item.amount) : item.unit
-          items.push({ name: itemName, amount: unit ? `${item.amount} ${unit}` : String(item.amount) })
-          count++
+          items.push({ name: itemName, amount: item.amount || null, unit: item.unit })
         }
       }
     }
-    onAddToShoppingList(items, lang === 'he' ? 'תוכנית ארוחות' : 'Meal plan')
-    showToast(lang === 'he' ? `${count} פריטים נוספו לרשימת הקניות` : `Added ${count} items to your shopping list`)
+    onAddToShoppingList(items)
+    showToast(lang === 'he' ? `${items.length} פריטים נוספו לרשימת הקניות` : `Added ${items.length} items to your shopping list`)
   }
 
   return (

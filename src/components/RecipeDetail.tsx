@@ -27,7 +27,7 @@ import type { TimerState, RecipeRevision } from '../types'
 interface RecipeDetailProps {
   onAddTimer: (label: string, minutes: number, recipeId: string, stepIndex: number) => void
   timers: TimerState[]
-  onAddToShoppingList: (items: { name: string; amount: string }[], recipeTitle: string) => void
+  onAddToShoppingList: (items: { name: string; amount: number | null; unit: string }[]) => void
 }
 
 const presetMultipliers = [0.5, 1, 1.5, 2, 3, 4]
@@ -433,14 +433,11 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
     const items = displayRecipe!.ingredients.flatMap(group =>
       group.items.map(item => {
         const itemName = lang === 'he' ? item.name : (item.nameEn ?? item.name)
-        if (!item.amount) return { name: itemName, amount: '' }
-        const scaled = item.amount * multiplier
-        const amt = scaleAmount(item.amount, multiplier)
-        const unit = lang === 'he' ? heUnit(item.unit, scaled) : item.unit
-        return { name: itemName, amount: unit ? `${amt} ${unit}` : amt }
+        if (!item.amount) return { name: itemName, amount: null, unit: item.unit }
+        return { name: itemName, amount: item.amount * multiplier, unit: item.unit }
       })
     )
-    onAddToShoppingList(items, displayTitle)
+    onAddToShoppingList(items)
     showToast(lang === 'he' ? `${items.length} פריטים נוספו לרשימת הקניות` : `Added ${items.length} items to your shopping list`)
   }
 

@@ -4,10 +4,9 @@ import { useCollections } from '../hooks/useCollections'
 import { useRecipes } from '../hooks/useRecipes'
 import { useLanguage } from '../hooks/useLanguage'
 import { useToast } from '../hooks/useToast'
-import { heUnit } from '../i18n'
 
 interface CollectionsPageProps {
-  onAddToShoppingList: (items: { name: string; amount: string }[], recipeTitle: string) => void
+  onAddToShoppingList: (items: { name: string; amount: number | null; unit: string }[]) => void
 }
 
 export default function CollectionsPage({ onAddToShoppingList }: CollectionsPageProps) {
@@ -49,16 +48,13 @@ export default function CollectionsPage({ onAddToShoppingList }: CollectionsPage
       const r = recipes.find(rec => rec.id === slug)
       if (!r) continue
       recipeCount++
-      const title = lang === 'he' ? (r.titleHe ?? r.title) : r.title
       const items = r.ingredients.flatMap(group =>
         group.items.map(item => {
           const itemName = lang === 'he' ? item.name : (item.nameEn ?? item.name)
-          if (!item.amount) return { name: itemName, amount: '' }
-          const unit = lang === 'he' ? heUnit(item.unit, item.amount) : item.unit
-          return { name: itemName, amount: unit ? `${item.amount} ${unit}` : `${item.amount}` }
+          return { name: itemName, amount: item.amount || null, unit: item.unit }
         })
       )
-      onAddToShoppingList(items, title)
+      onAddToShoppingList(items)
     }
     showToast(
       lang === 'he'
