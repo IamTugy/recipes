@@ -30,7 +30,14 @@
   --scrollbar-thumb: #45454a;
 }
 
-/* ── Print ── force light, ink-friendly colors regardless of the active theme */
+/* ── Print ── force light, ink-friendly colors regardless of the active theme,
+   and give printed output the shape of a designed document rather than a
+   stripped-down web page. */
+@page {
+  size: A4;
+  margin: 16mm 14mm;
+}
+
 @media print {
   :root, [data-theme="dark"] {
     --color-bg: 255 255 255;
@@ -39,7 +46,25 @@
     --color-cream: 20 20 20;
     --color-tint: 0 0 0;
   }
+
+  html, body { background: #fff; }
+
   .card { box-shadow: none !important; border-color: #ddd !important; }
+
+  /* Document-like typography: tighter measure, serif body text, ink-safe sizes */
+  body { font-size: 11pt; line-height: 1.45; }
+  h1 { font-size: 22pt; }
+  h2 { font-size: 16pt; }
+  h3, h4 { font-size: 10.5pt; }
+
+  a { color: inherit !important; text-decoration: none !important; }
+
+  /* Avoid awkward splits: keep ingredient/step groups and cards intact across pages */
+  .card, li, .print-recipe, .print-cover { break-inside: avoid; }
+  h1, h2, h3, h4 { break-after: avoid; }
+  ul, ol { orphans: 3; widows: 3; }
+
+  .print-booklet .print-recipe { break-inside: auto; }
 }
 
 @layer base {

@@ -131,6 +131,14 @@ export default function CollectionsPage({ onAddToShoppingList }: CollectionsPage
                   )}
                   <div className="flex items-center gap-3 shrink-0">
                     {col.recipeSlugs.length > 0 && (
+                      <Link
+                        to={`/collections/${col._id}/print`}
+                        className="text-xs text-cream/40 hover:text-amber transition-colors"
+                      >
+                        {lang === 'he' ? 'ייצוא כ-PDF' : 'Export as PDF'}
+                      </Link>
+                    )}
+                    {col.recipeSlugs.length > 0 && (
                       <button type="button"
                         onClick={() => handleAddCollectionToShoppingList(col.recipeSlugs)}
                         className="text-xs text-cream/40 hover:text-amber transition-colors"
