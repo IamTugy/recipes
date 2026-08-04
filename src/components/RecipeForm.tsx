@@ -3,13 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@clerk/react'
 import { DndContext, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
 import { SortableContext, arrayMove, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import type { Category, Difficulty, IngredientGroup, IngredientItem, Recipe, StepGroup, StepItem } from '../types'
+import type { Category, Difficulty, IngredientGroup, IngredientItem, Nutrition, Recipe, StepGroup, StepItem } from '../types'
 import type { ImportedRecipe } from '../lib/recipeImport'
 import { createRecipe, updateRecipe, type RecipeInput } from '../hooks/useRecipes'
 import { t, categoryEmoji } from '../i18n'
 import { useLanguage } from '../hooks/useLanguage'
 import { useToast } from '../hooks/useToast'
 import { translateText } from '../lib/translate'
+import { estimateNutrition } from '../lib/recipeNutrition'
 import SortableRow from './SortableRow'
 import DragHandle from './DragHandle'
 import PhotoUploadField from './PhotoUploadField'
@@ -105,6 +106,8 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
   const [prepTime, setPrepTime] = useState(prefill?.prepTime ?? 15)
   const [cookTime, setCookTime] = useState(prefill?.cookTime ?? 30)
   const [servings, setServings] = useState(prefill?.servings ?? 4)
+  const [nutrition, setNutrition] = useState<Nutrition>(prefill?.nutrition ?? {})
+  const [estimatingNutrition, setEstimatingNutrition] = useState(false)
   const [tags, setTags] = useState((prefill?.tags ?? []).join(', '))
   const [tips, setTips] = useState((prefill?.tips ?? []).join('\n'))
   const [tipsEn, setTipsEn] = useState((prefill?.tipsEn ?? []).join('\n'))
@@ -261,6 +264,29 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
     }))
   }
 
+  async function handleEstimateNutrition() {
+    const ingredients = stripIngredientKeys(
+      ingredientGroups
+        .map(g => ({ ...g, items: g.items.filter(item => item.name.trim() !== '') }))
+        .filter(g => g.items.length > 0)
+    )
+    if (ingredients.length === 0) {
+      showToast(lang === 'he' ? 'הוסיפו רכיבים לפני הערכת ערכים תזונתיים' : 'Add ingredients before estimating nutrition', 'error')
+      return
+    }
+    setEstimatingNutrition(true)
+    try {
+      const estimate = await estimateNutrition(ingredients, servings, getToken)
+      if (estimate) {
+        setNutrition(estimate)
+      } else {
+        showToast(lang === 'he' ? 'הערכת הערכים התזונתיים נכשלה' : 'Nutrition estimate failed', 'error')
+      }
+    } finally {
+      setEstimatingNutrition(false)
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
@@ -278,6 +304,7 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
         prepTime,
         cookTime,
         servings,
+        nutrition: Object.values(nutrition).some(v => v !== undefined) ? nutrition : undefined,
         tags: tags.split(',').map(s => s.trim()).filter(Boolean),
         tips: tips.split('\n').map(s => s.trim()).filter(Boolean),
         tipsEn: tipsEn.split('\n').map(s => s.trim()).filter(Boolean),
@@ -426,6 +453,40 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
             <div>
               <label className={labelClass}>{lang === 'he' ? 'מנות' : 'Servings'}</label>
               <input type="number" min={1} value={servings} onChange={e => setServings(Number(e.target.value))} className={inputClass} />
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className={labelClass}>{lang === 'he' ? 'ערכים תזונתיים (למנה)' : 'Nutrition (per serving)'}</label>
+              <button
+                type="button"
+                onClick={handleEstimateNutrition}
+                disabled={estimatingNutrition}
+                className="text-xs text-amber hover:text-amber/80 disabled:opacity-40"
+              >
+                {estimatingNutrition
+                  ? (lang === 'he' ? 'מעריך...' : 'Estimating...')
+                  : (lang === 'he' ? '✨ הערכה עם AI' : '✨ Estimate with AI')}
+              </button>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div>
+                <label className={labelClass}>{lang === 'he' ? 'קלוריות' : 'Calories'}</label>
+                <input type="number" min={0} value={nutrition.calories ?? ''} onChange={e => setNutrition(n => ({ ...n, calories: e.target.value ? Number(e.target.value) : undefined }))} className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>{lang === 'he' ? 'חלבון (גרם)' : 'Protein (g)'}</label>
+                <input type="number" min={0} value={nutrition.protein ?? ''} onChange={e => setNutrition(n => ({ ...n, protein: e.target.value ? Number(e.target.value) : undefined }))} className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>{lang === 'he' ? 'פחמימות (גרם)' : 'Carbs (g)'}</label>
+                <input type="number" min={0} value={nutrition.carbs ?? ''} onChange={e => setNutrition(n => ({ ...n, carbs: e.target.value ? Number(e.target.value) : undefined }))} className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>{lang === 'he' ? 'שומן (גרם)' : 'Fat (g)'}</label>
+                <input type="number" min={0} value={nutrition.fat ?? ''} onChange={e => setNutrition(n => ({ ...n, fat: e.target.value ? Number(e.target.value) : undefined }))} className={inputClass} />
+              </div>
             </div>
           </div>
 

@@ -1,5 +1,5 @@
 import { ApiError } from './api'
-import type { Category, Difficulty } from '../types'
+import type { Category, Difficulty, Nutrition } from '../types'
 
 export interface ImportedRecipe {
   title: string
@@ -15,6 +15,7 @@ export interface ImportedRecipe {
   cookTime?: number
   servings?: number
   difficulty?: Difficulty
+  nutrition?: Nutrition
   featured?: boolean
   ingredients?: { group?: string; groupEn?: string; items: { amount: number; unit: string; name: string; nameEn?: string }[] }[]
   steps?: { title?: string; titleEn?: string; items: { instruction: string; instructionEn?: string; timerMinutes?: number }[] }[]

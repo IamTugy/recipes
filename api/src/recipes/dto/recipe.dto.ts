@@ -97,6 +97,28 @@ export class StepGroupDto {
   items!: StepItemDto[]
 }
 
+export class NutritionDto {
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  calories?: number
+
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  protein?: number
+
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  carbs?: number
+
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  fat?: number
+}
+
 export class RecipeDto {
   @IsString()
   @MinLength(1)
@@ -148,6 +170,11 @@ export class RecipeDto {
 
   @IsIn(DIFFICULTIES)
   difficulty!: string
+
+  @ValidateNested()
+  @Type(() => NutritionDto)
+  @IsOptional()
+  nutrition?: NutritionDto
 
   @IsArray()
   @ValidateNested({ each: true })

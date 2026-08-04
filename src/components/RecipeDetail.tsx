@@ -660,6 +660,9 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
               { label: tx.cook, value: formatTime(displayRecipe.cookTime), icon: '🔥' },
               { label: tx.total, value: formatTime(totalTime), icon: '⏱' },
               { label: tx.servings, value: scaledServings.toString(), icon: '🍽' },
+              ...(displayRecipe.nutrition?.calories
+                ? [{ label: tx.calories, value: Math.round(displayRecipe.nutrition.calories).toString(), icon: '🔢' }]
+                : []),
             ].map(item => (
               <div key={item.label} className="bg-tint/[0.03] rounded-xl p-3 text-center border border-tint/5">
                 <p className="text-xl mb-1">{item.icon}</p>
