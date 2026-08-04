@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '@clerk/react'
 import { useLanguage } from '../hooks/useLanguage'
 import { importRecipe } from '../lib/recipeImport'
@@ -11,8 +11,14 @@ function isUrl(value: string) {
   return URL_PATTERN.test(value.trim())
 }
 
+function bookmarkletHref(origin: string) {
+  const script = `(function(){location.href=${JSON.stringify(`${origin}/recipes/import?url=`)}+encodeURIComponent(location.href);})();`
+  return `javascript:${script}`
+}
+
 export default function RecipeImportPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { getToken } = useAuth()
   const { lang } = useLanguage()
   const [source, setSource] = useState('')
@@ -31,12 +37,13 @@ export default function RecipeImportPage() {
     if (selected) setSource('')
   }
 
-  async function handleExtract() {
+  async function handleExtract(overrideSource?: string) {
+    const src = (overrideSource ?? trimmedSource)
     setError(null)
     setLoading(true)
     try {
       const draft = await importRecipe(
-        isUrl(trimmedSource) ? { url: trimmedSource } : { text: trimmedSource || undefined, file: file ?? undefined },
+        isUrl(src) ? { url: src } : { text: src || undefined, file: file ?? undefined },
         getToken
       )
       if (image) draft.image = image
@@ -47,6 +54,20 @@ export default function RecipeImportPage() {
       setLoading(false)
     }
   }
+
+  // Handles both the PWA share-target redirect (share_target in
+  // manifest.webmanifest) and the bookmarklet below: both land here with a
+  // ?url= (or ?text=, since some Android share sheets only fill that field)
+  // query param and expect the import to run immediately.
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    const incoming = params.get('url') || params.get('text')
+    if (!incoming) return
+    setSource(incoming)
+    navigate(location.pathname, { replace: true })
+    void handleExtract(incoming.trim())
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const inputClass = 'w-full bg-tint/[0.03] border border-tint/10 rounded-lg px-3 py-2 text-sm text-cream/80 placeholder-cream/25 outline-none focus:border-amber/30 transition-colors'
   const labelClass = 'block text-xs font-semibold text-cream/50 mb-1'
@@ -124,8 +145,26 @@ export default function RecipeImportPage() {
           </div>
         </div>
 
+        <div className="card p-4 space-y-2">
+          <p className="text-xs font-semibold text-cream/50">
+            {lang === 'he' ? 'ייבוא מהיר' : 'Quick import'}
+          </p>
+          <p className="text-sm text-cream/50">
+            {lang === 'he'
+              ? 'גררו את הכפתור הזה לסרגל המועדפים בדפדפן. בכל דף מתכון, לחיצה עליו תשלח את הדף היישר לכאן.'
+              : 'Drag this button to your browser bookmarks bar. On any recipe page, click it to send that page straight here.'}
+          </p>
+          <a
+            href={bookmarkletHref(window.location.origin)}
+            className="btn-ghost inline-block text-sm"
+            draggable
+          >
+            {lang === 'he' ? 'ייבוא למתכונים' : 'Import to Cookbook'}
+          </a>
+        </div>
+
         <div className="flex items-center gap-3">
-          <button type="button" onClick={handleExtract} disabled={!canSubmit} className="btn-primary disabled:opacity-50 flex items-center gap-2">
+          <button type="button" onClick={() => void handleExtract()} disabled={!canSubmit} className="btn-primary disabled:opacity-50 flex items-center gap-2">
             {loading && (
               <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
