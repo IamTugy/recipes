@@ -1,6 +1,6 @@
 import { Type } from 'class-transformer'
 import { IsArray, IsBoolean, IsIn, IsInt, IsOptional, IsString, Min, MinLength, ValidateNested } from 'class-validator'
-import { IngredientGroupDto, StepGroupDto } from './recipe.dto'
+import { IngredientGroupDto, NutritionDto, StepGroupDto } from './recipe.dto'
 
 const CATEGORIES = ['breakfast', 'lunch', 'dinner', 'dessert', 'salad', 'soup', 'snack', 'bread', 'sauce']
 const DIFFICULTIES = ['easy', 'medium', 'hard']
@@ -65,6 +65,11 @@ export class SaveRecipeDraftDto {
   @IsIn(DIFFICULTIES)
   @IsOptional()
   difficulty?: string
+
+  @ValidateNested()
+  @Type(() => NutritionDto)
+  @IsOptional()
+  nutrition?: NutritionDto
 
   @IsArray()
   @ValidateNested({ each: true })

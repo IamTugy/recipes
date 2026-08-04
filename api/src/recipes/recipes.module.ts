@@ -11,6 +11,8 @@ import { UsersModule } from '../users/users.module'
 import { AiModule } from '../ai/ai.module'
 import { RecipeImportController } from './import/recipe-import.controller'
 import { RecipeImportService } from './import/recipe-import.service'
+import { NutritionController } from './nutrition/nutrition.controller'
+import { NutritionService } from './nutrition/nutrition.service'
 
 @Module({
   imports: [
@@ -24,8 +26,8 @@ import { RecipeImportService } from './import/recipe-import.service'
     UsersModule,
     AiModule,
   ],
-  providers: [RecipesService, RecipeImportService],
-  controllers: [RecipesController, RecipeImportController],
+  providers: [RecipesService, RecipeImportService, NutritionService],
+  controllers: [RecipesController, RecipeImportController, NutritionController],
   exports: [RecipesService],
 })
 export class RecipesModule {}

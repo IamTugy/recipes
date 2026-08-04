@@ -50,6 +50,12 @@ export class Recipe {
   @Prop()
   difficulty?: string
 
+  // Per-serving estimate, typically produced by the AI nutrition-estimate
+  // endpoint from the ingredient list - never independently validated
+  // against the ingredients, so treat it as an approximation, not a fact.
+  @Prop({ type: MongooseSchema.Types.Mixed })
+  nutrition?: { calories?: number; protein?: number; carbs?: number; fat?: number }
+
   @Prop({ type: MongooseSchema.Types.Mixed, default: [] })
   ingredients!: unknown[]
 

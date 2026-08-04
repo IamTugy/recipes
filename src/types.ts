@@ -42,6 +42,13 @@ export interface StepGroup {
   items: StepItem[]
 }
 
+export interface Nutrition {
+  calories?: number
+  protein?: number
+  carbs?: number
+  fat?: number
+}
+
 export interface Recipe {
   id: string
   title: string          // English title
@@ -57,6 +64,7 @@ export interface Recipe {
   cookTime: number       // minutes
   servings: number
   difficulty: Difficulty
+  nutrition?: Nutrition   // per-serving estimate, usually AI-generated
   ingredients: IngredientGroup[]
   steps: StepGroup[]
   source?: string
