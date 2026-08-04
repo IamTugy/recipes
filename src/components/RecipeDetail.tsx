@@ -454,6 +454,15 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
     })
   }
 
+  function markStepChecked(key: string) {
+    setCheckedSteps(prev => {
+      if (prev.has(key)) return prev
+      const next = new Set(prev).add(key)
+      try { sessionStorage.setItem(`checked-${id}`, JSON.stringify([...next])) } catch { /* sessionStorage unavailable */ }
+      return next
+    })
+  }
+
   function toggleIngredient(key: string) {
     setCheckedIngredients(prev => {
       const next = new Set(prev)
@@ -1515,14 +1524,14 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
               </button>
               {wizardIndex === flatSteps.length - 1 ? (
                 <button type="button"
-                  onClick={() => setWizardOpen(false)}
+                  onClick={() => { markStepChecked(stepKey); setWizardOpen(false) }}
                   className="flex-1 py-3 rounded-xl text-sm font-semibold bg-amber/90 text-bg hover:bg-amber transition-colors"
                 >
                   {lang === 'he' ? 'סיום' : 'Finish'}
                 </button>
               ) : (
                 <button type="button"
-                  onClick={() => setWizardIndex(i => Math.min(i + 1, flatSteps.length - 1))}
+                  onClick={() => { markStepChecked(stepKey); setWizardIndex(i => Math.min(i + 1, flatSteps.length - 1)) }}
                   className="flex-1 py-3 rounded-xl text-sm font-semibold bg-amber/90 text-bg hover:bg-amber transition-colors"
                 >
                   {lang === 'he' ? 'הבא' : 'Next'}
