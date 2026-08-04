@@ -1,6 +1,6 @@
-import { useRef } from 'react'
 import { useLanguage } from '../hooks/useLanguage'
-import { useFocusTrap } from '../hooks/useFocusTrap'
+import Modal from './Modal'
+import { Dialog } from '@base-ui/react/dialog'
 
 interface KeyboardShortcutsHelpProps {
   open: boolean
@@ -9,10 +9,6 @@ interface KeyboardShortcutsHelpProps {
 
 export default function KeyboardShortcutsHelp({ open, onClose }: KeyboardShortcutsHelpProps) {
   const { lang } = useLanguage()
-  const dialogRef = useRef<HTMLDivElement>(null)
-  useFocusTrap(dialogRef, open)
-
-  if (!open) return null
 
   const shortcuts = lang === 'he'
     ? [
@@ -29,22 +25,12 @@ export default function KeyboardShortcutsHelp({ open, onClose }: KeyboardShortcu
     ]
 
   return (
-    <div
-      className="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center px-4"
-      onClick={onClose}
-    >
-      <div
-        ref={dialogRef}
-        role="dialog"
-        aria-modal="true"
-        className="card p-6 w-full max-w-sm"
-        onClick={e => e.stopPropagation()}
-        dir={lang === 'he' ? 'rtl' : 'ltr'}
-      >
+    <Modal open={open} onOpenChange={next => { if (!next) onClose() }} zIndexClassName="z-[60]" panelClassName="max-w-sm p-6">
+      <div dir={lang === 'he' ? 'rtl' : 'ltr'}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-serif text-lg font-bold text-cream">
+          <Dialog.Title className="font-serif text-lg font-bold text-cream">
             {lang === 'he' ? 'מקשי קיצור' : 'Keyboard shortcuts'}
-          </h2>
+          </Dialog.Title>
           <button type="button"
             onClick={onClose}
             aria-label={lang === 'he' ? 'סגור' : 'Close'}
@@ -64,6 +50,6 @@ export default function KeyboardShortcutsHelp({ open, onClose }: KeyboardShortcu
           ))}
         </ul>
       </div>
-    </div>
+    </Modal>
   )
 }
