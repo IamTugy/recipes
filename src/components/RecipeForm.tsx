@@ -14,6 +14,7 @@ import SortableRow from './SortableRow'
 import DragHandle from './DragHandle'
 import PhotoUploadField from './PhotoUploadField'
 import Breadcrumbs from './Breadcrumbs'
+import AppSelect from './ui/AppSelect'
 
 interface RecipeFormProps {
   existing?: Recipe
@@ -360,19 +361,21 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div>
               <label className={labelClass}>{lang === 'he' ? 'קטגוריה' : 'Category'}</label>
-              <select value={category} onChange={e => setCategory(e.target.value as Category)} className={inputClass}>
-                {CATEGORIES.map(c => (
-                  <option key={c} value={c}>{categoryEmoji[c]} {tx.categories[c]}</option>
-                ))}
-              </select>
+              <AppSelect
+                value={category}
+                onValueChange={value => setCategory(value as Category)}
+                triggerClassName={inputClass}
+                options={CATEGORIES.map(c => ({ value: c, label: `${categoryEmoji[c]} ${tx.categories[c]}` }))}
+              />
             </div>
             <div>
               <label className={labelClass}>{lang === 'he' ? 'רמת קושי' : 'Difficulty'}</label>
-              <select value={difficulty} onChange={e => setDifficulty(e.target.value as Difficulty)} className={inputClass}>
-                {DIFFICULTIES.map(d => (
-                  <option key={d} value={d}>{tx.difficulty[d]}</option>
-                ))}
-              </select>
+              <AppSelect
+                value={difficulty}
+                onValueChange={value => setDifficulty(value as Difficulty)}
+                triggerClassName={inputClass}
+                options={DIFFICULTIES.map(d => ({ value: d, label: tx.difficulty[d] }))}
+              />
             </div>
             <div>
               <label className={labelClass}>{lang === 'he' ? 'מטבח' : 'Cuisine'}</label>

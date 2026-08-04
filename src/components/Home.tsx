@@ -8,6 +8,7 @@ import { useLanguage } from '../hooks/useLanguage'
 import RecipeCard from './RecipeCard'
 import RecipeCardSkeleton from './RecipeCardSkeleton'
 import RecipeStrip from './RecipeStrip'
+import AppSelect from './ui/AppSelect'
 
 const categories: Category[] = ['breakfast', 'lunch', 'dinner', 'dessert', 'salad', 'soup', 'snack', 'bread', 'sauce']
 const difficulties: Difficulty[] = ['easy', 'medium', 'hard']
@@ -257,16 +258,17 @@ export default function Home() {
             }
             {' '}{lang === 'he' ? 'מתכונים' : 'recipes'}
           </p>
-          <select
+          <AppSelect
             value={sortBy}
-            onChange={e => setSortBy(e.target.value as SortOption)}
-            className="bg-tint/[0.03] border border-tint/10 rounded-lg text-xs text-cream/60 px-2.5 py-1.5 outline-none hover:bg-tint/[0.06] transition-colors"
-          >
-            <option value="default">{lang === 'he' ? 'ברירת מחדל' : 'Default order'}</option>
-            <option value="rating">{lang === 'he' ? 'דירוג גבוה' : 'Top rated'}</option>
-            <option value="quickest">{lang === 'he' ? 'הכי מהיר' : 'Quickest'}</option>
-            <option value="newest">{lang === 'he' ? 'חדש ביותר' : 'Newest'}</option>
-          </select>
+            onValueChange={value => setSortBy(value as SortOption)}
+            triggerClassName="bg-tint/[0.03] border border-tint/10 rounded-lg text-xs text-cream/60 px-2.5 py-1.5 outline-none hover:bg-tint/[0.06] transition-colors"
+            options={[
+              { value: 'default', label: lang === 'he' ? 'ברירת מחדל' : 'Default order' },
+              { value: 'rating', label: lang === 'he' ? 'דירוג גבוה' : 'Top rated' },
+              { value: 'quickest', label: lang === 'he' ? 'הכי מהיר' : 'Quickest' },
+              { value: 'newest', label: lang === 'he' ? 'חדש ביותר' : 'Newest' },
+            ]}
+          />
         </div>
 
         {loading ? (
