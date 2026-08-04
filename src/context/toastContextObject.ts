@@ -1,13 +1,13 @@
-import { createContext } from 'react'
+import { Toast } from '@base-ui/react/toast'
 
-export interface Toast {
-  id: string
-  message: string
-  type: 'success' | 'error'
-}
+export type ToastType = 'success' | 'error'
 
-export interface ToastContextValue {
-  showToast: (message: string, type?: Toast['type']) => void
-}
+export const TOAST_DURATION_MS = 3000
 
-export const ToastContext = createContext<ToastContextValue>({ showToast: () => {} })
+/**
+ * Global toast manager so `showToast` can be called from anywhere in the app
+ * (event handlers, effects, etc.), not just from inside a component that
+ * renders `Toast.Root`. `ToastProvider` wires this instance into
+ * `Toast.Provider` via the `toastManager` prop.
+ */
+export const toastManager = Toast.createToastManager<{ type: ToastType }>()
