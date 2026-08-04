@@ -67,11 +67,13 @@ codebase (see CLAUDE.md if present). Run the relevant test suite and
 linter before committing. Make focused commits with clear messages.
 When done, leave the working tree clean (all changes committed).
 
-If you genuinely need a decision only the repo owner can make (choice
-of external provider, a cost/billing tradeoff, an ambiguous or
-conflicting requirement), do not guess and do not implement a partial
-placeholder - stop and clearly state the question and the options
-instead of writing code.
+This runs fully unattended - there is no one to answer questions, so
+never stop and ask for a decision. If something is ambiguous (choice of
+external provider, a cost/billing tradeoff, a conflicting requirement),
+make the most reasonable judgment call yourself, note it and your
+reasoning clearly in the commit message and PR description, and keep
+going. Always finish with a real, working implementation and a
+non-empty commit - never leave the branch with zero commits.
 EOF
 )
     echo "[feature-request-worker] Running claude -p for issue #$number in $worktree"
@@ -86,16 +88,16 @@ EOF
   commit_count=$(git -C "$worktree" rev-list --count main.."$branch")
 
   if [ "$commit_count" -eq 0 ]; then
-    echo "[feature-request-worker] No commits from issue #$number - Claude needs input, not opening a PR"
+    echo "[feature-request-worker] No commits from issue #$number - unexpected, not opening a PR"
     gh issue edit "$number" -R "$REPO" --remove-label "$LABEL_IN_PROGRESS" --add-label "$LABEL_NEEDS_INPUT"
-    gh issue comment "$number" -R "$REPO" --body "Claude didn't make any changes and needs input to proceed:
+    gh issue comment "$number" -R "$REPO" --body "Claude ran but didn't produce any commits (unexpected - it's instructed to always finish with a working implementation, never stop to ask):
 
 \`\`\`
 $(tail -40 "$claude_log")
 \`\`\`
 
-Answer in this issue, then re-approve (add the \`$LABEL_APPROVED\` label) to try again."
-    echo "[feature-request-worker] Done with issue #$number -> needs input, see comment"
+Check the log above, then re-approve (add the \`$LABEL_APPROVED\` label) to try again."
+    echo "[feature-request-worker] Done with issue #$number -> unexpected empty result, see comment"
     return
   fi
 
