@@ -119,7 +119,7 @@ export default function TimerPanel({ timers, onToggle, onRemove, onReset }: Time
   const progressTimer = sorted.find(t => t.running && !t.done) ?? sorted[0]
 
   return (
-    <div className="print:hidden fixed bottom-0 left-0 right-0 z-50">
+    <div className="print:hidden fixed bottom-0 left-0 right-0 z-[65]">
       {/* Progress bar */}
       <div className="h-0.5 bg-tint/[0.06] relative">
         <div
