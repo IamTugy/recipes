@@ -348,6 +348,13 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
   }, [wizardOpen, stepsCount])
 
   useEffect(() => {
+    if (!wizardOpen) return
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = previousOverflow }
+  }, [wizardOpen])
+
+  useEffect(() => {
     if (!lightboxUrl) return
     function handleKey(e: KeyboardEvent) {
       if (e.key === 'Escape') setLightboxUrl(null)
@@ -1454,7 +1461,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
         const checked = checkedSteps.has(stepKey)
         const existingTimer = getTimerForStep(step.groupIdx, step.stepIdx)
         return (
-          <div ref={wizardRef} role="dialog" aria-modal="true" className="print:hidden fixed inset-0 z-50 bg-bg flex flex-col" dir={lang === 'he' ? 'rtl' : 'ltr'}>
+          <div ref={wizardRef} role="dialog" aria-modal="true" className="print:hidden fixed inset-0 z-[60] bg-bg flex flex-col" dir={lang === 'he' ? 'rtl' : 'ltr'}>
             <div className="flex items-center justify-between px-4 h-14 border-b border-tint/[0.06]">
               <span className="text-cream/40 text-sm">
                 {lang === 'he' ? `שלב ${wizardIndex + 1} מתוך ${flatSteps.length}` : `Step ${wizardIndex + 1} of ${flatSteps.length}`}
