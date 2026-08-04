@@ -43,5 +43,5 @@ export function useWakeLock() {
 
   useEffect(() => () => { void release() }, [release])
 
-  return { active, supported, toggle }
+  return { active, supported, toggle, request, release }
 }

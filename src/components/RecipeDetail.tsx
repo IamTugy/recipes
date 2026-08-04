@@ -355,6 +355,12 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
   }, [wizardOpen])
 
   useEffect(() => {
+    if (wizardOpen) void cookMode.request()
+    else void cookMode.release()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- cookMode is a new object every render; request/release are individually stable
+  }, [wizardOpen, cookMode.request, cookMode.release])
+
+  useEffect(() => {
     if (!lightboxUrl) return
     function handleKey(e: KeyboardEvent) {
       if (e.key === 'Escape') setLightboxUrl(null)
@@ -998,23 +1004,6 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                     {lang === 'he' ? 'מצב הדרכה' : 'Guided mode'}
                   </button>
                 )}
-              {cookMode.supported && (
-                <button type="button"
-                  onClick={cookMode.toggle}
-                  className={`print:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-                    cookMode.active
-                      ? 'bg-amber/10 border-amber/30 text-amber'
-                      : 'border-tint/10 text-cream/40 hover:text-cream/70'
-                  }`}
-                  title={lang === 'he' ? 'שמור על המסך דלוק בזמן בישול' : 'Keeps your screen awake while cooking'}
-                >
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
-                  {lang === 'he' ? 'מצב בישול' : 'Cook Mode'}
-                </button>
-              )}
               </div>
             </div>
             <div className="space-y-6">
@@ -1066,7 +1055,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p
-                                  className={`leading-relaxed transition-colors ${cookMode.active ? 'text-base' : 'text-sm'} ${
+                                  className={`leading-relaxed text-sm transition-colors ${
                                     checked ? 'text-cream/40 line-through' : 'text-cream/80'
                                   }`}
                                   dir={lang === 'he' ? 'rtl' : 'ltr'}
