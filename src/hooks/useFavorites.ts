@@ -2,6 +2,15 @@ import { useCallback, useEffect, useState } from 'react'
 import { useAuth } from '@clerk/react'
 import { apiFetch } from '../lib/api'
 
+// Warms the service worker's runtime cache for favorited recipes the user
+// hasn't necessarily opened recently, so they're still readable offline.
+function prefetchForOffline(slugs: string[], getToken: () => Promise<string | null>) {
+  if (!('serviceWorker' in navigator)) return
+  for (const slug of slugs) {
+    apiFetch(`/recipes/${slug}`, getToken).catch(() => { /* best-effort offline warmup */ })
+  }
+}
+
 export function useFavorites() {
   const { getToken, isLoaded, isSignedIn } = useAuth()
   const [favoriteSlugs, setFavoriteSlugs] = useState<Set<string>>(new Set())
@@ -13,7 +22,10 @@ export function useFavorites() {
 
     apiFetch<string[]>('/favorites', getToken)
       .then(slugs => {
-        if (!cancelled) setFavoriteSlugs(new Set(slugs))
+        if (!cancelled) {
+          setFavoriteSlugs(new Set(slugs))
+          prefetchForOffline(slugs, getToken)
+        }
       })
       .finally(() => {
         if (!cancelled) setLoading(false)
@@ -46,6 +58,8 @@ export function useFavorites() {
         else next.delete(slug)
         return next
       })
+    } else if (!isFavorited) {
+      prefetchForOffline([slug], getToken)
     }
   }, [favoriteSlugs, getToken])
 
