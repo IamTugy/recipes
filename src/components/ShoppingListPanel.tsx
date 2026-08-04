@@ -1,8 +1,7 @@
-import { useRef, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { useState } from 'react'
+import { Dialog } from '@base-ui/react/dialog'
 import type { ShoppingListItem } from '../hooks/useShoppingList'
 import { useLanguage } from '../hooks/useLanguage'
-import { useFocusTrap } from '../hooks/useFocusTrap'
 
 interface ShoppingListPanelProps {
   open: boolean
@@ -21,8 +20,6 @@ export default function ShoppingListPanel({
 }: ShoppingListPanelProps) {
   const { lang } = useLanguage()
   const [copied, setCopied] = useState(false)
-  const panelRef = useRef<HTMLDivElement>(null)
-  useFocusTrap(panelRef, open)
 
   const groups = new Map<string, ShoppingListItem[]>()
   for (const item of items) {
@@ -66,27 +63,14 @@ export default function ShoppingListPanel({
           </div>
         </div>
       )}
-      <AnimatePresence>
-      {open && (
-        <>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="print:hidden fixed inset-0 bg-black/40 z-40"
-          />
-          <motion.div
-            ref={panelRef}
-            role="dialog"
-            aria-modal="true"
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ type: 'tween', duration: 0.25 }}
-            className="print:hidden fixed top-0 right-0 h-full w-full sm:w-96 bg-card z-50 shadow-2xl flex flex-col"
-            dir={lang === 'he' ? 'rtl' : 'ltr'}
-          >
+      <Dialog.Root open={open} onOpenChange={next => { if (!next) onClose() }}>
+        <Dialog.Portal>
+          <Dialog.Backdrop className="print:hidden fixed inset-0 bg-black/40 z-40 transition-opacity duration-150 data-[starting-style]:opacity-0 data-[ending-style]:opacity-0" />
+          <Dialog.Viewport className="print:hidden fixed inset-0 z-50">
+            <Dialog.Popup
+              className="fixed top-0 right-0 h-full w-full sm:w-96 bg-card shadow-2xl flex flex-col transition-transform duration-150 data-[starting-style]:translate-x-full data-[ending-style]:translate-x-full"
+              dir={lang === 'he' ? 'rtl' : 'ltr'}
+            >
             <div className="flex items-center justify-between px-5 h-14 border-b border-tint/[0.06]">
               <h2 className="font-serif text-lg font-medium text-cream">
                 {lang === 'he' ? 'רשימת קניות' : 'Shopping List'}
@@ -187,10 +171,10 @@ export default function ShoppingListPanel({
                 </div>
               </div>
             )}
-          </motion.div>
-        </>
-      )}
-      </AnimatePresence>
+            </Dialog.Popup>
+          </Dialog.Viewport>
+        </Dialog.Portal>
+      </Dialog.Root>
     </>
   )
 }

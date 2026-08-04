@@ -1,10 +1,9 @@
-import { type ReactNode, useRef } from 'react'
+import { type ReactNode } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@clerk/react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { Dialog } from '@base-ui/react/dialog'
 import { useLanguage } from '../hooks/useLanguage'
 import { useTheme } from '../hooks/useTheme'
-import { useFocusTrap } from '../hooks/useFocusTrap'
 import { useMyRecipes, usePendingSubmissions } from '../hooks/useRecipes'
 import { OWNER_USER_ID } from '../lib/admin'
 import type { useSidebar } from '../hooks/useSidebar'
@@ -34,8 +33,6 @@ export default function Sidebar({ sidebar }: SidebarProps) {
   const attentionCount = isAdmin
     ? pendingSubmissions.length
     : myRecipes.filter(r => r.status === 'rejected').length
-  const panelRef = useRef<HTMLDivElement>(null)
-  useFocusTrap(panelRef, mobileOpen)
 
   const recipeLinks: SidebarLinkDef[] = [
     {
@@ -180,29 +177,16 @@ export default function Sidebar({ sidebar }: SidebarProps) {
       </aside>
 
       {/* Mobile drawer */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={() => setMobileOpen(false)}
-              className="print:hidden sm:hidden fixed inset-0 bg-black/40 z-40"
-            />
-            <motion.div
-              ref={panelRef}
-              role="dialog"
-              aria-modal="true"
-              initial={{ x: '-100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '-100%' }}
-              transition={{ type: 'tween', duration: 0.25 }}
-              className="print:hidden sm:hidden fixed top-0 bottom-0 left-0 w-72 bg-bg z-50 shadow-2xl"
-            >
+      <Dialog.Root open={mobileOpen} onOpenChange={setMobileOpen}>
+        <Dialog.Portal>
+          <Dialog.Backdrop className="print:hidden sm:hidden fixed inset-0 bg-black/40 z-40 transition-opacity duration-150 data-[starting-style]:opacity-0 data-[ending-style]:opacity-0" />
+          <Dialog.Viewport className="print:hidden sm:hidden fixed inset-0 z-50">
+            <Dialog.Popup className="fixed top-0 bottom-0 left-0 w-72 bg-bg shadow-2xl transition-transform duration-150 data-[starting-style]:-translate-x-full data-[ending-style]:-translate-x-full">
               {content(true, () => setMobileOpen(false))}
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+            </Dialog.Popup>
+          </Dialog.Viewport>
+        </Dialog.Portal>
+      </Dialog.Root>
     </>
   )
 }
