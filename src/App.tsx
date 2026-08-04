@@ -7,6 +7,7 @@ import Sidebar from './components/Sidebar'
 import Home from './components/Home'
 import RecipeDetail from './components/RecipeDetail'
 import CollectionsPage from './components/CollectionsPage'
+import CollectionPrintPage from './components/CollectionPrintPage'
 import NewRecipePage from './components/NewRecipePage'
 import RecipeImportPage from './components/RecipeImportPage'
 import RecipeForm from './components/RecipeForm'
@@ -71,6 +72,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/collections" element={<CollectionsPage onAddToShoppingList={shoppingList.addItems} />} />
+          <Route path="/collections/:id/print" element={<CollectionPrintPage />} />
           <Route path="/recipes/new" element={<NewRecipePage />} />
           <Route path="/recipes/new/blank" element={<RecipeForm />} />
           <Route path="/recipes/import" element={<RecipeImportPage />} />
