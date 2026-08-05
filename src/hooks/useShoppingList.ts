@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { aggregationKey, toBaseAmount, type RawShoppingItem } from '../lib/shoppingListAggregation'
 
 export interface ShoppingListItem {
   id: string
+  key: string
   name: string
-  amount: string
-  recipeTitle: string
+  amount: number | null
+  unit: string
   checked: boolean
 }
 
@@ -17,7 +19,9 @@ function load(): ShoppingListItem[] {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return []
     const parsed = JSON.parse(raw)
-    return Array.isArray(parsed) ? parsed : []
+    if (!Array.isArray(parsed)) return []
+    // Drop items saved in the pre-aggregation shape (string amount, no key/unit).
+    return parsed.filter((item): item is ShoppingListItem => typeof item?.key === 'string')
   } catch {
     return []
   }
@@ -49,17 +53,32 @@ export function useShoppingList() {
     undoTimeoutRef.current = setTimeout(() => setLastCleared(null), UNDO_WINDOW_MS)
   }
 
-  const addItems = useCallback((newItems: { name: string; amount: string }[], recipeTitle: string) => {
-    setItems(prev => [
-      ...prev,
-      ...newItems.map(item => ({
-        id: `item-${Date.now()}-${idCounter++}`,
-        name: item.name,
-        amount: item.amount,
-        recipeTitle,
-        checked: false,
-      })),
-    ])
+  const addItems = useCallback((newItems: RawShoppingItem[]) => {
+    setItems(prev => {
+      const next = [...prev]
+      for (const raw of newItems) {
+        const key = aggregationKey(raw.name, raw.unit, raw.amount)
+        const { amount, unit } = toBaseAmount(raw)
+        const existingIdx = next.findIndex(i => i.key === key)
+        if (existingIdx >= 0) {
+          const existing = next[existingIdx]
+          next[existingIdx] = {
+            ...existing,
+            amount: existing.amount === null || amount === null ? existing.amount : existing.amount + amount,
+          }
+        } else {
+          next.push({
+            id: `item-${Date.now()}-${idCounter++}`,
+            key,
+            name: raw.name,
+            amount,
+            unit,
+            checked: false,
+          })
+        }
+      }
+      return next
+    })
   }, [])
 
   const toggle = useCallback((id: string) => {

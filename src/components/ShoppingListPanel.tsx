@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Dialog } from '@base-ui/react/dialog'
 import type { ShoppingListItem } from '../hooks/useShoppingList'
 import { useLanguage } from '../hooks/useLanguage'
+import { formatAggregatedAmount } from '../lib/shoppingListAggregation'
 
 interface ShoppingListPanelProps {
   open: boolean
@@ -21,46 +22,50 @@ export default function ShoppingListPanel({
   const { lang } = useLanguage()
   const [copied, setCopied] = useState(false)
 
-  const groups = new Map<string, ShoppingListItem[]>()
-  for (const item of items) {
-    const group = groups.get(item.recipeTitle) ?? []
-    group.push(item)
-    groups.set(item.recipeTitle, group)
+  const title = lang === 'he' ? 'רשימת קניות' : 'Shopping List'
+
+  function listText() {
+    const lines = items.map(item => {
+      const amount = formatAggregatedAmount(item.amount, item.unit, lang)
+      return amount ? `${amount} ${item.name}` : item.name
+    })
+    return `${title}\n${lines.join('\n')}`
   }
 
   async function copyAsText() {
-    const text = [...groups.entries()]
-      .map(([recipeTitle, groupItems]) => {
-        const lines = groupItems.map(item => `- ${item.amount ? `${item.amount} ` : ''}${item.name}`).join('\n')
-        return `${recipeTitle}\n${lines}`
-      })
-      .join('\n\n')
     try {
-      await navigator.clipboard.writeText(text)
+      await navigator.clipboard.writeText(listText())
       setCopied(true)
       setTimeout(() => setCopied(false), 1500)
     } catch { /* clipboard unavailable */ }
+  }
+
+  async function shareList() {
+    const text = listText()
+    if (navigator.share) {
+      try {
+        await navigator.share({ title, text })
+      } catch { /* user cancelled share */ }
+    } else {
+      await copyAsText()
+    }
   }
 
   return (
     <>
       {items.length > 0 && (
         <div className="hidden print:block">
-          <h1 className="text-xl font-bold mb-4">{lang === 'he' ? 'רשימת קניות' : 'Shopping List'}</h1>
-          <div className="space-y-4">
-            {[...groups.entries()].map(([recipeTitle, groupItems]) => (
-              <div key={recipeTitle}>
-                <h2 className="text-sm font-semibold uppercase tracking-wider mb-1">{recipeTitle}</h2>
-                <ul className="space-y-1">
-                  {groupItems.map(item => (
-                    <li key={item.id} className="text-sm">
-                      ☐ {item.amount ? `${item.amount} ` : ''}{item.name}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
+          <h1 className="text-xl font-bold mb-4">{title}</h1>
+          <ul className="space-y-1">
+            {items.map(item => {
+              const amount = formatAggregatedAmount(item.amount, item.unit, lang)
+              return (
+                <li key={item.id} className="text-sm">
+                  ☐ {amount ? `${amount} ` : ''}{item.name}
+                </li>
+              )
+            })}
+          </ul>
         </div>
       )}
       <Dialog.Root open={open} onOpenChange={next => { if (!next) onClose() }}>
@@ -73,7 +78,7 @@ export default function ShoppingListPanel({
             >
             <div className="flex items-center justify-between px-5 h-14 border-b border-tint/[0.06]">
               <h2 className="font-serif text-lg font-medium text-cream">
-                {lang === 'he' ? 'רשימת קניות' : 'Shopping List'}
+                {title}
               </h2>
               <button type="button"
                 onClick={onClose}
@@ -105,53 +110,50 @@ export default function ShoppingListPanel({
                   {lang === 'he' ? 'הרשימה ריקה' : 'Your shopping list is empty'}
                 </p>
               ) : (
-                <div className="space-y-5">
-                  {[...groups.entries()].map(([recipeTitle, groupItems]) => (
-                    <div key={recipeTitle}>
-                      <h3 className="text-[11px] font-semibold uppercase tracking-wider text-cream/30 mb-1.5 truncate">
-                        {recipeTitle}
-                      </h3>
-                      <ul className="space-y-1.5">
-                        {groupItems.map(item => (
-                          <li
-                            key={item.id}
-                            className="flex items-center gap-3 group py-1.5 border-b border-tint/[0.04] last:border-0"
-                          >
-                            <button type="button"
-                              onClick={() => onToggle(item.id)}
-                              aria-label={item.checked
-                                ? (lang === 'he' ? 'סמן כלא נאסף' : 'Mark as not collected')
-                                : (lang === 'he' ? 'סמן כנאסף' : 'Mark as collected')}
-                              className={`shrink-0 h-8 w-8 sm:h-5 sm:w-5 rounded-md border flex items-center justify-center transition-colors ${
-                                item.checked ? 'bg-herb border-herb text-white' : 'border-tint/20 text-transparent'
-                              }`}
-                            >
-                              {item.checked && '✓'}
-                            </button>
-                            <p className={`flex-1 min-w-0 text-sm truncate ${item.checked ? 'text-cream/30 line-through' : 'text-cream/85'}`}>
-                              {item.amount ? `${item.amount} ` : ''}{item.name}
-                            </p>
-                            <button type="button"
-                              onClick={() => onRemove(item.id)}
-                              aria-label={lang === 'he' ? 'הסר פריט' : 'Remove item'}
-                              className="shrink-0 h-8 w-8 sm:h-6 sm:w-6 flex items-center justify-center rounded text-cream/30 sm:text-cream/20 hover:text-red-400 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
-                            >
-                              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                              </svg>
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                <ul className="space-y-1.5">
+                  {items.map(item => (
+                    <li
+                      key={item.id}
+                      className="flex items-center gap-3 group py-1.5 border-b border-tint/[0.04] last:border-0"
+                    >
+                      <button type="button"
+                        onClick={() => onToggle(item.id)}
+                        aria-label={item.checked
+                          ? (lang === 'he' ? 'סמן כלא נאסף' : 'Mark as not collected')
+                          : (lang === 'he' ? 'סמן כנאסף' : 'Mark as collected')}
+                        className={`shrink-0 h-8 w-8 sm:h-5 sm:w-5 rounded-md border flex items-center justify-center transition-colors ${
+                          item.checked ? 'bg-herb border-herb text-white' : 'border-tint/20 text-transparent'
+                        }`}
+                      >
+                        {item.checked && '✓'}
+                      </button>
+                      <p className={`flex-1 min-w-0 text-sm truncate ${item.checked ? 'text-cream/30 line-through' : 'text-cream/85'}`}>
+                        {(() => {
+                          const amount = formatAggregatedAmount(item.amount, item.unit, lang)
+                          return amount ? `${amount} ` : ''
+                        })()}{item.name}
+                      </p>
+                      <button type="button"
+                        onClick={() => onRemove(item.id)}
+                        aria-label={lang === 'he' ? 'הסר פריט' : 'Remove item'}
+                        className="shrink-0 h-8 w-8 sm:h-6 sm:w-6 flex items-center justify-center rounded text-cream/30 sm:text-cream/20 hover:text-red-400 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </li>
                   ))}
-                </div>
+                </ul>
               )}
             </div>
 
             {items.length > 0 && (
               <div className="px-5 py-3 border-t border-tint/[0.06] space-y-2">
                 <div className="flex items-center gap-2">
+                  <button type="button" onClick={shareList} className="btn-ghost text-xs flex-1">
+                    {lang === 'he' ? 'שתף' : 'Share'}
+                  </button>
                   <button type="button" onClick={copyAsText} className="btn-ghost text-xs flex-1">
                     {copied
                       ? (lang === 'he' ? 'הועתק!' : 'Copied!')
