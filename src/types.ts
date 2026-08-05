@@ -102,4 +102,6 @@ export interface TimerState {
   done: boolean
   recipeId: string
   stepIndex: number
+  /** Epoch ms this timer reaches zero - only meaningful while `running`. Lets remaining time be recomputed from wall-clock time instead of drifting when the tab is backgrounded/suspended. */
+  endsAt?: number
 }

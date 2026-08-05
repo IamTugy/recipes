@@ -6,11 +6,19 @@ let timerIdCounter = 0
 
 function saveTimers(timers: TimerState[]) {
   try {
-    localStorage.setItem(SESSION_KEY, JSON.stringify({
-      timers,
-      savedAt: Date.now(),
-    }))
+    localStorage.setItem(SESSION_KEY, JSON.stringify(timers))
   } catch { /* localStorage unavailable */ }
+}
+
+// Recompute remaining/done from wall-clock time (endsAt) rather than trusting
+// a stored countdown - background tabs/PWAs get throttled or fully suspended,
+// so a plain per-tick decrement understates how much time actually passed.
+function resolveTimer(t: TimerState): TimerState {
+  if (t.done || !t.running) return t
+  const endsAt = t.endsAt ?? (Date.now() + t.remainingSeconds * 1000)
+  const remaining = Math.max(0, Math.round((endsAt - Date.now()) / 1000))
+  const done = remaining === 0
+  return { ...t, remainingSeconds: remaining, done, running: !done, endsAt }
 }
 
 function loadTimers(): TimerState[] {
@@ -18,15 +26,8 @@ function loadTimers(): TimerState[] {
     const raw = localStorage.getItem(SESSION_KEY)
     if (!raw) return []
     const parsed = JSON.parse(raw)
-    if (!Array.isArray(parsed?.timers) || typeof parsed?.savedAt !== 'number') return []
-    const { timers, savedAt } = parsed as { timers: TimerState[], savedAt: number }
-    const elapsedSeconds = Math.floor((Date.now() - savedAt) / 1000)
-    return timers.map(t => {
-      if (t.done || !t.running) return t
-      const remaining = Math.max(0, t.remainingSeconds - elapsedSeconds)
-      const done = remaining === 0
-      return { ...t, remainingSeconds: remaining, done, running: !done }
-    })
+    if (!Array.isArray(parsed)) return []
+    return (parsed as TimerState[]).map(resolveTimer)
   } catch { return [] }
 }
 
@@ -38,12 +39,12 @@ export function useTimers() {
     setTimers(prev => {
       const next = prev.map(t => {
         if (t.id !== id || !t.running) return t
-        if (t.remainingSeconds <= 1) {
+        const resolved = resolveTimer(t)
+        if (resolved.done) {
           clearInterval(intervalsRef.current.get(id))
           intervalsRef.current.delete(id)
-          return { ...t, remainingSeconds: 0, running: false, done: true }
         }
-        return { ...t, remainingSeconds: t.remainingSeconds - 1 }
+        return resolved
       })
       saveTimers(next)
       return next
@@ -64,6 +65,22 @@ export function useTimers() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // A backgrounded/suspended tab's setInterval may not fire at all until the
+  // tab is foregrounded again - resync from wall-clock time the instant it is,
+  // rather than waiting for the next 1s tick.
+  useEffect(() => {
+    function handleVisibility() {
+      if (document.visibilityState !== 'visible') return
+      setTimers(prev => {
+        const next = prev.map(resolveTimer)
+        saveTimers(next)
+        return next
+      })
+    }
+    document.addEventListener('visibilitychange', handleVisibility)
+    return () => document.removeEventListener('visibilitychange', handleVisibility)
+  }, [])
+
   const addTimer = useCallback((label: string, minutes: number, recipeId: string, stepIndex: number) => {
     if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
       Notification.requestPermission().catch(() => { /* ignore - notifications are a nice-to-have */ })
@@ -74,6 +91,7 @@ export function useTimers() {
       const next = [...prev, {
         id, label, totalSeconds, remainingSeconds: totalSeconds,
         running: true, done: false, recipeId, stepIndex,
+        endsAt: Date.now() + totalSeconds * 1000,
       }]
       saveTimers(next)
       return next
@@ -89,11 +107,12 @@ export function useTimers() {
         if (t.running) {
           clearInterval(intervalsRef.current.get(id))
           intervalsRef.current.delete(id)
-          return { ...t, running: false }
+          const resolved = resolveTimer(t)
+          return { ...resolved, running: false, endsAt: undefined }
         } else {
           const interval = setInterval(() => tick(id), 1000)
           intervalsRef.current.set(id, interval)
-          return { ...t, running: true }
+          return { ...t, running: true, endsAt: Date.now() + t.remainingSeconds * 1000 }
         }
       })
       saveTimers(next)
@@ -116,7 +135,7 @@ export function useTimers() {
     intervalsRef.current.delete(id)
     setTimers(prev => {
       const next = prev.map(t =>
-        t.id !== id ? t : { ...t, remainingSeconds: t.totalSeconds, running: false, done: false }
+        t.id !== id ? t : { ...t, remainingSeconds: t.totalSeconds, running: false, done: false, endsAt: undefined }
       )
       saveTimers(next)
       return next
