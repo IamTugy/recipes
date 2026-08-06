@@ -65,6 +65,10 @@
   ul, ol { orphans: 3; widows: 3; }
 
   .print-booklet .print-recipe { break-inside: auto; }
+
+  /* Printing the shopping list: hide the routed page content underneath it
+     so the current recipe/page doesn't print alongside the list. */
+  body.printing-shopping-list .app-routes { display: none !important; }
 }
 
 @layer base {

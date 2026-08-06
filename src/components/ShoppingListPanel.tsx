@@ -40,6 +40,16 @@ export default function ShoppingListPanel({
     } catch { /* clipboard unavailable */ }
   }
 
+  function printList() {
+    document.body.classList.add('printing-shopping-list')
+    const cleanup = () => {
+      document.body.classList.remove('printing-shopping-list')
+      window.removeEventListener('afterprint', cleanup)
+    }
+    window.addEventListener('afterprint', cleanup)
+    window.print()
+  }
+
   async function shareList() {
     const text = listText()
     if (navigator.share) {
@@ -159,7 +169,7 @@ export default function ShoppingListPanel({
                       ? (lang === 'he' ? 'הועתק!' : 'Copied!')
                       : (lang === 'he' ? 'העתק כטקסט' : 'Copy as text')}
                   </button>
-                  <button type="button" onClick={() => window.print()} className="btn-ghost text-xs flex-1">
+                  <button type="button" onClick={printList} className="btn-ghost text-xs flex-1">
                     {lang === 'he' ? 'הדפס' : 'Print'}
                   </button>
                 </div>
