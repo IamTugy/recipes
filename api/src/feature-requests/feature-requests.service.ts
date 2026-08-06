@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common'
+import { ForbiddenException, Injectable, InternalServerErrorException } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 
 export interface FeatureRequest {
@@ -15,6 +15,7 @@ export interface FeatureRequest {
 const FEATURE_REQUEST_LABEL = 'feature-request'
 const APPROVED_LABEL = 'approved-for-claude'
 const SUBMITTER_PATTERN = /Submitted via the app by user `([^`]+)`\./
+const LOCKED_LABELS = ['approved-for-claude', 'claude-in-progress', 'claude-pr-open', 'claude-needs-input']
 
 interface GitHubIssue {
   number: number
@@ -90,6 +91,49 @@ export class FeatureRequestsService {
     await this.githubFetch(`/issues/${issueNumber}/labels`, {
       method: 'POST',
       body: JSON.stringify({ labels: [APPROVED_LABEL] }),
+    })
+  }
+
+  async getById(issueNumber: number): Promise<FeatureRequest> {
+    const res = await this.githubFetch(`/issues/${issueNumber}`)
+    const issue = (await res.json()) as GitHubIssue
+    return this.toFeatureRequest(issue)
+  }
+
+  private assertEditableBy(userId: string, request: FeatureRequest): void {
+    if (request.submittedBy !== userId) {
+      throw new ForbiddenException('You can only edit or withdraw your own feature requests')
+    }
+    if (request.state === 'closed') {
+      throw new ForbiddenException('This feature request is already closed')
+    }
+    if (request.labels.some(label => LOCKED_LABELS.includes(label))) {
+      throw new ForbiddenException('This feature request can no longer be edited or withdrawn because work on it has already started')
+    }
+  }
+
+  async update(userId: string, issueNumber: number, title: string, description: string): Promise<FeatureRequest> {
+    const existing = await this.getById(issueNumber)
+    this.assertEditableBy(userId, existing)
+
+    const res = await this.githubFetch(`/issues/${issueNumber}`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        title,
+        body: `${description}\n\n---\nSubmitted via the app by user \`${userId}\`.`,
+      }),
+    })
+    const issue = (await res.json()) as GitHubIssue
+    return this.toFeatureRequest(issue)
+  }
+
+  async withdraw(userId: string, issueNumber: number): Promise<void> {
+    const existing = await this.getById(issueNumber)
+    this.assertEditableBy(userId, existing)
+
+    await this.githubFetch(`/issues/${issueNumber}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ state: 'closed' }),
     })
   }
 }

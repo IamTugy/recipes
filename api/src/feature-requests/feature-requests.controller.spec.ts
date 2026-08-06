@@ -2,7 +2,13 @@ import { ForbiddenException } from '@nestjs/common'
 import { FeatureRequestsController } from './feature-requests.controller'
 
 describe('FeatureRequestsController', () => {
-  const featureRequestsService = { create: jest.fn(), list: jest.fn(), approve: jest.fn() }
+  const featureRequestsService = {
+    create: jest.fn(),
+    list: jest.fn(),
+    approve: jest.fn(),
+    update: jest.fn(),
+    withdraw: jest.fn(),
+  }
 
   beforeEach(() => jest.clearAllMocks())
 
@@ -52,5 +58,24 @@ describe('FeatureRequestsController', () => {
     const controller = new FeatureRequestsController(featureRequestsService as any, makeConfig('owner_1') as any)
     await expect(controller.approve(2, { userId: 'someone_else' } as any)).rejects.toThrow(ForbiddenException)
     expect(featureRequestsService.approve).not.toHaveBeenCalled()
+  })
+
+  it('PATCH /feature-requests/:number edits the request via the service', async () => {
+    featureRequestsService.update.mockResolvedValue({ number: 2, title: 'Updated title' })
+    const controller = new FeatureRequestsController(featureRequestsService as any, makeConfig('owner_1') as any)
+    const result = await controller.update(
+      2,
+      { title: 'Updated title', description: 'Updated body' },
+      { userId: 'user_1' } as any,
+    )
+    expect(featureRequestsService.update).toHaveBeenCalledWith('user_1', 2, 'Updated title', 'Updated body')
+    expect(result).toEqual({ number: 2, title: 'Updated title' })
+  })
+
+  it('DELETE /feature-requests/:number withdraws the request via the service', async () => {
+    const controller = new FeatureRequestsController(featureRequestsService as any, makeConfig('owner_1') as any)
+    const result = await controller.withdraw(2, { userId: 'user_1' } as any)
+    expect(featureRequestsService.withdraw).toHaveBeenCalledWith('user_1', 2)
+    expect(result).toEqual({ withdrawn: true })
   })
 })

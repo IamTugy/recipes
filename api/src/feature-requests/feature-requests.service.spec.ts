@@ -141,4 +141,106 @@ describe('FeatureRequestsService', () => {
     const service = await makeService()
     await expect(service.list()).rejects.toThrow('GitHub API request failed: 403')
   })
+
+  function mockIssueFetch(issue: Record<string, unknown>) {
+    const fetchMock = jest.fn()
+      .mockResolvedValueOnce({ ok: true, json: async () => issue })
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ ...issue, title: 'Updated', body: 'Updated body' }) })
+    global.fetch = fetchMock as unknown as typeof fetch
+    return fetchMock
+  }
+
+  const openIssue = {
+    number: 42,
+    title: 'Add dark mode',
+    body: 'Please add dark mode.\n\n---\nSubmitted via the app by user `user_1`.',
+    html_url: 'https://github.com/IamTugy/recipes/issues/42',
+    state: 'open',
+    labels: [{ name: 'feature-request' }],
+    created_at: '2026-08-01T00:00:00Z',
+  }
+
+  it('update edits the issue title and body when the requester owns it', async () => {
+    const fetchMock = mockIssueFetch(openIssue)
+
+    const service = await makeService()
+    const result = await service.update('user_1', 42, 'Updated', 'Updated body')
+
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      'https://api.github.com/repos/IamTugy/recipes/issues/42',
+      expect.objectContaining({ method: 'PATCH' }),
+    )
+    const [, init] = fetchMock.mock.calls[1]
+    expect(JSON.parse(init.body)).toEqual({
+      title: 'Updated',
+      body: 'Updated body\n\n---\nSubmitted via the app by user `user_1`.',
+    })
+    expect(result.title).toBe('Updated')
+  })
+
+  it('update rejects editing a request submitted by another user', async () => {
+    const fetchMock = jest.fn().mockResolvedValueOnce({ ok: true, json: async () => openIssue })
+    global.fetch = fetchMock as unknown as typeof fetch
+
+    const service = await makeService()
+    await expect(service.update('someone_else', 42, 'Updated', 'Updated body')).rejects.toThrow(
+      'You can only edit or withdraw your own feature requests',
+    )
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('update rejects editing a request that already has work started', async () => {
+    const fetchMock = jest.fn().mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ ...openIssue, labels: [{ name: 'approved-for-claude' }] }),
+    })
+    global.fetch = fetchMock as unknown as typeof fetch
+
+    const service = await makeService()
+    await expect(service.update('user_1', 42, 'Updated', 'Updated body')).rejects.toThrow(
+      'can no longer be edited or withdrawn',
+    )
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('update rejects editing an already-closed request', async () => {
+    const fetchMock = jest.fn().mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ ...openIssue, state: 'closed' }),
+    })
+    global.fetch = fetchMock as unknown as typeof fetch
+
+    const service = await makeService()
+    await expect(service.update('user_1', 42, 'Updated', 'Updated body')).rejects.toThrow(
+      'already closed',
+    )
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('withdraw closes the issue when the requester owns it', async () => {
+    const fetchMock = mockIssueFetch(openIssue)
+
+    const service = await makeService()
+    await service.withdraw('user_1', 42)
+
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      'https://api.github.com/repos/IamTugy/recipes/issues/42',
+      expect.objectContaining({ method: 'PATCH' }),
+    )
+    const [, init] = fetchMock.mock.calls[1]
+    expect(JSON.parse(init.body)).toEqual({ state: 'closed' })
+  })
+
+  it('withdraw rejects withdrawing a request submitted by another user', async () => {
+    const fetchMock = jest.fn().mockResolvedValueOnce({ ok: true, json: async () => openIssue })
+    global.fetch = fetchMock as unknown as typeof fetch
+
+    const service = await makeService()
+    await expect(service.withdraw('someone_else', 42)).rejects.toThrow(
+      'You can only edit or withdraw your own feature requests',
+    )
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+  })
 })
