@@ -545,14 +545,14 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
         </button>
       </div>
 
-      <div className="max-w-3xl mx-auto px-4 -mt-16 print:mt-4 relative pb-24">
+      <div className="max-w-3xl mx-auto px-4 -mt-16 relative pb-24 print:max-w-none print:mx-0 print:mt-0 print:px-0 print:pb-0">
         <Breadcrumbs crumbs={[
           { label: lang === 'he' ? 'בית' : 'Home', href: '/' },
           { label: tx.categories[displayRecipe.category] },
           { label: displayTitle },
         ]} />
         {/* Header card */}
-        <div className="card p-6 mb-6">
+        <div className="card p-6 mb-6 print:p-0 print:mb-5 print:border-0 print:shadow-none print:bg-transparent">
           <div className="flex flex-wrap items-center gap-2 mb-3">
             <span className="tag">{categoryEmoji[displayRecipe.category]} {tx.categories[displayRecipe.category]}</span>
             {displayRecipe.cuisine && <span className="tag">{displayRecipe.cuisine}</span>}
@@ -660,7 +660,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
           )}
 
           {/* Meta grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 print:grid-cols-5 gap-3 print:gap-2">
             {[
               { label: tx.prep, value: formatTime(displayRecipe.prepTime), icon: '🔪' },
               { label: tx.cook, value: formatTime(displayRecipe.cookTime), icon: '🔥' },
@@ -670,7 +670,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                 ? [{ label: tx.calories, value: Math.round(displayRecipe.nutrition.calories).toString(), icon: '🔢' }]
                 : []),
             ].map(item => (
-              <div key={item.label} className="bg-tint/[0.03] rounded-xl p-3 text-center border border-tint/5">
+              <div key={item.label} className="bg-tint/[0.03] print:bg-transparent print:border print:border-tint/15 rounded-xl print:rounded-lg p-3 print:p-2 text-center border border-tint/5">
                 <p className="text-xl mb-1">{item.icon}</p>
                 <p className="font-bold text-cream text-lg">{item.value}</p>
                 <p className="text-cream/40 text-xs">{item.label}</p>
@@ -927,9 +927,9 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-5 print:grid-cols-5 gap-6 print:gap-0">
           {/* Ingredients */}
-          {displayRecipe.ingredients.length > 0 && <div className="sm:col-span-2 card p-5 bg-amber/[0.04] border-amber/10 h-fit">
+          {displayRecipe.ingredients.length > 0 && <div className="sm:col-span-2 print:col-span-2 card p-5 bg-amber/[0.04] border-amber/10 h-fit print:p-0 print:pe-5 print:border-0 print:border-e print:border-tint/20 print:bg-transparent print:rounded-none">
             <h2 className="font-serif text-xl font-bold text-cream mb-4">{tx.ingredients}</h2>
             <div className="space-y-4">
               {displayRecipe.ingredients.map((group, gi) => {
@@ -996,7 +996,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
           </div>}
 
           {/* Steps */}
-          <div className="sm:col-span-3">
+          <div className="sm:col-span-3 print:col-span-3 print:ps-5">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-serif text-xl font-bold text-cream">{tx.instructions}</h2>
               <div className="print:hidden flex items-center gap-2">
@@ -1040,7 +1040,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                           <motion.div
                             key={si}
                             layout
-                            className={`relative rounded-xl border p-4 transition-colors cursor-pointer ${
+                            className={`relative rounded-xl border p-4 transition-colors cursor-pointer print:rounded-none print:border-0 print:bg-transparent print:p-0 print:pb-3 print:break-inside-avoid ${
                               checked
                                 ? 'border-herb/30 bg-herb/5'
                                 : 'border-tint/5 bg-tint/[0.02] hover:border-tint/10'
@@ -1057,7 +1057,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                             tabIndex={0}
                           >
                             <div className="flex gap-3">
-                              <div className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-base font-bold transition-colors ${
+                              <div className={`shrink-0 w-9 h-9 print:w-7 print:h-7 rounded-full flex items-center justify-center text-base print:text-sm font-bold transition-colors ${
                                 checked ? 'bg-herb text-white' : 'bg-amber text-bg'
                               }`}>
                                 {checked ? '✓' : stepNum}
@@ -1131,7 +1131,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
 
         {/* Tips */}
         {displayTips.length > 0 && (
-          <div className="mt-8 card p-5">
+          <div className="mt-8 card p-5 print:mt-6 print:p-0 print:border-0 print:border-t print:border-tint/15 print:pt-4 print:rounded-none print:bg-transparent print:break-inside-avoid">
             <h2 className="font-serif text-lg font-bold text-cream mb-3 flex items-center gap-2">
               <span>💡</span> {tx.tipsTitle}
             </h2>
