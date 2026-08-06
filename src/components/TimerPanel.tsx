@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type RefObject } from 'react'
 import type { TimerState } from '../types'
 import { formatSeconds } from '../utils/format'
 import { useLanguage } from '../hooks/useLanguage'
@@ -8,6 +8,7 @@ interface TimerPanelProps {
   onToggle: (id: string) => void
   onRemove: (id: string) => void
   onReset: (id: string) => void
+  panelRef?: RefObject<HTMLDivElement | null>
 }
 
 function MiniRing({ timer, size = 36 }: { timer: TimerState; size?: number }) {
@@ -81,7 +82,7 @@ function playDoneSound() {
   } catch { /* AudioContext unavailable */ }
 }
 
-export default function TimerPanel({ timers, onToggle, onRemove, onReset }: TimerPanelProps) {
+export default function TimerPanel({ timers, onToggle, onRemove, onReset, panelRef }: TimerPanelProps) {
   const { lang } = useLanguage()
   const [mobileIdx, setMobileIdx] = useState(0)
   const prevDoneIds = useRef<Set<string>>(new Set(timers.filter(t => t.done).map(t => t.id)))
@@ -119,7 +120,7 @@ export default function TimerPanel({ timers, onToggle, onRemove, onReset }: Time
   const progressTimer = sorted.find(t => t.running && !t.done) ?? sorted[0]
 
   return (
-    <div className="print:hidden fixed bottom-0 left-0 right-0 z-[65]">
+    <div ref={panelRef} className="print:hidden fixed bottom-0 left-0 right-0 z-[65]">
       {/* Progress bar */}
       <div className="h-0.5 bg-tint/[0.06] relative">
         <div

@@ -27,13 +27,14 @@ import type { TimerState, RecipeRevision } from '../types'
 interface RecipeDetailProps {
   onAddTimer: (label: string, minutes: number, recipeId: string, stepIndex: number) => void
   timers: TimerState[]
+  timerBarHeight: number
   onAddToShoppingList: (items: { name: string; amount: number | null; unit: string }[]) => void
 }
 
 const presetMultipliers = [0.5, 1, 1.5, 2, 3, 4]
 const presetLabels: Record<number, string> = { 0.5: '½x', 1: '1x', 1.5: '1.5x', 2: '2x', 3: '3x', 4: '4x' }
 
-export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }: RecipeDetailProps) {
+export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAddToShoppingList }: RecipeDetailProps) {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { lang } = useLanguage()
@@ -458,6 +459,26 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
       try { sessionStorage.setItem(`checked-${id}`, JSON.stringify([...next])) } catch { /* sessionStorage unavailable */ }
       return next
     })
+  }
+
+  // "Mark done" in guided mode both checks the step and advances the wizard,
+  // same as Next - but un-marking (clicking it again on an already-checked
+  // step) only toggles it off, since that's a correction, not progress.
+  function advanceWizardOrFinish() {
+    if (wizardIndex === flatSteps.length - 1) {
+      setWizardOpen(false)
+    } else {
+      setWizardIndex(i => Math.min(i + 1, flatSteps.length - 1))
+    }
+  }
+
+  function handleWizardMarkDone(key: string) {
+    if (checkedSteps.has(key)) {
+      toggleStep(key)
+      return
+    }
+    markStepChecked(key)
+    advanceWizardOrFinish()
   }
 
   function toggleIngredient(key: string) {
@@ -1459,7 +1480,14 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
         const checked = checkedSteps.has(stepKey)
         const existingTimer = getTimerForStep(step.groupIdx, step.stepIdx)
         return (
-          <div ref={wizardRef} role="dialog" aria-modal="true" className={`print:hidden fixed inset-0 z-[60] bg-bg flex flex-col ${timers.length > 0 ? 'pb-20 sm:pb-16' : ''}`} dir={lang === 'he' ? 'rtl' : 'ltr'}>
+          <div
+            ref={wizardRef}
+            role="dialog"
+            aria-modal="true"
+            className="print:hidden fixed inset-0 z-[60] bg-bg flex flex-col"
+            style={timerBarHeight > 0 ? { paddingBottom: timerBarHeight } : undefined}
+            dir={lang === 'he' ? 'rtl' : 'ltr'}
+          >
             <div className="flex items-center justify-between px-4 h-14 border-b border-tint/[0.06]">
               <span className="text-cream/40 text-sm">
                 {lang === 'he' ? `שלב ${wizardIndex + 1} מתוך ${flatSteps.length}` : `Step ${wizardIndex + 1} of ${flatSteps.length}`}
@@ -1501,7 +1529,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                   </button>
                 )}
                 <button type="button"
-                  onClick={() => toggleStep(stepKey)}
+                  onClick={() => handleWizardMarkDone(stepKey)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
                     checked ? 'border-herb/30 bg-herb/10 text-herb' : 'border-tint/10 text-cream/50 hover:text-cream/80'
                   }`}
@@ -1528,7 +1556,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList }
                 </button>
               ) : (
                 <button type="button"
-                  onClick={() => { markStepChecked(stepKey); setWizardIndex(i => Math.min(i + 1, flatSteps.length - 1)) }}
+                  onClick={() => { markStepChecked(stepKey); advanceWizardOrFinish() }}
                   className="flex-1 py-3 rounded-xl text-sm font-semibold bg-amber/90 text-bg hover:bg-amber transition-colors"
                 >
                   {lang === 'he' ? 'הבא' : 'Next'}

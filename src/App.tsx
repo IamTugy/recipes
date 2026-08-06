@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import { useAuth, SignIn } from '@clerk/react'
@@ -32,6 +32,24 @@ export default function App() {
   const [shoppingListOpen, setShoppingListOpen] = useState(false)
   const [shortcutsHelpOpen, setShortcutsHelpOpen] = useState(false)
   const { isLoaded, isSignedIn } = useAuth()
+  const timerPanelRef = useRef<HTMLDivElement>(null)
+  const [timerBarHeight, setTimerBarHeight] = useState(0)
+
+  // Measured (not guessed) so guided mode's reserved bottom padding always
+  // matches the real timer bar - including when it wraps to more rows or
+  // grows for the safe-area inset on notched phones.
+  useEffect(() => {
+    const el = timerPanelRef.current
+    if (!el) return
+    const observer = new ResizeObserver(([entry]) => {
+      setTimerBarHeight(entry.contentRect.height)
+    })
+    observer.observe(el)
+    return () => {
+      observer.disconnect()
+      setTimerBarHeight(0)
+    }
+  }, [timers.length])
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -88,6 +106,7 @@ export default function App() {
               <RecipeDetail
                 onAddTimer={addTimer}
                 timers={timers}
+                timerBarHeight={timerBarHeight}
                 onAddToShoppingList={shoppingList.addItems}
               />
             }
@@ -97,6 +116,7 @@ export default function App() {
       <AnimatePresence>
         {timers.length > 0 && (
           <TimerPanel
+            panelRef={timerPanelRef}
             timers={timers}
             onToggle={toggleTimer}
             onRemove={removeTimer}
