@@ -11,6 +11,7 @@ export interface FeatureRequest {
   labels: string[]
   createdAt: string
   submittedBy: string | null
+  denialReason: string | null
 }
 
 export function useFeatureRequests() {
@@ -90,5 +91,26 @@ export function useFeatureRequests() {
     return res.ok
   }, [getToken])
 
-  return { requests, loading, create, approve, update, withdraw }
+  const deny = useCallback(async (number: number, reason: string) => {
+    setRequests(prev => prev.map(r => (
+      r.number === number ? { ...r, labels: [...r.labels, 'denied'], denialReason: reason } : r
+    )))
+    const token = await getToken()
+    const res = await fetch(`/api/feature-requests/${number}/deny`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({ reason }),
+    })
+    if (!res.ok) {
+      setRequests(prev => prev.map(r => (
+        r.number === number ? { ...r, labels: r.labels.filter(l => l !== 'denied'), denialReason: null } : r
+      )))
+    }
+    return res.ok
+  }, [getToken])
+
+  return { requests, loading, create, approve, update, withdraw, deny }
 }

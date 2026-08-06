@@ -10,12 +10,15 @@ export interface FeatureRequest {
   labels: string[]
   createdAt: string
   submittedBy: string | null
+  denialReason: string | null
 }
 
 const FEATURE_REQUEST_LABEL = 'feature-request'
 const APPROVED_LABEL = 'approved-for-claude'
+const DENIED_LABEL = 'denied'
 const SUBMITTER_PATTERN = /Submitted via the app by user `([^`]+)`\./
 const LOCKED_LABELS = ['approved-for-claude', 'claude-in-progress', 'claude-pr-open', 'claude-needs-input']
+const DENIAL_REASON_PATTERN = /\n---\nDenied: ([\s\S]*)$/
 
 interface GitHubIssue {
   number: number
@@ -65,6 +68,7 @@ export class FeatureRequestsService {
       labels: issue.labels.map(l => (typeof l === 'string' ? l : l.name)),
       createdAt: issue.created_at,
       submittedBy: body.match(SUBMITTER_PATTERN)?.[1] ?? null,
+      denialReason: body.match(DENIAL_REASON_PATTERN)?.[1]?.trim() ?? null,
     }
   }
 
@@ -134,6 +138,20 @@ export class FeatureRequestsService {
     await this.githubFetch(`/issues/${issueNumber}`, {
       method: 'PATCH',
       body: JSON.stringify({ state: 'closed' }),
+    })
+  }
+
+  async deny(issueNumber: number, reason: string): Promise<void> {
+    const issueRes = await this.githubFetch(`/issues/${issueNumber}`)
+    const issue = (await issueRes.json()) as GitHubIssue
+    const body = issue.body ?? ''
+    await this.githubFetch(`/issues/${issueNumber}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ body: `${body}\n\n---\nDenied: ${reason}` }),
+    })
+    await this.githubFetch(`/issues/${issueNumber}/labels`, {
+      method: 'POST',
+      body: JSON.stringify({ labels: [DENIED_LABEL] }),
     })
   }
 }
