@@ -119,6 +119,16 @@ export class NutritionDto {
   fat?: number
 }
 
+export class SourceDto {
+  @IsString()
+  @MinLength(1)
+  title!: string
+
+  @IsString()
+  @MinLength(1)
+  url!: string
+}
+
 export class RecipeDto {
   @IsString()
   @MinLength(1)
@@ -199,4 +209,14 @@ export class RecipeDto {
   @IsBoolean()
   @IsOptional()
   featured?: boolean
+
+  @IsBoolean()
+  @IsOptional()
+  aiGenerated?: boolean
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => SourceDto)
+  @IsOptional()
+  sources?: SourceDto[]
 }

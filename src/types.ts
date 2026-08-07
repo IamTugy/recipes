@@ -68,6 +68,12 @@ export interface Recipe {
   ingredients: IngredientGroup[]
   steps: StepGroup[]
   source?: string
+  // Set when this recipe was researched/written by the AI-generate feature
+  // rather than a human - drives the non-removable "AI generated" badge.
+  aiGenerated?: boolean
+  // Citations shown in an "extra info" section. Editable for regular
+  // recipes, hidden when empty; read-only once aiGenerated is true.
+  sources?: { title: string; url: string }[]
   featured?: boolean
   hidden?: boolean
   tips?: string[]        // Hebrew tips

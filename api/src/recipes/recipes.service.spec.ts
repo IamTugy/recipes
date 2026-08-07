@@ -347,6 +347,25 @@ describe('RecipesService', () => {
     expect(result.publishedRevision).toBe(1)
   })
 
+  it('updateDraft ignores attempts to edit aiGenerated or sources once a recipe is AI-generated', async () => {
+    const existing = { slug: 'a', ownerId: 'user_1', status: 'draft', aiGenerated: true, sources: [{ title: 'Original', url: 'https://example.com' }] }
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(existing) })
+    const updated = { slug: 'a', currentRevision: 2 }
+    const findOneAndUpdate = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(updated) })
+    const service = await makeService({ findOne, findOneAndUpdate }, { create: jest.fn().mockResolvedValue({}) })
+    const tamperedDto = { ...minimalDto, aiGenerated: false, sources: [{ title: 'Fake', url: 'https://evil.example' }] }
+    await service.updateDraft('a', 'user_1', false, tamperedDto as any)
+
+    expect(findOneAndUpdate).toHaveBeenCalledWith(
+      { slug: 'a' },
+      {
+        $set: { ...tamperedDto, aiGenerated: true, sources: existing.sources },
+        $inc: { currentRevision: 1 },
+      },
+      { new: true },
+    )
+  })
+
   it('updateDraft throws NotFoundException when the recipe does not exist', async () => {
     const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(null) })
     const service = await makeService({ findOne })

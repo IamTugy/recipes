@@ -27,7 +27,7 @@ interface RatingAggregate {
 const RECIPE_FIELDS = [
   'title', 'titleHe', 'category', 'tags', 'tagsEn', 'cuisine', 'image', 'description',
   'descriptionEn', 'prepTime', 'cookTime', 'servings', 'difficulty', 'ingredients',
-  'steps', 'tips', 'tipsEn', 'featured',
+  'steps', 'tips', 'tipsEn', 'featured', 'aiGenerated', 'sources',
 ] as const
 
 @Injectable()
@@ -290,7 +290,14 @@ export class RecipesService implements OnModuleInit {
     // Editing a rejected recipe means the owner is addressing the feedback -
     // clear the rejected state so it isn't stuck showing "rejected" forever.
     const wasRejected = recipe.status === 'rejected'
-    const update: Record<string, unknown> = { $set: { ...dto, ...(wasRejected ? { status: 'draft' } : {}) }, $inc: { currentRevision: 1 } }
+    // The "AI generated" tag and its sources are immutable once set - a
+    // recipe can never have its AI provenance edited or removed, no matter
+    // what the request body contains.
+    const aiLock = recipe.aiGenerated ? { aiGenerated: true, sources: recipe.sources } : {}
+    const update: Record<string, unknown> = {
+      $set: { ...dto, ...aiLock, ...(wasRejected ? { status: 'draft' } : {}) },
+      $inc: { currentRevision: 1 },
+    }
     if (wasRejected) update.$unset = { reviewComment: '' }
     const updated = await this.recipeModel.findOneAndUpdate({ slug }, update, { new: true }).exec()
     if (!updated) throw new NotFoundException(`Recipe '${slug}' not found`)

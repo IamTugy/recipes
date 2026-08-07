@@ -286,7 +286,16 @@ export default function Home() {
         ) : filtered.length === 0 ? (
           <div className="text-center py-24 text-cream/30">
             <p className="text-sm tracking-widest uppercase mb-2">{tx.noResultsTitle}</p>
-            <p className="text-xs">{tx.noResultsHint}</p>
+            <p className="text-xs mb-5">{tx.noResultsHint}</p>
+            {search.trim() && (
+              <button
+                type="button"
+                onClick={() => navigate('/recipes/generate', { state: { query: search.trim() } })}
+                className="btn-primary text-sm"
+              >
+                {lang === 'he' ? `🔮 חפשו את "${search.trim()}" ברשת עם AI` : `🔮 Research "${search.trim()}" on the web with AI`}
+              </button>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -629,6 +629,13 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
             </div>
           )}
 
+          {displayRecipe.aiGenerated && (
+            <div className="print:hidden inline-flex items-center gap-1.5 text-xs font-semibold text-amber bg-amber/10 border border-amber/20 rounded-full px-3 py-1 mb-3">
+              <span>🤖</span>
+              <span>{lang === 'he' ? 'נוצר על ידי AI' : 'AI generated'}</span>
+            </div>
+          )}
+
           <h1
             className="font-serif text-3xl sm:text-4xl font-bold text-cream leading-tight mb-1"
             dir={lang === 'he' ? 'rtl' : 'ltr'}
@@ -1179,6 +1186,24 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                 {tag}
               </button>
             ))}
+          </div>
+        )}
+
+        {/* Sources - hidden entirely when there are none */}
+        {!!displayRecipe.sources?.length && (
+          <div className="mt-8 card p-5 print:mt-6 print:p-0 print:border-0 print:border-t print:border-tint/15 print:pt-4 print:rounded-none print:bg-transparent print:break-inside-avoid">
+            <h2 className="font-serif text-lg font-bold text-cream mb-3 flex items-center gap-2">
+              <span>🔗</span> {lang === 'he' ? 'מקורות' : 'Sources'}
+            </h2>
+            <ul className="space-y-1.5">
+              {displayRecipe.sources.map(s => (
+                <li key={s.url} className="text-sm">
+                  <a href={s.url} target="_blank" rel="noopener noreferrer" className="text-amber hover:text-amber/80 underline">
+                    {s.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
 

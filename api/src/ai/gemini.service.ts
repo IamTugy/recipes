@@ -42,4 +42,30 @@ export class GeminiService {
     if (!response.text) throw new Error('Gemini returned an empty response')
     return response.text
   }
+
+  // Grounds the response in live Google Search results, for research tasks
+  // (e.g. "find the best existing recipe for X") rather than pure generation
+  // from training data. The Gemini API rejects combining the googleSearch
+  // tool with responseMimeType/JSON output, so this only returns text plus
+  // the source URLs the model actually cited - callers that need structured
+  // JSON should feed this text into generateStructured as a second step.
+  async generateWithSearch(prompt: string): Promise<{ text: string; sources: { title: string; url: string }[] }> {
+    const client = this.getClient()
+    const response = await client.models.generateContent({
+      model: this.model,
+      contents: prompt,
+      config: { tools: [{ googleSearch: {} }] },
+    })
+    if (!response.text) throw new Error('Gemini returned an empty response')
+
+    const chunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks ?? []
+    const seen = new Set<string>()
+    const sources = chunks
+      .map(chunk => chunk.web)
+      .filter((web): web is { uri: string; title?: string } => !!web?.uri)
+      .filter(web => (seen.has(web.uri) ? false : (seen.add(web.uri), true)))
+      .map(web => ({ title: web.title ?? web.uri, url: web.uri }))
+
+    return { text: response.text, sources }
+  }
 }

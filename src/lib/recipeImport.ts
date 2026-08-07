@@ -17,6 +17,8 @@ export interface ImportedRecipe {
   difficulty?: Difficulty
   nutrition?: Nutrition
   featured?: boolean
+  aiGenerated?: boolean
+  sources?: { title: string; url: string }[]
   ingredients?: { group?: string; groupEn?: string; items: { amount: number; unit: string; name: string; nameEn?: string }[] }[]
   steps?: { title?: string; titleEn?: string; items: { instruction: string; instructionEn?: string; timerMinutes?: number }[] }[]
   tips?: string[]

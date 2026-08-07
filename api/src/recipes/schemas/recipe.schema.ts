@@ -65,6 +65,20 @@ export class Recipe {
   @Prop()
   source?: string
 
+  // Set when this recipe (or its current draft content) was produced by the
+  // AI-research feature rather than typed/imported by a human. Once true it
+  // is never allowed back to false or edited away - see
+  // RecipesService.updateDraft - so the "AI generated" badge stays a
+  // trustworthy signal of provenance.
+  @Prop({ default: false })
+  aiGenerated?: boolean
+
+  // Citations for where the AI found the recipe it generated. Shown as a
+  // read-only "Sources" section for AI recipes; for regular recipes the
+  // same field is a normal editable field (hidden in view mode when empty).
+  @Prop({ type: [{ title: String, url: String }], default: [] })
+  sources?: { title: string; url: string }[]
+
   @Prop({ default: false })
   featured?: boolean
 

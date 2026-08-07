@@ -31,7 +31,10 @@ export default function NewRecipePage() {
         <h1 className="font-serif text-2xl font-bold text-cream mb-6">
           {lang === 'he' ? 'איך תרצו להוסיף מתכון?' : 'How would you like to add a recipe?'}
         </h1>
-        <button type="button" onClick={() => navigate('/recipes/import')} className="btn-primary w-full">
+        <button type="button" onClick={() => navigate('/recipes/generate')} className="btn-primary w-full">
+          {lang === 'he' ? '🔮 חיפוש מתכון עם AI' : '🔮 Research a recipe with AI'}
+        </button>
+        <button type="button" onClick={() => navigate('/recipes/import')} className="btn-ghost w-full">
           {lang === 'he' ? '✨ ייבוא עם AI' : '✨ Import with AI'}
         </button>
         <button type="button" onClick={() => navigate('/recipes/new/blank')} className="btn-ghost w-full">
