@@ -4,8 +4,8 @@ import { RecipesController } from './recipes.controller'
 describe('RecipesController', () => {
   const recipesService = {
     findAll: jest.fn(),
-    findBySlug: jest.fn(),
-    findBySlugForUser: jest.fn(),
+    findById: jest.fn(),
+    findByIdForUser: jest.fn(),
     findMine: jest.fn(),
     findPublishedByOwner: jest.fn(),
     createDraft: jest.fn(),
@@ -22,7 +22,7 @@ describe('RecipesController', () => {
   const usersService = { namesByIds: jest.fn().mockResolvedValue({}) }
 
   function makeController(ownerUserId = 'admin_1') {
-    const activityLog = { record: jest.fn(), trendingSlugs: jest.fn() }
+    const activityLog = { record: jest.fn(), trendingIds: jest.fn() }
     const config = { get: jest.fn().mockReturnValue(ownerUserId) }
     return new RecipesController(recipesService as any, activityLog as any, config as any, usersService as any)
   }
@@ -36,33 +36,33 @@ describe('RecipesController', () => {
   })
 
   it('GET /recipes/public/:slug returns the recipe when ever-published and not hidden', async () => {
-    recipesService.findBySlug.mockResolvedValue({ slug: 'a', title: 'A' })
+    recipesService.findById.mockResolvedValue({ slug: 'a', title: 'A' })
     const controller = makeController()
 
     await expect(controller.findPublic('a')).resolves.toEqual({ slug: 'a', title: 'A' })
-    expect(recipesService.findBySlug).toHaveBeenCalledWith('a')
+    expect(recipesService.findById).toHaveBeenCalledWith('a')
   })
 
   it('GET /recipes/public/:slug throws 404 when never published, hidden, or missing', async () => {
-    recipesService.findBySlug.mockResolvedValue(null)
+    recipesService.findById.mockResolvedValue(null)
     const controller = makeController()
 
     await expect(controller.findPublic('missing')).rejects.toThrow(NotFoundException)
   })
 
   it('GET /recipes/:slug returns the recipe and logs a view when it has ever been published', async () => {
-    recipesService.findBySlugForUser.mockResolvedValue({ slug: 'a', status: 'published', publishedRevision: 1 })
+    recipesService.findByIdForUser.mockResolvedValue({ slug: 'a', status: 'published', publishedRevision: 1 })
     const controller = makeController()
 
     const result = await controller.findOne('a', { userId: 'user_1' } as any)
 
-    expect(recipesService.findBySlugForUser).toHaveBeenCalledWith('a', 'user_1', false)
+    expect(recipesService.findByIdForUser).toHaveBeenCalledWith('a', 'user_1', false)
     expect(result).toEqual({ slug: 'a', status: 'published', publishedRevision: 1 })
   })
 
   it('GET /recipes/:slug does not log a view for a never-published recipe', async () => {
-    recipesService.findBySlugForUser.mockResolvedValue({ slug: 'a', status: 'draft' })
-    const activityLog = { record: jest.fn(), trendingSlugs: jest.fn() }
+    recipesService.findByIdForUser.mockResolvedValue({ slug: 'a', status: 'draft' })
+    const activityLog = { record: jest.fn(), trendingIds: jest.fn() }
     const config = { get: jest.fn().mockReturnValue('admin_1') }
     const controller = new RecipesController(recipesService as any, activityLog as any, config as any, usersService as any)
 
@@ -72,22 +72,22 @@ describe('RecipesController', () => {
   })
 
   it('GET /recipes/:slug throws 404 when not found', async () => {
-    recipesService.findBySlugForUser.mockResolvedValue(null)
+    recipesService.findByIdForUser.mockResolvedValue(null)
     const controller = makeController()
     await expect(controller.findOne('missing', { userId: 'user_1' } as any)).rejects.toThrow(NotFoundException)
   })
 
   it('GET /recipes/trending returns recipes for the trending slugs, skipping any since-deleted ones', async () => {
-    const activityLog = { record: jest.fn(), trendingSlugs: jest.fn().mockResolvedValue(['a', 'gone', 'b']) }
+    const activityLog = { record: jest.fn(), trendingIds: jest.fn().mockResolvedValue(['a', 'gone', 'b']) }
     const config = { get: jest.fn().mockReturnValue('admin_1') }
-    recipesService.findBySlug.mockImplementation((slug: string) =>
+    recipesService.findById.mockImplementation((slug: string) =>
       slug === 'gone' ? Promise.resolve(null) : Promise.resolve({ slug }),
     )
     const controller = new RecipesController(recipesService as any, activityLog as any, config as any, usersService as any)
 
     const result = await controller.trending()
 
-    expect(activityLog.trendingSlugs).toHaveBeenCalled()
+    expect(activityLog.trendingIds).toHaveBeenCalled()
     expect(result).toEqual([{ slug: 'a' }, { slug: 'b' }])
   })
 

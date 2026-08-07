@@ -9,8 +9,8 @@ export class CookLog {
   userId!: string
 
   @Prop({ required: true, index: true })
-  recipeSlug!: string
+  recipeId!: string
 }
 
 export const CookLogSchema = SchemaFactory.createForClass(CookLog)
-CookLogSchema.index({ userId: 1, recipeSlug: 1 }, { unique: true })
+CookLogSchema.index({ userId: 1, recipeId: 1 }, { unique: true })

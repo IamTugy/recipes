@@ -30,7 +30,7 @@ export default function MealPlanPage({ onAddToShoppingList }: MealPlanPageProps)
   const { recipes } = useRecipes()
   const [weekOffset, setWeekOffset] = useState(0)
   const [pickerOpenFor, setPickerOpenFor] = useState<string | null>(null)
-  const [pickerSlug, setPickerSlug] = useState('')
+  const [pickerRecipeId, setPickerSlug] = useState('')
   const [pickerMealType, setPickerMealType] = useState<MealType>('dinner')
 
   const days = useMemo(() => {
@@ -58,9 +58,9 @@ export default function MealPlanPage({ onAddToShoppingList }: MealPlanPageProps)
   }
 
   async function handleAdd(date: string) {
-    if (!pickerSlug) return
+    if (!pickerRecipeId) return
     try {
-      await addEntry(date, pickerSlug, pickerMealType)
+      await addEntry(date, pickerRecipeId, pickerMealType)
       setPickerOpenFor(null)
       setPickerSlug('')
     } catch {
@@ -71,7 +71,7 @@ export default function MealPlanPage({ onAddToShoppingList }: MealPlanPageProps)
   function addWeekToShoppingList() {
     const items: { name: string; amount: number | null; unit: string }[] = []
     for (const entry of entries) {
-      const recipe = recipeFor(entry.recipeSlug)
+      const recipe = recipeFor(entry.recipeId)
       if (!recipe) continue
       for (const group of recipe.ingredients) {
         for (const item of group.items) {
@@ -136,16 +136,16 @@ export default function MealPlanPage({ onAddToShoppingList }: MealPlanPageProps)
                   ) : (
                     <ul className="space-y-1.5">
                       {dayEntries.map(entry => {
-                        const recipe = recipeFor(entry.recipeSlug)
+                        const recipe = recipeFor(entry.recipeId)
                         return (
                           <li key={entry.id} className="flex items-center justify-between gap-2 text-sm">
                             <button type="button"
-                              onClick={() => navigate(`/recipe/${entry.recipeSlug}`)}
+                              onClick={() => navigate(`/recipes/${entry.recipeId}`)}
                               className="text-cream/70 hover:text-amber transition-colors text-start truncate"
                             >
                               <span className="text-cream/30 text-xs">{mealTypeLabel[entry.mealType]}</span>
                               {' · '}
-                              {recipe ? (lang === 'he' ? (recipe.titleHe ?? recipe.title) : recipe.title) : entry.recipeSlug}
+                              {recipe ? (lang === 'he' ? (recipe.titleHe ?? recipe.title) : recipe.title) : entry.recipeId}
                             </button>
                             <button type="button"
                               onClick={() => removeEntry(entry.id)}
@@ -162,7 +162,7 @@ export default function MealPlanPage({ onAddToShoppingList }: MealPlanPageProps)
                   {pickerOpenFor === iso && (
                     <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-tint/[0.06] pt-3">
                       <AppSelect
-                        value={pickerSlug}
+                        value={pickerRecipeId}
                         onValueChange={setPickerSlug}
                         triggerClassName="bg-tint/[0.03] border border-tint/10 rounded-lg px-2 py-1.5 text-xs text-cream/80 outline-none focus:border-amber/30"
                         popupClassName="max-h-56"
@@ -178,7 +178,7 @@ export default function MealPlanPage({ onAddToShoppingList }: MealPlanPageProps)
                         triggerClassName="bg-tint/[0.03] border border-tint/10 rounded-lg px-2 py-1.5 text-xs text-cream/80 outline-none focus:border-amber/30"
                         options={MEAL_TYPES.map(mt => ({ value: mt, label: mealTypeLabel[mt] }))}
                       />
-                      <button type="button" disabled={!pickerSlug} onClick={() => handleAdd(iso)} className="btn-primary text-xs disabled:opacity-40">
+                      <button type="button" disabled={!pickerRecipeId} onClick={() => handleAdd(iso)} className="btn-primary text-xs disabled:opacity-40">
                         {lang === 'he' ? 'הוסף' : 'Add'}
                       </button>
                       <button type="button" onClick={() => setPickerOpenFor(null)} className="text-xs text-cream/40 hover:text-cream/70">

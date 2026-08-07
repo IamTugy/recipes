@@ -13,7 +13,7 @@ export default function CollectionPrintPage() {
 
   const collection = collections.find(c => c._id === id)
   const collectionRecipes = collection
-    ? collection.recipeSlugs.map(slug => recipes.find(r => r.id === slug)).filter((r): r is NonNullable<typeof r> => !!r)
+    ? collection.recipeIds.map(slug => recipes.find(r => r.id === slug)).filter((r): r is NonNullable<typeof r> => !!r)
     : []
 
   if (loading) {

@@ -38,10 +38,10 @@ export class UploadsService {
     })
   }
 
-  async presignPhotoUpload(recipeSlug: string, contentType: string, purpose: 'review' | 'recipe' = 'review'): Promise<{ uploadUrl: string; publicUrl: string }> {
+  async presignPhotoUpload(recipeId: string, contentType: string, purpose: 'review' | 'recipe' = 'review'): Promise<{ uploadUrl: string; publicUrl: string }> {
     const extension = EXTENSION_BY_CONTENT_TYPE[contentType]
     const folder = purpose === 'recipe' ? 'recipes' : 'reviews'
-    const key = `${folder}/${recipeSlug}/${randomUUID()}.${extension}`
+    const key = `${folder}/${recipeId}/${randomUUID()}.${extension}`
 
     const command = new PutObjectCommand({
       Bucket: this.bucket,
@@ -53,7 +53,7 @@ export class UploadsService {
     return { uploadUrl, publicUrl: `${this.publicUrl}/${key}` }
   }
 
-  async enhancePhoto(recipeSlug: string, imageUrl: string): Promise<{ publicUrl: string }> {
+  async enhancePhoto(recipeId: string, imageUrl: string): Promise<{ publicUrl: string }> {
     // Only accept images we already host - fetching arbitrary caller-supplied
     // URLs server-side would be an SSRF vector.
     if (!imageUrl.startsWith(`${this.publicUrl}/`)) {
@@ -68,7 +68,7 @@ export class UploadsService {
     const enhanced = await this.gemini.editImage(sourceBuffer.toString('base64'), contentType, ENHANCE_PROMPT)
 
     const extension = EXTENSION_BY_CONTENT_TYPE[enhanced.mimeType] ?? 'png'
-    const key = `recipes/${recipeSlug}/${randomUUID()}.${extension}`
+    const key = `recipes/${recipeId}/${randomUUID()}.${extension}`
     await this.s3.send(
       new PutObjectCommand({
         Bucket: this.bucket,

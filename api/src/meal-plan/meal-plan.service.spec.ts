@@ -13,7 +13,7 @@ describe('MealPlanService', () => {
   }
 
   it('listForRange returns entries for the user within the date range, sorted by date', async () => {
-    const entries = [{ _id: '1', date: '2026-08-03', recipeSlug: 'a', mealType: 'dinner' }]
+    const entries = [{ _id: '1', date: '2026-08-03', recipeId: 'a', mealType: 'dinner' }]
     const lean = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(entries) })
     const sort = jest.fn().mockReturnValue({ lean })
     const find = jest.fn().mockReturnValue({ sort })
@@ -23,26 +23,26 @@ describe('MealPlanService', () => {
 
     expect(find).toHaveBeenCalledWith({ userId: 'user_1', date: { $gte: '2026-08-03', $lte: '2026-08-09' } })
     expect(sort).toHaveBeenCalledWith({ date: 1 })
-    expect(result).toEqual([{ id: '1', date: '2026-08-03', recipeSlug: 'a', mealType: 'dinner' }])
+    expect(result).toEqual([{ id: '1', date: '2026-08-03', recipeId: 'a', mealType: 'dinner' }])
   })
 
   it('add creates an entry defaulting mealType to dinner when not given', async () => {
-    const create = jest.fn().mockResolvedValue({ _id: '1', date: '2026-08-03', recipeSlug: 'a', mealType: 'dinner' })
+    const create = jest.fn().mockResolvedValue({ _id: '1', date: '2026-08-03', recipeId: 'a', mealType: 'dinner' })
     const service = await makeService({ create })
 
-    const result = await service.add('user_1', { date: '2026-08-03', recipeSlug: 'a' })
+    const result = await service.add('user_1', { date: '2026-08-03', recipeId: 'a' })
 
-    expect(create).toHaveBeenCalledWith({ userId: 'user_1', date: '2026-08-03', recipeSlug: 'a', mealType: 'dinner' })
-    expect(result).toEqual({ id: '1', date: '2026-08-03', recipeSlug: 'a', mealType: 'dinner' })
+    expect(create).toHaveBeenCalledWith({ userId: 'user_1', date: '2026-08-03', recipeId: 'a', mealType: 'dinner' })
+    expect(result).toEqual({ id: '1', date: '2026-08-03', recipeId: 'a', mealType: 'dinner' })
   })
 
   it('add creates an entry with the given mealType', async () => {
-    const create = jest.fn().mockResolvedValue({ _id: '1', date: '2026-08-03', recipeSlug: 'a', mealType: 'lunch' })
+    const create = jest.fn().mockResolvedValue({ _id: '1', date: '2026-08-03', recipeId: 'a', mealType: 'lunch' })
     const service = await makeService({ create })
 
-    await service.add('user_1', { date: '2026-08-03', recipeSlug: 'a', mealType: 'lunch' })
+    await service.add('user_1', { date: '2026-08-03', recipeId: 'a', mealType: 'lunch' })
 
-    expect(create).toHaveBeenCalledWith({ userId: 'user_1', date: '2026-08-03', recipeSlug: 'a', mealType: 'lunch' })
+    expect(create).toHaveBeenCalledWith({ userId: 'user_1', date: '2026-08-03', recipeId: 'a', mealType: 'lunch' })
   })
 
   it('remove deletes an entry owned by the requesting user', async () => {

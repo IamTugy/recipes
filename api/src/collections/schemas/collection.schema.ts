@@ -12,7 +12,7 @@ export class Collection {
   name!: string
 
   @Prop({ type: [String], default: [] })
-  recipeSlugs!: string[]
+  recipeIds!: string[]
 }
 
 export const CollectionSchema = SchemaFactory.createForClass(Collection)

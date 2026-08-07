@@ -27,7 +27,7 @@ export default function RecipeImportPage() {
   const [image, setImage] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const uploadSlugRef = useRef(`import-${Date.now()}`)
+  const uploadRecipeIdRef = useRef(`import-${Date.now()}`)
 
   const trimmedSource = source.trim()
   const canSubmit = (!!trimmedSource || !!file) && !loading
@@ -92,7 +92,7 @@ export default function RecipeImportPage() {
             <PhotoUploadField
               image={image}
               onChange={setImage}
-              uploadSlug={uploadSlugRef.current}
+              uploadRecipeId={uploadRecipeIdRef.current}
               lang={lang}
               onError={setError}
             />

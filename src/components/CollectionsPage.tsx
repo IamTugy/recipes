@@ -122,11 +122,11 @@ export default function CollectionsPage({ onAddToShoppingList }: CollectionsPage
                       onClick={() => startEditing(col._id, col.name)}
                       title={lang === 'he' ? 'לחצו לעריכת השם' : 'Click to rename'}
                     >
-                      {col.name} <span className="text-cream/30 text-sm font-sans">({col.recipeSlugs.length})</span>
+                      {col.name} <span className="text-cream/30 text-sm font-sans">({col.recipeIds.length})</span>
                     </h2>
                   )}
                   <div className="flex items-center gap-3 shrink-0">
-                    {col.recipeSlugs.length > 0 && (
+                    {col.recipeIds.length > 0 && (
                       <Link
                         to={`/collections/${col._id}/print`}
                         className="text-xs text-cream/40 hover:text-amber transition-colors"
@@ -134,9 +134,9 @@ export default function CollectionsPage({ onAddToShoppingList }: CollectionsPage
                         {lang === 'he' ? 'ייצוא כ-PDF' : 'Export as PDF'}
                       </Link>
                     )}
-                    {col.recipeSlugs.length > 0 && (
+                    {col.recipeIds.length > 0 && (
                       <button type="button"
-                        onClick={() => handleAddCollectionToShoppingList(col.recipeSlugs)}
+                        onClick={() => handleAddCollectionToShoppingList(col.recipeIds)}
                         className="text-xs text-cream/40 hover:text-amber transition-colors"
                       >
                         {lang === 'he' ? 'הוסף הכל לרשימת קניות' : 'Add all to shopping list'}
@@ -150,19 +150,19 @@ export default function CollectionsPage({ onAddToShoppingList }: CollectionsPage
                     </button>
                   </div>
                 </div>
-                {col.recipeSlugs.length === 0 ? (
+                {col.recipeIds.length === 0 ? (
                   <p className="text-xs text-cream/25">
                     {lang === 'he' ? 'אין עדיין מתכונים באוסף הזה' : 'No recipes in this collection yet'}
                   </p>
                 ) : (
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    {col.recipeSlugs.map(slug => {
+                    {col.recipeIds.map(slug => {
                       const r = recipes.find(rec => rec.id === slug)
                       if (!r) return null
                       const title = lang === 'he' ? (r.titleHe ?? r.title) : r.title
                       return (
                         <div key={slug} className="group relative">
-                          <Link to={`/recipe/${slug}`}>
+                          <Link to={`/recipes/${slug}`}>
                             <div className="relative h-24 rounded-xl overflow-hidden mb-2 bg-tint/[0.04]">
                               {r.image?.includes('assets.tugy.dev') && (
                                 <img src={r.image} alt={title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />

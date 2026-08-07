@@ -26,8 +26,8 @@ describe('RatingsService', () => {
     const result = await service.rate('user_1', 'a', 4)
 
     expect(findOneAndUpdate).toHaveBeenCalledWith(
-      { userId: 'user_1', recipeSlug: 'a' },
-      { $set: { userId: 'user_1', recipeSlug: 'a', score: 4 } },
+      { userId: 'user_1', recipeId: 'a' },
+      { $set: { userId: 'user_1', recipeId: 'a', score: 4 } },
       { upsert: true, new: true },
     )
     expect(result).toEqual({ score: 4 })
@@ -39,8 +39,8 @@ describe('RatingsService', () => {
     await service.rate('user_1', 'a', 5, 'Loved it')
 
     expect(findOneAndUpdate).toHaveBeenCalledWith(
-      { userId: 'user_1', recipeSlug: 'a' },
-      { $set: { userId: 'user_1', recipeSlug: 'a', score: 5, comment: 'Loved it' } },
+      { userId: 'user_1', recipeId: 'a' },
+      { $set: { userId: 'user_1', recipeId: 'a', score: 5, comment: 'Loved it' } },
       { upsert: true, new: true },
     )
   })
@@ -52,8 +52,8 @@ describe('RatingsService', () => {
     await service.rate('user_1', 'a', 5, 'Loved it', photoUrl)
 
     expect(findOneAndUpdate).toHaveBeenCalledWith(
-      { userId: 'user_1', recipeSlug: 'a' },
-      { $set: { userId: 'user_1', recipeSlug: 'a', score: 5, comment: 'Loved it', photoUrl } },
+      { userId: 'user_1', recipeId: 'a' },
+      { $set: { userId: 'user_1', recipeId: 'a', score: 5, comment: 'Loved it', photoUrl } },
       { upsert: true, new: true },
     )
   })
@@ -65,8 +65,8 @@ describe('RatingsService', () => {
     await service.rate('user_1', 'a', 5)
 
     expect(findOneAndUpdate).toHaveBeenCalledWith(
-      { userId: 'user_1', recipeSlug: 'a' },
-      { $set: { userId: 'user_1', recipeSlug: 'a', score: 5, recipeRevision: 3 } },
+      { userId: 'user_1', recipeId: 'a' },
+      { $set: { userId: 'user_1', recipeId: 'a', score: 5, recipeRevision: 3 } },
       { upsert: true, new: true },
     )
   })
@@ -76,7 +76,7 @@ describe('RatingsService', () => {
     const service = await makeService({ deleteOne })
     await service.deleteRating('user_1', 'a')
 
-    expect(deleteOne).toHaveBeenCalledWith({ userId: 'user_1', recipeSlug: 'a' })
+    expect(deleteOne).toHaveBeenCalledWith({ userId: 'user_1', recipeId: 'a' })
   })
 
   it("myRating returns the user's own score and comment for a recipe", async () => {
@@ -86,7 +86,7 @@ describe('RatingsService', () => {
     const service = await makeService({ findOne })
     const result = await service.myRating('user_1', 'a')
 
-    expect(findOne).toHaveBeenCalledWith({ userId: 'user_1', recipeSlug: 'a' })
+    expect(findOne).toHaveBeenCalledWith({ userId: 'user_1', recipeId: 'a' })
     expect(result).toEqual({ score: 4, comment: 'Pretty good', photoUrl: null })
   })
 
@@ -109,7 +109,7 @@ describe('RatingsService', () => {
     const service = await makeService({ find })
     const result = await service.reviewsForRecipe('a')
 
-    expect(find).toHaveBeenCalledWith({ recipeSlug: 'a', comment: { $exists: true, $ne: '' } })
+    expect(find).toHaveBeenCalledWith({ recipeId: 'a', comment: { $exists: true, $ne: '' } })
     expect(sort).toHaveBeenCalledWith({ createdAt: -1 })
     expect(limit).toHaveBeenCalledWith(20)
     expect(result).toEqual([{
@@ -155,7 +155,7 @@ describe('RatingsService', () => {
     const result = await service.distributionForRecipe('a')
 
     expect(aggregate).toHaveBeenCalledWith([
-      { $match: { recipeSlug: 'a' } },
+      { $match: { recipeId: 'a' } },
       { $group: { _id: '$score', count: { $sum: 1 } } },
     ])
     expect(result).toEqual({ 1: 0, 2: 0, 3: 1, 4: 0, 5: 3 })

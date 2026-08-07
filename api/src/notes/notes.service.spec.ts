@@ -22,7 +22,7 @@ describe('NotesService', () => {
     findOne.mockReturnValue({ exec: jest.fn().mockResolvedValue({ text: 'used less sugar' }) })
     const service = await makeService()
     await expect(service.get('user_1', 'a')).resolves.toBe('used less sugar')
-    expect(findOne).toHaveBeenCalledWith({ userId: 'user_1', recipeSlug: 'a' })
+    expect(findOne).toHaveBeenCalledWith({ userId: 'user_1', recipeId: 'a' })
   })
 
   it('get returns null when no note exists', async () => {
@@ -31,21 +31,21 @@ describe('NotesService', () => {
     await expect(service.get('user_1', 'a')).resolves.toBeNull()
   })
 
-  it('save upserts the note text by userId+recipeSlug', async () => {
+  it('save upserts the note text by userId+recipeId', async () => {
     findOneAndUpdate.mockReturnValue({ exec: jest.fn().mockResolvedValue({ text: 'great!' }) })
     const service = await makeService()
     await service.save('user_1', 'a', 'great!')
     expect(findOneAndUpdate).toHaveBeenCalledWith(
-      { userId: 'user_1', recipeSlug: 'a' },
-      { userId: 'user_1', recipeSlug: 'a', text: 'great!' },
+      { userId: 'user_1', recipeId: 'a' },
+      { userId: 'user_1', recipeId: 'a', text: 'great!' },
       { upsert: true },
     )
   })
 
-  it('remove deletes the note by userId+recipeSlug', async () => {
+  it('remove deletes the note by userId+recipeId', async () => {
     deleteOne.mockReturnValue({ exec: jest.fn().mockResolvedValue({}) })
     const service = await makeService()
     await service.remove('user_1', 'a')
-    expect(deleteOne).toHaveBeenCalledWith({ userId: 'user_1', recipeSlug: 'a' })
+    expect(deleteOne).toHaveBeenCalledWith({ userId: 'user_1', recipeId: 'a' })
   })
 })

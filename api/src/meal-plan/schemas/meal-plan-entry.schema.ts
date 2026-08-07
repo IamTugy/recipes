@@ -14,7 +14,7 @@ export class MealPlanEntry {
   date!: string
 
   @Prop({ required: true })
-  recipeSlug!: string
+  recipeId!: string
 
   @Prop({ enum: ['breakfast', 'lunch', 'dinner', 'snack'], default: 'dinner' })
   mealType!: 'breakfast' | 'lunch' | 'dinner' | 'snack'

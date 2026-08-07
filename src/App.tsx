@@ -96,14 +96,14 @@ export default function App() {
           <Route path="/recipes/new/blank" element={<RecipeForm />} />
           <Route path="/recipes/import" element={<RecipeImportPage />} />
           <Route path="/recipes/generate" element={<RecipeAiGeneratePage />} />
-          <Route path="/recipe/:id/edit" element={<EditRecipePage />} />
+          <Route path="/recipes/:id/edit" element={<EditRecipePage />} />
           <Route path="/feature-requests" element={<FeatureRequestsPage />} />
           <Route path="/my-recipes" element={<MyRecipesPage />} />
           <Route path="/admin/submissions" element={<AdminSubmissionsPage />} />
           <Route path="/meal-plan" element={<MealPlanPage onAddToShoppingList={shoppingList.addItems} />} />
           <Route path="/chef/:userId" element={<ChefProfilePage />} />
           <Route
-            path="/recipe/:id"
+            path="/recipes/:id"
             element={
               <RecipeDetail
                 onAddTimer={addTimer}

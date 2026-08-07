@@ -160,7 +160,7 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
   }
 
   const [error, setError] = useState<string | null>(null)
-  const uploadSlugRef = useRef(existing?.id ?? `new-${Date.now()}`)
+  const uploadRecipeIdRef = useRef(existing?.id ?? `new-${Date.now()}`)
 
   function updateIngredientGroup(gi: number, patch: Partial<Omit<IngredientGroup, 'items'>>) {
     setIngredientGroups(prev => prev.map((g, i) => (i === gi ? { ...g, ...patch } : g)))
@@ -327,11 +327,11 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
 
       if (isEditing) {
         await updateRecipe(existing!.id, input, getToken)
-        navigate(`/recipe/${existing!.id}`)
+        navigate(`/recipes/${existing!.id}`)
         showToast(lang === 'he' ? 'המתכון עודכן' : 'Recipe updated')
       } else {
-        const slug = await createRecipe(input, getToken)
-        navigate(`/recipe/${slug}`)
+        const newId = await createRecipe(input, getToken)
+        navigate(`/recipes/${newId}`)
         showToast(lang === 'he' ? 'המתכון נוצר' : 'Recipe created')
       }
     } catch {
@@ -353,7 +353,7 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
           isEditing
             ? [
                 { label: lang === 'he' ? 'בית' : 'Home', href: '/' },
-                { label: displayTitle || (lang === 'he' ? 'מתכון' : 'Recipe'), href: `/recipe/${existing!.id}` },
+                { label: displayTitle || (lang === 'he' ? 'מתכון' : 'Recipe'), href: `/recipes/${existing!.id}` },
                 { label: lang === 'he' ? 'עריכה' : 'Edit' },
               ]
             : [
@@ -432,7 +432,7 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
             <PhotoUploadField
               image={image}
               onChange={setImage}
-              uploadSlug={uploadSlugRef.current}
+              uploadRecipeId={uploadRecipeIdRef.current}
               lang={lang}
               onError={message => showToast(message, 'error')}
             />

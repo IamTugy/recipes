@@ -72,7 +72,7 @@ export default function AdminSubmissionsPage() {
             {recipes.map(r => (
               <div key={r.id} className="card p-4">
                 <div className="flex items-start justify-between gap-3 mb-2">
-                  <button type="button" onClick={() => navigate(`/recipe/${r.id}`)} className="font-serif text-base font-medium text-cream hover:text-amber transition-colors text-start">
+                  <button type="button" onClick={() => navigate(`/recipes/${r.id}`)} className="font-serif text-base font-medium text-cream hover:text-amber transition-colors text-start">
                     {r.title}
                   </button>
                   <span className="shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber/10 text-amber">

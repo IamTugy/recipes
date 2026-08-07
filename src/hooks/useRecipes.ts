@@ -4,14 +4,6 @@ import type { Recipe } from '../types'
 import { apiFetch, ApiError } from '../lib/api'
 import { notifyRecipeStatusChanged, onRecipeStatusChanged } from '../lib/recipeEvents'
 
-interface ApiRecipe extends Omit<Recipe, 'id'> {
-  slug: string
-}
-
-function toRecipe(r: ApiRecipe): Recipe {
-  return { ...r, id: r.slug }
-}
-
 export type RecipeInput = Omit<Recipe, 'id' | 'averageRating' | 'ratingCount' | 'viewCount'>
 
 export async function createRecipe(input: RecipeInput, getToken: () => Promise<string | null>): Promise<string> {
@@ -25,13 +17,13 @@ export async function createRecipe(input: RecipeInput, getToken: () => Promise<s
     body: JSON.stringify(input),
   })
   if (!res.ok) throw new ApiError(res.status, 'Failed to create recipe')
-  const data: ApiRecipe = await res.json()
-  return data.slug
+  const data: Recipe = await res.json()
+  return data.id
 }
 
-export async function updateRecipe(slug: string, input: RecipeInput, getToken: () => Promise<string | null>): Promise<void> {
+export async function updateRecipe(id: string, input: RecipeInput, getToken: () => Promise<string | null>): Promise<void> {
   const token = await getToken()
-  const res = await fetch(`/api/recipes/${slug}`, {
+  const res = await fetch(`/api/recipes/${id}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -42,16 +34,16 @@ export async function updateRecipe(slug: string, input: RecipeInput, getToken: (
   if (!res.ok) throw new ApiError(res.status, 'Failed to update recipe')
 }
 
-export async function deleteRecipe(slug: string, getToken: () => Promise<string | null>): Promise<void> {
+export async function deleteRecipe(id: string, getToken: () => Promise<string | null>): Promise<void> {
   const token = await getToken()
-  const res = await fetch(`/api/recipes/${slug}`, {
+  const res = await fetch(`/api/recipes/${id}`, {
     method: 'DELETE',
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   })
   if (!res.ok) throw new ApiError(res.status, 'Failed to delete recipe')
 }
 
-async function postAction(path: string, getToken: () => Promise<string | null>, body?: unknown): Promise<ApiRecipe> {
+async function postAction(path: string, getToken: () => Promise<string | null>, body?: unknown): Promise<Recipe> {
   const token = await getToken()
   const res = await fetch(`/api${path}`, {
     method: 'POST',
@@ -68,26 +60,26 @@ async function postAction(path: string, getToken: () => Promise<string | null>, 
   return res.json()
 }
 
-export async function submitForReview(slug: string, getToken: () => Promise<string | null>): Promise<Recipe> {
-  const recipe = toRecipe(await postAction(`/recipes/${slug}/submit`, getToken))
+export async function submitForReview(id: string, getToken: () => Promise<string | null>): Promise<Recipe> {
+  const recipe = await postAction(`/recipes/${id}/submit`, getToken)
   notifyRecipeStatusChanged()
   return recipe
 }
 
-export async function cancelSubmission(slug: string, getToken: () => Promise<string | null>): Promise<Recipe> {
-  const recipe = toRecipe(await postAction(`/recipes/${slug}/cancel-submission`, getToken))
+export async function cancelSubmission(id: string, getToken: () => Promise<string | null>): Promise<Recipe> {
+  const recipe = await postAction(`/recipes/${id}/cancel-submission`, getToken)
   notifyRecipeStatusChanged()
   return recipe
 }
 
-export async function approveSubmission(slug: string, getToken: () => Promise<string | null>): Promise<Recipe> {
-  const recipe = toRecipe(await postAction(`/recipes/${slug}/approve`, getToken))
+export async function approveSubmission(id: string, getToken: () => Promise<string | null>): Promise<Recipe> {
+  const recipe = await postAction(`/recipes/${id}/approve`, getToken)
   notifyRecipeStatusChanged()
   return recipe
 }
 
-export async function rejectSubmission(slug: string, comment: string, getToken: () => Promise<string | null>): Promise<Recipe> {
-  const recipe = toRecipe(await postAction(`/recipes/${slug}/reject`, getToken, { comment }))
+export async function rejectSubmission(id: string, comment: string, getToken: () => Promise<string | null>): Promise<Recipe> {
+  const recipe = await postAction(`/recipes/${id}/reject`, getToken, { comment })
   notifyRecipeStatusChanged()
   return recipe
 }
@@ -98,7 +90,7 @@ export function useMyRecipes(enabled = true) {
   const [loading, setLoading] = useState(true)
 
   function reload() {
-    return apiFetch<ApiRecipe[]>('/recipes/mine', getToken).then(data => setRecipes(data.map(toRecipe)))
+    return apiFetch<Recipe[]>('/recipes/mine', getToken).then(data => setRecipes(data))
   }
 
   useEffect(() => {
@@ -123,7 +115,7 @@ export function usePendingSubmissions(enabled = true) {
   const [loading, setLoading] = useState(true)
 
   function reload() {
-    return apiFetch<ApiRecipe[]>('/recipes/admin/submissions', getToken).then(data => setRecipes(data.map(toRecipe)))
+    return apiFetch<Recipe[]>('/recipes/admin/submissions', getToken).then(data => setRecipes(data))
   }
 
   useEffect(() => {
@@ -152,10 +144,10 @@ export function useRecipes() {
     if (!isLoaded || !isSignedIn) return
     let cancelled = false
 
-    apiFetch<ApiRecipe[]>('/recipes', getToken)
+    apiFetch<Recipe[]>('/recipes', getToken)
       .then(data => {
         if (cancelled) return
-        setRecipes(data.map(toRecipe))
+        setRecipes(data)
         setError(null)
       })
       .catch(err => {
@@ -172,20 +164,20 @@ export function useRecipes() {
   return { recipes, loading, error }
 }
 
-export function useRecipe(slug: string | undefined) {
+export function useRecipe(id: string | undefined) {
   const { getToken, isLoaded, isSignedIn } = useAuth()
   const [recipe, setRecipe] = useState<Recipe | undefined>(undefined)
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
 
   useEffect(() => {
-    if (!isLoaded || !isSignedIn || !slug) return
+    if (!isLoaded || !isSignedIn || !id) return
     let cancelled = false
 
-    apiFetch<ApiRecipe>(`/recipes/${slug}`, getToken)
+    apiFetch<Recipe>(`/recipes/${id}`, getToken)
       .then(data => {
         if (cancelled) return
-        setRecipe(toRecipe(data))
+        setRecipe(data)
       })
       .catch(() => {
         if (cancelled) return
@@ -196,7 +188,7 @@ export function useRecipe(slug: string | undefined) {
       })
 
     return () => { cancelled = true }
-  }, [isLoaded, isSignedIn, slug, getToken])
+  }, [isLoaded, isSignedIn, id, getToken])
 
   return { recipe, loading, notFound }
 }
@@ -211,11 +203,11 @@ export function useChefProfile(userId: string | undefined) {
     if (!isLoaded || !isSignedIn || !userId) return
     let cancelled = false
 
-    apiFetch<{ userId: string; name: string | null; recipes: ApiRecipe[] }>(`/recipes/chef/${userId}`, getToken)
+    apiFetch<{ userId: string; name: string | null; recipes: Recipe[] }>(`/recipes/chef/${userId}`, getToken)
       .then(data => {
         if (cancelled) return
         setName(data.name)
-        setRecipes(data.recipes.map(toRecipe))
+        setRecipes(data.recipes)
       })
       .finally(() => { if (!cancelled) setLoading(false) })
 
@@ -233,9 +225,9 @@ export function useTrending() {
     if (!isLoaded || !isSignedIn) return
     let cancelled = false
 
-    apiFetch<ApiRecipe[]>('/recipes/trending', getToken)
+    apiFetch<Recipe[]>('/recipes/trending', getToken)
       .then(data => {
-        if (!cancelled) setTrending(data.map(toRecipe))
+        if (!cancelled) setTrending(data)
       })
       .catch(() => { /* trending is a nice-to-have, fail silently */ })
 

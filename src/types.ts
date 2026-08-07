@@ -92,6 +92,7 @@ export interface Recipe {
 }
 
 export interface RecipeRevision {
+  id: string
   revisionNumber: number
   authorId: string
   snapshot: Record<string, unknown>

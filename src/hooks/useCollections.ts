@@ -5,7 +5,7 @@ import { apiFetch } from '../lib/api'
 export interface RecipeCollection {
   _id: string
   name: string
-  recipeSlugs: string[]
+  recipeIds: string[]
 }
 
 export function useCollections() {
@@ -60,8 +60,8 @@ export function useCollections() {
     })
   }, [getToken])
 
-  const addRecipe = useCallback(async (id: string, slug: string) => {
-    setCollections(prev => prev.map(c => (c._id === id ? { ...c, recipeSlugs: [...new Set([...c.recipeSlugs, slug])] } : c)))
+  const addRecipe = useCallback(async (id: string, recipeId: string) => {
+    setCollections(prev => prev.map(c => (c._id === id ? { ...c, recipeIds: [...new Set([...c.recipeIds, recipeId])] } : c)))
     const token = await getToken()
     await fetch(`/api/collections/${id}/recipes`, {
       method: 'POST',
@@ -69,14 +69,14 @@ export function useCollections() {
         'Content-Type': 'application/json',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-      body: JSON.stringify({ slug }),
+      body: JSON.stringify({ recipeId }),
     })
   }, [getToken])
 
-  const removeRecipe = useCallback(async (id: string, slug: string) => {
-    setCollections(prev => prev.map(c => (c._id === id ? { ...c, recipeSlugs: c.recipeSlugs.filter(s => s !== slug) } : c)))
+  const removeRecipe = useCallback(async (id: string, recipeId: string) => {
+    setCollections(prev => prev.map(c => (c._id === id ? { ...c, recipeIds: c.recipeIds.filter(s => s !== recipeId) } : c)))
     const token = await getToken()
-    await fetch(`/api/collections/${id}/recipes/${slug}`, {
+    await fetch(`/api/collections/${id}/recipes/${recipeId}`, {
       method: 'DELETE',
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     })

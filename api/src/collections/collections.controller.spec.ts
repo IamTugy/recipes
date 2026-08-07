@@ -43,18 +43,18 @@ describe('CollectionsController', () => {
   })
 
   it('POST /collections/:id/recipes adds a recipe to the collection', async () => {
-    collectionsService.addRecipe.mockResolvedValue({ recipeSlugs: ['a'] })
+    collectionsService.addRecipe.mockResolvedValue({ recipeIds: ['a'] })
     const controller = new CollectionsController(collectionsService as any)
-    const result = await controller.addRecipe('col_1', { slug: 'a' }, { userId: 'user_1' } as any)
+    const result = await controller.addRecipe('col_1', { recipeId: 'a' }, { userId: 'user_1' } as any)
     expect(collectionsService.addRecipe).toHaveBeenCalledWith('user_1', 'col_1', 'a')
-    expect(result).toEqual({ recipeSlugs: ['a'] })
+    expect(result).toEqual({ recipeIds: ['a'] })
   })
 
   it('DELETE /collections/:id/recipes/:slug removes a recipe from the collection', async () => {
-    collectionsService.removeRecipe.mockResolvedValue({ recipeSlugs: [] })
+    collectionsService.removeRecipe.mockResolvedValue({ recipeIds: [] })
     const controller = new CollectionsController(collectionsService as any)
     const result = await controller.removeRecipe('col_1', 'a', { userId: 'user_1' } as any)
     expect(collectionsService.removeRecipe).toHaveBeenCalledWith('user_1', 'col_1', 'a')
-    expect(result).toEqual({ recipeSlugs: [] })
+    expect(result).toEqual({ recipeIds: [] })
   })
 })

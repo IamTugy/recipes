@@ -11,13 +11,13 @@ export class ReviewRepliesService {
 
   async create(
     ratingId: string,
-    recipeSlug: string,
+    recipeId: string,
     userId: string,
     text: string,
     mentionedUserId?: string,
     mentionedName?: string,
   ): Promise<ReviewReplyDocument> {
-    return this.reviewReplyModel.create({ ratingId, recipeSlug, userId, text, mentionedUserId, mentionedName })
+    return this.reviewReplyModel.create({ ratingId, recipeId, userId, text, mentionedUserId, mentionedName })
   }
 
   async listByRating(ratingId: string): Promise<(ReviewReply & { _id: unknown; createdAt: Date })[]> {

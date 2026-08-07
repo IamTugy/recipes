@@ -6,7 +6,7 @@ const PURPOSES = ['review', 'recipe']
 export class PresignUploadDto {
   @IsString()
   @MinLength(1)
-  recipeSlug!: string
+  recipeId!: string
 
   @IsIn(ALLOWED_CONTENT_TYPES)
   contentType!: string

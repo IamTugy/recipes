@@ -12,20 +12,20 @@ export class FavoritesController {
 
   @Get()
   async list(@Req() req: Request & { userId: string }) {
-    return this.favoritesService.listSlugs(req.userId)
+    return this.favoritesService.listIds(req.userId)
   }
 
-  @Post(':slug')
-  async add(@Param('slug') slug: string, @Req() req: Request & { userId: string }) {
-    await this.favoritesService.add(req.userId, slug)
-    await this.activityLog.record(req.userId, slug, 'favorited')
+  @Post(':id')
+  async add(@Param('id') id: string, @Req() req: Request & { userId: string }) {
+    await this.favoritesService.add(req.userId, id)
+    await this.activityLog.record(req.userId, id, 'favorited')
     return { favorited: true }
   }
 
-  @Delete(':slug')
-  async remove(@Param('slug') slug: string, @Req() req: Request & { userId: string }) {
-    await this.favoritesService.remove(req.userId, slug)
-    await this.activityLog.record(req.userId, slug, 'unfavorited')
+  @Delete(':id')
+  async remove(@Param('id') id: string, @Req() req: Request & { userId: string }) {
+    await this.favoritesService.remove(req.userId, id)
+    await this.activityLog.record(req.userId, id, 'unfavorited')
     return { favorited: false }
   }
 }

@@ -15,7 +15,7 @@ describe('ReviewRepliesService', () => {
 
     expect(create).toHaveBeenCalledWith({
       ratingId: 'r1',
-      recipeSlug: 'a',
+      recipeId: 'a',
       userId: 'user_2',
       text: 'Nice!',
       mentionedUserId: 'user_1',

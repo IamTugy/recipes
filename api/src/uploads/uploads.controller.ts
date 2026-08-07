@@ -9,11 +9,11 @@ export class UploadsController {
 
   @Post('presign')
   async presign(@Body() body: PresignUploadDto) {
-    return this.uploadsService.presignPhotoUpload(body.recipeSlug, body.contentType, body.purpose)
+    return this.uploadsService.presignPhotoUpload(body.recipeId, body.contentType, body.purpose)
   }
 
   @Post('enhance-photo')
   async enhancePhoto(@Body() body: EnhancePhotoDto) {
-    return this.uploadsService.enhancePhoto(body.recipeSlug, body.imageUrl)
+    return this.uploadsService.enhancePhoto(body.recipeId, body.imageUrl)
   }
 }

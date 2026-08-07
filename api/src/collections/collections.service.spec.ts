@@ -31,11 +31,11 @@ describe('CollectionsService', () => {
   })
 
   it('create makes a new empty collection for the user', async () => {
-    create.mockResolvedValue({ name: 'Desserts', recipeSlugs: [] })
+    create.mockResolvedValue({ name: 'Desserts', recipeIds: [] })
     const service = await makeService()
     const result = await service.create('user_1', 'Desserts')
-    expect(create).toHaveBeenCalledWith({ userId: 'user_1', name: 'Desserts', recipeSlugs: [] })
-    expect(result).toEqual({ name: 'Desserts', recipeSlugs: [] })
+    expect(create).toHaveBeenCalledWith({ userId: 'user_1', name: 'Desserts', recipeIds: [] })
+    expect(result).toEqual({ name: 'Desserts', recipeIds: [] })
   })
 
   it("rename updates only the requesting user's collection name", async () => {
@@ -58,26 +58,26 @@ describe('CollectionsService', () => {
   })
 
   it('addRecipe adds a slug to the collection without duplicating it', async () => {
-    findOneAndUpdate.mockReturnValue({ exec: jest.fn().mockResolvedValue({ recipeSlugs: ['a'] }) })
+    findOneAndUpdate.mockReturnValue({ exec: jest.fn().mockResolvedValue({ recipeIds: ['a'] }) })
     const service = await makeService()
     const result = await service.addRecipe('user_1', 'col_1', 'a')
     expect(findOneAndUpdate).toHaveBeenCalledWith(
       { _id: 'col_1', userId: 'user_1' },
-      { $addToSet: { recipeSlugs: 'a' } },
+      { $addToSet: { recipeIds: 'a' } },
       { new: true },
     )
-    expect(result).toEqual({ recipeSlugs: ['a'] })
+    expect(result).toEqual({ recipeIds: ['a'] })
   })
 
   it('removeRecipe pulls a slug out of the collection', async () => {
-    findOneAndUpdate.mockReturnValue({ exec: jest.fn().mockResolvedValue({ recipeSlugs: [] }) })
+    findOneAndUpdate.mockReturnValue({ exec: jest.fn().mockResolvedValue({ recipeIds: [] }) })
     const service = await makeService()
     const result = await service.removeRecipe('user_1', 'col_1', 'a')
     expect(findOneAndUpdate).toHaveBeenCalledWith(
       { _id: 'col_1', userId: 'user_1' },
-      { $pull: { recipeSlugs: 'a' } },
+      { $pull: { recipeIds: 'a' } },
       { new: true },
     )
-    expect(result).toEqual({ recipeSlugs: [] })
+    expect(result).toEqual({ recipeIds: [] })
   })
 })

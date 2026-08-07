@@ -21,7 +21,7 @@ describe('ActivityLogService', () => {
     })
   })
 
-  it('trendingSlugs returns recipeIds ordered by view count within the window', async () => {
+  it('trendingIds returns recipeIds ordered by view count within the window', async () => {
     const aggregate = jest.fn().mockResolvedValue([
       { _id: 'a', count: 5 },
       { _id: 'b', count: 3 },
@@ -31,7 +31,7 @@ describe('ActivityLogService', () => {
     }).compile()
 
     const service = moduleRef.get(ActivityLogService)
-    const result = await service.trendingSlugs(6, 7)
+    const result = await service.trendingIds(6, 7)
 
     expect(result).toEqual(['a', 'b'])
     const pipeline = aggregate.mock.calls[0][0]
@@ -43,7 +43,7 @@ describe('ActivityLogService', () => {
     ]))
   })
 
-  it('viewCountsBySlug returns a count of unique (user, day) pairs per recipeId', async () => {
+  it('viewCountsById returns a count of unique (user, day) pairs per recipeId', async () => {
     const aggregate = jest.fn().mockResolvedValue([
       { _id: 'a', count: 12 },
       { _id: 'b', count: 4 },
@@ -53,7 +53,7 @@ describe('ActivityLogService', () => {
     }).compile()
 
     const service = moduleRef.get(ActivityLogService)
-    const result = await service.viewCountsBySlug(['a', 'b', 'c'])
+    const result = await service.viewCountsById(['a', 'b', 'c'])
 
     expect(result.get('a')).toBe(12)
     expect(result.get('b')).toBe(4)

@@ -7,7 +7,7 @@ export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack'
 export interface MealPlanEntry {
   id: string
   date: string
-  recipeSlug: string
+  recipeId: string
   mealType: MealType
 }
 
@@ -28,7 +28,7 @@ export function useMealPlan(start: string, end: string) {
     return () => { cancelled = true }
   }, [isLoaded, isSignedIn, reload])
 
-  async function addEntry(date: string, recipeSlug: string, mealType: MealType): Promise<void> {
+  async function addEntry(date: string, recipeId: string, mealType: MealType): Promise<void> {
     const token = await getToken()
     const res = await fetch('/api/meal-plan', {
       method: 'POST',
@@ -36,7 +36,7 @@ export function useMealPlan(start: string, end: string) {
         'Content-Type': 'application/json',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-      body: JSON.stringify({ date, recipeSlug, mealType }),
+      body: JSON.stringify({ date, recipeId, mealType }),
     })
     if (!res.ok) throw new ApiError(res.status, 'Failed to add meal plan entry')
     const entry: MealPlanEntry = await res.json()

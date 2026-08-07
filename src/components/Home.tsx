@@ -119,7 +119,7 @@ export default function Home() {
   function surpriseMe() {
     if (filtered.length === 0) return
     const pick = filtered[Math.floor(Math.random() * filtered.length)]
-    navigate(`/recipe/${pick.id}`)
+    navigate(`/recipes/${pick.id}`)
   }
 
   return (

@@ -3,7 +3,7 @@ import { useFocusTrap } from '../hooks/useFocusTrap'
 import RecipePlaceholder from './RecipePlaceholder'
 import RecipeDetailSkeleton from './RecipeDetailSkeleton'
 import Breadcrumbs from './Breadcrumbs'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useRecipe, useRecipes, deleteRecipe, submitForReview, cancelSubmission } from '../hooks/useRecipes'
 import { OWNER_USER_ID } from '../lib/admin'
@@ -37,6 +37,7 @@ const presetLabels: Record<number, string> = { 0.5: '½x', 1: '1x', 1.5: '1.5x',
 export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAddToShoppingList }: RecipeDetailProps) {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const { lang } = useLanguage()
   const tx = t[lang]
   const { recipe, loading: recipeLoading } = useRecipe(id)
@@ -177,7 +178,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
           'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({ recipeSlug: id, contentType: file.type }),
+        body: JSON.stringify({ recipeId: id, contentType: file.type }),
       })
       if (!presignRes.ok) return
       const { uploadUrl, publicUrl } = await presignRes.json()
@@ -232,10 +233,14 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
   }
 
   async function share() {
-    // Route through /share/recipe/:slug instead of the page's own hash URL -
+    // Route through /share/recipes/:id instead of the page's own hash URL -
     // link-preview crawlers (WhatsApp, iMessage, Slack) don't run JS, so they
     // need a server-rendered page with this recipe's own og:image/og:title.
-    const shareUrl = id ? `${window.location.origin}/share/recipe/${id}` : window.location.href
+    // Carry the currently-viewed revision along too, so sharing an older
+    // version previews and links to that version, not whatever's live now.
+    const shareUrl = id
+      ? `${window.location.origin}/share/recipes/${id}${viewingRevision ? `?rev=${viewingRevision.id}` : ''}`
+      : window.location.href
     const shareData = { title: recipe?.title, url: shareUrl }
     if (navigator.share) {
       try { await navigator.share(shareData) } catch { /* user cancelled */ }
@@ -285,6 +290,31 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
       return []
     }
   }
+
+  // Keeps the ?rev= query param in sync with which revision is on screen, so
+  // the URL (and the Share button, which reads it from here) always points
+  // at exactly what the viewer is looking at - not just whatever's live now.
+  function selectRevision(rev: RecipeRevision | null) {
+    setViewingRevision(rev)
+    setSearchParams(prev => {
+      const next = new URLSearchParams(prev)
+      if (rev) next.set('rev', rev.id)
+      else next.delete('rev')
+      return next
+    }, { replace: true })
+  }
+
+  // A recipe opened via a shared link that includes ?rev= should land
+  // directly on that revision's content, not the live one.
+  useEffect(() => {
+    const rev = searchParams.get('rev')
+    if (!rev || !id) return
+    loadRevisions().then(revs => {
+      const match = revs.find(r => r.id === rev)
+      if (match) setViewingRevision(match)
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id])
 
   async function handleSubmitForReview() {
     if (!id) return
@@ -668,7 +698,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
 
           {canEdit && recipe.status !== 'pending_review' && (
             <button type="button"
-              onClick={() => navigate(`/recipe/${id}/edit`)}
+              onClick={() => navigate(`/recipes/${id}/edit`)}
               className="btn-primary text-xs mb-5 inline-flex items-center gap-1.5"
             >
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -755,7 +785,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                   setRevisionsOpen(true)
                   const revs = revisions ?? await loadRevisions()
                   const live = revs.find(r => r.revisionNumber === recipe.publishedRevision)
-                  if (live) setViewingRevision(live)
+                  if (live) selectRevision(live)
                 }}
                 className="flex items-center gap-1.5 text-sm font-medium text-herb hover:text-herb/80 transition-colors"
               >
@@ -797,7 +827,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                   ) : (
                     <ul className="space-y-1 mb-2 max-h-40 overflow-y-auto">
                       {collections.map(col => {
-                        const inCollection = id ? col.recipeSlugs.includes(id) : false
+                        const inCollection = id ? col.recipeIds.includes(id) : false
                         return (
                           <li key={col._id}>
                             <label className="flex items-center gap-2 text-sm text-cream/70 cursor-pointer">
@@ -873,15 +903,19 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
               </button>
             )}
 
-            <button type="button"
-              onClick={share}
-              className="flex items-center gap-1.5 text-sm font-medium text-cream/40 hover:text-cream/70 transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342a3 3 0 100-2.684l-6.44 3.22a3 3 0 100 2.684l6.44-3.22zM8.684 13.342l6.632 3.316m0-11.317l-6.632 3.316" />
-              </svg>
-              {shareState === 'copied' ? (lang === 'he' ? 'הועתק!' : 'Copied!') : (lang === 'he' ? 'שתף' : 'Share')}
-            </button>
+            {/* Personal recipes (never published) have nothing public to
+                preview or link to, so sharing isn't offered at all. */}
+            {recipe.publishedRevision != null && (
+              <button type="button"
+                onClick={share}
+                className="flex items-center gap-1.5 text-sm font-medium text-cream/40 hover:text-cream/70 transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342a3 3 0 100-2.684l-6.44 3.22a3 3 0 100 2.684l6.44-3.22zM8.684 13.342l6.632 3.316m0-11.317l-6.632 3.316" />
+                </svg>
+                {shareState === 'copied' ? (lang === 'he' ? 'הועתק!' : 'Copied!') : (lang === 'he' ? 'שתף' : 'Share')}
+              </button>
+            )}
 
             <button type="button"
               onClick={() => window.print()}
@@ -1371,7 +1405,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
               {otherReviews.map(r => (
                 <ReviewItem
                   key={r.id}
-                  recipeSlug={id!}
+                  recipeId={id!}
                   review={r}
                   lang={lang}
                   getToken={getToken}
@@ -1408,7 +1442,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
               </button>
               {viewingRevision && (
                 <button type="button"
-                  onClick={() => setViewingRevision(null)}
+                  onClick={() => selectRevision(null)}
                   className="text-xs font-semibold text-amber hover:text-amber/80 transition-colors"
                 >
                   {lang === 'he' ? 'חזרה לגרסה הנוכחית' : 'Back to current version'}
@@ -1432,7 +1466,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                     return (
                       <li key={rev.revisionNumber}>
                         <button type="button"
-                          onClick={() => setViewingRevision(isSelected ? null : rev)}
+                          onClick={() => selectRevision(isSelected ? null : rev)}
                           className={`card w-full p-3 text-xs text-cream/50 flex items-center justify-between gap-2 text-start transition-colors ${
                             isSelected ? 'border border-amber/50' : isLatest ? 'border border-amber/30' : ''
                           }`}
@@ -1476,7 +1510,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
               {relatedRecipes.map(r => {
                 const title = lang === 'he' ? (r.titleHe ?? r.title) : r.title
                 return (
-                  <Link key={r.id} to={`/recipe/${r.id}`} className="group">
+                  <Link key={r.id} to={`/recipes/${r.id}`} className="group">
                     <div className="relative h-24 rounded-xl overflow-hidden mb-2">
                       {r.image?.includes('assets.tugy.dev') ? (
                         <img

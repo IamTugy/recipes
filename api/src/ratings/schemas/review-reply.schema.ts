@@ -9,7 +9,7 @@ export class ReviewReply {
   ratingId!: string
 
   @Prop({ required: true, index: true })
-  recipeSlug!: string
+  recipeId!: string
 
   @Prop({ required: true })
   userId!: string

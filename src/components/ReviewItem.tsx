@@ -27,7 +27,7 @@ interface Reply {
 }
 
 interface ReviewItemProps {
-  recipeSlug: string
+  recipeId: string
   review: Review
   lang: 'he' | 'en'
   getToken: () => Promise<string | null>
@@ -60,7 +60,7 @@ function UpvoteButton({ upvoted, count, onToggle, lang }: { upvoted: boolean; co
   )
 }
 
-export default function ReviewItem({ recipeSlug, review, lang, getToken, onOpenLightbox, translation, onToggleTranslate, liveRevision }: ReviewItemProps) {
+export default function ReviewItem({ recipeId, review, lang, getToken, onOpenLightbox, translation, onToggleTranslate, liveRevision }: ReviewItemProps) {
   const showingTranslation = !!translation?.showing
   const [upvoted, setUpvoted] = useState(review.upvotedByMe)
   const [upvoteCount, setUpvoteCount] = useState(review.upvoteCount)
@@ -90,7 +90,7 @@ export default function ReviewItem({ recipeSlug, review, lang, getToken, onOpenL
     const nextUpvoted = !upvoted
     setUpvoted(nextUpvoted)
     setUpvoteCount(c => c + (nextUpvoted ? 1 : -1))
-    const res = await authedFetch(`/api/ratings/${recipeSlug}/${review.id}/upvote`, { method: 'POST' })
+    const res = await authedFetch(`/api/ratings/${recipeId}/${review.id}/upvote`, { method: 'POST' })
     if (res.ok) {
       const data: { upvoted: boolean; count: number } = await res.json()
       setUpvoted(data.upvoted)
@@ -105,7 +105,7 @@ export default function ReviewItem({ recipeSlug, review, lang, getToken, onOpenL
     setReplies(current =>
       current?.map(r => (r.id === replyId ? { ...r, upvotedByMe: !r.upvotedByMe, upvoteCount: r.upvoteCount + (r.upvotedByMe ? -1 : 1) } : r)) ?? current
     )
-    const res = await authedFetch(`/api/ratings/${recipeSlug}/replies/${replyId}/upvote`, { method: 'POST' })
+    const res = await authedFetch(`/api/ratings/${recipeId}/replies/${replyId}/upvote`, { method: 'POST' })
     if (res.ok) {
       const data: { upvoted: boolean; count: number } = await res.json()
       setReplies(current => current?.map(r => (r.id === replyId ? { ...r, upvotedByMe: data.upvoted, upvoteCount: data.count } : r)) ?? current)
@@ -117,7 +117,7 @@ export default function ReviewItem({ recipeSlug, review, lang, getToken, onOpenL
   }
 
   async function loadReplies() {
-    const res = await authedFetch(`/api/ratings/${recipeSlug}/${review.id}/replies`)
+    const res = await authedFetch(`/api/ratings/${recipeId}/${review.id}/replies`)
     if (res.ok) setReplies(await res.json())
   }
 
@@ -138,7 +138,7 @@ export default function ReviewItem({ recipeSlug, review, lang, getToken, onOpenL
     const text = replyText.trim()
     if (!text || posting) return
     setPosting(true)
-    const res = await authedFetch(`/api/ratings/${recipeSlug}/${review.id}/replies`, {
+    const res = await authedFetch(`/api/ratings/${recipeId}/${review.id}/replies`, {
       method: 'POST',
       body: JSON.stringify({ text, mentionedUserId: mention?.userId }),
     })

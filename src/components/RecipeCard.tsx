@@ -39,7 +39,7 @@ export default function RecipeCard({ recipe, index, searchQuery, isFavorite, onT
       transition={{ delay: index * 0.04, duration: 0.35 }}
       className="h-full"
     >
-      <Link to={`/recipe/${recipe.id}`} className="block group h-full">
+      <Link to={`/recipes/${recipe.id}`} className="block group h-full">
         <div className="card overflow-hidden h-full flex flex-col">
           {/* Image */}
           <div className="relative h-52 sm:h-60 overflow-hidden">
@@ -87,7 +87,7 @@ export default function RecipeCard({ recipe, index, searchQuery, isFavorite, onT
               )}
               {editable && (
                 <button type="button"
-                  onClick={e => { e.preventDefault(); e.stopPropagation(); navigate(`/recipe/${recipe.id}/edit`) }}
+                  onClick={e => { e.preventDefault(); e.stopPropagation(); navigate(`/recipes/${recipe.id}/edit`) }}
                   className="h-9 w-9 sm:h-7 sm:w-7 flex items-center justify-center rounded-full backdrop-blur-sm border bg-black/30 border-white/20 text-white/80 hover:text-white transition-colors"
                   aria-label={lang === 'he' ? 'ערוך מתכון' : 'Edit recipe'}
                 >

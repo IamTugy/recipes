@@ -5,12 +5,12 @@ import ImageCropModal from './ImageCropModal'
 interface PhotoUploadFieldProps {
   image: string
   onChange: (url: string) => void
-  uploadSlug: string
+  uploadRecipeId: string
   lang: 'he' | 'en'
   onError?: (message: string) => void
 }
 
-export default function PhotoUploadField({ image, onChange, uploadSlug, lang, onError }: PhotoUploadFieldProps) {
+export default function PhotoUploadField({ image, onChange, uploadRecipeId, lang, onError }: PhotoUploadFieldProps) {
   const { getToken } = useAuth()
   const [uploading, setUploading] = useState(false)
   const [enhancing, setEnhancing] = useState(false)
@@ -44,7 +44,7 @@ export default function PhotoUploadField({ image, onChange, uploadSlug, lang, on
           'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({ recipeSlug: uploadSlug, contentType: 'image/jpeg', purpose: 'recipe' }),
+        body: JSON.stringify({ recipeId: uploadRecipeId, contentType: 'image/jpeg', purpose: 'recipe' }),
       })
       if (!presignRes.ok) throw new Error('presign failed')
       const { uploadUrl, publicUrl } = await presignRes.json()
@@ -69,7 +69,7 @@ export default function PhotoUploadField({ image, onChange, uploadSlug, lang, on
           'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({ recipeSlug: uploadSlug, imageUrl: image }),
+        body: JSON.stringify({ recipeId: uploadRecipeId, imageUrl: image }),
       })
       if (!res.ok) throw new Error('enhance failed')
       const { publicUrl } = await res.json()

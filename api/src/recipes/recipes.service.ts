@@ -18,6 +18,15 @@ function slugify(text: string): string {
     .replace(/^-+|-+$/g, '')
 }
 
+// Recipes are looked up by their Mongo _id everywhere now (URLs, sharing,
+// every cross-collection reference) instead of the title-derived slug, so
+// two recipes can share a title and a share link never breaks on non-ASCII
+// characters. A malformed id (e.g. an old slug-based link, or a crawler
+// probing garbage) must behave like "not found", not throw a 500.
+function isCastError(err: unknown): boolean {
+  return err instanceof Error && err.name === 'CastError'
+}
+
 interface RatingAggregate {
   _id: string
   avg: number
@@ -92,52 +101,52 @@ export class RecipesService implements OnModuleInit {
     const unowned = await this.recipeModel.find({ ownerId: { $exists: false } }).exec()
     if (unowned.length === 0) return
 
-    const ratedSlugs = new Set<string>(
-      await this.ratingModel.distinct('recipeSlug', { userId: ownerId }).exec(),
+    const ratedIds = new Set<string>(
+      await this.ratingModel.distinct('recipeId', { userId: ownerId }).exec(),
     )
-    const unownedSlugs = unowned.map(r => r.slug)
-    const publishedSlugs = unownedSlugs.filter(s => ratedSlugs.has(s))
-    const draftSlugs = unownedSlugs.filter(s => !ratedSlugs.has(s))
+    const unownedIds = unowned.map(r => r.id as string)
+    const publishedIds = unownedIds.filter(id => ratedIds.has(id))
+    const draftIds = unownedIds.filter(id => !ratedIds.has(id))
 
-    await this.recipeModel.updateMany({ slug: { $in: unownedSlugs } }, { $set: { ownerId } })
+    await this.recipeModel.updateMany({ _id: { $in: unownedIds } }, { $set: { ownerId } })
 
-    if (draftSlugs.length > 0) {
+    if (draftIds.length > 0) {
       await this.recipeModel.updateMany(
-        { slug: { $in: draftSlugs } },
+        { _id: { $in: draftIds } },
         { $set: { status: 'draft', currentRevision: 0 } },
       )
     }
 
-    if (publishedSlugs.length > 0) {
+    if (publishedIds.length > 0) {
       await this.recipeModel.updateMany(
-        { slug: { $in: publishedSlugs } },
+        { _id: { $in: publishedIds } },
         { $set: { status: 'published', currentRevision: 1, publishedRevision: 1 } },
       )
       for (const recipe of unowned) {
-        if (!publishedSlugs.includes(recipe.slug)) continue
-        const alreadyHasRevision = await this.revisionModel.exists({ recipeSlug: recipe.slug, revisionNumber: 1 })
+        if (!publishedIds.includes(recipe.id as string)) continue
+        const alreadyHasRevision = await this.revisionModel.exists({ recipeId: recipe.id, revisionNumber: 1 })
         if (alreadyHasRevision) continue
         const snapshot: Record<string, unknown> = {}
         for (const field of RECIPE_FIELDS) snapshot[field] = recipe[field]
-        await this.revisionModel.create({ recipeSlug: recipe.slug, revisionNumber: 1, authorId: ownerId, snapshot, published: true })
+        await this.revisionModel.create({ recipeId: recipe.id, revisionNumber: 1, authorId: ownerId, snapshot, published: true })
       }
     }
 
     this.logger.log(
-      `Backfilled ownership on ${unownedSlugs.length} legacy recipe(s): ${publishedSlugs.length} published, ${draftSlugs.length} draft`,
+      `Backfilled ownership on ${unownedIds.length} legacy recipe(s): ${publishedIds.length} published, ${draftIds.length} draft`,
     )
   }
 
-  private async ratingsBySlug(slugs: string[]): Promise<Map<string, { avg: number; count: number }>> {
+  private async ratingsById(ids: string[]): Promise<Map<string, { avg: number; count: number }>> {
     const aggregates = (await this.ratingModel.aggregate([
-      { $match: { recipeSlug: { $in: slugs } } },
-      { $group: { _id: '$recipeSlug', avg: { $avg: '$score' }, count: { $sum: 1 } } },
+      { $match: { recipeId: { $in: ids } } },
+      { $group: { _id: '$recipeId', avg: { $avg: '$score' }, count: { $sum: 1 } } },
     ])) as RatingAggregate[]
 
     return new Map(aggregates.map(a => [a._id, { avg: a.avg, count: a.count }]))
   }
 
-  private async attachRatingsAndViews<T extends { slug: string; ownerId?: string }>(
+  private async attachRatingsAndViews<T extends { id: string; ownerId?: string }>(
     recipes: T[],
     ratings: Map<string, { avg: number; count: number }>,
     views: Map<string, number>,
@@ -146,13 +155,13 @@ export class RecipesService implements OnModuleInit {
     const ownerIds = [...new Set(recipes.map(r => r.ownerId).filter((v): v is string => !!v))]
     const names = await this.usersService.namesByIds(ownerIds)
     return recipes.map(recipe => {
-      const rating = ratings.get(recipe.slug)
+      const rating = ratings.get(recipe.id)
       return {
         ...recipe,
         averageRating: rating ? Math.round(rating.avg * 10) / 10 : null,
         ratingCount: rating?.count ?? 0,
-        viewCount: views.get(recipe.slug) ?? 0,
-        cookCount: cooks.get(recipe.slug) ?? 0,
+        viewCount: views.get(recipe.id) ?? 0,
+        cookCount: cooks.get(recipe.id) ?? 0,
         ownerName: recipe.ownerId ? names[recipe.ownerId] ?? null : null,
       }
     })
@@ -163,11 +172,11 @@ export class RecipesService implements OnModuleInit {
   // document. Overlays the recipe fields from its `publishedRevision`
   // snapshot on top of the live doc (which still supplies slug/status/
   // ownerId/timestamps etc).
-  private async overlayPublishedSnapshot(recipe: RecipeDocument): Promise<Record<string, unknown> & { slug: string }> {
+  private async overlayPublishedSnapshot(recipe: RecipeDocument): Promise<Record<string, unknown> & { id: string }> {
     const plain = recipe.toObject()
     if (recipe.publishedRevision == null) return plain
     const revision = await this.revisionModel
-      .findOne({ recipeSlug: recipe.slug, revisionNumber: recipe.publishedRevision })
+      .findOne({ recipeId: recipe.id, revisionNumber: recipe.publishedRevision })
       .lean()
       .exec()
     if (!revision) return plain
@@ -177,11 +186,11 @@ export class RecipesService implements OnModuleInit {
   async findAll() {
     const recipes = await this.recipeModel.find({ hidden: { $ne: true }, publishedRevision: { $ne: null } }).exec()
     const plain = await Promise.all(recipes.map(r => this.overlayPublishedSnapshot(r)))
-    const slugs = plain.map(r => r.slug as string)
+    const ids = plain.map(r => r.id)
     const [ratings, views, cooks] = await Promise.all([
-      this.ratingsBySlug(slugs),
-      this.activityLogService.viewCountsBySlug(slugs),
-      this.cookLogService.countsBySlug(slugs),
+      this.ratingsById(ids),
+      this.activityLogService.viewCountsById(ids),
+      this.cookLogService.countsById(ids),
     ])
     return this.attachRatingsAndViews(plain, ratings, views, cooks)
   }
@@ -189,22 +198,28 @@ export class RecipesService implements OnModuleInit {
   async findPublishedByOwner(ownerId: string) {
     const recipes = await this.recipeModel.find({ ownerId, hidden: { $ne: true }, publishedRevision: { $ne: null } }).exec()
     const plain = await Promise.all(recipes.map(r => this.overlayPublishedSnapshot(r)))
-    const slugs = plain.map(r => r.slug as string)
+    const ids = plain.map(r => r.id)
     const [ratings, views, cooks] = await Promise.all([
-      this.ratingsBySlug(slugs),
-      this.activityLogService.viewCountsBySlug(slugs),
-      this.cookLogService.countsBySlug(slugs),
+      this.ratingsById(ids),
+      this.activityLogService.viewCountsById(ids),
+      this.cookLogService.countsById(ids),
     ])
     return this.attachRatingsAndViews(plain, ratings, views, cooks)
   }
 
-  async findBySlug(slug: string) {
-    const recipe = await this.recipeModel.findOne({ slug, hidden: { $ne: true }, publishedRevision: { $ne: null } }).exec()
+  async findById(id: string) {
+    let recipe: RecipeDocument | null
+    try {
+      recipe = await this.recipeModel.findOne({ _id: id, hidden: { $ne: true }, publishedRevision: { $ne: null } }).exec()
+    } catch (err) {
+      if (isCastError(err)) return null
+      throw err
+    }
     if (!recipe) return null
     const [ratings, views, cooks] = await Promise.all([
-      this.ratingsBySlug([slug]),
-      this.activityLogService.viewCountsBySlug([slug]),
-      this.cookLogService.countsBySlug([slug]),
+      this.ratingsById([id]),
+      this.activityLogService.viewCountsById([id]),
+      this.cookLogService.countsById([id]),
     ])
     const plain = await this.overlayPublishedSnapshot(recipe)
     return (await this.attachRatingsAndViews([plain], ratings, views, cooks))[0]
@@ -214,18 +229,24 @@ export class RecipesService implements OnModuleInit {
   // draft/pending/rejected recipe, or an admin checking anything - either
   // one sees their live in-progress content. Anyone else viewing a recipe
   // that has ever been published sees the pinned public snapshot instead.
-  async findBySlugForUser(slug: string, userId: string, isAdmin: boolean) {
-    const recipe = await this.recipeModel.findOne({ slug, deletedAt: { $exists: false } }).exec()
+  async findByIdForUser(id: string, userId: string, isAdmin: boolean) {
+    let recipe: RecipeDocument | null
+    try {
+      recipe = await this.recipeModel.findOne({ _id: id, deletedAt: { $exists: false } }).exec()
+    } catch (err) {
+      if (isCastError(err)) return null
+      throw err
+    }
     if (!recipe) return null
     const isOwnerOrAdmin = isAdmin || recipe.ownerId === userId
     if (recipe.publishedRevision == null && !isOwnerOrAdmin) return null
 
     if (recipe.publishedRevision != null) {
-      const base = isOwnerOrAdmin ? recipe.toObject() : await this.overlayPublishedSnapshot(recipe)
+      const base = isOwnerOrAdmin ? { ...recipe.toObject(), id: recipe.id } : await this.overlayPublishedSnapshot(recipe)
       const [ratings, views, cooks] = await Promise.all([
-        this.ratingsBySlug([slug]),
-        this.activityLogService.viewCountsBySlug([slug]),
-        this.cookLogService.countsBySlug([slug]),
+        this.ratingsById([id]),
+        this.activityLogService.viewCountsById([id]),
+        this.cookLogService.countsById([id]),
       ])
       return (await this.attachRatingsAndViews([base], ratings, views, cooks))[0]
     }
@@ -253,7 +274,7 @@ export class RecipesService implements OnModuleInit {
     const snapshot: Record<string, unknown> = {}
     for (const field of RECIPE_FIELDS) snapshot[field] = recipe[field]
     await this.revisionModel.create({
-      recipeSlug: recipe.slug,
+      recipeId: recipe.id,
       revisionNumber: recipe.currentRevision,
       authorId,
       snapshot,
@@ -267,9 +288,15 @@ export class RecipesService implements OnModuleInit {
     return recipe
   }
 
-  private async getEditableOrThrow(slug: string, userId: string, isAdmin: boolean): Promise<RecipeDocument> {
-    const recipe = await this.recipeModel.findOne({ slug, deletedAt: { $exists: false } }).exec()
-    if (!recipe) throw new NotFoundException(`Recipe '${slug}' not found`)
+  private async getEditableOrThrow(id: string, userId: string, isAdmin: boolean): Promise<RecipeDocument> {
+    let recipe: RecipeDocument | null
+    try {
+      recipe = await this.recipeModel.findOne({ _id: id, deletedAt: { $exists: false } }).exec()
+    } catch (err) {
+      if (isCastError(err)) throw new NotFoundException(`Recipe '${id}' not found`)
+      throw err
+    }
+    if (!recipe) throw new NotFoundException(`Recipe '${id}' not found`)
     if (recipe.ownerId && recipe.ownerId !== userId && !isAdmin) {
       throw new ForbiddenException('Only the owner or an admin can edit this recipe')
     }
@@ -285,8 +312,8 @@ export class RecipesService implements OnModuleInit {
   // number instead of racing to increment the same stale value - which
   // previously could leave the live document's fields out of sync with
   // whichever revision number ended up stored on it.
-  async updateDraft(slug: string, userId: string, isAdmin: boolean, dto: SaveRecipeDraftDto): Promise<RecipeDocument> {
-    const recipe = await this.getEditableOrThrow(slug, userId, isAdmin)
+  async updateDraft(id: string, userId: string, isAdmin: boolean, dto: SaveRecipeDraftDto): Promise<RecipeDocument> {
+    const recipe = await this.getEditableOrThrow(id, userId, isAdmin)
     // Editing a rejected recipe means the owner is addressing the feedback -
     // clear the rejected state so it isn't stuck showing "rejected" forever.
     const wasRejected = recipe.status === 'rejected'
@@ -299,14 +326,14 @@ export class RecipesService implements OnModuleInit {
       $inc: { currentRevision: 1 },
     }
     if (wasRejected) update.$unset = { reviewComment: '' }
-    const updated = await this.recipeModel.findOneAndUpdate({ slug }, update, { new: true }).exec()
-    if (!updated) throw new NotFoundException(`Recipe '${slug}' not found`)
+    const updated = await this.recipeModel.findOneAndUpdate({ _id: id }, update, { new: true }).exec()
+    if (!updated) throw new NotFoundException(`Recipe '${id}' not found`)
     await this.saveNewRevision(updated, userId)
     return updated
   }
 
-  async submitForReview(slug: string, userId: string, isAdmin: boolean): Promise<RecipeDocument> {
-    const recipe = await this.getEditableOrThrow(slug, userId, isAdmin)
+  async submitForReview(id: string, userId: string, isAdmin: boolean): Promise<RecipeDocument> {
+    const recipe = await this.getEditableOrThrow(id, userId, isAdmin)
     const missing = this.missingRequiredFields(recipe)
     if (missing.length > 0) {
       throw new BadRequestException(`Cannot submit for review, missing/invalid: ${missing.join(', ')}`)
@@ -332,9 +359,9 @@ export class RecipesService implements OnModuleInit {
     return missing
   }
 
-  async cancelSubmission(slug: string, userId: string, isAdmin: boolean): Promise<RecipeDocument> {
-    const recipe = await this.recipeModel.findOne({ slug }).exec()
-    if (!recipe) throw new NotFoundException(`Recipe '${slug}' not found`)
+  async cancelSubmission(id: string, userId: string, isAdmin: boolean): Promise<RecipeDocument> {
+    const recipe = await this.recipeModel.findOne({ _id: id }).exec()
+    if (!recipe) throw new NotFoundException(`Recipe '${id}' not found`)
     if (recipe.ownerId !== userId && !isAdmin) throw new ForbiddenException('Only the owner or an admin can cancel this submission')
     if (recipe.status !== 'pending_review') throw new BadRequestException('This recipe is not pending review')
     recipe.status = recipe.publishedRevision != null ? 'published' : 'draft'
@@ -347,13 +374,13 @@ export class RecipesService implements OnModuleInit {
     return recipes.map(r => r.toObject())
   }
 
-  async approveSubmission(slug: string, adminId: string): Promise<RecipeDocument> {
-    const recipe = await this.recipeModel.findOne({ slug }).exec()
-    if (!recipe) throw new NotFoundException(`Recipe '${slug}' not found`)
+  async approveSubmission(id: string, adminId: string): Promise<RecipeDocument> {
+    const recipe = await this.recipeModel.findOne({ _id: id }).exec()
+    if (!recipe) throw new NotFoundException(`Recipe '${id}' not found`)
     if (recipe.status !== 'pending_review') throw new BadRequestException('This recipe is not pending review')
 
     await this.revisionModel.updateOne(
-      { recipeSlug: slug, revisionNumber: recipe.currentRevision },
+      { recipeId: id, revisionNumber: recipe.currentRevision },
       { $set: { published: true } },
     )
 
@@ -364,9 +391,9 @@ export class RecipesService implements OnModuleInit {
     return recipe
   }
 
-  async rejectSubmission(slug: string, comment: string): Promise<RecipeDocument> {
-    const recipe = await this.recipeModel.findOne({ slug }).exec()
-    if (!recipe) throw new NotFoundException(`Recipe '${slug}' not found`)
+  async rejectSubmission(id: string, comment: string): Promise<RecipeDocument> {
+    const recipe = await this.recipeModel.findOne({ _id: id }).exec()
+    if (!recipe) throw new NotFoundException(`Recipe '${id}' not found`)
     if (recipe.status !== 'pending_review') throw new BadRequestException('This recipe is not pending review')
     recipe.status = 'rejected'
     recipe.reviewComment = comment
@@ -374,21 +401,27 @@ export class RecipesService implements OnModuleInit {
     return recipe
   }
 
-  async canViewDraftRevisions(slug: string, userId: string, isAdmin: boolean): Promise<boolean> {
+  async canViewDraftRevisions(id: string, userId: string, isAdmin: boolean): Promise<boolean> {
     if (isAdmin) return true
-    const recipe = await this.recipeModel.findOne({ slug }).select('ownerId').lean().exec()
-    return !!recipe && recipe.ownerId === userId
+    try {
+      const recipe = await this.recipeModel.findOne({ _id: id }).select('ownerId').lean().exec()
+      return !!recipe && recipe.ownerId === userId
+    } catch (err) {
+      if (isCastError(err)) return false
+      throw err
+    }
   }
 
   // A random visitor only ever sees the recipe's published trajectory. The
   // owner/admin also sees their own drafts-in-progress here, so an edit
   // that hasn't been submitted/approved yet still shows up as the latest
   // entry instead of silently missing from the list.
-  async listRevisions(slug: string, includeDrafts: boolean) {
-    const filter: Record<string, unknown> = { recipeSlug: slug }
+  async listRevisions(id: string, includeDrafts: boolean) {
+    const filter: Record<string, unknown> = { recipeId: id }
     if (!includeDrafts) filter.published = true
     const revisions = await this.revisionModel.find(filter).sort({ revisionNumber: -1 }).lean().exec()
     return revisions.map(r => ({
+      id: String(r._id),
       revisionNumber: r.revisionNumber,
       authorId: r.authorId,
       snapshot: r.snapshot,
@@ -402,8 +435,8 @@ export class RecipesService implements OnModuleInit {
   // it stays recoverable by design), and everything else is soft-deleted
   // (deletedAt set) rather than removed from the database, so a mistaken
   // delete is always reversible by clearing that field.
-  async remove(slug: string, userId: string, isAdmin: boolean): Promise<void> {
-    const recipe = await this.recipeModel.findOne({ slug }).exec()
+  async remove(id: string, userId: string, isAdmin: boolean): Promise<void> {
+    const recipe = await this.recipeModel.findOne({ _id: id }).exec()
     if (!recipe) return
     if (recipe.publishedRevision != null) {
       throw new ForbiddenException('A recipe that has ever been published can never be deleted')

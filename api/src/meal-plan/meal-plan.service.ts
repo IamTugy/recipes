@@ -17,7 +17,7 @@ export class MealPlanService {
     return entries.map(e => ({
       id: String(e._id),
       date: e.date,
-      recipeSlug: e.recipeSlug,
+      recipeId: e.recipeId,
       mealType: e.mealType,
     }))
   }
@@ -26,10 +26,10 @@ export class MealPlanService {
     const entry = await this.entryModel.create({
       userId,
       date: dto.date,
-      recipeSlug: dto.recipeSlug,
+      recipeId: dto.recipeId,
       mealType: dto.mealType ?? 'dinner',
     })
-    return { id: String(entry._id), date: entry.date, recipeSlug: entry.recipeSlug, mealType: entry.mealType }
+    return { id: String(entry._id), date: entry.date, recipeId: entry.recipeId, mealType: entry.mealType }
   }
 
   async remove(userId: string, id: string): Promise<void> {

@@ -20,12 +20,12 @@ describe('MealPlanController', () => {
   })
 
   it('POST /meal-plan adds an entry for the requesting user', async () => {
-    const body = { date: '2026-08-03', recipeSlug: 'a' } as any
+    const body = { date: '2026-08-03', recipeId: 'a' } as any
     mealPlanService.add.mockResolvedValue({ id: '1', ...body, mealType: 'dinner' })
     const controller = new MealPlanController(mealPlanService as any)
     const result = await controller.add(body, { userId: 'user_1' } as any)
     expect(mealPlanService.add).toHaveBeenCalledWith('user_1', body)
-    expect(result).toEqual({ id: '1', date: '2026-08-03', recipeSlug: 'a', mealType: 'dinner' })
+    expect(result).toEqual({ id: '1', date: '2026-08-03', recipeId: 'a', mealType: 'dinner' })
   })
 
   it('DELETE /meal-plan/:id removes the entry', async () => {

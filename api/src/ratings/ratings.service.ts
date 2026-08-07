@@ -11,31 +11,31 @@ export class RatingsService {
     @InjectModel(Recipe.name) private readonly recipeModel: Model<RecipeDocument>,
   ) {}
 
-  async rate(userId: string, recipeSlug: string, score: number, comment?: string, photoUrl?: string): Promise<{ score: number }> {
-    const setDoc: { userId: string; recipeSlug: string; score: number; comment?: string; photoUrl?: string; recipeRevision?: number } = { userId, recipeSlug, score }
+  async rate(userId: string, recipeId: string, score: number, comment?: string, photoUrl?: string): Promise<{ score: number }> {
+    const setDoc: { userId: string; recipeId: string; score: number; comment?: string; photoUrl?: string; recipeRevision?: number } = { userId, recipeId, score }
     if (comment !== undefined) setDoc.comment = comment
     if (photoUrl !== undefined) setDoc.photoUrl = photoUrl
-    const recipe = await this.recipeModel.findOne({ slug: recipeSlug }).select('publishedRevision').lean().exec()
+    const recipe = await this.recipeModel.findOne({ _id: recipeId }).select('publishedRevision').lean().exec()
     if (recipe?.publishedRevision != null) setDoc.recipeRevision = recipe.publishedRevision
     const doc = await this.ratingModel
-      .findOneAndUpdate({ userId, recipeSlug }, { $set: setDoc }, { upsert: true, new: true })
+      .findOneAndUpdate({ userId, recipeId }, { $set: setDoc }, { upsert: true, new: true })
       .exec()
     return { score: doc!.score }
   }
 
-  async deleteRating(userId: string, recipeSlug: string): Promise<void> {
-    await this.ratingModel.deleteOne({ userId, recipeSlug }).exec()
+  async deleteRating(userId: string, recipeId: string): Promise<void> {
+    await this.ratingModel.deleteOne({ userId, recipeId }).exec()
   }
 
-  async myRating(userId: string, recipeSlug: string): Promise<{ score: number; comment: string | null; photoUrl: string | null } | null> {
-    const doc = await this.ratingModel.findOne({ userId, recipeSlug }).lean().exec()
+  async myRating(userId: string, recipeId: string): Promise<{ score: number; comment: string | null; photoUrl: string | null } | null> {
+    const doc = await this.ratingModel.findOne({ userId, recipeId }).lean().exec()
     if (!doc) return null
     return { score: doc.score, comment: doc.comment ?? null, photoUrl: doc.photoUrl ?? null }
   }
 
-  async distributionForRecipe(recipeSlug: string): Promise<Record<1 | 2 | 3 | 4 | 5, number>> {
+  async distributionForRecipe(recipeId: string): Promise<Record<1 | 2 | 3 | 4 | 5, number>> {
     const rows = await this.ratingModel.aggregate([
-      { $match: { recipeSlug } },
+      { $match: { recipeId } },
       { $group: { _id: '$score', count: { $sum: 1 } } },
     ])
     const distribution: Record<1 | 2 | 3 | 4 | 5, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
@@ -45,9 +45,9 @@ export class RatingsService {
     return distribution
   }
 
-  async reviewsForRecipe(recipeSlug: string, limit = 20): Promise<{ id: string; userId: string; score: number; comment: string; photoUrl: string | null; upvotes: string[]; recipeRevision: number; createdAt: Date }[]> {
+  async reviewsForRecipe(recipeId: string, limit = 20): Promise<{ id: string; userId: string; score: number; comment: string; photoUrl: string | null; upvotes: string[]; recipeRevision: number; createdAt: Date }[]> {
     const docs = await this.ratingModel
-      .find({ recipeSlug, comment: { $exists: true, $ne: '' } })
+      .find({ recipeId, comment: { $exists: true, $ne: '' } })
       .sort({ createdAt: -1 })
       .limit(limit)
       .lean()

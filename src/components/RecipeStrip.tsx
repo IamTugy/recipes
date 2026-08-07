@@ -20,7 +20,7 @@ export default function RecipeStrip({ title, recipes }: RecipeStripProps) {
         {recipes.map(r => {
           const recipeTitle = lang === 'he' ? (r.titleHe ?? r.title) : r.title
           return (
-            <Link key={r.id} to={`/recipe/${r.id}`} className="shrink-0 w-32 group">
+            <Link key={r.id} to={`/recipes/${r.id}`} className="shrink-0 w-32 group">
               <div className="relative h-20 w-32 rounded-lg overflow-hidden mb-1.5">
                 {r.image?.includes('assets.tugy.dev') ? (
                   <img

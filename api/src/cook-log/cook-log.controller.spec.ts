@@ -1,12 +1,12 @@
 import { CookLogController } from './cook-log.controller'
 
 describe('CookLogController', () => {
-  const cookLogService = { markCooked: jest.fn(), unmarkCooked: jest.fn(), listSlugs: jest.fn() }
+  const cookLogService = { markCooked: jest.fn(), unmarkCooked: jest.fn(), listIds: jest.fn() }
 
   beforeEach(() => jest.clearAllMocks())
 
   it("GET /cooked returns the current user's cooked recipe slugs", async () => {
-    cookLogService.listSlugs.mockResolvedValue(['a', 'b'])
+    cookLogService.listIds.mockResolvedValue(['a', 'b'])
     const controller = new CookLogController(cookLogService as any)
     await expect(controller.list({ userId: 'user_1' } as any)).resolves.toEqual(['a', 'b'])
   })

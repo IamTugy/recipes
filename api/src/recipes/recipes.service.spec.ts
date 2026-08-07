@@ -12,11 +12,11 @@ import { UsersService } from '../users/users.service'
 
 describe('RecipesService', () => {
   function makeActivityLog(viewCounts: Map<string, number> = new Map()) {
-    return { viewCountsBySlug: jest.fn().mockResolvedValue(viewCounts) }
+    return { viewCountsById: jest.fn().mockResolvedValue(viewCounts) }
   }
 
   function makeCookLog(cookCounts: Map<string, number> = new Map()) {
-    return { countsBySlug: jest.fn().mockResolvedValue(cookCounts) }
+    return { countsById: jest.fn().mockResolvedValue(cookCounts) }
   }
 
   function makeUsers() {
@@ -90,8 +90,8 @@ describe('RecipesService', () => {
 
   it('onModuleInit assigns ownership to legacy recipes, publishing only ones the owner already rated', async () => {
     const unowned = [
-      { slug: 'rated-recipe', title: 'Rated Recipe' },
-      { slug: 'other-recipe', title: 'Other Recipe' },
+      { id: 'rated-recipe', slug: 'rated-recipe', title: 'Rated Recipe' },
+      { id: 'other-recipe', slug: 'other-recipe', title: 'Other Recipe' },
     ]
     const find = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(unowned) })
     const updateMany = jest.fn().mockResolvedValue({ modifiedCount: 0 })
@@ -107,26 +107,26 @@ describe('RecipesService', () => {
     await service.onModuleInit()
 
     expect(find).toHaveBeenCalledWith({ ownerId: { $exists: false } })
-    expect(distinct).toHaveBeenCalledWith('recipeSlug', { userId: 'owner_1' })
+    expect(distinct).toHaveBeenCalledWith('recipeId', { userId: 'owner_1' })
     expect(updateMany).toHaveBeenCalledWith(
-      { slug: { $in: ['rated-recipe', 'other-recipe'] } },
+      { _id: { $in: ['rated-recipe', 'other-recipe'] } },
       { $set: { ownerId: 'owner_1' } },
     )
     expect(updateMany).toHaveBeenCalledWith(
-      { slug: { $in: ['other-recipe'] } },
+      { _id: { $in: ['other-recipe'] } },
       { $set: { status: 'draft', currentRevision: 0 } },
     )
     expect(updateMany).toHaveBeenCalledWith(
-      { slug: { $in: ['rated-recipe'] } },
+      { _id: { $in: ['rated-recipe'] } },
       { $set: { status: 'published', currentRevision: 1, publishedRevision: 1 } },
     )
     expect(create).toHaveBeenCalledWith(expect.objectContaining({
-      recipeSlug: 'rated-recipe', revisionNumber: 1, authorId: 'owner_1', published: true,
+      recipeId: 'rated-recipe', revisionNumber: 1, authorId: 'owner_1', published: true,
     }))
   })
 
   it('onModuleInit does not create a duplicate revision-1 snapshot when one already exists', async () => {
-    const unowned = [{ slug: 'rated-recipe', title: 'Rated Recipe' }]
+    const unowned = [{ id: 'rated-recipe', slug: 'rated-recipe', title: 'Rated Recipe' }]
     const find = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(unowned) })
     const updateMany = jest.fn().mockResolvedValue({ modifiedCount: 0 })
     const distinct = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(['rated-recipe']) })
@@ -158,17 +158,17 @@ describe('RecipesService', () => {
   }
 
   it('findAll returns only ever-published, non-hidden recipes with no ratings or views attached', async () => {
-    const exec = jest.fn().mockResolvedValue([{ slug: 'a', publishedRevision: undefined, toObject: () => ({ slug: 'a' }) }])
+    const exec = jest.fn().mockResolvedValue([{ slug: 'a', publishedRevision: undefined, toObject: () => ({ slug: 'a', id: 'a' }) }])
     const find = jest.fn().mockReturnValue({ exec })
     const service = await makeService({ find })
     const result = await service.findAll()
 
     expect(find).toHaveBeenCalledWith({ hidden: { $ne: true }, publishedRevision: { $ne: null } })
-    expect(result).toEqual([{ slug: 'a', averageRating: null, ratingCount: 0, viewCount: 0, cookCount: 0, ownerName: null }])
+    expect(result).toEqual([{ slug: 'a', id: 'a', averageRating: null, ratingCount: 0, viewCount: 0, cookCount: 0, ownerName: null }])
   })
 
   it('findAll overlays the published-revision snapshot instead of live in-progress edits', async () => {
-    const recipe = { slug: 'a', publishedRevision: 1, toObject: () => ({ slug: 'a', title: 'Live Draft Title' }) }
+    const recipe = { slug: 'a', publishedRevision: 1, toObject: () => ({ slug: 'a', id: 'a', title: 'Live Draft Title' }) }
     const find = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue([recipe]) })
     const revisionModel = { findOne: jest.fn().mockReturnValue({ lean: () => ({ exec: jest.fn().mockResolvedValue({ snapshot: { title: 'Published Title' } }) }) }) }
     const service = await makeService({ find }, revisionModel)
@@ -178,7 +178,7 @@ describe('RecipesService', () => {
   })
 
   it('findAll attaches averageRating, ratingCount, and viewCount', async () => {
-    const exec = jest.fn().mockResolvedValue([{ slug: 'a', publishedRevision: undefined, toObject: () => ({ slug: 'a' }) }])
+    const exec = jest.fn().mockResolvedValue([{ slug: 'a', publishedRevision: undefined, toObject: () => ({ slug: 'a', id: 'a' }) }])
     const find = jest.fn().mockReturnValue({ exec })
     const aggregate = jest.fn().mockResolvedValue([{ _id: 'a', avg: 4.5, count: 2 }])
     const service = await makeService({ find }, undefined, { aggregate }, makeActivityLog(new Map([['a', 42]])))
@@ -188,83 +188,83 @@ describe('RecipesService', () => {
   })
 
   it('findPublishedByOwner returns only that owner\'s ever-published, non-hidden recipes', async () => {
-    const exec = jest.fn().mockResolvedValue([{ slug: 'a', publishedRevision: undefined, toObject: () => ({ slug: 'a' }) }])
+    const exec = jest.fn().mockResolvedValue([{ slug: 'a', publishedRevision: undefined, toObject: () => ({ slug: 'a', id: 'a' }) }])
     const find = jest.fn().mockReturnValue({ exec })
     const service = await makeService({ find })
     const result = await service.findPublishedByOwner('user_1')
 
     expect(find).toHaveBeenCalledWith({ ownerId: 'user_1', hidden: { $ne: true }, publishedRevision: { $ne: null } })
-    expect(result).toEqual([{ slug: 'a', averageRating: null, ratingCount: 0, viewCount: 0, cookCount: 0, ownerName: null }])
+    expect(result).toEqual([{ slug: 'a', id: 'a', averageRating: null, ratingCount: 0, viewCount: 0, cookCount: 0, ownerName: null }])
   })
 
-  it('findBySlug returns the matching published recipe with ratings and views attached', async () => {
-    const exec = jest.fn().mockResolvedValue({ slug: 'a', publishedRevision: undefined, toObject: () => ({ slug: 'a' }) })
+  it('findById returns the matching published recipe with ratings and views attached', async () => {
+    const exec = jest.fn().mockResolvedValue({ slug: 'a', publishedRevision: undefined, toObject: () => ({ slug: 'a', id: 'a' }) })
     const findOne = jest.fn().mockReturnValue({ exec })
     const aggregate = jest.fn().mockResolvedValue([{ _id: 'a', avg: 3, count: 1 }])
     const service = await makeService({ findOne }, undefined, { aggregate }, makeActivityLog(new Map([['a', 7]])))
-    const result = await service.findBySlug('a')
+    const result = await service.findById('a')
 
-    expect(findOne).toHaveBeenCalledWith({ slug: 'a', hidden: { $ne: true }, publishedRevision: { $ne: null } })
-    expect(result).toEqual({ slug: 'a', averageRating: 3, ratingCount: 1, viewCount: 7, cookCount: 0, ownerName: null })
+    expect(findOne).toHaveBeenCalledWith({ _id: 'a', hidden: { $ne: true }, publishedRevision: { $ne: null } })
+    expect(result).toEqual({ slug: 'a', id: 'a', averageRating: 3, ratingCount: 1, viewCount: 7, cookCount: 0, ownerName: null })
   })
 
-  it('findBySlug excludes hidden or never-published recipes', async () => {
+  it('findById excludes hidden or never-published recipes', async () => {
     const exec = jest.fn().mockResolvedValue(null)
     const findOne = jest.fn().mockReturnValue({ exec })
     const service = await makeService({ findOne })
-    const result = await service.findBySlug('hidden-one')
+    const result = await service.findById('hidden-one')
 
     expect(result).toBeNull()
   })
 
-  it("findBySlugForUser returns the owner's own draft even though it has never been published", async () => {
-    const recipe = { slug: 'a', status: 'draft', ownerId: 'user_1', publishedRevision: undefined, toObject: () => ({ slug: 'a', status: 'draft', ownerId: 'user_1' }) }
+  it("findByIdForUser returns the owner's own draft even though it has never been published", async () => {
+    const recipe = { slug: 'a', status: 'draft', ownerId: 'user_1', publishedRevision: undefined, toObject: () => ({ slug: 'a', id: 'a', status: 'draft', ownerId: 'user_1' }) }
     const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
     const service = await makeService({ findOne })
-    const result = await service.findBySlugForUser('a', 'user_1', false)
+    const result = await service.findByIdForUser('a', 'user_1', false)
 
     expect(result).toMatchObject({ slug: 'a', averageRating: null, ratingCount: 0, viewCount: 0 })
   })
 
-  it('findBySlugForUser returns null for a never-published draft belonging to someone else', async () => {
-    const recipe = { slug: 'a', status: 'draft', ownerId: 'user_1', publishedRevision: undefined, toObject: () => ({ slug: 'a' }) }
+  it('findByIdForUser returns null for a never-published draft belonging to someone else', async () => {
+    const recipe = { slug: 'a', status: 'draft', ownerId: 'user_1', publishedRevision: undefined, toObject: () => ({ slug: 'a', id: 'a' }) }
     const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
     const service = await makeService({ findOne })
-    const result = await service.findBySlugForUser('a', 'user_2', false)
+    const result = await service.findByIdForUser('a', 'user_2', false)
 
     expect(result).toBeNull()
   })
 
-  it('findBySlugForUser returns a never-published draft belonging to someone else when the requester is an admin', async () => {
-    const recipe = { slug: 'a', status: 'draft', ownerId: 'user_1', publishedRevision: undefined, toObject: () => ({ slug: 'a', status: 'draft' }) }
+  it('findByIdForUser returns a never-published draft belonging to someone else when the requester is an admin', async () => {
+    const recipe = { slug: 'a', status: 'draft', ownerId: 'user_1', publishedRevision: undefined, toObject: () => ({ slug: 'a', id: 'a', status: 'draft' }) }
     const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
     const service = await makeService({ findOne })
-    const result = await service.findBySlugForUser('a', 'admin_1', true)
+    const result = await service.findByIdForUser('a', 'admin_1', true)
 
     expect(result).toMatchObject({ slug: 'a', status: 'draft' })
   })
 
-  it("findBySlugForUser shows the owner their own live in-progress edits on a published recipe, not the pinned snapshot", async () => {
-    const recipe = { slug: 'a', status: 'published', ownerId: 'user_1', publishedRevision: 1, currentRevision: 2, toObject: () => ({ slug: 'a', title: 'Live Draft Title' }) }
+  it("findByIdForUser shows the owner their own live in-progress edits on a published recipe, not the pinned snapshot", async () => {
+    const recipe = { id: 'a', slug: 'a', status: 'published', ownerId: 'user_1', publishedRevision: 1, currentRevision: 2, toObject: () => ({ slug: 'a', id: 'a', title: 'Live Draft Title' }) }
     const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
     const service = await makeService({ findOne })
-    const result = await service.findBySlugForUser('a', 'user_1', false)
+    const result = await service.findByIdForUser('a', 'user_1', false)
 
     expect(result).toMatchObject({ slug: 'a', title: 'Live Draft Title' })
   })
 
-  it('findBySlugForUser shows a non-owner the pinned published snapshot, not the owner\'s in-progress edits', async () => {
-    const recipe = { slug: 'a', status: 'published', ownerId: 'user_1', publishedRevision: 1, currentRevision: 2, toObject: () => ({ slug: 'a', title: 'Live Draft Title' }) }
+  it('findByIdForUser shows a non-owner the pinned published snapshot, not the owner\'s in-progress edits', async () => {
+    const recipe = { slug: 'a', status: 'published', ownerId: 'user_1', publishedRevision: 1, currentRevision: 2, toObject: () => ({ slug: 'a', id: 'a', title: 'Live Draft Title' }) }
     const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
     const revisionModel = { findOne: jest.fn().mockReturnValue({ lean: () => ({ exec: jest.fn().mockResolvedValue({ snapshot: { title: 'Published Title' } }) }) }) }
     const service = await makeService({ findOne }, revisionModel)
-    const result = await service.findBySlugForUser('a', 'user_2', false)
+    const result = await service.findByIdForUser('a', 'user_2', false)
 
     expect(result).toMatchObject({ slug: 'a', title: 'Published Title' })
   })
 
   it('findMine returns the recipes owned by the given user, most recently updated first', async () => {
-    const recipes = [{ slug: 'a', toObject: () => ({ slug: 'a' }) }]
+    const recipes = [{ slug: 'a', toObject: () => ({ slug: 'a', id: 'a' }) }]
     const sort = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipes) })
     const find = jest.fn().mockReturnValue({ sort })
     const service = await makeService({ find })
@@ -272,12 +272,12 @@ describe('RecipesService', () => {
 
     expect(find).toHaveBeenCalledWith({ ownerId: 'user_1', deletedAt: { $exists: false } })
     expect(sort).toHaveBeenCalledWith({ updatedAt: -1 })
-    expect(result).toEqual([{ slug: 'a' }])
+    expect(result).toEqual([{ slug: 'a', id: 'a' }])
   })
 
   it('createDraft slugifies the title, stores the recipe as a revision-1 draft, and snapshots it', async () => {
     const exists = jest.fn().mockResolvedValue(null)
-    const created = { slug: 'tomato-soup', ...minimalDto, currentRevision: 1 }
+    const created = { id: 'tomato-soup', slug: 'tomato-soup', ...minimalDto, currentRevision: 1 }
     const create = jest.fn().mockResolvedValue(created)
     const revisionCreate = jest.fn().mockResolvedValue({})
     const service = await makeService({ exists, create }, { create: revisionCreate })
@@ -285,7 +285,7 @@ describe('RecipesService', () => {
 
     expect(exists).toHaveBeenCalledWith({ slug: 'tomato-soup' })
     expect(create).toHaveBeenCalledWith({ ...minimalDto, slug: 'tomato-soup', ownerId: 'user_1', status: 'draft', currentRevision: 1 })
-    expect(revisionCreate).toHaveBeenCalledWith(expect.objectContaining({ recipeSlug: 'tomato-soup', revisionNumber: 1, authorId: 'user_1' }))
+    expect(revisionCreate).toHaveBeenCalledWith(expect.objectContaining({ recipeId: 'tomato-soup', revisionNumber: 1, authorId: 'user_1' }))
   })
 
   it('createDraft appends a numeric suffix when the slug is already taken', async () => {
@@ -301,18 +301,18 @@ describe('RecipesService', () => {
   it('updateDraft atomically increments the revision counter and saves a new snapshot', async () => {
     const existing = { slug: 'tomato-soup', ownerId: 'user_1', status: 'draft' }
     const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(existing) })
-    const updated = { slug: 'tomato-soup', currentRevision: 2, ...minimalDto }
+    const updated = { id: 'tomato-soup', slug: 'tomato-soup', currentRevision: 2, ...minimalDto }
     const findOneAndUpdate = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(updated) })
     const revisionCreate = jest.fn().mockResolvedValue({})
     const service = await makeService({ findOne, findOneAndUpdate }, { create: revisionCreate })
     const result = await service.updateDraft('tomato-soup', 'user_1', false, minimalDto as any)
 
     expect(findOneAndUpdate).toHaveBeenCalledWith(
-      { slug: 'tomato-soup' },
+      { _id: 'tomato-soup' },
       { $set: minimalDto, $inc: { currentRevision: 1 } },
       { new: true },
     )
-    expect(revisionCreate).toHaveBeenCalledWith(expect.objectContaining({ recipeSlug: 'tomato-soup', revisionNumber: 2, authorId: 'user_1' }))
+    expect(revisionCreate).toHaveBeenCalledWith(expect.objectContaining({ recipeId: 'tomato-soup', revisionNumber: 2, authorId: 'user_1' }))
     expect(result).toBe(updated)
   })
 
@@ -325,7 +325,7 @@ describe('RecipesService', () => {
     await service.updateDraft('a', 'user_1', false, minimalDto as any)
 
     expect(findOneAndUpdate).toHaveBeenCalledWith(
-      { slug: 'a' },
+      { _id: 'a' },
       {
         $set: { ...minimalDto, status: 'draft' },
         $inc: { currentRevision: 1 },
@@ -357,7 +357,7 @@ describe('RecipesService', () => {
     await service.updateDraft('a', 'user_1', false, tamperedDto as any)
 
     expect(findOneAndUpdate).toHaveBeenCalledWith(
-      { slug: 'a' },
+      { _id: 'a' },
       {
         $set: { ...tamperedDto, aiGenerated: true, sources: existing.sources },
         $inc: { currentRevision: 1 },
@@ -376,14 +376,14 @@ describe('RecipesService', () => {
     const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(null) })
     const service = await makeService({ findOne })
     await expect(service.updateDraft('a', 'user_1', false, minimalDto as any)).rejects.toThrow(NotFoundException)
-    expect(findOne).toHaveBeenCalledWith({ slug: 'a', deletedAt: { $exists: false } })
+    expect(findOne).toHaveBeenCalledWith({ _id: 'a', deletedAt: { $exists: false } })
   })
 
-  it('findBySlugForUser looks up the recipe excluding soft-deleted ones', async () => {
+  it('findByIdForUser looks up the recipe excluding soft-deleted ones', async () => {
     const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(null) })
     const service = await makeService({ findOne })
-    await service.findBySlugForUser('a', 'user_1', false)
-    expect(findOne).toHaveBeenCalledWith({ slug: 'a', deletedAt: { $exists: false } })
+    await service.findByIdForUser('a', 'user_1', false)
+    expect(findOne).toHaveBeenCalledWith({ _id: 'a', deletedAt: { $exists: false } })
   })
 
   it('updateDraft throws ForbiddenException when a non-owner, non-admin tries to edit', async () => {
@@ -455,7 +455,7 @@ describe('RecipesService', () => {
   })
 
   it('listPendingSubmissions returns pending_review recipes, oldest first', async () => {
-    const recipes = [{ slug: 'a', toObject: () => ({ slug: 'a' }) }]
+    const recipes = [{ slug: 'a', toObject: () => ({ slug: 'a', id: 'a' }) }]
     const sort = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipes) })
     const find = jest.fn().mockReturnValue({ sort })
     const service = await makeService({ find })
@@ -463,7 +463,7 @@ describe('RecipesService', () => {
 
     expect(find).toHaveBeenCalledWith({ status: 'pending_review' })
     expect(sort).toHaveBeenCalledWith({ updatedAt: 1 })
-    expect(result).toEqual([{ slug: 'a' }])
+    expect(result).toEqual([{ slug: 'a', id: 'a' }])
   })
 
   it('approveSubmission marks the current revision published and pins it as the live one', async () => {
@@ -474,7 +474,7 @@ describe('RecipesService', () => {
     const result = await service.approveSubmission('a', 'admin_1')
 
     expect(updateOne).toHaveBeenCalledWith(
-      { recipeSlug: 'a', revisionNumber: 3 },
+      { recipeId: 'a', revisionNumber: 3 },
       { $set: { published: true } },
     )
     expect(recipe.status).toBe('published')
@@ -522,7 +522,7 @@ describe('RecipesService', () => {
   })
 
   it('listRevisions returns every revision, newest first, when includeDrafts is true', async () => {
-    const revisions = [{ revisionNumber: 2, authorId: 'admin_1', snapshot: {}, published: false, createdAt: new Date('2026-01-02') }]
+    const revisions = [{ _id: 'rev-2', revisionNumber: 2, authorId: 'admin_1', snapshot: {}, published: false, createdAt: new Date('2026-01-02') }]
     const exec = jest.fn().mockResolvedValue(revisions)
     const lean = jest.fn().mockReturnValue({ exec })
     const sort = jest.fn().mockReturnValue({ lean })
@@ -530,9 +530,9 @@ describe('RecipesService', () => {
     const service = await makeService({}, { find })
     const result = await service.listRevisions('a', true)
 
-    expect(find).toHaveBeenCalledWith({ recipeSlug: 'a' })
+    expect(find).toHaveBeenCalledWith({ recipeId: 'a' })
     expect(sort).toHaveBeenCalledWith({ revisionNumber: -1 })
-    expect(result).toEqual([{ revisionNumber: 2, authorId: 'admin_1', snapshot: {}, published: false, publishedAt: new Date('2026-01-02') }])
+    expect(result).toEqual([{ id: 'rev-2', revisionNumber: 2, authorId: 'admin_1', snapshot: {}, published: false, publishedAt: new Date('2026-01-02') }])
   })
 
   it('listRevisions only returns published revisions when includeDrafts is false', async () => {
@@ -540,7 +540,7 @@ describe('RecipesService', () => {
     const service = await makeService({}, { find })
     await service.listRevisions('a', false)
 
-    expect(find).toHaveBeenCalledWith({ recipeSlug: 'a', published: true })
+    expect(find).toHaveBeenCalledWith({ recipeId: 'a', published: true })
   })
 
   it('remove soft-deletes a never-published recipe when the requester is its owner', async () => {

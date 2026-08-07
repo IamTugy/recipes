@@ -8,7 +8,7 @@ export class AddMealPlanEntryDto {
   date!: string
 
   @IsString()
-  recipeSlug!: string
+  recipeId!: string
 
   @IsIn(MEAL_TYPES)
   @IsOptional()

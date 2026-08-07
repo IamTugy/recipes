@@ -9,25 +9,25 @@ interface CookCountAggregate { _id: string; count: number }
 export class CookLogService {
   constructor(@InjectModel(CookLog.name) private readonly cookLogModel: Model<CookLogDocument>) {}
 
-  async markCooked(userId: string, recipeSlug: string): Promise<void> {
+  async markCooked(userId: string, recipeId: string): Promise<void> {
     await this.cookLogModel
-      .findOneAndUpdate({ userId, recipeSlug }, { userId, recipeSlug }, { upsert: true })
+      .findOneAndUpdate({ userId, recipeId }, { userId, recipeId }, { upsert: true })
       .exec()
   }
 
-  async unmarkCooked(userId: string, recipeSlug: string): Promise<void> {
-    await this.cookLogModel.deleteOne({ userId, recipeSlug }).exec()
+  async unmarkCooked(userId: string, recipeId: string): Promise<void> {
+    await this.cookLogModel.deleteOne({ userId, recipeId }).exec()
   }
 
-  async listSlugs(userId: string): Promise<string[]> {
+  async listIds(userId: string): Promise<string[]> {
     const logs = await this.cookLogModel.find({ userId }).exec()
-    return logs.map(l => l.recipeSlug)
+    return logs.map(l => l.recipeId)
   }
 
-  async countsBySlug(recipeSlugs: string[]): Promise<Map<string, number>> {
+  async countsById(recipeIds: string[]): Promise<Map<string, number>> {
     const aggregates = (await this.cookLogModel.aggregate([
-      { $match: { recipeSlug: { $in: recipeSlugs } } },
-      { $group: { _id: '$recipeSlug', count: { $sum: 1 } } },
+      { $match: { recipeId: { $in: recipeIds } } },
+      { $group: { _id: '$recipeId', count: { $sum: 1 } } },
     ])) as CookCountAggregate[]
 
     return new Map(aggregates.map(a => [a._id, a.count]))

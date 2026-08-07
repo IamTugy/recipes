@@ -9,8 +9,8 @@ export class Favorite {
   userId!: string
 
   @Prop({ required: true, index: true })
-  recipeSlug!: string
+  recipeId!: string
 }
 
 export const FavoriteSchema = SchemaFactory.createForClass(Favorite)
-FavoriteSchema.index({ userId: 1, recipeSlug: 1 }, { unique: true })
+FavoriteSchema.index({ userId: 1, recipeId: 1 }, { unique: true })

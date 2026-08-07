@@ -12,7 +12,7 @@ export class CollectionsService {
   }
 
   async create(userId: string, name: string): Promise<CollectionDocument> {
-    return this.collectionModel.create({ userId, name, recipeSlugs: [] })
+    return this.collectionModel.create({ userId, name, recipeIds: [] })
   }
 
   async rename(userId: string, id: string, name: string): Promise<CollectionDocument | null> {
@@ -23,15 +23,15 @@ export class CollectionsService {
     await this.collectionModel.deleteOne({ _id: id, userId }).exec()
   }
 
-  async addRecipe(userId: string, id: string, recipeSlug: string): Promise<CollectionDocument | null> {
+  async addRecipe(userId: string, id: string, recipeId: string): Promise<CollectionDocument | null> {
     return this.collectionModel
-      .findOneAndUpdate({ _id: id, userId }, { $addToSet: { recipeSlugs: recipeSlug } }, { new: true })
+      .findOneAndUpdate({ _id: id, userId }, { $addToSet: { recipeIds: recipeId } }, { new: true })
       .exec()
   }
 
-  async removeRecipe(userId: string, id: string, recipeSlug: string): Promise<CollectionDocument | null> {
+  async removeRecipe(userId: string, id: string, recipeId: string): Promise<CollectionDocument | null> {
     return this.collectionModel
-      .findOneAndUpdate({ _id: id, userId }, { $pull: { recipeSlugs: recipeSlug } }, { new: true })
+      .findOneAndUpdate({ _id: id, userId }, { $pull: { recipeIds: recipeId } }, { new: true })
       .exec()
   }
 }

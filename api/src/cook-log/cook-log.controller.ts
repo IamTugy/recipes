@@ -8,18 +8,18 @@ export class CookLogController {
 
   @Get()
   async list(@Req() req: Request & { userId: string }) {
-    return this.cookLogService.listSlugs(req.userId)
+    return this.cookLogService.listIds(req.userId)
   }
 
-  @Post(':slug')
-  async mark(@Param('slug') slug: string, @Req() req: Request & { userId: string }) {
-    await this.cookLogService.markCooked(req.userId, slug)
+  @Post(':id')
+  async mark(@Param('id') id: string, @Req() req: Request & { userId: string }) {
+    await this.cookLogService.markCooked(req.userId, id)
     return { cooked: true }
   }
 
-  @Delete(':slug')
-  async unmark(@Param('slug') slug: string, @Req() req: Request & { userId: string }) {
-    await this.cookLogService.unmarkCooked(req.userId, slug)
+  @Delete(':id')
+  async unmark(@Param('id') id: string, @Req() req: Request & { userId: string }) {
+    await this.cookLogService.unmarkCooked(req.userId, id)
     return { cooked: false }
   }
 }

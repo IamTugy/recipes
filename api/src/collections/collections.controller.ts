@@ -39,15 +39,15 @@ export class CollectionsController {
     @Body() body: AddRecipeDto,
     @Req() req: Request & { userId: string },
   ) {
-    return this.collectionsService.addRecipe(req.userId, id, body.slug)
+    return this.collectionsService.addRecipe(req.userId, id, body.recipeId)
   }
 
-  @Delete(':id/recipes/:slug')
+  @Delete(':id/recipes/:recipeId')
   async removeRecipe(
     @Param('id') id: string,
-    @Param('slug') slug: string,
+    @Param('recipeId') recipeId: string,
     @Req() req: Request & { userId: string },
   ) {
-    return this.collectionsService.removeRecipe(req.userId, id, slug)
+    return this.collectionsService.removeRecipe(req.userId, id, recipeId)
   }
 }

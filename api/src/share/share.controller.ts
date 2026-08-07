@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Res } from '@nestjs/common'
+import { Controller, Get, Param, Query, Res } from '@nestjs/common'
 import type { Response } from 'express'
 import { RecipesService } from '../recipes/recipes.service'
 import { Public } from '../auth/public.decorator'
@@ -23,19 +23,33 @@ export class ShareController {
   constructor(private readonly recipesService: RecipesService) {}
 
   @Public()
-  @Get('recipe/:slug')
-  async shareRecipe(@Param('slug') slug: string, @Res() res: Response) {
-    const appUrl = `${APP_URL}/#/recipe/${encodeURIComponent(slug)}`
-    const recipe = await this.recipesService.findBySlug(slug)
+  @Get('recipes/:id')
+  async shareRecipe(@Param('id') id: string, @Query('rev') rev: string | undefined, @Res() res: Response) {
+    const appUrl = rev
+      ? `${APP_URL}/#/recipes/${encodeURIComponent(id)}?rev=${encodeURIComponent(rev)}`
+      : `${APP_URL}/#/recipes/${encodeURIComponent(id)}`
 
+    // findById already only ever returns recipes that have a publishedRevision,
+    // so a personal/never-published recipe (nothing to preview) just bounces
+    // straight into the app instead of leaking a private draft's content here.
+    const recipe = await this.recipesService.findById(id)
     if (!recipe) {
       res.redirect(302, appUrl)
       return
     }
 
-    const title = escapeHtml(String(recipe.title ?? ''))
-    const description = escapeHtml(String(recipe.description || recipe.descriptionEn || ''))
-    const image = String(recipe.image || FALLBACK_IMAGE)
+    // A specific past revision was requested - only ever consider published
+    // ones (includeDrafts: false), so an in-progress draft can't leak either.
+    const content = rev
+      ? (await this.recipesService.listRevisions(id, false)).find(r => r.id === rev)?.snapshot ?? recipe
+      : recipe
+
+    const title = escapeHtml(String(content.title ?? ''))
+    const description = escapeHtml(String(content.description || content.descriptionEn || ''))
+    // encodeURI, not encodeURIComponent - it leaves an already-valid URL's
+    // structure (:, /, ?) intact while escaping raw non-ASCII characters
+    // (e.g. an unencoded "pão" in the path), which crawlers reject outright.
+    const image = encodeURI(String(content.image || FALLBACK_IMAGE))
 
     res.type('html').send(`<!doctype html>
 <html>

@@ -27,8 +27,8 @@ export class RecipesController {
 
   @Get('trending')
   async trending() {
-    const slugs = await this.activityLog.trendingSlugs()
-    const recipes = await Promise.all(slugs.map(slug => this.recipesService.findBySlug(slug)))
+    const ids = await this.activityLog.trendingIds()
+    const recipes = await Promise.all(ids.map(id => this.recipesService.findById(id)))
     return recipes.filter((r): r is NonNullable<typeof r> => !!r)
   }
 
@@ -52,31 +52,31 @@ export class RecipesController {
     return this.recipesService.listPendingSubmissions()
   }
 
-  @Get('public/:slug')
-  async findPublic(@Param('slug') slug: string) {
-    const recipe = await this.recipesService.findBySlug(slug)
+  @Get('public/:id')
+  async findPublic(@Param('id') id: string) {
+    const recipe = await this.recipesService.findById(id)
     if (!recipe) {
-      throw new NotFoundException(`Recipe '${slug}' not found`)
+      throw new NotFoundException(`Recipe '${id}' not found`)
     }
     return recipe
   }
 
-  @Get(':slug')
-  async findOne(@Param('slug') slug: string, @Req() req: Request & { userId: string }) {
-    const recipe = await this.recipesService.findBySlugForUser(slug, req.userId, this.isAdmin(req.userId))
+  @Get(':id')
+  async findOne(@Param('id') id: string, @Req() req: Request & { userId: string }) {
+    const recipe = await this.recipesService.findByIdForUser(id, req.userId, this.isAdmin(req.userId))
     if (!recipe) {
-      throw new NotFoundException(`Recipe '${slug}' not found`)
+      throw new NotFoundException(`Recipe '${id}' not found`)
     }
     if (recipe.publishedRevision != null) {
-      await this.activityLog.record(req.userId, slug, 'recipe_viewed')
+      await this.activityLog.record(req.userId, id, 'recipe_viewed')
     }
     return recipe
   }
 
-  @Get(':slug/revisions')
-  async listRevisions(@Param('slug') slug: string, @Req() req: Request & { userId: string }) {
-    const includeDrafts = await this.recipesService.canViewDraftRevisions(slug, req.userId, this.isAdmin(req.userId))
-    return this.recipesService.listRevisions(slug, includeDrafts)
+  @Get(':id/revisions')
+  async listRevisions(@Param('id') id: string, @Req() req: Request & { userId: string }) {
+    const includeDrafts = await this.recipesService.canViewDraftRevisions(id, req.userId, this.isAdmin(req.userId))
+    return this.recipesService.listRevisions(id, includeDrafts)
   }
 
   @Post()
@@ -85,49 +85,49 @@ export class RecipesController {
     return recipe.toObject()
   }
 
-  @Put(':slug')
+  @Put(':id')
   async update(
-    @Param('slug') slug: string,
+    @Param('id') id: string,
     @Body() body: SaveRecipeDraftDto,
     @Req() req: Request & { userId: string },
   ) {
-    const recipe = await this.recipesService.updateDraft(slug, req.userId, this.isAdmin(req.userId), body)
+    const recipe = await this.recipesService.updateDraft(id, req.userId, this.isAdmin(req.userId), body)
     return recipe.toObject()
   }
 
-  @Post(':slug/submit')
-  async submit(@Param('slug') slug: string, @Req() req: Request & { userId: string }) {
-    const recipe = await this.recipesService.submitForReview(slug, req.userId, this.isAdmin(req.userId))
+  @Post(':id/submit')
+  async submit(@Param('id') id: string, @Req() req: Request & { userId: string }) {
+    const recipe = await this.recipesService.submitForReview(id, req.userId, this.isAdmin(req.userId))
     return recipe.toObject()
   }
 
-  @Post(':slug/cancel-submission')
-  async cancelSubmission(@Param('slug') slug: string, @Req() req: Request & { userId: string }) {
-    const recipe = await this.recipesService.cancelSubmission(slug, req.userId, this.isAdmin(req.userId))
+  @Post(':id/cancel-submission')
+  async cancelSubmission(@Param('id') id: string, @Req() req: Request & { userId: string }) {
+    const recipe = await this.recipesService.cancelSubmission(id, req.userId, this.isAdmin(req.userId))
     return recipe.toObject()
   }
 
-  @Post(':slug/approve')
-  async approve(@Param('slug') slug: string, @Req() req: Request & { userId: string }) {
+  @Post(':id/approve')
+  async approve(@Param('id') id: string, @Req() req: Request & { userId: string }) {
     if (!this.isAdmin(req.userId)) throw new ForbiddenException('Admins only')
-    const recipe = await this.recipesService.approveSubmission(slug, req.userId)
+    const recipe = await this.recipesService.approveSubmission(id, req.userId)
     return recipe.toObject()
   }
 
-  @Post(':slug/reject')
+  @Post(':id/reject')
   async reject(
-    @Param('slug') slug: string,
+    @Param('id') id: string,
     @Body() body: RejectSubmissionDto,
     @Req() req: Request & { userId: string },
   ) {
     if (!this.isAdmin(req.userId)) throw new ForbiddenException('Admins only')
-    const recipe = await this.recipesService.rejectSubmission(slug, body.comment)
+    const recipe = await this.recipesService.rejectSubmission(id, body.comment)
     return recipe.toObject()
   }
 
-  @Delete(':slug')
-  async remove(@Param('slug') slug: string, @Req() req: Request & { userId: string }) {
-    await this.recipesService.remove(slug, req.userId, this.isAdmin(req.userId))
+  @Delete(':id')
+  async remove(@Param('id') id: string, @Req() req: Request & { userId: string }) {
+    await this.recipesService.remove(id, req.userId, this.isAdmin(req.userId))
     return { deleted: true }
   }
 }

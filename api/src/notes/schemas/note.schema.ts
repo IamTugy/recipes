@@ -9,11 +9,11 @@ export class Note {
   userId!: string
 
   @Prop({ required: true, index: true })
-  recipeSlug!: string
+  recipeId!: string
 
   @Prop({ required: true })
   text!: string
 }
 
 export const NoteSchema = SchemaFactory.createForClass(Note)
-NoteSchema.index({ userId: 1, recipeSlug: 1 }, { unique: true })
+NoteSchema.index({ userId: 1, recipeId: 1 }, { unique: true })

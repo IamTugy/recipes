@@ -7,25 +7,25 @@ import { SaveNoteDto } from './dto/save-note.dto'
 export class NotesController {
   constructor(private readonly notesService: NotesService) {}
 
-  @Get(':slug')
-  async get(@Param('slug') slug: string, @Req() req: Request & { userId: string }) {
-    const text = await this.notesService.get(req.userId, slug)
+  @Get(':id')
+  async get(@Param('id') id: string, @Req() req: Request & { userId: string }) {
+    const text = await this.notesService.get(req.userId, id)
     return { text }
   }
 
-  @Put(':slug')
+  @Put(':id')
   async save(
-    @Param('slug') slug: string,
+    @Param('id') id: string,
     @Body() body: SaveNoteDto,
     @Req() req: Request & { userId: string },
   ) {
-    await this.notesService.save(req.userId, slug, body.text)
+    await this.notesService.save(req.userId, id, body.text)
     return { text: body.text }
   }
 
-  @Delete(':slug')
-  async remove(@Param('slug') slug: string, @Req() req: Request & { userId: string }) {
-    await this.notesService.remove(req.userId, slug)
+  @Delete(':id')
+  async remove(@Param('id') id: string, @Req() req: Request & { userId: string }) {
+    await this.notesService.remove(req.userId, id)
     return { text: null }
   }
 }

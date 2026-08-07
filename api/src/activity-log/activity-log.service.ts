@@ -23,7 +23,7 @@ export class ActivityLogService {
     await this.activityLogModel.create({ userId, recipeId, action, metadata })
   }
 
-  async trendingSlugs(limit = 6, sinceDays = 7): Promise<string[]> {
+  async trendingIds(limit = 6, sinceDays = 7): Promise<string[]> {
     const since = new Date(Date.now() - sinceDays * 24 * 60 * 60 * 1000)
     const aggregates = (await this.activityLogModel.aggregate([
       { $match: { action: 'recipe_viewed', timestamp: { $gte: since } } },
@@ -38,7 +38,7 @@ export class ActivityLogService {
   // Counts unique (user, day) pairs per recipe rather than raw view events,
   // so a visitor refreshing the page all afternoon counts once, while
   // coming back tomorrow counts again.
-  async viewCountsBySlug(recipeIds: string[]): Promise<Map<string, number>> {
+  async viewCountsById(recipeIds: string[]): Promise<Map<string, number>> {
     const aggregates = (await this.activityLogModel.aggregate([
       { $match: { action: 'recipe_viewed', recipeId: { $in: recipeIds } } },
       { $group: { _id: { recipeId: '$recipeId', userId: '$userId', day: { $dateToString: { format: '%Y-%m-%d', date: '$timestamp' } } } } },

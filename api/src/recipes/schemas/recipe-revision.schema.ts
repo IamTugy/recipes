@@ -13,7 +13,7 @@ export type RecipeRevisionDocument = RecipeRevision & Document
 @Schema({ timestamps: true })
 export class RecipeRevision {
   @Prop({ required: true, index: true })
-  recipeSlug!: string
+  recipeId!: string
 
   @Prop({ required: true })
   revisionNumber!: number
@@ -29,4 +29,4 @@ export class RecipeRevision {
 }
 
 export const RecipeRevisionSchema = SchemaFactory.createForClass(RecipeRevision)
-RecipeRevisionSchema.index({ recipeSlug: 1, revisionNumber: 1 }, { unique: true })
+RecipeRevisionSchema.index({ recipeId: 1, revisionNumber: 1 }, { unique: true })
