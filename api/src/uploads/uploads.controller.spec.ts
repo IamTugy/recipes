@@ -27,4 +27,16 @@ describe('UploadsController', () => {
 
     expect(uploadsService.presignPhotoUpload).toHaveBeenCalledWith('a', 'image/jpeg', 'recipe')
   })
+
+  it('POST /uploads/enhance-photo delegates to the service and returns the new public URL', async () => {
+    const uploadsService = {
+      enhancePhoto: jest.fn().mockResolvedValue({ publicUrl: 'https://recipes-assets.tugy.dev/recipes/a/enhanced.png' }),
+    }
+    const controller = new UploadsController(uploadsService as any)
+
+    const result = await controller.enhancePhoto({ recipeSlug: 'a', imageUrl: 'https://recipes-assets.tugy.dev/recipes/a/photo.jpg' })
+
+    expect(uploadsService.enhancePhoto).toHaveBeenCalledWith('a', 'https://recipes-assets.tugy.dev/recipes/a/photo.jpg')
+    expect(result).toEqual({ publicUrl: 'https://recipes-assets.tugy.dev/recipes/a/enhanced.png' })
+  })
 })
