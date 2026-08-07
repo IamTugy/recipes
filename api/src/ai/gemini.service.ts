@@ -1,11 +1,17 @@
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { GoogleGenAI } from '@google/genai'
+import { GoogleGenAI, Modality } from '@google/genai'
+
+export interface EditedImage {
+  data: string
+  mimeType: string
+}
 
 @Injectable()
 export class GeminiService {
   private client: GoogleGenAI | null = null
   private readonly model = 'gemini-3.5-flash'
+  private readonly imageModel = 'gemini-2.5-flash-image'
 
   constructor(private readonly config: ConfigService) {}
 
@@ -67,5 +73,22 @@ export class GeminiService {
       .map(web => ({ title: web.title ?? web.uri, url: web.uri }))
 
     return { text: response.text, sources }
+  }
+
+  // Sends an existing image back to Gemini's image model along with an edit
+  // instruction and returns the regenerated image bytes - used for the
+  // "enhance picture" feature, which asks for a minimal retouch rather than
+  // a from-scratch generation.
+  async editImage(imageBase64: string, mimeType: string, prompt: string): Promise<EditedImage> {
+    const client = this.getClient()
+    const response = await client.models.generateContent({
+      model: this.imageModel,
+      contents: [{ role: 'user', parts: [{ inlineData: { data: imageBase64, mimeType } }, { text: prompt }] }],
+      config: { responseModalities: [Modality.IMAGE] },
+    })
+    const parts = response.candidates?.[0]?.content?.parts ?? []
+    const image = parts.find(part => part.inlineData?.data)?.inlineData
+    if (!image?.data) throw new Error('Gemini returned no image')
+    return { data: image.data, mimeType: image.mimeType ?? 'image/png' }
   }
 }

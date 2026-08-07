@@ -7,6 +7,7 @@ jest.mock('@google/genai', () => ({
   GoogleGenAI: jest.fn().mockImplementation(() => ({
     models: { generateContent: mockGenerateContent },
   })),
+  Modality: { IMAGE: 'IMAGE' },
 }))
 
 describe('GeminiService', () => {
@@ -97,5 +98,30 @@ describe('GeminiService', () => {
     const service = new GeminiService(config as unknown as ConfigService)
 
     await expect(service.generateWithSearch('x')).rejects.toThrow('Gemini returned an empty response')
+  })
+
+  it('editImage returns the inline image data from the response', async () => {
+    mockGenerateContent.mockResolvedValue({
+      candidates: [{ content: { parts: [{ text: 'ok' }, { inlineData: { data: 'YmFzZTY0', mimeType: 'image/png' } }] } }],
+    })
+    const config = { get: jest.fn().mockReturnValue('test-key') }
+    const service = new GeminiService(config as unknown as ConfigService)
+
+    const result = await service.editImage('aW5wdXQ=', 'image/jpeg', 'retouch it')
+
+    expect(result).toEqual({ data: 'YmFzZTY0', mimeType: 'image/png' })
+    expect(mockGenerateContent).toHaveBeenCalledWith({
+      model: 'gemini-2.5-flash-image',
+      contents: [{ role: 'user', parts: [{ inlineData: { data: 'aW5wdXQ=', mimeType: 'image/jpeg' } }, { text: 'retouch it' }] }],
+      config: { responseModalities: ['IMAGE'] },
+    })
+  })
+
+  it('editImage throws when Gemini returns no image', async () => {
+    mockGenerateContent.mockResolvedValue({ candidates: [{ content: { parts: [{ text: 'nope' }] } }] })
+    const config = { get: jest.fn().mockReturnValue('test-key') }
+    const service = new GeminiService(config as unknown as ConfigService)
+
+    await expect(service.editImage('aW5wdXQ=', 'image/jpeg', 'retouch it')).rejects.toThrow('Gemini returned no image')
   })
 })

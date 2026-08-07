@@ -1,6 +1,7 @@
 import { Body, Controller, Post } from '@nestjs/common'
 import { UploadsService } from './uploads.service'
 import { PresignUploadDto } from './dto/presign-upload.dto'
+import { EnhancePhotoDto } from './dto/enhance-photo.dto'
 
 @Controller('uploads')
 export class UploadsController {
@@ -9,5 +10,10 @@ export class UploadsController {
   @Post('presign')
   async presign(@Body() body: PresignUploadDto) {
     return this.uploadsService.presignPhotoUpload(body.recipeSlug, body.contentType, body.purpose)
+  }
+
+  @Post('enhance-photo')
+  async enhancePhoto(@Body() body: EnhancePhotoDto) {
+    return this.uploadsService.enhancePhoto(body.recipeSlug, body.imageUrl)
   }
 }
