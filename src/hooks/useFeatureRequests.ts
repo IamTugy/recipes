@@ -62,6 +62,23 @@ export function useFeatureRequests() {
     return res.ok
   }, [getToken])
 
+  const unapprove = useCallback(async (number: number) => {
+    setRequests(prev => prev.map(r => (
+      r.number === number ? { ...r, labels: r.labels.filter(l => l !== 'approved-for-claude') } : r
+    )))
+    const token = await getToken()
+    const res = await fetch(`/api/feature-requests/${number}/unapprove`, {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+    if (!res.ok) {
+      setRequests(prev => prev.map(r => (
+        r.number === number ? { ...r, labels: [...r.labels, 'approved-for-claude'] } : r
+      )))
+    }
+    return res.ok
+  }, [getToken])
+
   const update = useCallback(async (number: number, title: string, description: string) => {
     const token = await getToken()
     const res = await fetch(`/api/feature-requests/${number}`, {
@@ -112,5 +129,5 @@ export function useFeatureRequests() {
     return res.ok
   }, [getToken])
 
-  return { requests, loading, create, approve, update, withdraw, deny }
+  return { requests, loading, create, approve, unapprove, update, withdraw, deny }
 }

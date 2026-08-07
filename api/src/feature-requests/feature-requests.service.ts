@@ -98,6 +98,17 @@ export class FeatureRequestsService {
     })
   }
 
+  async unapprove(issueNumber: number): Promise<void> {
+    const existing = await this.getById(issueNumber)
+    if (!existing.labels.includes(APPROVED_LABEL)) {
+      throw new ForbiddenException('This request is not currently approved')
+    }
+    if (existing.labels.some(label => label !== APPROVED_LABEL && LOCKED_LABELS.includes(label))) {
+      throw new ForbiddenException('Claude has already started work on this request and it can no longer be unapproved')
+    }
+    await this.githubFetch(`/issues/${issueNumber}/labels/${APPROVED_LABEL}`, { method: 'DELETE' })
+  }
+
   async getById(issueNumber: number): Promise<FeatureRequest> {
     const res = await this.githubFetch(`/issues/${issueNumber}`)
     const issue = (await res.json()) as GitHubIssue

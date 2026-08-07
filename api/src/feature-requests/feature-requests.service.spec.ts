@@ -157,6 +157,45 @@ describe('FeatureRequestsService', () => {
     expect(JSON.parse(init.body)).toEqual({ labels: ['approved-for-claude'] })
   })
 
+  it('unapprove removes the approved-for-claude label when nothing has started', async () => {
+    const fetchMock = jest.fn()
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ ...openIssue, labels: [{ name: 'approved-for-claude' }] }) })
+      .mockResolvedValueOnce({ ok: true, json: async () => ({}) })
+    global.fetch = fetchMock as unknown as typeof fetch
+
+    const service = await makeService()
+    await service.unapprove(42)
+
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      'https://api.github.com/repos/IamTugy/recipes/issues/42/labels/approved-for-claude',
+      expect.objectContaining({ method: 'DELETE' }),
+    )
+  })
+
+  it('unapprove rejects a request that is not currently approved', async () => {
+    const fetchMock = jest.fn().mockResolvedValueOnce({ ok: true, json: async () => openIssue })
+    global.fetch = fetchMock as unknown as typeof fetch
+
+    const service = await makeService()
+    await expect(service.unapprove(42)).rejects.toThrow('This request is not currently approved')
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('unapprove rejects a request Claude has already started working on', async () => {
+    const fetchMock = jest.fn().mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ ...openIssue, labels: [{ name: 'approved-for-claude' }, { name: 'claude-in-progress' }] }),
+    })
+    global.fetch = fetchMock as unknown as typeof fetch
+
+    const service = await makeService()
+    await expect(service.unapprove(42)).rejects.toThrow(
+      'Claude has already started work on this request and it can no longer be unapproved',
+    )
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+  })
+
   it('deny patches the issue body with the reason and adds the denied label', async () => {
     const mockIssue = {
       number: 42,

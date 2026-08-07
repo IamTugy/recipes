@@ -39,6 +39,19 @@ export class FeatureRequestsController {
     return { approved: true }
   }
 
+  @Post(':number/unapprove')
+  async unapprove(
+    @Param('number', ParseIntPipe) number: number,
+    @Req() req: Request & { userId: string },
+  ) {
+    const ownerUserId = this.config.get<string>('OWNER_USER_ID')
+    if (req.userId !== ownerUserId) {
+      throw new ForbiddenException('Only the app owner can unapprove feature requests')
+    }
+    await this.featureRequestsService.unapprove(number)
+    return { unapproved: true }
+  }
+
   @Patch(':number')
   async update(
     @Param('number', ParseIntPipe) number: number,

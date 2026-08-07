@@ -6,6 +6,7 @@ describe('FeatureRequestsController', () => {
     create: jest.fn(),
     list: jest.fn(),
     approve: jest.fn(),
+    unapprove: jest.fn(),
     update: jest.fn(),
     withdraw: jest.fn(),
     deny: jest.fn(),
@@ -59,6 +60,19 @@ describe('FeatureRequestsController', () => {
     const controller = new FeatureRequestsController(featureRequestsService as any, makeConfig('owner_1') as any)
     await expect(controller.approve(2, { userId: 'someone_else' } as any)).rejects.toThrow(ForbiddenException)
     expect(featureRequestsService.approve).not.toHaveBeenCalled()
+  })
+
+  it('POST /feature-requests/:number/unapprove unapproves when the current user is the owner', async () => {
+    const controller = new FeatureRequestsController(featureRequestsService as any, makeConfig('owner_1') as any)
+    const result = await controller.unapprove(2, { userId: 'owner_1' } as any)
+    expect(featureRequestsService.unapprove).toHaveBeenCalledWith(2)
+    expect(result).toEqual({ unapproved: true })
+  })
+
+  it('POST /feature-requests/:number/unapprove rejects non-owner users', async () => {
+    const controller = new FeatureRequestsController(featureRequestsService as any, makeConfig('owner_1') as any)
+    await expect(controller.unapprove(2, { userId: 'someone_else' } as any)).rejects.toThrow(ForbiddenException)
+    expect(featureRequestsService.unapprove).not.toHaveBeenCalled()
   })
 
   it('PATCH /feature-requests/:number edits the request via the service', async () => {

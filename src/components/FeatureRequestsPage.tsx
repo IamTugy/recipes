@@ -21,7 +21,7 @@ export default function FeatureRequestsPage() {
   const { lang } = useLanguage()
   const { showToast } = useToast()
   const { userId } = useAuth()
-  const { requests, loading, create, approve, update, withdraw, deny } = useFeatureRequests()
+  const { requests, loading, create, approve, unapprove, update, withdraw, deny } = useFeatureRequests()
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -49,6 +49,11 @@ export default function FeatureRequestsPage() {
   async function handleApprove(number: number) {
     const ok = await approve(number)
     if (ok) showToast(lang === 'he' ? 'אושר לביצוע' : 'Approved for Claude')
+  }
+
+  async function handleUnapprove(number: number) {
+    const ok = await unapprove(number)
+    if (ok) showToast(lang === 'he' ? 'האישור בוטל' : 'Approval removed')
   }
 
   function startEdit(r: { number: number, title: string, body: string }) {
@@ -254,6 +259,14 @@ export default function FeatureRequestsPage() {
                               {status === 'needs-input'
                                 ? (lang === 'he' ? 'נסה שוב' : 'Retry')
                                 : (lang === 'he' ? 'אשר לביצוע' : 'Approve for Claude')}
+                            </button>
+                          )}
+                          {isOwner && status === 'approved' && (
+                            <button type="button"
+                              onClick={() => handleUnapprove(r.number)}
+                              className="text-xs font-semibold text-cream/50 hover:text-cream/80 transition-colors"
+                            >
+                              {lang === 'he' ? 'בטל אישור' : 'Unapprove'}
                             </button>
                           )}
                           {isOwner && canDeny && (
