@@ -217,9 +217,9 @@ export class RecipesService implements OnModuleInit {
     }
     if (!recipe) return null
     const [ratings, views, cooks] = await Promise.all([
-      this.ratingsById([id]),
-      this.activityLogService.viewCountsById([id]),
-      this.cookLogService.countsById([id]),
+      this.ratingsById([recipe.id]),
+      this.activityLogService.viewCountsById([recipe.id]),
+      this.cookLogService.countsById([recipe.id]),
     ])
     const plain = await this.overlayPublishedSnapshot(recipe)
     return (await this.attachRatingsAndViews([plain], ratings, views, cooks))[0]
@@ -244,9 +244,9 @@ export class RecipesService implements OnModuleInit {
     if (recipe.publishedRevision != null) {
       const base = isOwnerOrAdmin ? { ...recipe.toObject(), id: recipe.id } : await this.overlayPublishedSnapshot(recipe)
       const [ratings, views, cooks] = await Promise.all([
-        this.ratingsById([id]),
-        this.activityLogService.viewCountsById([id]),
-        this.cookLogService.countsById([id]),
+        this.ratingsById([recipe.id]),
+        this.activityLogService.viewCountsById([recipe.id]),
+        this.cookLogService.countsById([recipe.id]),
       ])
       return (await this.attachRatingsAndViews([base], ratings, views, cooks))[0]
     }

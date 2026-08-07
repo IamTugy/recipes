@@ -68,7 +68,7 @@ export class RecipesController {
       throw new NotFoundException(`Recipe '${id}' not found`)
     }
     if (recipe.publishedRevision != null) {
-      await this.activityLog.record(req.userId, id, 'recipe_viewed')
+      await this.activityLog.record(req.userId, recipe.id, 'recipe_viewed')
     }
     return recipe
   }

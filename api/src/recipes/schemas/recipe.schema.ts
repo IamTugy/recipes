@@ -3,7 +3,11 @@ import { Document, Schema as MongooseSchema } from 'mongoose'
 
 export type RecipeDocument = Recipe & Document
 
-@Schema({ timestamps: true })
+// virtuals: true is required for the "id" virtual (Mongoose's default
+// _id.toHexString() getter) to actually appear in .toObject()/.toJSON()
+// output - without it, every API response built from those was silently
+// missing the field the frontend routes/links to (sends /recipes/undefined).
+@Schema({ timestamps: true, toObject: { virtuals: true }, toJSON: { virtuals: true } })
 export class Recipe {
   @Prop({ required: true, unique: true, index: true })
   slug!: string
