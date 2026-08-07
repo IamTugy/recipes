@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useNavigate } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import { useAuth, SignIn } from '@clerk/react'
 import Nav from './components/Nav'
@@ -35,6 +35,20 @@ export default function App() {
   const { isLoaded, isSignedIn } = useAuth()
   const timerPanelRef = useRef<HTMLDivElement>(null)
   const [timerBarHeight, setTimerBarHeight] = useState(0)
+  const navigate = useNavigate()
+
+  // A shared recipe link lands here first (?share=/recipes/<id>) instead of
+  // going straight to the hash route, so Home ends up as a real history
+  // entry underneath it - landing directly on the recipe via location.replace
+  // collapsed everything into one entry with nothing to back into.
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn) return
+    const params = new URLSearchParams(window.location.search)
+    const target = params.get('share')
+    if (!target) return
+    window.history.replaceState(null, '', `${window.location.pathname}${window.location.hash}`)
+    navigate(target)
+  }, [isLoaded, isSignedIn, navigate])
 
   // Measured (not guessed) so guided mode's reserved bottom padding always
   // matches the real timer bar - including when it wraps to more rows or

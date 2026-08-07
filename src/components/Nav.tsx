@@ -37,7 +37,7 @@ export default function Nav({ shoppingListCount, onOpenShoppingList, onToggleMob
         <div className="flex items-center gap-0.5 sm:gap-2 shrink-0">
           <button type="button"
             onClick={onOpenShoppingList}
-            className="relative h-10 w-10 sm:h-7 sm:w-7 flex items-center justify-center rounded-lg text-cream/40 hover:text-cream/70 border border-tint/10 hover:bg-tint/[0.05] transition-colors"
+            className="relative h-10 w-10 sm:h-7 sm:w-7 flex items-center justify-center rounded-full text-cream/40 hover:text-cream/70 hover:bg-tint/[0.05] transition-colors"
             title={lang === 'he' ? 'רשימת קניות' : 'Shopping list'}
             aria-label={lang === 'he' ? 'רשימת קניות' : 'Shopping list'}
           >

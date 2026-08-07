@@ -30,9 +30,43 @@ describe('ShareController', () => {
     expect(html).toContain('og:image" content="https://assets.tugy.dev/salted-cucumber.jpg"')
     expect(html).toContain('og:title" content="Salted Cucumber Salad"')
     expect(html).toContain('og:description" content="A tangy summer salad."')
-    expect(html).toContain('https://recipes.tugy.dev/#/recipes/6a75d719acabc64c19daa913')
+    expect(html).toContain('og:url" content="https://recipes.tugy.dev/#/recipes/6a75d719acabc64c19daa913"')
     expect(res.redirect).not.toHaveBeenCalled()
     expect(recipesService.listRevisions).not.toHaveBeenCalled()
+  })
+
+  it('redirects browsers through the app root (?share=...), not straight to the recipe hash route', async () => {
+    // location.replace() straight to the recipe collapses this page and the
+    // recipe into one history entry with nothing to back into - landing on
+    // Home first (a real navigation) gives the back button somewhere to go.
+    recipesService.findById.mockResolvedValue({
+      title: 'Salted Cucumber Salad',
+      description: 'A tangy summer salad.',
+      image: 'https://assets.tugy.dev/salted-cucumber.jpg',
+    })
+    const controller = new ShareController(recipesService as any)
+    const res = makeRes()
+
+    await controller.shareRecipe('6a75d719acabc64c19daa913', undefined, res as any)
+
+    const html = res.send.mock.calls[0][0] as string
+    const redirectUrl = 'https://recipes.tugy.dev/?share=%2Frecipes%2F6a75d719acabc64c19daa913'
+    expect(html).toContain(`http-equiv="refresh" content="0; url=${redirectUrl}"`)
+    expect(html).toContain(`location.replace("${redirectUrl}")`)
+  })
+
+  it('carries the revision through the ?share= redirect target too', async () => {
+    recipesService.findById.mockResolvedValue({ title: 'Live Title', description: '', image: 'https://assets.tugy.dev/live.jpg' })
+    recipesService.listRevisions.mockResolvedValue([
+      { id: 'rev-1', snapshot: { title: 'Old Published Title', image: 'https://assets.tugy.dev/old.jpg' } },
+    ])
+    const controller = new ShareController(recipesService as any)
+    const res = makeRes()
+
+    await controller.shareRecipe('6a75d719acabc64c19daa913', 'rev-1', res as any)
+
+    const html = res.send.mock.calls[0][0] as string
+    expect(html).toContain('location.replace("https://recipes.tugy.dev/?share=%2Frecipes%2F6a75d719acabc64c19daa913%3Frev%3Drev-1")')
   })
 
   it('falls back to the default image when the recipe has none', async () => {
@@ -84,7 +118,7 @@ describe('ShareController', () => {
 
     await controller.shareRecipe('missing-recipe', undefined, res as any)
 
-    expect(res.redirect).toHaveBeenCalledWith(302, 'https://recipes.tugy.dev/#/recipes/missing-recipe')
+    expect(res.redirect).toHaveBeenCalledWith(302, 'https://recipes.tugy.dev/')
     expect(res.send).not.toHaveBeenCalled()
   })
 

@@ -25,16 +25,24 @@ export class ShareController {
   @Public()
   @Get('recipes/:id')
   async shareRecipe(@Param('id') id: string, @Query('rev') rev: string | undefined, @Res() res: Response) {
-    const appUrl = rev
-      ? `${APP_URL}/#/recipes/${encodeURIComponent(id)}?rev=${encodeURIComponent(rev)}`
-      : `${APP_URL}/#/recipes/${encodeURIComponent(id)}`
+    const hashPath = rev
+      ? `/recipes/${encodeURIComponent(id)}?rev=${encodeURIComponent(rev)}`
+      : `/recipes/${encodeURIComponent(id)}`
+    const appUrl = `${APP_URL}/#${hashPath}`
+    // Land on the app's root first (a real navigation, not a hash-only
+    // change) and let it push the recipe route on top once it mounts -
+    // redirecting straight to the recipe with location.replace() collapses
+    // this page and the recipe into a single history entry with nothing
+    // useful beneath it, so the back button has nowhere to go. Landing on
+    // Home first means Home is a real entry the user can back into.
+    const redirectUrl = `${APP_URL}/?share=${encodeURIComponent(hashPath)}`
 
     // findById already only ever returns recipes that have a publishedRevision,
     // so a personal/never-published recipe (nothing to preview) just bounces
     // straight into the app instead of leaking a private draft's content here.
     const recipe = await this.recipesService.findById(id)
     if (!recipe) {
-      res.redirect(302, appUrl)
+      res.redirect(302, `${APP_URL}/`)
       return
     }
 
@@ -66,8 +74,8 @@ export class ShareController {
 <meta name="twitter:title" content="${title}">
 <meta name="twitter:description" content="${description}">
 <meta name="twitter:image" content="${image}">
-<meta http-equiv="refresh" content="0; url=${appUrl}">
-<script>location.replace(${JSON.stringify(appUrl)})</script>
+<meta http-equiv="refresh" content="0; url=${redirectUrl}">
+<script>location.replace(${JSON.stringify(redirectUrl)})</script>
 </head>
 <body>Redirecting to <a href="${appUrl}">${title}</a>&hellip;</body>
 </html>`)
