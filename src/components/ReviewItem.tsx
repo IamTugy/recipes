@@ -85,6 +85,8 @@ export default function ReviewItem({ recipeSlug, review, lang, getToken, onOpenL
   }
 
   async function toggleReviewUpvote() {
+    const prevUpvoted = upvoted
+    const prevCount = upvoteCount
     const nextUpvoted = !upvoted
     setUpvoted(nextUpvoted)
     setUpvoteCount(c => c + (nextUpvoted ? 1 : -1))
@@ -93,6 +95,9 @@ export default function ReviewItem({ recipeSlug, review, lang, getToken, onOpenL
       const data: { upvoted: boolean; count: number } = await res.json()
       setUpvoted(data.upvoted)
       setUpvoteCount(data.count)
+    } else {
+      setUpvoted(prevUpvoted)
+      setUpvoteCount(prevCount)
     }
   }
 
@@ -104,6 +109,10 @@ export default function ReviewItem({ recipeSlug, review, lang, getToken, onOpenL
     if (res.ok) {
       const data: { upvoted: boolean; count: number } = await res.json()
       setReplies(current => current?.map(r => (r.id === replyId ? { ...r, upvotedByMe: data.upvoted, upvoteCount: data.count } : r)) ?? current)
+    } else {
+      setReplies(current =>
+        current?.map(r => (r.id === replyId ? { ...r, upvotedByMe: !r.upvotedByMe, upvoteCount: r.upvoteCount + (r.upvotedByMe ? -1 : 1) } : r)) ?? current
+      )
     }
   }
 
