@@ -10,6 +10,7 @@ import CollectionsPage from './components/CollectionsPage'
 import CollectionPrintPage from './components/CollectionPrintPage'
 import NewRecipePage from './components/NewRecipePage'
 import RecipeImportPage from './components/RecipeImportPage'
+import RecipeAiGeneratePage from './components/RecipeAiGeneratePage'
 import RecipeForm from './components/RecipeForm'
 import EditRecipePage from './components/EditRecipePage'
 import FeatureRequestsPage from './components/FeatureRequestsPage'
@@ -94,6 +95,7 @@ export default function App() {
           <Route path="/recipes/new" element={<NewRecipePage />} />
           <Route path="/recipes/new/blank" element={<RecipeForm />} />
           <Route path="/recipes/import" element={<RecipeImportPage />} />
+          <Route path="/recipes/generate" element={<RecipeAiGeneratePage />} />
           <Route path="/recipe/:id/edit" element={<EditRecipePage />} />
           <Route path="/feature-requests" element={<FeatureRequestsPage />} />
           <Route path="/my-recipes" element={<MyRecipesPage />} />

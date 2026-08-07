@@ -112,6 +112,8 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
   const [tips, setTips] = useState((prefill?.tips ?? []).join('\n'))
   const [tipsEn, setTipsEn] = useState((prefill?.tipsEn ?? []).join('\n'))
   const [featured, setFeatured] = useState(prefill?.featured ?? false)
+  const aiGenerated = prefill?.aiGenerated ?? false
+  const [sources, setSources] = useState(prefill?.sources ?? [])
   const [ingredientGroups, setIngredientGroups] = useState<LocalIngredientGroup[]>(
     prefill?.ingredients?.length ? prefill.ingredients.map(keyIngredientGroup) : [emptyIngredientGroup()]
   )
@@ -309,6 +311,8 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
         tips: tips.split('\n').map(s => s.trim()).filter(Boolean),
         tipsEn: tipsEn.split('\n').map(s => s.trim()).filter(Boolean),
         featured,
+        aiGenerated,
+        sources: sources.filter(s => s.title.trim() && s.url.trim()),
         ingredients: stripIngredientKeys(
           ingredientGroups
             .map(g => ({ ...g, items: g.items.filter(item => item.name.trim() !== '') }))
@@ -364,6 +368,13 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
               ? (lang === 'he' ? 'שכפול מתכון' : 'Duplicate Recipe')
               : (lang === 'he' ? 'מתכון חדש' : 'New Recipe')}
         </h1>
+
+        {aiGenerated && (
+          <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber bg-amber/10 border border-amber/20 rounded-full px-3 py-1">
+            <span>🤖</span>
+            <span>{lang === 'he' ? 'נוצר על ידי AI' : 'AI generated'}</span>
+          </div>
+        )}
 
         {error && (
           <div className="card p-3 text-sm text-red-400 border border-red-400/20">{error}</div>
@@ -687,6 +698,47 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
           <button type="button" onClick={addStepGroup} className="btn-ghost text-xs">
             + {lang === 'he' ? 'הוסף קבוצת שלבים' : 'Add step group'}
           </button>
+        </div>
+
+        {/* Sources - read-only once AI-generated, otherwise a normal editable field */}
+        <div className="card p-5 space-y-3">
+          <h2 className="font-serif text-lg font-bold text-cream">{lang === 'he' ? 'מקורות' : 'Sources'}</h2>
+          {aiGenerated ? (
+            <ul className="space-y-1.5">
+              {sources.map(s => (
+                <li key={s.url} className="text-sm">
+                  <a href={s.url} target="_blank" rel="noopener noreferrer" className="text-amber hover:text-amber/80 underline">
+                    {s.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <>
+              {sources.map((s, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <input
+                    value={s.title}
+                    onChange={e => setSources(prev => prev.map((x, xi) => xi === i ? { ...x, title: e.target.value } : x))}
+                    placeholder={lang === 'he' ? 'כותרת המקור' : 'Source title'}
+                    className={`${inputClass} flex-1`}
+                  />
+                  <input
+                    value={s.url}
+                    onChange={e => setSources(prev => prev.map((x, xi) => xi === i ? { ...x, url: e.target.value } : x))}
+                    placeholder="https://..."
+                    className={`${inputClass} flex-1`}
+                  />
+                  <button type="button" onClick={() => setSources(prev => prev.filter((_, xi) => xi !== i))} className="text-cream/30 hover:text-red-400 shrink-0">
+                    ✕
+                  </button>
+                </div>
+              ))}
+              <button type="button" onClick={() => setSources(prev => [...prev, { title: '', url: '' }])} className="text-xs text-amber hover:text-amber/80">
+                + {lang === 'he' ? 'הוסף מקור' : 'Add source'}
+              </button>
+            </>
+          )}
         </div>
 
         <div className="flex items-center gap-3">

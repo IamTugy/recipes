@@ -49,4 +49,53 @@ describe('GeminiService', () => {
     await expect(service.generateText('say hi')).resolves.toBe('hello there')
     expect(mockGenerateContent).toHaveBeenCalledWith({ model: 'gemini-3.5-flash', contents: 'say hi' })
   })
+
+  it('generateWithSearch uses the googleSearch tool and returns deduped cited sources', async () => {
+    mockGenerateContent.mockResolvedValue({
+      text: 'Here is the best recipe...',
+      candidates: [{
+        groundingMetadata: {
+          groundingChunks: [
+            { web: { uri: 'https://example.com/a', title: 'Recipe A' } },
+            { web: { uri: 'https://example.com/a', title: 'Recipe A' } },
+            { web: { uri: 'https://example.com/b' } },
+            {},
+          ],
+        },
+      }],
+    })
+    const config = { get: jest.fn().mockReturnValue('test-key') }
+    const service = new GeminiService(config as unknown as ConfigService)
+
+    const result = await service.generateWithSearch('find the best soup')
+
+    expect(mockGenerateContent).toHaveBeenCalledWith({
+      model: 'gemini-3.5-flash',
+      contents: 'find the best soup',
+      config: { tools: [{ googleSearch: {} }] },
+    })
+    expect(result).toEqual({
+      text: 'Here is the best recipe...',
+      sources: [
+        { title: 'Recipe A', url: 'https://example.com/a' },
+        { title: 'https://example.com/b', url: 'https://example.com/b' },
+      ],
+    })
+  })
+
+  it('generateWithSearch returns no sources when grounding metadata is absent', async () => {
+    mockGenerateContent.mockResolvedValue({ text: 'plain answer' })
+    const config = { get: jest.fn().mockReturnValue('test-key') }
+    const service = new GeminiService(config as unknown as ConfigService)
+
+    await expect(service.generateWithSearch('x')).resolves.toEqual({ text: 'plain answer', sources: [] })
+  })
+
+  it('generateWithSearch throws when Gemini returns an empty response', async () => {
+    mockGenerateContent.mockResolvedValue({ text: undefined })
+    const config = { get: jest.fn().mockReturnValue('test-key') }
+    const service = new GeminiService(config as unknown as ConfigService)
+
+    await expect(service.generateWithSearch('x')).rejects.toThrow('Gemini returned an empty response')
+  })
 })
