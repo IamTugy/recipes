@@ -14,6 +14,7 @@ import { FeatureRequestsModule } from './feature-requests/feature-requests.modul
 import { TranslationsModule } from './translations/translations.module'
 import { CookLogModule } from './cook-log/cook-log.module'
 import { MealPlanModule } from './meal-plan/meal-plan.module'
+import { ShareModule } from './share/share.module'
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { MealPlanModule } from './meal-plan/meal-plan.module'
     TranslationsModule,
     CookLogModule,
     MealPlanModule,
+    ShareModule,
   ],
   controllers: [HealthController],
 })

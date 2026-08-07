@@ -232,13 +232,17 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
   }
 
   async function share() {
-    const shareData = { title: recipe?.title, url: window.location.href }
+    // Route through /share/recipe/:slug instead of the page's own hash URL -
+    // link-preview crawlers (WhatsApp, iMessage, Slack) don't run JS, so they
+    // need a server-rendered page with this recipe's own og:image/og:title.
+    const shareUrl = id ? `${window.location.origin}/share/recipe/${id}` : window.location.href
+    const shareData = { title: recipe?.title, url: shareUrl }
     if (navigator.share) {
       try { await navigator.share(shareData) } catch { /* user cancelled */ }
       return
     }
     try {
-      await navigator.clipboard.writeText(window.location.href)
+      await navigator.clipboard.writeText(shareUrl)
       setShareState('copied')
       setTimeout(() => setShareState('idle'), 2000)
     } catch { /* clipboard unavailable */ }
