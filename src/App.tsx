@@ -86,7 +86,7 @@ export default function App() {
         onToggleMobileSidebar={() => sidebar.setMobileOpen(o => !o)}
       />
       <Sidebar sidebar={sidebar} />
-      <div className={`transition-[padding] duration-200 ${sidebar.collapsed ? 'sm:pl-16' : 'sm:pl-60'}`}>
+      <div className={`transition-[padding] duration-200 print:pl-0 ${sidebar.collapsed ? 'sm:pl-16' : 'sm:pl-60'}`}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/collections" element={<CollectionsPage onAddToShoppingList={shoppingList.addItems} />} />
