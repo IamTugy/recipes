@@ -587,7 +587,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
         ) : (
           <RecipePlaceholder recipe={displayRecipe} />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/40 to-transparent pointer-events-none" />
         <button type="button"
           onClick={() => navigate(-1)}
           className={`print:hidden absolute top-4 ${lang === 'he' ? 'right-4' : 'left-4'} flex items-center gap-2 px-3 py-2 bg-black/40 backdrop-blur-sm text-white/80 hover:text-white rounded-xl text-sm transition-colors border border-white/10`}
