@@ -52,12 +52,12 @@ export default function Sidebar({ sidebar }: SidebarProps) {
       ),
       badge: !isAdmin && attentionCount > 0 ? attentionCount : undefined,
     },
-    { key: 'collections', label: lang === 'he' ? 'האוספים שלי' : 'My Collections', path: '/collections', icon: <span className="w-4 h-4 flex items-center justify-center text-sm">📚</span> },
-    { key: 'meal-plan', label: lang === 'he' ? 'תוכנית ארוחות' : 'Meal Plan', path: '/meal-plan', icon: <span className="w-4 h-4 flex items-center justify-center text-sm">🗓️</span> },
+    { key: 'collections', label: lang === 'he' ? 'שמורים' : 'My Collections', path: '/collections', icon: <span className="w-4 h-4 flex items-center justify-center text-sm">📚</span> },
+    { key: 'meal-plan', label: lang === 'he' ? 'תפריט שבועי' : 'Meal Plan', path: '/meal-plan', icon: <span className="w-4 h-4 flex items-center justify-center text-sm">🗓️</span> },
   ]
 
   const moreLinks: SidebarLinkDef[] = [
-    { key: 'feature-requests', label: lang === 'he' ? 'בקשות לתכונות חדשות' : 'Feature Requests', path: '/feature-requests', icon: <span className="w-4 h-4 flex items-center justify-center text-sm">💡</span> },
+    { key: 'feature-requests', label: lang === 'he' ? 'בקש פיצ\'ר חדש' : 'Feature Requests', path: '/feature-requests', icon: <span className="w-4 h-4 flex items-center justify-center text-sm">💡</span> },
     ...(isAdmin ? [{
       key: 'admin-submissions',
       label: lang === 'he' ? 'תור אישורים' : 'Review Queue',

@@ -69,7 +69,15 @@ export class GeminiService {
     const sources = chunks
       .map(chunk => chunk.web)
       .filter((web): web is { uri: string; title?: string } => !!web?.uri)
-      .filter(web => (seen.has(web.uri) ? false : (seen.add(web.uri), true)))
+      // Dedupe by title, not uri: Gemini's search grounding gives each citation
+      // its own Vertex AI redirect URL, so the same source cited multiple times
+      // produces distinct uris that all resolve to the same page.
+      .filter(web => {
+        const key = web.title ?? web.uri
+        if (seen.has(key)) return false
+        seen.add(key)
+        return true
+      })
       .map(web => ({ title: web.title ?? web.uri, url: web.uri }))
 
     return { text: response.text, sources }

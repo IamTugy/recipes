@@ -89,7 +89,7 @@ export default function MealPlanPage({ onAddToShoppingList }: MealPlanPageProps)
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center justify-between gap-3 mb-6 flex-wrap">
           <h1 className="font-serif text-2xl font-bold text-cream">
-            {lang === 'he' ? 'תוכנית ארוחות' : 'Meal Plan'}
+            {lang === 'he' ? 'תפריט שבועי' : 'Meal Plan'}
           </h1>
           <div className="flex items-center gap-2">
             <button type="button" onClick={() => setWeekOffset(w => w - 1)} className="btn-ghost text-xs">

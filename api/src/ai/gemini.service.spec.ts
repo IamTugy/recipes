@@ -84,6 +84,29 @@ describe('GeminiService', () => {
     })
   })
 
+  it('generateWithSearch dedupes citations of the same source that carry different Vertex redirect URIs', async () => {
+    mockGenerateContent.mockResolvedValue({
+      text: 'Here is the best recipe...',
+      candidates: [{
+        groundingMetadata: {
+          groundingChunks: [
+            { web: { uri: 'https://vertexaisearch.example/redirect/1', title: 'example.com' } },
+            { web: { uri: 'https://vertexaisearch.example/redirect/2', title: 'example.com' } },
+            { web: { uri: 'https://vertexaisearch.example/redirect/3', title: 'example.com' } },
+          ],
+        },
+      }],
+    })
+    const config = { get: jest.fn().mockReturnValue('test-key') }
+    const service = new GeminiService(config as unknown as ConfigService)
+
+    const result = await service.generateWithSearch('find the best soup')
+
+    expect(result.sources).toEqual([
+      { title: 'example.com', url: 'https://vertexaisearch.example/redirect/1' },
+    ])
+  })
+
   it('generateWithSearch returns no sources when grounding metadata is absent', async () => {
     mockGenerateContent.mockResolvedValue({ text: 'plain answer' })
     const config = { get: jest.fn().mockReturnValue('test-key') }

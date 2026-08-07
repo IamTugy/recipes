@@ -99,7 +99,7 @@ export default function FeatureRequestsPage() {
     <div className="print:hidden min-h-dvh bg-bg pt-20 pb-16 px-4">
       <div className="max-w-2xl mx-auto">
         <h1 className="font-serif text-2xl font-bold text-cream mb-2">
-          {lang === 'he' ? 'בקשות לתכונות חדשות' : 'Feature Requests'}
+          {lang === 'he' ? 'בקש פיצ\'ר חדש' : 'Feature Requests'}
         </h1>
         <p className="text-sm text-cream/40 mb-6">
           {isOwner

@@ -67,7 +67,7 @@ export default function CollectionsPage({ onAddToShoppingList }: CollectionsPage
     <div className="print:hidden min-h-dvh bg-bg pt-20 pb-16 px-4">
       <div className="max-w-3xl mx-auto">
         <h1 className="font-serif text-2xl font-bold text-cream mb-6">
-          {lang === 'he' ? 'האוספים שלי' : 'My Collections'}
+          {lang === 'he' ? 'שמורים' : 'My Collections'}
         </h1>
 
         <div className="card p-4 mb-6 flex gap-2">

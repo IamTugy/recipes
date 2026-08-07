@@ -372,7 +372,7 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
         {aiGenerated && (
           <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber bg-amber/10 border border-amber/20 rounded-full px-3 py-1">
             <span>🤖</span>
-            <span>{lang === 'he' ? 'נוצר על ידי AI' : 'AI generated'}</span>
+            <span>{lang === 'he' ? 'נוצר בעזרת AI' : 'AI generated'}</span>
           </div>
         )}
 
