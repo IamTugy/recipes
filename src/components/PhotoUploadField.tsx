@@ -16,6 +16,10 @@ export default function PhotoUploadField({ image, onChange, uploadRecipeId, lang
   const [uploading, setUploading] = useState(false)
   const [cropSrc, setCropSrc] = useState<string | null>(null)
   const [enhanceOpen, setEnhanceOpen] = useState(false)
+  // Single-level undo for the last accepted AI enhance - cleared by any
+  // other change (fresh upload, another enhance) so it never points at a
+  // stale photo.
+  const [preEnhanceImage, setPreEnhanceImage] = useState<string | null>(null)
   const busy = uploading
 
   function handleFileSelected(e: React.ChangeEvent<HTMLInputElement>) {
@@ -51,6 +55,7 @@ export default function PhotoUploadField({ image, onChange, uploadRecipeId, lang
       const { uploadUrl, publicUrl } = await presignRes.json()
       const uploadResult = await fetch(uploadUrl, { method: 'PUT', headers: { 'Content-Type': 'image/jpeg' }, body: blob })
       if (!uploadResult.ok) throw new Error('upload failed')
+      setPreEnhanceImage(null)
       onChange(publicUrl)
     } catch {
       onError?.(lang === 'he' ? 'העלאת התמונה נכשלה' : 'Photo upload failed')
@@ -86,17 +91,31 @@ export default function PhotoUploadField({ image, onChange, uploadRecipeId, lang
         </div>
       </label>
       {image && (
-        <button
-          type="button"
-          onClick={() => setEnhanceOpen(true)}
-          disabled={busy}
-          className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-amber hover:text-amber/80 disabled:opacity-40 transition-colors"
-        >
-          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-          </svg>
-          {lang === 'he' ? 'שפר תמונה עם AI' : 'Enhance photo with AI'}
-        </button>
+        <div className="mt-2 flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setEnhanceOpen(true)}
+            disabled={busy}
+            className="flex items-center gap-1.5 text-xs font-semibold text-amber hover:text-amber/80 disabled:opacity-40 transition-colors"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+            </svg>
+            {lang === 'he' ? 'שפר תמונה עם AI' : 'Enhance photo with AI'}
+          </button>
+          {preEnhanceImage && (
+            <button
+              type="button"
+              onClick={() => { onChange(preEnhanceImage); setPreEnhanceImage(null) }}
+              className="flex items-center gap-1 text-xs font-medium text-cream/40 hover:text-cream/70 transition-colors"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
+              </svg>
+              {lang === 'he' ? 'בטל שיפור' : 'Undo enhance'}
+            </button>
+          )}
+        </div>
       )}
       {cropSrc && (
         <ImageCropModal imageSrc={cropSrc} lang={lang} onCancel={closeCropModal} onConfirm={handleCropConfirm} />
@@ -107,7 +126,7 @@ export default function PhotoUploadField({ image, onChange, uploadRecipeId, lang
           uploadRecipeId={uploadRecipeId}
           lang={lang}
           onCancel={() => setEnhanceOpen(false)}
-          onApplied={publicUrl => { onChange(publicUrl); setEnhanceOpen(false) }}
+          onApplied={publicUrl => { setPreEnhanceImage(image); onChange(publicUrl); setEnhanceOpen(false) }}
         />
       )}
     </>

@@ -32,6 +32,10 @@ export default function EnhanceImageModal({ imageUrl, uploadRecipeId, lang, onCa
   const [instructions, setInstructions] = useState('')
   const [enhancing, setEnhancing] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  // The freshly generated candidate, held here for review - never touches
+  // the recipe until the user explicitly accepts it, so a result they don't
+  // like never even reaches "undo" territory.
+  const [resultUrl, setResultUrl] = useState<string | null>(null)
 
   function applyPreset(preset: Preset) {
     setInstructions(prev => (prev.trim() ? `${prev.trim()}. ${preset.instructions}` : preset.instructions))
@@ -52,7 +56,7 @@ export default function EnhanceImageModal({ imageUrl, uploadRecipeId, lang, onCa
       })
       if (!res.ok) throw new Error('enhance failed')
       const { publicUrl } = await res.json()
-      onApplied(publicUrl)
+      setResultUrl(publicUrl)
     } catch {
       setError(lang === 'he' ? 'שיפור התמונה נכשל' : 'Photo enhancement failed')
     } finally {
@@ -63,11 +67,13 @@ export default function EnhanceImageModal({ imageUrl, uploadRecipeId, lang, onCa
   return (
     <Modal open onOpenChange={next => { if (!next && !enhancing) onCancel() }} zIndexClassName="z-50" panelClassName="max-w-lg p-5 space-y-4">
       <Dialog.Title className="font-serif text-lg font-bold text-cream">
-        {lang === 'he' ? 'שפר תמונה עם AI' : 'Enhance photo with AI'}
+        {resultUrl
+          ? (lang === 'he' ? 'זה נראה טוב?' : 'Does this look right?')
+          : (lang === 'he' ? 'שפר תמונה עם AI' : 'Enhance photo with AI')}
       </Dialog.Title>
 
       <div className="relative w-full h-56 rounded-lg overflow-hidden bg-black/40">
-        <img src={imageUrl} alt="" className="w-full h-full object-contain" />
+        <img src={resultUrl ?? imageUrl} alt="" className="w-full h-full object-contain" />
         {enhancing && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/60">
             <svg className="w-8 h-8 animate-spin text-amber" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -77,45 +83,66 @@ export default function EnhanceImageModal({ imageUrl, uploadRecipeId, lang, onCa
         )}
       </div>
 
-      <div className="flex flex-wrap gap-1.5">
-        {PRESETS.map(preset => (
-          <button
-            key={preset.label.en}
-            type="button"
-            onClick={() => applyPreset(preset)}
+      {resultUrl ? (
+        <>
+          <p className="text-xs text-cream/40">
+            {lang === 'he' ? 'התמונה המקורית לא תוחלף עד שתאשרו.' : "The original photo isn't replaced until you confirm."}
+          </p>
+          <div className="flex items-center justify-end gap-3">
+            <button type="button" onClick={onCancel} className="btn-ghost">
+              {lang === 'he' ? 'ביטול' : 'Cancel'}
+            </button>
+            <button type="button" onClick={() => setResultUrl(null)} className="btn-ghost">
+              {lang === 'he' ? 'נסה שוב' : 'Try again'}
+            </button>
+            <button type="button" onClick={() => onApplied(resultUrl)} className="btn-primary">
+              {lang === 'he' ? 'השתמש בתמונה זו' : 'Use this photo'}
+            </button>
+          </div>
+        </>
+      ) : (
+        <>
+          <div className="flex flex-wrap gap-1.5">
+            {PRESETS.map(preset => (
+              <button
+                key={preset.label.en}
+                type="button"
+                onClick={() => applyPreset(preset)}
+                disabled={enhancing}
+                className="px-2.5 py-1 rounded-full text-xs font-medium border border-tint/10 text-cream/60 hover:text-cream/90 hover:border-amber/30 transition-colors disabled:opacity-40"
+              >
+                {lang === 'he' ? preset.label.he : preset.label.en}
+              </button>
+            ))}
+          </div>
+
+          <textarea
+            value={instructions}
+            onChange={e => setInstructions(e.target.value)}
             disabled={enhancing}
-            className="px-2.5 py-1 rounded-full text-xs font-medium border border-tint/10 text-cream/60 hover:text-cream/90 hover:border-amber/30 transition-colors disabled:opacity-40"
-          >
-            {lang === 'he' ? preset.label.he : preset.label.en}
-          </button>
-        ))}
-      </div>
+            placeholder={lang === 'he'
+              ? 'מה תרצו לשנות בתמונה? (אופציונלי)'
+              : 'What would you like to change about the photo? (optional)'}
+            rows={3}
+            maxLength={300}
+            dir={lang === 'he' ? 'rtl' : 'ltr'}
+            className="w-full bg-tint/[0.03] border border-tint/10 rounded-lg px-3 py-2 text-sm text-cream/80 placeholder-cream/25 outline-none focus:border-amber/30 transition-colors resize-none disabled:opacity-50"
+          />
 
-      <textarea
-        value={instructions}
-        onChange={e => setInstructions(e.target.value)}
-        disabled={enhancing}
-        placeholder={lang === 'he'
-          ? 'מה תרצו לשנות בתמונה? (אופציונלי)'
-          : 'What would you like to change about the photo? (optional)'}
-        rows={3}
-        maxLength={300}
-        dir={lang === 'he' ? 'rtl' : 'ltr'}
-        className="w-full bg-tint/[0.03] border border-tint/10 rounded-lg px-3 py-2 text-sm text-cream/80 placeholder-cream/25 outline-none focus:border-amber/30 transition-colors resize-none disabled:opacity-50"
-      />
+          {error && <p className="text-xs text-red-400">{error}</p>}
 
-      {error && <p className="text-xs text-red-400">{error}</p>}
-
-      <div className="flex items-center justify-end gap-3">
-        <button type="button" onClick={onCancel} disabled={enhancing} className="btn-ghost disabled:opacity-50">
-          {lang === 'he' ? 'ביטול' : 'Cancel'}
-        </button>
-        <button type="button" onClick={handleGenerate} disabled={enhancing} className="btn-primary disabled:opacity-50">
-          {enhancing
-            ? (lang === 'he' ? 'משפר...' : 'Enhancing...')
-            : (lang === 'he' ? 'שפר תמונה' : 'Generate')}
-        </button>
-      </div>
+          <div className="flex items-center justify-end gap-3">
+            <button type="button" onClick={onCancel} disabled={enhancing} className="btn-ghost disabled:opacity-50">
+              {lang === 'he' ? 'ביטול' : 'Cancel'}
+            </button>
+            <button type="button" onClick={handleGenerate} disabled={enhancing} className="btn-primary disabled:opacity-50">
+              {enhancing
+                ? (lang === 'he' ? 'משפר...' : 'Enhancing...')
+                : (lang === 'he' ? 'שפר תמונה' : 'Generate')}
+            </button>
+          </div>
+        </>
+      )}
     </Modal>
   )
 }
