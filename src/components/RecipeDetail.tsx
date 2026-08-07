@@ -241,7 +241,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
     const shareUrl = id
       ? `${window.location.origin}/share/recipes/${id}${viewingRevision ? `?rev=${viewingRevision.id}` : ''}`
       : window.location.href
-    const shareData = { title: recipe?.title, url: shareUrl }
+    const shareData = { title: displayTitle, text: displayDescription, url: shareUrl }
     if (navigator.share) {
       try { await navigator.share(shareData) } catch { /* user cancelled */ }
       return
