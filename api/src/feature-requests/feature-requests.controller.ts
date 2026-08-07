@@ -1,8 +1,9 @@
-import { Body, Controller, ForbiddenException, Get, Param, ParseIntPipe, Post, Req } from '@nestjs/common'
+import { Body, Controller, Delete, ForbiddenException, Get, Param, ParseIntPipe, Patch, Post, Req } from '@nestjs/common'
 import { Request } from 'express'
 import { ConfigService } from '@nestjs/config'
 import { FeatureRequestsService } from './feature-requests.service'
 import { CreateFeatureRequestDto } from './dto/create-feature-request.dto'
+import { UpdateFeatureRequestDto } from './dto/update-feature-request.dto'
 
 @Controller('feature-requests')
 export class FeatureRequestsController {
@@ -35,5 +36,23 @@ export class FeatureRequestsController {
     }
     await this.featureRequestsService.approve(number)
     return { approved: true }
+  }
+
+  @Patch(':number')
+  async update(
+    @Param('number', ParseIntPipe) number: number,
+    @Body() body: UpdateFeatureRequestDto,
+    @Req() req: Request & { userId: string },
+  ) {
+    return this.featureRequestsService.update(req.userId, number, body.title, body.description)
+  }
+
+  @Delete(':number')
+  async withdraw(
+    @Param('number', ParseIntPipe) number: number,
+    @Req() req: Request & { userId: string },
+  ) {
+    await this.featureRequestsService.withdraw(req.userId, number)
+    return { withdrawn: true }
   }
 }

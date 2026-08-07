@@ -61,5 +61,34 @@ export function useFeatureRequests() {
     return res.ok
   }, [getToken])
 
-  return { requests, loading, create, approve }
+  const update = useCallback(async (number: number, title: string, description: string) => {
+    const token = await getToken()
+    const res = await fetch(`/api/feature-requests/${number}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({ title, description }),
+    })
+    if (res.ok) {
+      const updated: FeatureRequest = await res.json()
+      setRequests(prev => prev.map(r => (r.number === number ? updated : r)))
+    }
+    return res.ok
+  }, [getToken])
+
+  const withdraw = useCallback(async (number: number) => {
+    const token = await getToken()
+    const res = await fetch(`/api/feature-requests/${number}`, {
+      method: 'DELETE',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+    if (res.ok) {
+      setRequests(prev => prev.filter(r => r.number !== number))
+    }
+    return res.ok
+  }, [getToken])
+
+  return { requests, loading, create, approve, update, withdraw }
 }
