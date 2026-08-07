@@ -45,7 +45,7 @@ describe('Recipes flow (e2e)', () => {
 
   it('serves recipes and logs a view for authenticated requests', async () => {
     const recipeModel = app.get('RecipeModel')
-    await recipeModel.create({
+    const recipe = await recipeModel.create({
       slug: 'test-recipe',
       title: 'Test Recipe',
       category: 'dessert',
@@ -70,7 +70,7 @@ describe('Recipes flow (e2e)', () => {
     expect(listRes.body).toHaveLength(1)
 
     await request(app.getHttpServer())
-      .get('/recipes/test-recipe')
+      .get(`/recipes/${recipe.id}`)
       .set('Authorization', 'Bearer faketoken')
       .expect(200)
 
@@ -78,6 +78,6 @@ describe('Recipes flow (e2e)', () => {
     const logs = await activityModel.find({ action: 'recipe_viewed' })
     expect(logs).toHaveLength(1)
     expect(logs[0].userId).toBe('user_1')
-    expect(logs[0].recipeId).toBe('test-recipe')
+    expect(logs[0].recipeId).toBe(recipe.id)
   })
 })
