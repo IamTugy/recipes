@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@clerk/react'
 import { DndContext, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
@@ -76,12 +76,12 @@ function RegenerateButton({ lang, busy, onClick }: { lang: 'he' | 'en'; busy: bo
       onClick={onClick}
       disabled={busy}
       title={lang === 'he' ? 'תרגם מחדש' : 'Regenerate translation'}
-      aria-label={lang === 'he' ? 'תרגם מחדש' : 'Regenerate translation'}
-      className="shrink-0 text-cream/30 hover:text-amber disabled:opacity-40 transition-colors"
+      className="shrink-0 flex items-center gap-1 text-xs font-medium text-cream/40 hover:text-amber disabled:opacity-40 transition-colors"
     >
       <svg className={`w-3.5 h-3.5 ${busy ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
       </svg>
+      {lang === 'he' ? 'תרגם' : 'Translate'}
     </button>
   )
 }
@@ -290,6 +290,19 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
     }
   }
 
+  // AI-generated/imported drafts fill in everything except nutrition (Gemini
+  // can't reliably estimate it in the same pass as the rest of the recipe) -
+  // auto-run the same estimate once on arrival so it isn't just silently
+  // blank. Re-estimating later is still the same manual button.
+  const autoEstimatedRef = useRef(false)
+  useEffect(() => {
+    if (autoEstimatedRef.current) return
+    if (!importedDraft || importedDraft.nutrition) return
+    autoEstimatedRef.current = true
+    void handleEstimateNutrition()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
@@ -342,7 +355,7 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
     }
   }
 
-  const inputClass = 'w-full bg-tint/[0.03] border border-tint/10 rounded-lg px-3 py-2 text-sm text-cream/80 placeholder-cream/25 outline-none focus:border-amber/30 transition-colors'
+  const inputClass = 'w-full bg-tint/[0.03] border border-tint/10 rounded-lg px-3 py-2 text-sm text-cream/80 placeholder-cream/25 outline-none focus:border-amber/30 transition-colors resize-none'
   const labelClass = 'block text-xs font-semibold text-cream/50 mb-1'
 
   const displayTitle = (lang === 'he' ? titleHe : title) || title || titleHe
@@ -421,9 +434,12 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
               <input value={cuisine} onChange={e => setCuisine(e.target.value)} className={inputClass} />
             </div>
             <div className="flex items-end pb-2">
-              <label className="flex items-center gap-2 text-sm text-cream/70">
+              <label
+                className="flex items-center gap-2 text-sm text-cream/70"
+                title={lang === 'he' ? 'מציג תג "מומלץ" על כרטיס המתכון' : 'Shows a "Featured" badge on the recipe card'}
+              >
                 <input type="checkbox" checked={featured} onChange={e => setFeatured(e.target.checked)} />
-                {lang === 'he' ? 'מומלץ' : 'Featured'}
+                {lang === 'he' ? 'מומלץ (מציג תג על הכרטיס)' : 'Featured (shows a badge on the card)'}
               </label>
             </div>
           </div>
@@ -479,7 +495,9 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
               >
                 {estimatingNutrition
                   ? (lang === 'he' ? 'מעריך...' : 'Estimating...')
-                  : (lang === 'he' ? '✨ הערכה עם AI' : '✨ Estimate with AI')}
+                  : Object.values(nutrition).some(v => v !== undefined)
+                    ? (lang === 'he' ? '✨ הערך מחדש עם AI' : '✨ Re-estimate with AI')
+                    : (lang === 'he' ? '✨ הערכה עם AI' : '✨ Estimate with AI')}
               </button>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -562,14 +580,18 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
                           {group.items.map((item, ii) => (
                             <SortableRow key={item._key} id={item._key}>
                               {({ attributes: itemAttrs, listeners: itemListeners }) => (
-                                <div className="flex items-center gap-2">
-                                  <DragHandle attributes={itemAttrs} listeners={itemListeners} />
-                                  <div className="grid grid-cols-12 gap-2 items-center flex-1">
-                                    <input type="number" step="any" value={item.amount ?? ''} onChange={e => updateIngredientItem(gi, ii, { amount: Number(e.target.value) })} className={`${inputClass} col-span-2`} placeholder={lang === 'he' ? 'כמות' : 'Qty'} />
-                                    <input value={item.unit ?? ''} onChange={e => updateIngredientItem(gi, ii, { unit: e.target.value })} className={`${inputClass} col-span-2`} placeholder={lang === 'he' ? 'יחידה' : 'Unit'} />
-                                    <input value={item.name} onChange={e => { const v = e.target.value; updateIngredientItem(gi, ii, { name: v }); if (!(item.nameEn ?? '').trim()) scheduleAutoTranslate(`ing-${item._key}`, v, 'en', translated => updateIngredientItem(gi, ii, { nameEn: translated })) }} className={`${inputClass} col-span-4`} placeholder={lang === 'he' ? 'שם (עברית)' : 'Name (Hebrew)'} />
-                                    <input value={item.nameEn ?? ''} onChange={e => { const v = e.target.value; updateIngredientItem(gi, ii, { nameEn: v }); if (!item.name.trim()) scheduleAutoTranslate(`ingEn-${item._key}`, v, 'he', translated => updateIngredientItem(gi, ii, { name: translated })) }} className={`${inputClass} col-span-3`} placeholder={lang === 'he' ? 'שם (אנגלית)' : 'Name (English)'} />
-                                    <button type="button" onClick={() => removeIngredientItem(gi, ii)} className="col-span-1 text-red-400/60 hover:text-red-400 text-xs">✕</button>
+                                <div className="flex items-start gap-2">
+                                  <DragHandle attributes={itemAttrs} listeners={itemListeners} className="mt-2.5" />
+                                  <div className="flex flex-col gap-2 flex-1">
+                                    <div className="flex gap-2">
+                                      <input type="number" step="any" value={item.amount ?? ''} onChange={e => updateIngredientItem(gi, ii, { amount: Number(e.target.value) })} className={`${inputClass} w-20 shrink-0`} placeholder={lang === 'he' ? 'כמות' : 'Qty'} />
+                                      <input value={item.unit ?? ''} onChange={e => updateIngredientItem(gi, ii, { unit: e.target.value })} className={`${inputClass} w-24 shrink-0`} placeholder={lang === 'he' ? 'יחידה' : 'Unit'} />
+                                      <button type="button" onClick={() => removeIngredientItem(gi, ii)} className="shrink-0 text-red-400/60 hover:text-red-400 text-xs px-1">✕</button>
+                                    </div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                      <input value={item.name} onChange={e => { const v = e.target.value; updateIngredientItem(gi, ii, { name: v }); if (!(item.nameEn ?? '').trim()) scheduleAutoTranslate(`ing-${item._key}`, v, 'en', translated => updateIngredientItem(gi, ii, { nameEn: translated })) }} className={inputClass} placeholder={lang === 'he' ? 'שם (עברית)' : 'Name (Hebrew)'} dir="rtl" />
+                                      <input value={item.nameEn ?? ''} onChange={e => { const v = e.target.value; updateIngredientItem(gi, ii, { nameEn: v }); if (!item.name.trim()) scheduleAutoTranslate(`ingEn-${item._key}`, v, 'he', translated => updateIngredientItem(gi, ii, { name: translated })) }} className={inputClass} placeholder={lang === 'he' ? 'שם (אנגלית)' : 'Name (English)'} />
+                                    </div>
                                   </div>
                                   <RegenerateButton
                                     lang={lang}
