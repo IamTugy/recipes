@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config'
 import { FeatureRequestsService } from './feature-requests.service'
 import { CreateFeatureRequestDto } from './dto/create-feature-request.dto'
 import { UpdateFeatureRequestDto } from './dto/update-feature-request.dto'
+import { DenyFeatureRequestDto } from './dto/deny-feature-request.dto'
 
 @Controller('feature-requests')
 export class FeatureRequestsController {
@@ -54,5 +55,19 @@ export class FeatureRequestsController {
   ) {
     await this.featureRequestsService.withdraw(req.userId, number)
     return { withdrawn: true }
+  }
+
+  @Post(':number/deny')
+  async deny(
+    @Param('number', ParseIntPipe) number: number,
+    @Body() body: DenyFeatureRequestDto,
+    @Req() req: Request & { userId: string },
+  ) {
+    const ownerUserId = this.config.get<string>('OWNER_USER_ID')
+    if (req.userId !== ownerUserId) {
+      throw new ForbiddenException('Only the app owner can deny feature requests')
+    }
+    await this.featureRequestsService.deny(number, body.reason)
+    return { denied: true }
   }
 }

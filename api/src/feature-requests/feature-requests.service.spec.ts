@@ -61,6 +61,7 @@ describe('FeatureRequestsService', () => {
       labels: ['feature-request'],
       createdAt: mockIssue.created_at,
       submittedBy: 'user_1',
+      denialReason: null,
     })
   })
 
@@ -95,6 +96,7 @@ describe('FeatureRequestsService', () => {
       labels: ['feature-request'],
       createdAt: '2026-08-01T00:00:00Z',
       submittedBy: null,
+      denialReason: null,
     }])
   })
 
@@ -119,6 +121,27 @@ describe('FeatureRequestsService', () => {
     expect(result[0].submittedBy).toBe('user_42')
   })
 
+  it('list extracts the denial reason embedded in the issue body', async () => {
+    const mockIssues = [
+      {
+        number: 1,
+        title: 'A',
+        body: 'Do the thing.\n\n---\nSubmitted via the app by user `user_42`.\n\n---\nDenied: Not a good fit for the app.',
+        html_url: 'https://github.com/x/1',
+        state: 'open',
+        labels: ['feature-request', 'denied'],
+        created_at: '2026-08-01T00:00:00Z',
+      },
+    ]
+    const fetchMock = jest.fn().mockResolvedValue({ ok: true, json: async () => mockIssues })
+    global.fetch = fetchMock as unknown as typeof fetch
+
+    const service = await makeService()
+    const result = await service.list()
+
+    expect(result[0].denialReason).toBe('Not a good fit for the app.')
+  })
+
   it('approve adds the approved-for-claude label to the issue', async () => {
     const fetchMock = jest.fn().mockResolvedValue({ ok: true, json: async () => ({}) })
     global.fetch = fetchMock as unknown as typeof fetch
@@ -132,6 +155,44 @@ describe('FeatureRequestsService', () => {
     )
     const [, init] = fetchMock.mock.calls[0]
     expect(JSON.parse(init.body)).toEqual({ labels: ['approved-for-claude'] })
+  })
+
+  it('deny patches the issue body with the reason and adds the denied label', async () => {
+    const mockIssue = {
+      number: 42,
+      title: 'Add dark mode',
+      body: 'Please add dark mode.\n\n---\nSubmitted via the app by user `user_1`.',
+    }
+    const fetchMock = jest.fn()
+      .mockResolvedValueOnce({ ok: true, json: async () => mockIssue })
+      .mockResolvedValueOnce({ ok: true, json: async () => ({}) })
+      .mockResolvedValueOnce({ ok: true, json: async () => ({}) })
+    global.fetch = fetchMock as unknown as typeof fetch
+
+    const service = await makeService()
+    await service.deny(42, 'Not a good fit for the app.')
+
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      1,
+      'https://api.github.com/repos/IamTugy/recipes/issues/42',
+      expect.not.objectContaining({ method: expect.anything() }),
+    )
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      'https://api.github.com/repos/IamTugy/recipes/issues/42',
+      expect.objectContaining({ method: 'PATCH' }),
+    )
+    const [, patchInit] = fetchMock.mock.calls[1]
+    expect(JSON.parse(patchInit.body)).toEqual({
+      body: 'Please add dark mode.\n\n---\nSubmitted via the app by user `user_1`.\n\n---\nDenied: Not a good fit for the app.',
+    })
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      3,
+      'https://api.github.com/repos/IamTugy/recipes/issues/42/labels',
+      expect.objectContaining({ method: 'POST' }),
+    )
+    const [, labelInit] = fetchMock.mock.calls[2]
+    expect(JSON.parse(labelInit.body)).toEqual({ labels: ['denied'] })
   })
 
   it('throws when the GitHub API responds with a non-OK status', async () => {

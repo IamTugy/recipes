@@ -3,12 +3,12 @@ import { useAuth } from '@clerk/react'
 import { useFeatureRequests } from '../hooks/useFeatureRequests'
 import { useLanguage } from '../hooks/useLanguage'
 import { useToast } from '../hooks/useToast'
+import { OWNER_USER_ID } from '../lib/admin'
 
-const OWNER_USER_ID = 'user_3HPJ4j3dNkQv27nDh4WpuFAL4KB'
-
-type RequestStatus = 'pending' | 'approved' | 'in-progress' | 'needs-input' | 'pr-open' | 'closed'
+type RequestStatus = 'pending' | 'approved' | 'denied' | 'in-progress' | 'needs-input' | 'pr-open' | 'closed'
 
 function getStatus(labels: string[], state: string): RequestStatus {
+  if (labels.includes('denied')) return 'denied'
   if (state === 'closed') return 'closed'
   if (labels.includes('claude-pr-open')) return 'pr-open'
   if (labels.includes('claude-needs-input')) return 'needs-input'
@@ -21,10 +21,12 @@ export default function FeatureRequestsPage() {
   const { lang } = useLanguage()
   const { showToast } = useToast()
   const { userId } = useAuth()
-  const { requests, loading, create, approve, update, withdraw } = useFeatureRequests()
+  const { requests, loading, create, approve, update, withdraw, deny } = useFeatureRequests()
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [denyingNumber, setDenyingNumber] = useState<number | null>(null)
+  const [denyReason, setDenyReason] = useState('')
   const isOwner = userId === OWNER_USER_ID
   const [editingNumber, setEditingNumber] = useState<number | null>(null)
   const [editTitle, setEditTitle] = useState('')
@@ -76,6 +78,16 @@ export default function FeatureRequestsPage() {
     if (!window.confirm(lang === 'he' ? 'לבטל את הבקשה?' : 'Withdraw this request?')) return
     const ok = await withdraw(number)
     if (ok) showToast(lang === 'he' ? 'הבקשה בוטלה' : 'Request withdrawn')
+  }
+
+  async function handleDeny(number: number) {
+    if (!denyReason.trim()) return
+    const ok = await deny(number, denyReason.trim())
+    if (ok) {
+      showToast(lang === 'he' ? 'הבקשה נדחתה' : 'Request denied')
+      setDenyingNumber(null)
+      setDenyReason('')
+    }
   }
 
   return (
@@ -135,6 +147,7 @@ export default function FeatureRequestsPage() {
               const statusLabel: Record<RequestStatus, string> = {
                 pending: lang === 'he' ? 'ממתין' : 'Pending',
                 approved: lang === 'he' ? 'אושר' : 'Approved',
+                denied: lang === 'he' ? 'נדחה' : 'Denied',
                 'in-progress': lang === 'he' ? 'קלוד עובד על זה' : 'Claude is working on it',
                 'needs-input': lang === 'he' ? 'דורש תשובה מכם' : 'Needs your input',
                 'pr-open': lang === 'he' ? 'PR פתוח לבדיקה' : 'PR open for review',
@@ -143,6 +156,7 @@ export default function FeatureRequestsPage() {
               const statusClass: Record<RequestStatus, string> = {
                 pending: 'bg-amber/10 text-amber',
                 approved: 'bg-herb/10 text-herb',
+                denied: 'bg-red-500/10 text-red-400',
                 'in-progress': 'bg-amber/10 text-amber',
                 'needs-input': 'bg-red-500/10 text-red-400',
                 'pr-open': 'bg-herb/10 text-herb',
@@ -150,6 +164,7 @@ export default function FeatureRequestsPage() {
               }
               const canApprove = status === 'pending' || status === 'needs-input'
               const canEdit = status === 'pending' && r.submittedBy === userId
+              const canDeny = status === 'pending' || status === 'needs-input'
               const isEditing = editingNumber === r.number
               return (
                 <div key={r.number} className="card p-4">
@@ -199,37 +214,74 @@ export default function FeatureRequestsPage() {
                       <p className="text-sm text-cream/60 whitespace-pre-wrap mb-2">
                         {r.body.split('\n---\n')[0]}
                       </p>
-                      <div className="flex items-center gap-3 flex-wrap">
-                        <a href={r.htmlUrl} target="_blank" rel="noreferrer" className="text-xs text-cream/30 hover:text-cream/60 transition-colors">
-                          {lang === 'he' ? 'צפה ב-GitHub' : 'View on GitHub'} #{r.number}
-                        </a>
-                        {isOwner && canApprove && (
-                          <button type="button"
-                            onClick={() => handleApprove(r.number)}
-                            className="text-xs font-semibold text-amber hover:text-amber/80 transition-colors"
-                          >
-                            {status === 'needs-input'
-                              ? (lang === 'he' ? 'נסה שוב' : 'Retry')
-                              : (lang === 'he' ? 'אשר לביצוע' : 'Approve for Claude')}
-                          </button>
-                        )}
-                        {canEdit && (
-                          <button type="button"
-                            onClick={() => startEdit(r)}
-                            className="text-xs font-semibold text-cream/50 hover:text-cream/80 transition-colors"
-                          >
-                            {lang === 'he' ? 'ערוך' : 'Edit'}
-                          </button>
-                        )}
-                        {canEdit && (
-                          <button type="button"
-                            onClick={() => handleWithdraw(r.number)}
-                            className="text-xs font-semibold text-red-400/70 hover:text-red-400 transition-colors"
-                          >
-                            {lang === 'he' ? 'בטל בקשה' : 'Withdraw'}
-                          </button>
-                        )}
-                      </div>
+                      {status === 'denied' && r.denialReason && (
+                        <p className="text-sm text-red-400/80 whitespace-pre-wrap mb-2">
+                          {lang === 'he' ? 'סיבת הדחייה: ' : 'Denial reason: '}{r.denialReason}
+                        </p>
+                      )}
+                      {denyingNumber === r.number ? (
+                        <div className="space-y-2">
+                          <textarea
+                            value={denyReason}
+                            onChange={e => setDenyReason(e.target.value)}
+                            placeholder={lang === 'he' ? 'למה נדחתה הבקשה?' : 'Why is this being denied?'}
+                            rows={2}
+                            className="w-full bg-tint/[0.03] border border-tint/10 rounded-lg px-3 py-2 text-sm text-cream/80 placeholder-cream/25 outline-none focus:border-amber/30 transition-colors"
+                          />
+                          <div className="flex gap-2">
+                            <button type="button"
+                              disabled={!denyReason.trim()}
+                              onClick={() => handleDeny(r.number)}
+                              className="text-xs font-semibold text-red-400 hover:text-red-300 disabled:opacity-40 transition-colors"
+                            >
+                              {lang === 'he' ? 'שלח דחייה' : 'Send denial'}
+                            </button>
+                            <button type="button" onClick={() => { setDenyingNumber(null); setDenyReason('') }} className="text-xs text-cream/40 hover:text-cream/70 transition-colors">
+                              {lang === 'he' ? 'ביטול' : 'Cancel'}
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-3 flex-wrap">
+                          <a href={r.htmlUrl} target="_blank" rel="noreferrer" className="text-xs text-cream/30 hover:text-cream/60 transition-colors">
+                            {lang === 'he' ? 'צפה ב-GitHub' : 'View on GitHub'} #{r.number}
+                          </a>
+                          {isOwner && canApprove && (
+                            <button type="button"
+                              onClick={() => handleApprove(r.number)}
+                              className="text-xs font-semibold text-amber hover:text-amber/80 transition-colors"
+                            >
+                              {status === 'needs-input'
+                                ? (lang === 'he' ? 'נסה שוב' : 'Retry')
+                                : (lang === 'he' ? 'אשר לביצוע' : 'Approve for Claude')}
+                            </button>
+                          )}
+                          {isOwner && canDeny && (
+                            <button type="button"
+                              onClick={() => { setDenyingNumber(r.number); setDenyReason('') }}
+                              className="text-xs font-semibold text-red-400 hover:text-red-300 transition-colors"
+                            >
+                              {lang === 'he' ? 'דחה' : 'Deny'}
+                            </button>
+                          )}
+                          {canEdit && (
+                            <button type="button"
+                              onClick={() => startEdit(r)}
+                              className="text-xs font-semibold text-cream/50 hover:text-cream/80 transition-colors"
+                            >
+                              {lang === 'he' ? 'ערוך' : 'Edit'}
+                            </button>
+                          )}
+                          {canEdit && (
+                            <button type="button"
+                              onClick={() => handleWithdraw(r.number)}
+                              className="text-xs font-semibold text-red-400/70 hover:text-red-400 transition-colors"
+                            >
+                              {lang === 'he' ? 'בטל בקשה' : 'Withdraw'}
+                            </button>
+                          )}
+                        </div>
+                      )}
                     </>
                   )}
                 </div>

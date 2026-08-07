@@ -8,6 +8,7 @@ describe('FeatureRequestsController', () => {
     approve: jest.fn(),
     update: jest.fn(),
     withdraw: jest.fn(),
+    deny: jest.fn(),
   }
 
   beforeEach(() => jest.clearAllMocks())
@@ -77,5 +78,20 @@ describe('FeatureRequestsController', () => {
     const result = await controller.withdraw(2, { userId: 'user_1' } as any)
     expect(featureRequestsService.withdraw).toHaveBeenCalledWith('user_1', 2)
     expect(result).toEqual({ withdrawn: true })
+  })
+
+  it('POST /feature-requests/:number/deny denies when the current user is the owner', async () => {
+    const controller = new FeatureRequestsController(featureRequestsService as any, makeConfig('owner_1') as any)
+    const result = await controller.deny(2, { reason: 'Not a good fit' }, { userId: 'owner_1' } as any)
+    expect(featureRequestsService.deny).toHaveBeenCalledWith(2, 'Not a good fit')
+    expect(result).toEqual({ denied: true })
+  })
+
+  it('POST /feature-requests/:number/deny rejects non-owner users', async () => {
+    const controller = new FeatureRequestsController(featureRequestsService as any, makeConfig('owner_1') as any)
+    await expect(
+      controller.deny(2, { reason: 'Not a good fit' }, { userId: 'someone_else' } as any),
+    ).rejects.toThrow(ForbiddenException)
+    expect(featureRequestsService.deny).not.toHaveBeenCalled()
   })
 })
