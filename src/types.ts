@@ -34,6 +34,7 @@ export interface StepItem {
   timerMinutes?: number
   tip?: string             // Hebrew
   tipEn?: string           // English
+  image?: string
 }
 
 export interface StepGroup {

@@ -1,4 +1,4 @@
-import { IsString, IsUrl, MinLength } from 'class-validator'
+import { IsOptional, IsString, IsUrl, MaxLength, MinLength } from 'class-validator'
 
 export class EnhancePhotoDto {
   @IsString()
@@ -7,4 +7,9 @@ export class EnhancePhotoDto {
 
   @IsUrl({ require_tld: false })
   imageUrl!: string
+
+  @IsString()
+  @IsOptional()
+  @MaxLength(300)
+  instructions?: string
 }

@@ -80,6 +80,10 @@ export class StepItemDto {
   @IsString()
   @IsOptional()
   tipEn?: string
+
+  @IsString()
+  @IsOptional()
+  image?: string
 }
 
 export class StepGroupDto {

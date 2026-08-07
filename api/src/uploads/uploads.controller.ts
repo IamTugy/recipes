@@ -14,6 +14,6 @@ export class UploadsController {
 
   @Post('enhance-photo')
   async enhancePhoto(@Body() body: EnhancePhotoDto) {
-    return this.uploadsService.enhancePhoto(body.recipeId, body.imageUrl)
+    return this.uploadsService.enhancePhoto(body.recipeId, body.imageUrl, body.instructions)
   }
 }

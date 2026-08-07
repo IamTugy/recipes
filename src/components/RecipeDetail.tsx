@@ -563,6 +563,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
       instruction: lang === 'he' ? step.instruction : (step.instructionEn ?? step.instruction),
       tip: lang === 'he' ? step.tip : (step.tipEn ?? step.tip),
       timerMinutes: step.timerMinutes,
+      image: step.image,
     }))
   )
 
@@ -580,7 +581,8 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
           <img
             src={displayRecipe.image}
             alt={displayTitle}
-            className="w-full h-full object-cover"
+            onClick={() => setLightboxUrl(displayRecipe.image!)}
+            className="w-full h-full object-cover cursor-zoom-in"
           />
         ) : (
           <RecipePlaceholder recipe={displayRecipe} />
@@ -1138,6 +1140,15 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                                   {instruction}
                                 </p>
 
+                                {step.image && (
+                                  <img
+                                    src={step.image}
+                                    alt=""
+                                    onClick={e => { e.stopPropagation(); setLightboxUrl(step.image!) }}
+                                    className="print:hidden mt-2 w-20 h-20 object-cover rounded-lg cursor-zoom-in"
+                                  />
+                                )}
+
                                 {tip && !checked && (
                                   <p className="mt-2 text-xs text-amber/70 flex items-start gap-1.5">
                                     <span className="mt-0.5">💡</span>
@@ -1576,6 +1587,14 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
               <p className="max-w-lg text-xl sm:text-2xl leading-relaxed text-cream">
                 {step.instruction}
               </p>
+              {step.image && (
+                <img
+                  src={step.image}
+                  alt=""
+                  onClick={() => setLightboxUrl(step.image!)}
+                  className="max-w-xs w-full max-h-52 object-cover rounded-xl cursor-zoom-in"
+                />
+              )}
               {step.tip && (
                 <p className="max-w-md text-sm text-amber/70 flex items-start gap-1.5">
                   <span className="mt-0.5">💡</span>

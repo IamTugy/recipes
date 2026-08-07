@@ -14,6 +14,7 @@ import { estimateNutrition } from '../lib/recipeNutrition'
 import SortableRow from './SortableRow'
 import DragHandle from './DragHandle'
 import PhotoUploadField from './PhotoUploadField'
+import StepPhotoField from './StepPhotoField'
 import Breadcrumbs from './Breadcrumbs'
 import AppSelect from './ui/AppSelect'
 
@@ -637,6 +638,12 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
                               {({ attributes: itemAttrs, listeners: itemListeners }) => (
                                 <div className="flex gap-2">
                                   <DragHandle attributes={itemAttrs} listeners={itemListeners} className="mt-2" />
+                                  <StepPhotoField
+                                    image={step.image}
+                                    onChange={url => updateStepItem(gi, si, { image: url })}
+                                    uploadRecipeId={uploadRecipeIdRef.current}
+                                    lang={lang}
+                                  />
                                   <div className="flex flex-col gap-2 flex-1">
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                       <textarea

@@ -83,6 +83,27 @@ describe('UploadsService', () => {
       expect(result.publicUrl).toMatch(/^https:\/\/recipes-assets\.tugy\.dev\/recipes\/tomato-soup\/[^/]+\.png$/)
     })
 
+    it('includes the caller-supplied instructions in the Gemini prompt, keeping the same-dish guardrail', async () => {
+      const editImage = jest.fn().mockResolvedValue({ data: Buffer.from('enhanced-bytes').toString('base64'), mimeType: 'image/png' })
+      const service = await makeService({ editImage })
+
+      await service.enhancePhoto('tomato-soup', imageUrl, 'Show it outdoors in natural sunlight')
+
+      const [, , prompt] = editImage.mock.calls[0]
+      expect(prompt).toContain('Show it outdoors in natural sunlight')
+      expect(prompt).toContain('must still look like a real photograph of the exact same meal')
+    })
+
+    it('falls back to a conservative cleanup prompt when no instructions are given', async () => {
+      const editImage = jest.fn().mockResolvedValue({ data: Buffer.from('enhanced-bytes').toString('base64'), mimeType: 'image/png' })
+      const service = await makeService({ editImage })
+
+      await service.enhancePhoto('tomato-soup', imageUrl)
+
+      const [, , prompt] = editImage.mock.calls[0]
+      expect(prompt).toContain('minimal, realistic edits')
+    })
+
     it('rejects image URLs outside of our own bucket', async () => {
       const editImage = jest.fn()
       const service = await makeService({ editImage })

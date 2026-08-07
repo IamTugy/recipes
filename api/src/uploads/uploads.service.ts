@@ -11,10 +11,15 @@ const EXTENSION_BY_CONTENT_TYPE: Record<string, string> = {
   'image/webp': 'webp',
 }
 
-// Deliberately conservative: this asks Gemini to retouch the photo the user
-// already took rather than generate a new one, per the issue's "minimal
-// changes, not full ai generated picture" requirement.
-const ENHANCE_PROMPT = `You are retouching a home-cooked food photo for a recipe website. Make minimal, realistic edits only: clean up or blur a messy/distracting background, improve lighting and color balance, and improve the framing/positioning of the plate if it helps the composition. Do not add, remove, or alter the food itself, and do not change the plate or dish. The result must still look like a real photograph of the exact same meal, not an illustration or AI-generated scene. Return only the edited image.`
+// The one guardrail that always applies regardless of what the user asks
+// for: it must stay a photo of the exact same dish, never an illustration
+// or a different meal. Background/setting/lighting are fair game for the
+// user's own instructions (e.g. "show it outdoors") to override.
+const BASE_PROMPT = `You are editing a home-cooked food photo for a recipe website. Do not add, remove, or alter the food itself, and do not change the plate or dish - it must still look like a real photograph of the exact same meal, not an illustration or an AI-generated scene. Return only the edited image.`
+
+// Used when the user hasn't asked for anything specific - a conservative
+// cleanup rather than a stylistic change.
+const DEFAULT_ENHANCE_INSTRUCTIONS = 'Make minimal, realistic edits: clean up or blur a messy/distracting background, improve lighting and color balance, and improve the framing/positioning of the plate if it helps the composition.'
 
 @Injectable()
 export class UploadsService {
@@ -53,7 +58,7 @@ export class UploadsService {
     return { uploadUrl, publicUrl: `${this.publicUrl}/${key}` }
   }
 
-  async enhancePhoto(recipeId: string, imageUrl: string): Promise<{ publicUrl: string }> {
+  async enhancePhoto(recipeId: string, imageUrl: string, instructions?: string): Promise<{ publicUrl: string }> {
     // Only accept images we already host - fetching arbitrary caller-supplied
     // URLs server-side would be an SSRF vector.
     if (!imageUrl.startsWith(`${this.publicUrl}/`)) {
@@ -65,7 +70,8 @@ export class UploadsService {
     const contentType = sourceResponse.headers.get('content-type') ?? 'image/jpeg'
     const sourceBuffer = Buffer.from(await sourceResponse.arrayBuffer())
 
-    const enhanced = await this.gemini.editImage(sourceBuffer.toString('base64'), contentType, ENHANCE_PROMPT)
+    const prompt = `${BASE_PROMPT}\n\n${instructions?.trim() || DEFAULT_ENHANCE_INSTRUCTIONS}`
+    const enhanced = await this.gemini.editImage(sourceBuffer.toString('base64'), contentType, prompt)
 
     const extension = EXTENSION_BY_CONTENT_TYPE[enhanced.mimeType] ?? 'png'
     const key = `recipes/${recipeId}/${randomUUID()}.${extension}`
