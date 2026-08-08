@@ -549,31 +549,37 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
                 <SortableRow key={group._key} id={group._key} className="border border-tint/10 rounded-xl p-4 space-y-3">
                   {({ attributes, listeners }) => (
                     <>
-                      <div className="flex items-center gap-2">
-                        <DragHandle attributes={attributes} listeners={listeners} />
-                        <input
-                          value={group.group ?? ''}
-                          onChange={e => { const v = e.target.value; updateIngredientGroup(gi, { group: v }); if (!(group.groupEn ?? '').trim()) scheduleAutoTranslate(`ing-group-${group._key}`, v, 'en', translated => updateIngredientGroup(gi, { groupEn: translated })) }}
-                          placeholder={lang === 'he' ? 'שם הקבוצה (עברית, אופציונלי)' : 'Group name (Hebrew, optional)'}
-                          className={`${inputClass} flex-1`}
-                          dir="rtl"
-                        />
-                        <input
-                          value={group.groupEn ?? ''}
-                          onChange={e => { const v = e.target.value; updateIngredientGroup(gi, { groupEn: v }); if (!(group.group ?? '').trim()) scheduleAutoTranslate(`ing-groupEn-${group._key}`, v, 'he', translated => updateIngredientGroup(gi, { group: translated })) }}
-                          placeholder={lang === 'he' ? 'שם הקבוצה (אנגלית, אופציונלי)' : 'Group name (English, optional)'}
-                          className={`${inputClass} flex-1`}
-                        />
-                        <RegenerateButton
-                          lang={lang}
-                          busy={regenerating.has(`ing-group-${group._key}`)}
-                          onClick={() => regenerateTranslation(`ing-group-${group._key}`, group.group ?? '', group.groupEn ?? '', v => updateIngredientGroup(gi, { group: v }), v => updateIngredientGroup(gi, { groupEn: v }))}
-                        />
-                        {ingredientGroups.length > 1 && (
-                          <button type="button" onClick={() => removeIngredientGroup(gi)} className="text-xs text-red-400/70 hover:text-red-400 shrink-0">
-                            {lang === 'he' ? 'הסר קבוצה' : 'Remove group'}
-                          </button>
-                        )}
+                      <div className="flex items-start gap-2">
+                        <DragHandle attributes={attributes} listeners={listeners} className="mt-2.5" />
+                        <div className="flex flex-col gap-2 flex-1">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <input
+                              value={group.group ?? ''}
+                              onChange={e => { const v = e.target.value; updateIngredientGroup(gi, { group: v }); if (!(group.groupEn ?? '').trim()) scheduleAutoTranslate(`ing-group-${group._key}`, v, 'en', translated => updateIngredientGroup(gi, { groupEn: translated })) }}
+                              placeholder={lang === 'he' ? 'שם הקבוצה (עברית, אופציונלי)' : 'Group name (Hebrew, optional)'}
+                              className={inputClass}
+                              dir="rtl"
+                            />
+                            <input
+                              value={group.groupEn ?? ''}
+                              onChange={e => { const v = e.target.value; updateIngredientGroup(gi, { groupEn: v }); if (!(group.group ?? '').trim()) scheduleAutoTranslate(`ing-groupEn-${group._key}`, v, 'he', translated => updateIngredientGroup(gi, { group: translated })) }}
+                              placeholder={lang === 'he' ? 'שם הקבוצה (אנגלית, אופציונלי)' : 'Group name (English, optional)'}
+                              className={inputClass}
+                            />
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <RegenerateButton
+                              lang={lang}
+                              busy={regenerating.has(`ing-group-${group._key}`)}
+                              onClick={() => regenerateTranslation(`ing-group-${group._key}`, group.group ?? '', group.groupEn ?? '', v => updateIngredientGroup(gi, { group: v }), v => updateIngredientGroup(gi, { groupEn: v }))}
+                            />
+                            {ingredientGroups.length > 1 && (
+                              <button type="button" onClick={() => removeIngredientGroup(gi)} className="text-xs text-red-400/70 hover:text-red-400 shrink-0">
+                                {lang === 'he' ? 'הסר קבוצה' : 'Remove group'}
+                              </button>
+                            )}
+                          </div>
+                        </div>
                       </div>
                       <DndContext sensors={sensors} onDragEnd={event => reorderIngredientItems(gi, event)}>
                         <SortableContext items={group.items.map(item => item._key)} strategy={verticalListSortingStrategy}>
@@ -584,8 +590,8 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
                                   <DragHandle attributes={itemAttrs} listeners={itemListeners} className="mt-2.5" />
                                   <div className="flex flex-col gap-2 flex-1">
                                     <div className="flex gap-2">
-                                      <input type="number" step="any" value={item.amount ?? ''} onChange={e => updateIngredientItem(gi, ii, { amount: Number(e.target.value) })} className={`${inputClass} w-20 shrink-0`} placeholder={lang === 'he' ? 'כמות' : 'Qty'} />
-                                      <input value={item.unit ?? ''} onChange={e => updateIngredientItem(gi, ii, { unit: e.target.value })} className={`${inputClass} w-24 shrink-0`} placeholder={lang === 'he' ? 'יחידה' : 'Unit'} />
+                                      <input type="number" step="any" value={item.amount ?? ''} onChange={e => updateIngredientItem(gi, ii, { amount: Number(e.target.value) })} className={`${inputClass} w-16 shrink-0`} placeholder={lang === 'he' ? 'כמות' : 'Qty'} />
+                                      <input value={item.unit ?? ''} onChange={e => updateIngredientItem(gi, ii, { unit: e.target.value })} className={`${inputClass} w-16 shrink-0`} placeholder={lang === 'he' ? 'יחידה' : 'Unit'} />
                                       <button type="button" onClick={() => removeIngredientItem(gi, ii)} className="shrink-0 text-red-400/60 hover:text-red-400 text-xs px-1">✕</button>
                                     </div>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -627,31 +633,37 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
                 <SortableRow key={group._key} id={group._key} className="border border-tint/10 rounded-xl p-4 space-y-3">
                   {({ attributes, listeners }) => (
                     <>
-                      <div className="flex items-center gap-2">
-                        <DragHandle attributes={attributes} listeners={listeners} />
-                        <input
-                          value={group.title ?? ''}
-                          onChange={e => { const v = e.target.value; updateStepGroup(gi, { title: v }); if (!(group.titleEn ?? '').trim()) scheduleAutoTranslate(`step-group-${group._key}`, v, 'en', translated => updateStepGroup(gi, { titleEn: translated })) }}
-                          placeholder={lang === 'he' ? 'שם השלב (עברית, אופציונלי)' : 'Section title (Hebrew, optional)'}
-                          className={`${inputClass} flex-1`}
-                          dir="rtl"
-                        />
-                        <input
-                          value={group.titleEn ?? ''}
-                          onChange={e => { const v = e.target.value; updateStepGroup(gi, { titleEn: v }); if (!(group.title ?? '').trim()) scheduleAutoTranslate(`step-groupEn-${group._key}`, v, 'he', translated => updateStepGroup(gi, { title: translated })) }}
-                          placeholder={lang === 'he' ? 'שם השלב (אנגלית, אופציונלי)' : 'Section title (English, optional)'}
-                          className={`${inputClass} flex-1`}
-                        />
-                        <RegenerateButton
-                          lang={lang}
-                          busy={regenerating.has(`step-group-${group._key}`)}
-                          onClick={() => regenerateTranslation(`step-group-${group._key}`, group.title ?? '', group.titleEn ?? '', v => updateStepGroup(gi, { title: v }), v => updateStepGroup(gi, { titleEn: v }))}
-                        />
-                        {stepGroups.length > 1 && (
-                          <button type="button" onClick={() => removeStepGroup(gi)} className="text-xs text-red-400/70 hover:text-red-400 shrink-0">
-                            {lang === 'he' ? 'הסר קבוצה' : 'Remove group'}
-                          </button>
-                        )}
+                      <div className="flex items-start gap-2">
+                        <DragHandle attributes={attributes} listeners={listeners} className="mt-2.5" />
+                        <div className="flex flex-col gap-2 flex-1">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <input
+                              value={group.title ?? ''}
+                              onChange={e => { const v = e.target.value; updateStepGroup(gi, { title: v }); if (!(group.titleEn ?? '').trim()) scheduleAutoTranslate(`step-group-${group._key}`, v, 'en', translated => updateStepGroup(gi, { titleEn: translated })) }}
+                              placeholder={lang === 'he' ? 'שם השלב (עברית, אופציונלי)' : 'Section title (Hebrew, optional)'}
+                              className={inputClass}
+                              dir="rtl"
+                            />
+                            <input
+                              value={group.titleEn ?? ''}
+                              onChange={e => { const v = e.target.value; updateStepGroup(gi, { titleEn: v }); if (!(group.title ?? '').trim()) scheduleAutoTranslate(`step-groupEn-${group._key}`, v, 'he', translated => updateStepGroup(gi, { title: translated })) }}
+                              placeholder={lang === 'he' ? 'שם השלב (אנגלית, אופציונלי)' : 'Section title (English, optional)'}
+                              className={inputClass}
+                            />
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <RegenerateButton
+                              lang={lang}
+                              busy={regenerating.has(`step-group-${group._key}`)}
+                              onClick={() => regenerateTranslation(`step-group-${group._key}`, group.title ?? '', group.titleEn ?? '', v => updateStepGroup(gi, { title: v }), v => updateStepGroup(gi, { titleEn: v }))}
+                            />
+                            {stepGroups.length > 1 && (
+                              <button type="button" onClick={() => removeStepGroup(gi)} className="text-xs text-red-400/70 hover:text-red-400 shrink-0">
+                                {lang === 'he' ? 'הסר קבוצה' : 'Remove group'}
+                              </button>
+                            )}
+                          </div>
+                        </div>
                       </div>
                       <DndContext sensors={sensors} onDragEnd={event => reorderStepItems(gi, event)}>
                         <SortableContext items={group.items.map(item => item._key)} strategy={verticalListSortingStrategy}>
