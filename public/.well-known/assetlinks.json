@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "dev.tugy.recipes",
+    "sha256_cert_fingerprints": ["8F:FD:AB:5C:61:8C:CF:E0:17:1C:5B:BE:4B:79:94:18:B0:00:B3:C4:A8:08:EF:01:1F:99:71:75:C9:92:7C:DB"]
+  }
+}]
