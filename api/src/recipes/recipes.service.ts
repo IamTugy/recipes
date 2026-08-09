@@ -355,6 +355,16 @@ export class RecipesService implements OnModuleInit {
     return updated
   }
 
+  // Partial-save for just the photo - lets a quick photo fix go through
+  // without a full save being blocked by unrelated invalid fields elsewhere
+  // in the form. No revision bump, no quality review triggered.
+  async updateImage(id: string, userId: string, isAdmin: boolean, image: string): Promise<RecipeDocument> {
+    await this.getEditableOrThrow(id, userId, isAdmin)
+    const updated = await this.recipeModel.findOneAndUpdate({ _id: id }, { $set: { image } }, { new: true }).exec()
+    if (!updated) throw new NotFoundException(`Recipe '${id}' not found`)
+    return updated
+  }
+
   // Score threshold an AI review must meet to publish. Below this, the
   // recipe is rejected with the review's findings instead.
   private static readonly PUBLISH_THRESHOLD = 95

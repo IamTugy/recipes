@@ -1,10 +1,11 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Put, Req } from '@nestjs/common'
+import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Put, Req } from '@nestjs/common'
 import { Request } from 'express'
 import { ConfigService } from '@nestjs/config'
 import { RecipesService } from './recipes.service'
 import { ActivityLogService } from '../activity-log/activity-log.service'
 import { UsersService } from '../users/users.service'
 import { SaveRecipeDraftDto } from './dto/save-recipe-draft.dto'
+import { UpdateRecipeImageDto } from './dto/update-recipe-image.dto'
 
 @Controller('recipes')
 export class RecipesController {
@@ -94,6 +95,16 @@ export class RecipesController {
     @Req() req: Request & { userId: string },
   ) {
     const recipe = await this.recipesService.updateDraft(id, req.userId, this.isAdmin(req.userId), body)
+    return recipe.toObject()
+  }
+
+  @Patch(':id/image')
+  async updateImage(
+    @Param('id') id: string,
+    @Body() body: UpdateRecipeImageDto,
+    @Req() req: Request & { userId: string },
+  ) {
+    const recipe = await this.recipesService.updateImage(id, req.userId, this.isAdmin(req.userId), body.image)
     return recipe.toObject()
   }
 
