@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Category, Difficulty } from '../types'
 import { useMyRecipes } from '../hooks/useRecipes'
@@ -8,6 +8,7 @@ import { useLanguage } from '../hooks/useLanguage'
 import RecipeCard from './RecipeCard'
 import RecipeCardSkeleton from './RecipeCardSkeleton'
 import RecipePlaceholder from './RecipePlaceholder'
+import { useInfiniteScroll } from '../hooks/useInfiniteScroll'
 
 const categories: Category[] = ['breakfast', 'lunch', 'dinner', 'dessert', 'salad', 'soup', 'snack', 'bread', 'sauce']
 const difficulties: Difficulty[] = ['easy', 'medium', 'hard']
@@ -43,12 +44,12 @@ export default function MyRecipesPage() {
   const [activeStatus, setActiveStatus] = useState<StatusFilter | null>(null)
   const [liveOnly, setLiveOnly] = useState(false)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
-  const [page, setPage] = useState(1)
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const filtersKey = JSON.stringify([search, activeCategory, activeDifficulty, activeStatus, liveOnly])
   const [prevFiltersKey, setPrevFiltersKey] = useState(filtersKey)
   if (filtersKey !== prevFiltersKey) {
     setPrevFiltersKey(filtersKey)
-    setPage(1)
+    setVisibleCount(PAGE_SIZE)
   }
 
   const filtered = useMemo(() => {
@@ -68,11 +69,11 @@ export default function MyRecipesPage() {
     return list
   }, [recipes, search, activeCategory, activeDifficulty, activeStatus, liveOnly])
 
-  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
-  const paged = useMemo(
-    () => filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
-    [filtered, page]
-  )
+  const paged = useMemo(() => filtered.slice(0, visibleCount), [filtered, visibleCount])
+  const hasMore = visibleCount < filtered.length
+  const sentinelRef = useInfiniteScroll(useCallback(() => {
+    setVisibleCount(v => Math.min(v + PAGE_SIZE, filtered.length))
+  }, [filtered.length]))
 
   return (
     <div className="min-h-dvh bg-bg pt-14">
@@ -312,25 +313,11 @@ export default function MyRecipesPage() {
           </div>
         )}
 
-        {!loading && filtered.length > PAGE_SIZE && (
-          <div className="flex items-center justify-center gap-3 mt-8">
-            <button type="button"
-              onClick={() => setPage(p => Math.max(1, p - 1))}
-              disabled={page === 1}
-              className="px-3 py-1.5 text-xs font-medium rounded-lg border border-tint/10 text-cream/50 hover:text-cream/80 disabled:opacity-30 transition-colors"
-            >
-              {lang === 'he' ? 'הקודם' : 'Previous'}
-            </button>
-            <span className="text-xs text-cream/40 tracking-wider">
-              {lang === 'he' ? `עמוד ${page} מתוך ${pageCount}` : `Page ${page} of ${pageCount}`}
+        {!loading && hasMore && (
+          <div ref={sentinelRef} className="flex items-center justify-center py-8">
+            <span className="text-xs text-cream/30 tracking-wider">
+              {lang === 'he' ? 'טוען עוד...' : 'Loading more...'}
             </span>
-            <button type="button"
-              onClick={() => setPage(p => Math.min(pageCount, p + 1))}
-              disabled={page === pageCount}
-              className="px-3 py-1.5 text-xs font-medium rounded-lg border border-tint/10 text-cream/50 hover:text-cream/80 disabled:opacity-30 transition-colors"
-            >
-              {lang === 'he' ? 'הבא' : 'Next'}
-            </button>
           </div>
         )}
       </div>
