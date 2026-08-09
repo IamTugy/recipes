@@ -1,6 +1,10 @@
 import { UploadsController } from './uploads.controller'
 
 describe('UploadsController', () => {
+  const activityLog = { record: jest.fn() }
+
+  beforeEach(() => jest.clearAllMocks())
+
   it('POST /uploads/presign returns a presigned upload URL and the resulting public URL', async () => {
     const uploadsService = {
       presignPhotoUpload: jest.fn().mockResolvedValue({
@@ -8,7 +12,7 @@ describe('UploadsController', () => {
         publicUrl: 'https://recipes-assets.tugy.dev/reviews/a/photo.jpg',
       }),
     }
-    const controller = new UploadsController(uploadsService as any)
+    const controller = new UploadsController(uploadsService as any, activityLog as any)
 
     const result = await controller.presign({ recipeId: 'a', contentType: 'image/jpeg' })
 
@@ -21,7 +25,7 @@ describe('UploadsController', () => {
 
   it('passes the purpose through when provided', async () => {
     const uploadsService = { presignPhotoUpload: jest.fn().mockResolvedValue({ uploadUrl: 'u', publicUrl: 'p' }) }
-    const controller = new UploadsController(uploadsService as any)
+    const controller = new UploadsController(uploadsService as any, activityLog as any)
 
     await controller.presign({ recipeId: 'a', contentType: 'image/jpeg', purpose: 'recipe' })
 
@@ -32,9 +36,12 @@ describe('UploadsController', () => {
     const uploadsService = {
       enhancePhoto: jest.fn().mockResolvedValue({ publicUrl: 'https://recipes-assets.tugy.dev/recipes/a/enhanced.png' }),
     }
-    const controller = new UploadsController(uploadsService as any)
+    const controller = new UploadsController(uploadsService as any, activityLog as any)
 
-    const result = await controller.enhancePhoto({ recipeId: 'a', imageUrl: 'https://recipes-assets.tugy.dev/recipes/a/photo.jpg' })
+    const result = await controller.enhancePhoto(
+      { recipeId: 'a', imageUrl: 'https://recipes-assets.tugy.dev/recipes/a/photo.jpg' },
+      { userId: 'user_1' } as any,
+    )
 
     expect(uploadsService.enhancePhoto).toHaveBeenCalledWith('a', 'https://recipes-assets.tugy.dev/recipes/a/photo.jpg', undefined)
     expect(result).toEqual({ publicUrl: 'https://recipes-assets.tugy.dev/recipes/a/enhanced.png' })
@@ -44,16 +51,33 @@ describe('UploadsController', () => {
     const uploadsService = {
       enhancePhoto: jest.fn().mockResolvedValue({ publicUrl: 'https://recipes-assets.tugy.dev/recipes/a/enhanced.png' }),
     }
-    const controller = new UploadsController(uploadsService as any)
+    const controller = new UploadsController(uploadsService as any, activityLog as any)
 
-    await controller.enhancePhoto({
-      recipeId: 'a',
-      imageUrl: 'https://recipes-assets.tugy.dev/recipes/a/photo.jpg',
-      instructions: 'Show it outdoors in natural sunlight',
-    })
+    await controller.enhancePhoto(
+      {
+        recipeId: 'a',
+        imageUrl: 'https://recipes-assets.tugy.dev/recipes/a/photo.jpg',
+        instructions: 'Show it outdoors in natural sunlight',
+      },
+      { userId: 'user_1' } as any,
+    )
 
     expect(uploadsService.enhancePhoto).toHaveBeenCalledWith(
       'a', 'https://recipes-assets.tugy.dev/recipes/a/photo.jpg', 'Show it outdoors in natural sunlight',
     )
+  })
+
+  it('POST /uploads/enhance-photo logs an ai_photo_enhance_used event', async () => {
+    const uploadsService = {
+      enhancePhoto: jest.fn().mockResolvedValue({ publicUrl: 'https://recipes-assets.tugy.dev/recipes/a/enhanced.png' }),
+    }
+    const controller = new UploadsController(uploadsService as any, activityLog as any)
+
+    await controller.enhancePhoto(
+      { recipeId: 'a', imageUrl: 'https://recipes-assets.tugy.dev/recipes/a/photo.jpg' },
+      { userId: 'user_1' } as any,
+    )
+
+    expect(activityLog.record).toHaveBeenCalledWith('user_1', 'a', 'ai_photo_enhance_used')
   })
 })
