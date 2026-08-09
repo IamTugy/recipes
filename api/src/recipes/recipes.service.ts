@@ -308,6 +308,7 @@ export class RecipesService implements OnModuleInit {
       ...dto, sources: dedupeSources(dto.sources), slug, ownerId: userId, status: 'draft', currentRevision: 1,
     })
     await this.saveNewRevision(recipe, userId)
+    await this.activityLogService.record(userId, recipe.id, 'recipe_created')
     return recipe
   }
 
@@ -352,6 +353,7 @@ export class RecipesService implements OnModuleInit {
     const updated = await this.recipeModel.findOneAndUpdate({ _id: id }, update, { new: true }).exec()
     if (!updated) throw new NotFoundException(`Recipe '${id}' not found`)
     await this.saveNewRevision(updated, userId)
+    await this.activityLogService.record(userId, updated.id, 'recipe_updated')
     return updated
   }
 
@@ -366,7 +368,9 @@ export class RecipesService implements OnModuleInit {
       throw new BadRequestException(`Cannot submit for review, missing/invalid: ${missing.join(', ')}`)
     }
 
+    await this.activityLogService.record(userId, id, 'recipe_submitted_for_review')
     const review = await this.qualityService.review(recipe.toObject())
+    await this.activityLogService.record(userId, id, 'ai_quality_review_used')
 
     if (review.score >= RecipesService.PUBLISH_THRESHOLD) {
       await this.revisionModel.updateOne(
@@ -376,12 +380,16 @@ export class RecipesService implements OnModuleInit {
       recipe.publishedRevision = recipe.currentRevision
       recipe.status = 'published'
       recipe.reviewComment = undefined
+      recipe.qualityReview = review
+      await recipe.save()
+      await this.activityLogService.record(userId, id, 'recipe_published')
     } else {
       recipe.status = 'rejected'
       recipe.reviewComment = undefined
+      recipe.qualityReview = review
+      await recipe.save()
+      await this.activityLogService.record(userId, id, 'recipe_rejected', { score: review.score })
     }
-    recipe.qualityReview = review
-    await recipe.save()
     return recipe
   }
 
@@ -482,5 +490,6 @@ export class RecipesService implements OnModuleInit {
     }
     recipe.deletedAt = new Date()
     await recipe.save()
+    await this.activityLogService.record(userId, id, 'recipe_deleted', { title: recipe.title, ownerId: recipe.ownerId })
   }
 }

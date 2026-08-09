@@ -13,7 +13,7 @@ import { RecipeQualityService } from './quality/recipe-quality.service'
 
 describe('RecipesService', () => {
   function makeActivityLog(viewCounts: Map<string, number> = new Map()) {
-    return { viewCountsById: jest.fn().mockResolvedValue(viewCounts) }
+    return { viewCountsById: jest.fn().mockResolvedValue(viewCounts), record: jest.fn().mockResolvedValue(undefined) }
   }
 
   function makeCookLog(cookCounts: Map<string, number> = new Map()) {
@@ -330,6 +330,16 @@ describe('RecipesService', () => {
     expect(create).toHaveBeenCalledWith(expect.objectContaining({ slug: 'tomato-soup-2' }))
   })
 
+  it('createDraft logs a recipe_created event', async () => {
+    const exists = jest.fn().mockResolvedValue(false)
+    const create = jest.fn().mockResolvedValue({ id: 'new-recipe', title: 'Tomato Soup' })
+    const activityLog = makeActivityLog()
+    const service = await makeService({ exists, create }, { create: jest.fn().mockResolvedValue({}) }, undefined, activityLog)
+    await service.createDraft('user_1', { title: 'Tomato Soup' } as any)
+
+    expect(activityLog.record).toHaveBeenCalledWith('user_1', 'new-recipe', 'recipe_created')
+  })
+
   it('updateDraft atomically increments the revision counter and saves a new snapshot', async () => {
     const existing = { slug: 'tomato-soup', ownerId: 'user_1', status: 'draft' }
     const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(existing) })
@@ -432,6 +442,18 @@ describe('RecipesService', () => {
     await expect(service.updateDraft('a', 'user_1', false, minimalDto as any)).rejects.toThrow(BadRequestException)
   })
 
+  it('updateDraft logs a recipe_updated event', async () => {
+    const existing = { slug: 'tomato-soup', ownerId: 'user_1', status: 'draft' }
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(existing) })
+    const updated = { id: 'tomato-soup', slug: 'tomato-soup', currentRevision: 2 }
+    const findOneAndUpdate = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(updated) })
+    const activityLog = makeActivityLog()
+    const service = await makeService({ findOne, findOneAndUpdate }, { create: jest.fn().mockResolvedValue({}) }, undefined, activityLog)
+    await service.updateDraft('tomato-soup', 'user_1', false, minimalDto as any)
+
+    expect(activityLog.record).toHaveBeenCalledWith('user_1', 'tomato-soup', 'recipe_updated')
+  })
+
   function completeRecipe(overrides: Record<string, unknown> = {}) {
     return {
       ...minimalDto,
@@ -515,6 +537,31 @@ describe('RecipesService', () => {
     const service = await makeService({ findOne })
 
     await expect(service.submitForReview('a', 'user_1', false)).rejects.toThrow(/every section needs at least one instruction/)
+  })
+
+  it('submitForReview logs submitted, AI-quality-review-used, and published events on a passing score', async () => {
+    const recipe = completeRecipe()
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
+    const updateOne = jest.fn().mockResolvedValue({})
+    const quality = makeQualityService({ score: 100, checkedAt: 'now', findings: [] })
+    const activityLog = makeActivityLog()
+    const service = await makeService({ findOne }, { updateOne }, undefined, activityLog, undefined, undefined, undefined, quality)
+    await service.submitForReview('a', 'user_1', false)
+
+    expect(activityLog.record).toHaveBeenCalledWith('user_1', 'a', 'recipe_submitted_for_review')
+    expect(activityLog.record).toHaveBeenCalledWith('user_1', 'a', 'ai_quality_review_used')
+    expect(activityLog.record).toHaveBeenCalledWith('user_1', 'a', 'recipe_published')
+  })
+
+  it('submitForReview logs a recipe_rejected event with the score on a failing score', async () => {
+    const recipe = completeRecipe()
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
+    const quality = makeQualityService({ score: 40, checkedAt: 'now', findings: [{ category: 'x', severity: 'critical', message: 'bad' }] })
+    const activityLog = makeActivityLog()
+    const service = await makeService({ findOne }, undefined, undefined, activityLog, undefined, undefined, undefined, quality)
+    await service.submitForReview('a', 'user_1', false)
+
+    expect(activityLog.record).toHaveBeenCalledWith('user_1', 'a', 'recipe_rejected', { score: 40 })
   })
 
   it('listRecentSubmissions returns recipes with a qualityReview, most recently checked first', async () => {
@@ -615,5 +662,15 @@ describe('RecipesService', () => {
 
     await expect(service.remove('tomato-soup', 'user_2', false)).rejects.toThrow(ForbiddenException)
     expect(recipe.save).not.toHaveBeenCalled()
+  })
+
+  it('remove logs a recipe_deleted event with a title/ownerId snapshot before soft-deleting', async () => {
+    const recipe = { id: 'a', title: 'Tomato Soup', ownerId: 'user_1', status: 'draft', publishedRevision: null, save: jest.fn() }
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
+    const activityLog = makeActivityLog()
+    const service = await makeService({ findOne }, undefined, undefined, activityLog)
+    await service.remove('a', 'user_1', false)
+
+    expect(activityLog.record).toHaveBeenCalledWith('user_1', 'a', 'recipe_deleted', { title: 'Tomato Soup', ownerId: 'user_1' })
   })
 })
