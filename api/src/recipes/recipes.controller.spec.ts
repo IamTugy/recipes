@@ -10,6 +10,7 @@ describe('RecipesController', () => {
     findPublishedByOwner: jest.fn(),
     createDraft: jest.fn(),
     updateDraft: jest.fn(),
+    updateImage: jest.fn(),
     submitForReview: jest.fn(),
     listRecentSubmissions: jest.fn(),
     listRevisions: jest.fn(),
@@ -148,6 +149,15 @@ describe('RecipesController', () => {
     const result = await controller.update('tomato-soup', body, { userId: 'user_1' } as any)
     expect(recipesService.updateDraft).toHaveBeenCalledWith('tomato-soup', 'user_1', false, body)
     expect(result).toEqual({ slug: 'tomato-soup', title: 'Tomato Soup v2' })
+  })
+
+  it('PATCH /recipes/:slug/image updates just the photo, without a full draft save', async () => {
+    const updated = { toObject: () => ({ slug: 'tomato-soup', image: 'https://r2.example.com/new.jpg' }) }
+    recipesService.updateImage.mockResolvedValue(updated)
+    const controller = makeController()
+    const result = await controller.updateImage('tomato-soup', { image: 'https://r2.example.com/new.jpg' }, { userId: 'user_1' } as any)
+    expect(recipesService.updateImage).toHaveBeenCalledWith('tomato-soup', 'user_1', false, 'https://r2.example.com/new.jpg')
+    expect(result).toEqual({ slug: 'tomato-soup', image: 'https://r2.example.com/new.jpg' })
   })
 
   it('POST /recipes/:slug/submit submits the recipe for the AI review gate', async () => {

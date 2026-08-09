@@ -15,8 +15,7 @@ import { useHistoryStack } from '../hooks/useHistoryStack'
 import ConfirmDialog from './ConfirmDialog'
 import SortableRow from './SortableRow'
 import DragHandle from './DragHandle'
-import PhotoUploadField from './PhotoUploadField'
-import StepPhotoField from './StepPhotoField'
+import EditableImageField from './EditableImageField'
 import Breadcrumbs from './Breadcrumbs'
 import AppSelect from './ui/AppSelect'
 import FilterInfoPopover from './FilterInfoPopover'
@@ -616,10 +615,11 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
 
           <div>
             <label className={labelClass}>{lang === 'he' ? 'תמונה' : 'Photo'}</label>
-            <PhotoUploadField
+            <EditableImageField
               image={image}
-              onChange={url => { commitHistory(); setImage(url) }}
+              onChange={url => { commitHistory(); setImage(url ?? '') }}
               uploadRecipeId={uploadRecipeIdRef.current}
+              recipeId={existing?.id}
               lang={lang}
               onError={message => showToast(message, 'error')}
             />
@@ -842,11 +842,12 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
                               {({ attributes: itemAttrs, listeners: itemListeners }) => (
                                 <div className="flex gap-2">
                                   <DragHandle attributes={itemAttrs} listeners={itemListeners} className="mt-2" />
-                                  <StepPhotoField
+                                  <EditableImageField
                                     image={step.image}
                                     onChange={url => { commitHistory(); updateStepItem(gi, si, { image: url }) }}
                                     uploadRecipeId={uploadRecipeIdRef.current}
                                     lang={lang}
+                                    size="small"
                                   />
                                   <div className="flex flex-col gap-2 flex-1 min-w-0">
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">

@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '@clerk/react'
 import { useLanguage } from '../hooks/useLanguage'
 import { importRecipe } from '../lib/recipeImport'
-import PhotoUploadField from './PhotoUploadField'
+import EditableImageField from './EditableImageField'
 
 const URL_PATTERN = /^https?:\/\/\S+$/i
 
@@ -89,9 +89,9 @@ export default function RecipeImportPage() {
         <div className="card p-5 space-y-4">
           <div>
             <label className={labelClass}>{lang === 'he' ? 'תמונה' : 'Photo'}</label>
-            <PhotoUploadField
+            <EditableImageField
               image={image}
-              onChange={setImage}
+              onChange={url => setImage(url ?? '')}
               uploadRecipeId={uploadRecipeIdRef.current}
               lang={lang}
               onError={setError}
