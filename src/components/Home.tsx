@@ -5,10 +5,10 @@ import { useRecipes, useTrending } from '../hooks/useRecipes'
 import { useFavorites } from '../hooks/useFavorites'
 import { t, categoryEmoji } from '../i18n'
 import { useLanguage } from '../hooks/useLanguage'
-import RecipeCard from './RecipeCard'
 import RecipeCardSkeleton from './RecipeCardSkeleton'
 import RecipeStrip from './RecipeStrip'
 import AppSelect from './ui/AppSelect'
+import VirtualRecipeGrid from './VirtualRecipeGrid'
 
 const categories: Category[] = ['breakfast', 'lunch', 'dinner', 'dessert', 'salad', 'soup', 'snack', 'bread', 'sauce']
 const difficulties: Difficulty[] = ['easy', 'medium', 'hard']
@@ -298,18 +298,12 @@ export default function Home() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filtered.map((r, i) => (
-              <RecipeCard
-                key={r.id}
-                recipe={r}
-                index={i}
-                searchQuery={search}
-                isFavorite={favoriteSlugs.has(r.id)}
-                onToggleFavorite={toggleFavorite}
-              />
-            ))}
-          </div>
+          <VirtualRecipeGrid
+            recipes={filtered}
+            searchQuery={search}
+            favoriteSlugs={favoriteSlugs}
+            onToggleFavorite={toggleFavorite}
+          />
         )}
       </div>
     </div>

@@ -29,6 +29,8 @@ const statusClass: Record<StatusFilter, string> = {
   rejected: 'bg-red-500/10 text-red-400',
 }
 
+const PAGE_SIZE = 24
+
 export default function MyRecipesPage() {
   const { lang } = useLanguage()
   const tx = t[lang]
@@ -41,6 +43,13 @@ export default function MyRecipesPage() {
   const [activeStatus, setActiveStatus] = useState<StatusFilter | null>(null)
   const [liveOnly, setLiveOnly] = useState(false)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [page, setPage] = useState(1)
+  const filtersKey = JSON.stringify([search, activeCategory, activeDifficulty, activeStatus, liveOnly])
+  const [prevFiltersKey, setPrevFiltersKey] = useState(filtersKey)
+  if (filtersKey !== prevFiltersKey) {
+    setPrevFiltersKey(filtersKey)
+    setPage(1)
+  }
 
   const filtered = useMemo(() => {
     let list = recipes
@@ -58,6 +67,12 @@ export default function MyRecipesPage() {
     }
     return list
   }, [recipes, search, activeCategory, activeDifficulty, activeStatus, liveOnly])
+
+  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
+  const paged = useMemo(
+    () => filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
+    [filtered, page]
+  )
 
   return (
     <div className="min-h-dvh bg-bg pt-14">
@@ -227,7 +242,7 @@ export default function MyRecipesPage() {
           </div>
         ) : viewMode === 'list' ? (
           <ul className="space-y-1.5">
-            {filtered.map(r => {
+            {paged.map(r => {
               const status = (r.status ?? 'published') as StatusFilter
               const showBadge = !(status === 'published' && r.currentRevision === r.publishedRevision)
               const displayTitle = lang === 'he' ? (r.titleHe ?? r.title) : r.title
@@ -277,7 +292,7 @@ export default function MyRecipesPage() {
           </ul>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filtered.map((r, i) => {
+            {paged.map((r, i) => {
               const status = (r.status ?? 'published') as StatusFilter
               return (
                 <RecipeCard
@@ -294,6 +309,28 @@ export default function MyRecipesPage() {
                 />
               )
             })}
+          </div>
+        )}
+
+        {!loading && filtered.length > PAGE_SIZE && (
+          <div className="flex items-center justify-center gap-3 mt-8">
+            <button type="button"
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="px-3 py-1.5 text-xs font-medium rounded-lg border border-tint/10 text-cream/50 hover:text-cream/80 disabled:opacity-30 transition-colors"
+            >
+              {lang === 'he' ? 'הקודם' : 'Previous'}
+            </button>
+            <span className="text-xs text-cream/40 tracking-wider">
+              {lang === 'he' ? `עמוד ${page} מתוך ${pageCount}` : `Page ${page} of ${pageCount}`}
+            </span>
+            <button type="button"
+              onClick={() => setPage(p => Math.min(pageCount, p + 1))}
+              disabled={page === pageCount}
+              className="px-3 py-1.5 text-xs font-medium rounded-lg border border-tint/10 text-cream/50 hover:text-cream/80 disabled:opacity-30 transition-colors"
+            >
+              {lang === 'he' ? 'הבא' : 'Next'}
+            </button>
           </div>
         )}
       </div>

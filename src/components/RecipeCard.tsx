@@ -15,10 +15,14 @@ interface RecipeCardProps {
   onToggleFavorite: (slug: string) => void
   statusBadge?: { label: string; className: string }
   editable?: boolean
+  imageLoading?: 'eager' | 'lazy'
+  imageFetchPriority?: 'high' | 'auto'
 }
 
 
-export default function RecipeCard({ recipe, index, searchQuery, isFavorite, onToggleFavorite, statusBadge, editable }: RecipeCardProps) {
+export default function RecipeCard({
+  recipe, index, searchQuery, isFavorite, onToggleFavorite, statusBadge, editable, imageLoading, imageFetchPriority,
+}: RecipeCardProps) {
   const navigate = useNavigate()
   const { lang } = useLanguage()
   const tx = t[lang]
@@ -48,8 +52,8 @@ export default function RecipeCard({ recipe, index, searchQuery, isFavorite, onT
                 src={recipe.image}
                 alt={displayTitle}
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                loading={index < 4 ? 'eager' : 'lazy'}
-                fetchPriority={index === 0 ? 'high' : 'auto'}
+                loading={imageLoading ?? (index < 4 ? 'eager' : 'lazy')}
+                fetchPriority={imageFetchPriority ?? (index === 0 ? 'high' : 'auto')}
               />
             ) : (
               <RecipePlaceholder recipe={recipe} />
