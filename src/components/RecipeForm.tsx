@@ -590,8 +590,8 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
                                   <DragHandle attributes={itemAttrs} listeners={itemListeners} className="mt-2.5" />
                                   <div className="flex flex-col gap-2 flex-1 min-w-0">
                                     <div className="flex gap-2">
-                                      <input type="number" step="any" value={item.amount ?? ''} onChange={e => updateIngredientItem(gi, ii, { amount: Number(e.target.value) })} className={`${inputClass} w-16 shrink-0`} placeholder={lang === 'he' ? 'כמות' : 'Qty'} />
-                                      <input value={item.unit ?? ''} onChange={e => updateIngredientItem(gi, ii, { unit: e.target.value })} className={`${inputClass} w-16 shrink-0`} placeholder={lang === 'he' ? 'יחידה' : 'Unit'} />
+                                      <input type="number" step="any" value={item.amount ?? ''} onChange={e => updateIngredientItem(gi, ii, { amount: Number(e.target.value) })} className={`${inputClass} !w-16 shrink-0`} placeholder={lang === 'he' ? 'כמות' : 'Qty'} />
+                                      <input value={item.unit ?? ''} onChange={e => updateIngredientItem(gi, ii, { unit: e.target.value })} className={`${inputClass} !w-16 shrink-0`} placeholder={lang === 'he' ? 'יחידה' : 'Unit'} />
                                       <button type="button" onClick={() => removeIngredientItem(gi, ii)} className="shrink-0 text-red-400/60 hover:text-red-400 text-xs px-1">✕</button>
                                     </div>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
