@@ -91,6 +91,21 @@ export interface Recipe {
   reviewComment?: string
   currentRevision?: number
   publishedRevision?: number | null
+  qualityReview?: QualityReview
+}
+
+export interface QualityFinding {
+  category: string
+  severity: 'critical' | 'major' | 'minor'
+  message: string
+  field?: string
+}
+
+export interface QualityReview {
+  score: number
+  checkedAt: string
+  findings: QualityFinding[]
+  suggestedFields?: Record<string, unknown>
 }
 
 export interface RecipeRevision {

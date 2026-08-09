@@ -42,6 +42,29 @@ describe('GeminiService', () => {
     await expect(service.generateStructured('x')).rejects.toThrow('Gemini returned an empty response')
   })
 
+  it('generateStructuredWithImage sends the image inline and parses the JSON text response', async () => {
+    mockGenerateContent.mockResolvedValue({ text: '{"score":90}' })
+    const config = { get: jest.fn().mockReturnValue('test-key') }
+    const service = new GeminiService(config as unknown as ConfigService)
+
+    const result = await service.generateStructuredWithImage<{ score: number }>('review this', 'aW1n', 'image/jpeg')
+
+    expect(result).toEqual({ score: 90 })
+    expect(mockGenerateContent).toHaveBeenCalledWith({
+      model: 'gemini-3.5-flash',
+      contents: [{ role: 'user', parts: [{ inlineData: { data: 'aW1n', mimeType: 'image/jpeg' } }, { text: 'review this' }] }],
+      config: { responseMimeType: 'application/json' },
+    })
+  })
+
+  it('generateStructuredWithImage throws when Gemini returns an empty response', async () => {
+    mockGenerateContent.mockResolvedValue({ text: undefined })
+    const config = { get: jest.fn().mockReturnValue('test-key') }
+    const service = new GeminiService(config as unknown as ConfigService)
+
+    await expect(service.generateStructuredWithImage('x', 'aW1n', 'image/jpeg')).rejects.toThrow('Gemini returned an empty response')
+  })
+
   it('generateText returns the plain text response', async () => {
     mockGenerateContent.mockResolvedValue({ text: 'hello there' })
     const config = { get: jest.fn().mockReturnValue('test-key') }

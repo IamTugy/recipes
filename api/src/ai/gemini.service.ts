@@ -39,6 +39,21 @@ export class GeminiService {
     return JSON.parse(response.text) as T
   }
 
+  // Same JSON-structured contract as generateStructured, but with an image
+  // attached - used by the recipe quality review, which needs to judge the
+  // photo alongside the recipe text (does it match the dish, is it usable
+  // quality) in one call rather than a separate vision pass.
+  async generateStructuredWithImage<T>(prompt: string, imageBase64: string, mimeType: string): Promise<T> {
+    const client = this.getClient()
+    const response = await client.models.generateContent({
+      model: this.model,
+      contents: [{ role: 'user', parts: [{ inlineData: { data: imageBase64, mimeType } }, { text: prompt }] }],
+      config: { responseMimeType: 'application/json' },
+    })
+    if (!response.text) throw new Error('Gemini returned an empty response')
+    return JSON.parse(response.text) as T
+  }
+
   // Plain text generation, no JSON constraint - not used by the recipe
   // import feature, but exists now so a future chat feature can call
   // GeminiService directly without needing changes here.

@@ -1,4 +1,4 @@
-import { ForbiddenException, NotFoundException } from '@nestjs/common'
+import { NotFoundException } from '@nestjs/common'
 import { RecipesController } from './recipes.controller'
 
 describe('RecipesController', () => {
@@ -11,10 +11,7 @@ describe('RecipesController', () => {
     createDraft: jest.fn(),
     updateDraft: jest.fn(),
     submitForReview: jest.fn(),
-    cancelSubmission: jest.fn(),
-    listPendingSubmissions: jest.fn(),
-    approveSubmission: jest.fn(),
-    rejectSubmission: jest.fn(),
+    listRecentSubmissions: jest.fn(),
     listRevisions: jest.fn(),
     canViewDraftRevisions: jest.fn(),
     remove: jest.fn(),
@@ -116,16 +113,21 @@ describe('RecipesController', () => {
     expect(result).toEqual({ userId: 'user_2', name: null, recipes: [] })
   })
 
-  it('GET /recipes/admin/submissions returns the pending queue for an admin', async () => {
-    recipesService.listPendingSubmissions.mockResolvedValue([{ slug: 'a' }])
-    const controller = makeController('admin_1')
-    await expect(controller.listPendingSubmissions({ userId: 'admin_1' } as any)).resolves.toEqual([{ slug: 'a' }])
-  })
+  it('GET /recipes/submissions returns the recent AI-review feed, annotated with owner display names', async () => {
+    recipesService.listRecentSubmissions.mockResolvedValue([
+      { slug: 'a', ownerId: 'user_1' },
+      { slug: 'b', ownerId: 'user_2' },
+    ])
+    usersService.namesByIds.mockResolvedValue({ user_1: 'Tugy' })
+    const controller = makeController()
 
-  it('GET /recipes/admin/submissions throws ForbiddenException for a non-admin', async () => {
-    const controller = makeController('admin_1')
-    await expect(controller.listPendingSubmissions({ userId: 'user_1' } as any)).rejects.toThrow(ForbiddenException)
-    expect(recipesService.listPendingSubmissions).not.toHaveBeenCalled()
+    const result = await controller.listRecentSubmissions()
+
+    expect(usersService.namesByIds).toHaveBeenCalledWith(['user_1', 'user_2'])
+    expect(result).toEqual([
+      { slug: 'a', ownerId: 'user_1', ownerName: 'Tugy' },
+      { slug: 'b', ownerId: 'user_2', ownerName: null },
+    ])
   })
 
   it('POST /recipes creates a draft owned by the requester', async () => {
@@ -148,52 +150,13 @@ describe('RecipesController', () => {
     expect(result).toEqual({ slug: 'tomato-soup', title: 'Tomato Soup v2' })
   })
 
-  it('POST /recipes/:slug/submit submits the recipe for review', async () => {
-    const submitted = { toObject: () => ({ slug: 'a', status: 'pending_review' }) }
+  it('POST /recipes/:slug/submit submits the recipe for the AI review gate', async () => {
+    const submitted = { toObject: () => ({ slug: 'a', status: 'published', qualityReview: { score: 100 } }) }
     recipesService.submitForReview.mockResolvedValue(submitted)
     const controller = makeController()
     const result = await controller.submit('a', { userId: 'user_1' } as any)
     expect(recipesService.submitForReview).toHaveBeenCalledWith('a', 'user_1', false)
-    expect(result).toEqual({ slug: 'a', status: 'pending_review' })
-  })
-
-  it('POST /recipes/:slug/cancel-submission cancels a pending submission', async () => {
-    const cancelled = { toObject: () => ({ slug: 'a', status: 'draft' }) }
-    recipesService.cancelSubmission.mockResolvedValue(cancelled)
-    const controller = makeController()
-    const result = await controller.cancelSubmission('a', { userId: 'user_1' } as any)
-    expect(recipesService.cancelSubmission).toHaveBeenCalledWith('a', 'user_1', false)
-    expect(result).toEqual({ slug: 'a', status: 'draft' })
-  })
-
-  it('POST /recipes/:slug/approve publishes the recipe for an admin', async () => {
-    const approved = { toObject: () => ({ slug: 'a', status: 'published' }) }
-    recipesService.approveSubmission.mockResolvedValue(approved)
-    const controller = makeController('admin_1')
-    const result = await controller.approve('a', { userId: 'admin_1' } as any)
-    expect(recipesService.approveSubmission).toHaveBeenCalledWith('a', 'admin_1')
-    expect(result).toEqual({ slug: 'a', status: 'published' })
-  })
-
-  it('POST /recipes/:slug/approve throws ForbiddenException for a non-admin', async () => {
-    const controller = makeController('admin_1')
-    await expect(controller.approve('a', { userId: 'user_1' } as any)).rejects.toThrow(ForbiddenException)
-    expect(recipesService.approveSubmission).not.toHaveBeenCalled()
-  })
-
-  it('POST /recipes/:slug/reject rejects the recipe with a comment for an admin', async () => {
-    const rejected = { toObject: () => ({ slug: 'a', status: 'rejected' }) }
-    recipesService.rejectSubmission.mockResolvedValue(rejected)
-    const controller = makeController('admin_1')
-    const result = await controller.reject('a', { comment: 'needs a photo' }, { userId: 'admin_1' } as any)
-    expect(recipesService.rejectSubmission).toHaveBeenCalledWith('a', 'needs a photo')
-    expect(result).toEqual({ slug: 'a', status: 'rejected' })
-  })
-
-  it('POST /recipes/:slug/reject throws ForbiddenException for a non-admin', async () => {
-    const controller = makeController('admin_1')
-    await expect(controller.reject('a', { comment: 'x' }, { userId: 'user_1' } as any)).rejects.toThrow(ForbiddenException)
-    expect(recipesService.rejectSubmission).not.toHaveBeenCalled()
+    expect(result).toEqual({ slug: 'a', status: 'published', qualityReview: { score: 100 } })
   })
 
   it("GET /recipes/:slug/revisions includes drafts when the requester can view them (owner/admin)", async () => {
