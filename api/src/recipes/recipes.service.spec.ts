@@ -295,14 +295,17 @@ describe('RecipesService', () => {
     expect(revisionCreate).toHaveBeenCalledWith(expect.objectContaining({ recipeId: 'tomato-soup', revisionNumber: 1, authorId: 'user_1' }))
   })
 
-  it('createDraft drops sources that repeat the same URL as an earlier one', async () => {
+  it('createDraft drops sources that repeat the same title as an earlier one, even with a different URL', async () => {
+    // Search-grounded citations of the same source get their own unique
+    // Vertex AI redirect URL per citation, so URL alone can't detect the
+    // duplicate - title is the reliable signal here.
     const exists = jest.fn().mockResolvedValue(null)
     const dto = {
       ...minimalDto,
       sources: [
-        { title: 'A', url: 'https://example.com/recipe' },
-        { title: 'A again', url: 'https://example.com/recipe' },
-        { title: 'B', url: 'https://example.com/other' },
+        { title: 'example.com', url: 'https://redirect.example/citation/1' },
+        { title: 'example.com', url: 'https://redirect.example/citation/2' },
+        { title: 'other.com', url: 'https://redirect.example/citation/3' },
       ],
     }
     const create = jest.fn().mockResolvedValue({ id: 'tomato-soup', slug: 'tomato-soup', ...dto, currentRevision: 1 })
@@ -311,8 +314,8 @@ describe('RecipesService', () => {
 
     expect(create).toHaveBeenCalledWith(expect.objectContaining({
       sources: [
-        { title: 'A', url: 'https://example.com/recipe' },
-        { title: 'B', url: 'https://example.com/other' },
+        { title: 'example.com', url: 'https://redirect.example/citation/1' },
+        { title: 'other.com', url: 'https://redirect.example/citation/3' },
       ],
     }))
   })

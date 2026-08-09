@@ -35,7 +35,7 @@ Check for all of the following and report a finding for each problem you find (n
 - Quantities that don't make sense (wildly wrong amount for the dish, or for the stated servings)
 - The photo doesn't look like real food, is low quality/blurry/unusable, or doesn't match the dish described
 - Missing or incomplete steps for a dish that clearly needs them
-- Steps that would benefit from a timer but have none set (use judgment - not every step needs one)
+- Steps that would benefit from a timer but have none set - check the actual "timerMinutes" field on that step in the JSON before flagging this; if it's already a number, the timer is set and this is NOT a finding, regardless of how the instruction text reads (use judgment on which steps need one at all - not every step does)
 - Ingredients listed but never referenced in any step, or a step referencing an ingredient that isn't listed
 - Duplicate or near-duplicate ingredient entries
 - An ingredient with an empty unit where that's actually wrong: empty unit is fine for a naturally countable whole item ("1 onion", "10 grapes", "1 garlic clove"), but wrong for something measured by mass/volume ("1 milk" or "1 butter" needs a unit like g or ml)

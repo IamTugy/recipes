@@ -28,15 +28,19 @@ function isCastError(err: unknown): boolean {
   return err instanceof Error && err.name === 'CastError'
 }
 
-// Drops sources whose URL exactly repeats an earlier one (trimmed,
-// case-insensitive) - a client or the AI import/generate flow occasionally
-// cites the same page twice, and the "Sources" section shouldn't show a
-// duplicate link.
+// Drops sources that repeat an earlier one. Dedupe by title, not URL - the
+// AI-research flow's search grounding gives each citation of the same
+// source its own unique Vertex AI redirect URL, so two citations of the
+// same page have different URLs but identical titles (see
+// GeminiService.generateWithSearch, which applies the same rule to its own
+// output - this catches sources that made it past that first dedup pass,
+// e.g. from re-running research or merging citations another way). Falls
+// back to the URL when the title is empty.
 function dedupeSources(sources?: { title: string; url: string }[]): { title: string; url: string }[] | undefined {
   if (!sources) return sources
   const seen = new Set<string>()
   return sources.filter(s => {
-    const key = s.url.trim().toLowerCase()
+    const key = (s.title.trim() || s.url.trim()).toLowerCase()
     if (seen.has(key)) return false
     seen.add(key)
     return true
