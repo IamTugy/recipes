@@ -238,8 +238,15 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
     // need a server-rendered page with this recipe's own og:image/og:title.
     // Carry the currently-viewed revision along too, so sharing an older
     // version previews and links to that version, not whatever's live now.
+    // When sharing the live version, tack on the published revision number -
+    // crawlers cache previews per exact URL, so without this, editing a
+    // recipe's photo/title after it's been shared once would leave every
+    // future share stuck showing the old preview forever.
+    const shareQuery = viewingRevision
+      ? `?rev=${viewingRevision.id}`
+      : recipe?.publishedRevision != null ? `?v=${recipe.publishedRevision}` : ''
     const shareUrl = id
-      ? `${window.location.origin}/share/recipes/${id}${viewingRevision ? `?rev=${viewingRevision.id}` : ''}`
+      ? `${window.location.origin}/share/recipes/${id}${shareQuery}`
       : window.location.href
     const shareData = { title: displayTitle, text: displayDescription, url: shareUrl }
     if (navigator.share) {
