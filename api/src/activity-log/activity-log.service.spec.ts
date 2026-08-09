@@ -21,6 +21,23 @@ describe('ActivityLogService', () => {
     })
   })
 
+  it('record swallows errors from a failed persist instead of throwing', async () => {
+    const create = jest.fn().mockRejectedValue(new Error('Mongo hiccup'))
+    const moduleRef = await Test.createTestingModule({
+      providers: [ActivityLogService, { provide: getModelToken(ActivityLog.name), useValue: { create } }],
+    }).compile()
+
+    const service = moduleRef.get(ActivityLogService)
+
+    await expect(service.record('user_1', 'recipe-a', 'recipe_viewed')).resolves.toBeUndefined()
+    expect(create).toHaveBeenCalledWith({
+      userId: 'user_1',
+      recipeId: 'recipe-a',
+      action: 'recipe_viewed',
+      metadata: undefined,
+    })
+  })
+
   it('trendingIds returns recipeIds ordered by view count within the window', async () => {
     const aggregate = jest.fn().mockResolvedValue([
       { _id: 'a', count: 5 },

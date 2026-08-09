@@ -143,9 +143,20 @@ export default function Home() {
   const filteredCountRef = useRef(filtered.length)
   filteredCountRef.current = filtered.length
 
+  // Suppresses two false-positive logs: (1) the initial mount, where `search`
+  // may already be non-empty because it was seeded from the URL (?q=/&tag=)
+  // rather than typed by the user, and (2) while `recipes` are still loading,
+  // where resultsCount would read as 0 regardless of whether the query
+  // actually matches once data arrives.
+  const isFirstRun = useRef(true)
+
   useEffect(() => {
+    if (isFirstRun.current) {
+      isFirstRun.current = false
+      return
+    }
     const trimmed = search.trim()
-    if (!trimmed) return
+    if (!trimmed || loading) return
     const timer = setTimeout(() => {
       logSearch(trimmed, filteredCountRef.current, getToken)
     }, 1000)
