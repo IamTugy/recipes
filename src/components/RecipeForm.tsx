@@ -503,19 +503,19 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div>
                 <label className={labelClass}>{lang === 'he' ? 'קלוריות' : 'Calories'}</label>
-                <input type="number" min={0} value={nutrition.calories ?? ''} onChange={e => setNutrition(n => ({ ...n, calories: e.target.value ? Number(e.target.value) : undefined }))} className={inputClass} />
+                <input type="number" min={0} step="any" value={nutrition.calories ?? ''} onChange={e => setNutrition(n => ({ ...n, calories: e.target.value ? Number(e.target.value) : undefined }))} className={inputClass} />
               </div>
               <div>
                 <label className={labelClass}>{lang === 'he' ? 'חלבון (גרם)' : 'Protein (g)'}</label>
-                <input type="number" min={0} value={nutrition.protein ?? ''} onChange={e => setNutrition(n => ({ ...n, protein: e.target.value ? Number(e.target.value) : undefined }))} className={inputClass} />
+                <input type="number" min={0} step="any" value={nutrition.protein ?? ''} onChange={e => setNutrition(n => ({ ...n, protein: e.target.value ? Number(e.target.value) : undefined }))} className={inputClass} />
               </div>
               <div>
                 <label className={labelClass}>{lang === 'he' ? 'פחמימות (גרם)' : 'Carbs (g)'}</label>
-                <input type="number" min={0} value={nutrition.carbs ?? ''} onChange={e => setNutrition(n => ({ ...n, carbs: e.target.value ? Number(e.target.value) : undefined }))} className={inputClass} />
+                <input type="number" min={0} step="any" value={nutrition.carbs ?? ''} onChange={e => setNutrition(n => ({ ...n, carbs: e.target.value ? Number(e.target.value) : undefined }))} className={inputClass} />
               </div>
               <div>
                 <label className={labelClass}>{lang === 'he' ? 'שומן (גרם)' : 'Fat (g)'}</label>
-                <input type="number" min={0} value={nutrition.fat ?? ''} onChange={e => setNutrition(n => ({ ...n, fat: e.target.value ? Number(e.target.value) : undefined }))} className={inputClass} />
+                <input type="number" min={0} step="any" value={nutrition.fat ?? ''} onChange={e => setNutrition(n => ({ ...n, fat: e.target.value ? Number(e.target.value) : undefined }))} className={inputClass} />
               </div>
               <div>
                 <label className={labelClass}>{lang === 'he' ? 'משקל מנה משוער (גרם)' : 'Est. serving weight (g)'}</label>
