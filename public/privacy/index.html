@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy - Tugy's Cookbook</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #1a1612;
+      --cream: #f5efe6;
+      --amber: #d9a441;
+      --dim: rgba(245, 239, 230, 0.65);
+      --line: rgba(245, 239, 230, 0.1);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--cream);
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Rubik", system-ui, sans-serif;
+      line-height: 1.6;
+    }
+    main {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 4rem 1.5rem 6rem;
+    }
+    h1 {
+      font-family: Georgia, "Cormorant Garamond", serif;
+      font-size: 2rem;
+      margin-bottom: 0.25rem;
+    }
+    .updated {
+      color: var(--dim);
+      font-size: 0.85rem;
+      margin-bottom: 2.5rem;
+    }
+    h2 {
+      font-family: Georgia, "Cormorant Garamond", serif;
+      font-size: 1.25rem;
+      margin-top: 2.5rem;
+      margin-bottom: 0.75rem;
+      color: var(--amber);
+    }
+    p, li { color: var(--dim); font-size: 0.95rem; }
+    ul { padding-left: 1.25rem; }
+    li { margin-bottom: 0.5rem; }
+    a { color: var(--amber); }
+    hr { border: none; border-top: 1px solid var(--line); margin: 3rem 0; }
+    .back { display: inline-block; margin-bottom: 2rem; color: var(--dim); text-decoration: none; font-size: 0.85rem; }
+    .back:hover { color: var(--cream); }
+  </style>
+</head>
+<body>
+  <main>
+    <a class="back" href="/">&larr; Tugy's Cookbook</a>
+    <h1>Privacy Policy</h1>
+    <p class="updated">Last updated: August 9, 2026</p>
+
+    <p>
+      Tugy's Cookbook ("the app") is a personal recipe collection app. This page explains what
+      data the app collects, why, and how it's handled. If anything here is unclear, contact
+      <a href="mailto:tugmica@gmail.com">tugmica@gmail.com</a>.
+    </p>
+
+    <h2>Account information</h2>
+    <p>
+      Signing in is handled by Clerk, a third-party authentication provider. Clerk may collect
+      your email address, name, and profile photo depending on how you sign in (email, Google,
+      etc). See <a href="https://clerk.com/legal/privacy" target="_blank" rel="noopener">Clerk's
+      privacy policy</a> for details on how they handle this data. The app itself stores your
+      Clerk user ID to associate recipes, favorites, and ratings with your account.
+    </p>
+
+    <h2>Content you provide</h2>
+    <ul>
+      <li>Recipes you create, edit, or import (titles, ingredients, steps, photos, notes)</li>
+      <li>Photos you upload, including AI-enhanced versions of your photos</li>
+      <li>Ratings, favorites, and shopping list items</li>
+      <li>Feature requests or feedback you submit</li>
+      <li>Text, URLs, or photos you submit for AI-assisted recipe import</li>
+    </ul>
+    <p>
+      Uploaded photos are stored on Cloudflare R2 object storage. Recipe data is stored in a
+      MongoDB database operated by the app.
+    </p>
+
+    <h2>AI features</h2>
+    <p>
+      Features like AI recipe import, photo enhancement, translation, and nutrition estimates
+      send the relevant text or image data to Google's Gemini API for processing. This data is
+      sent solely to generate the requested result and is not used by this app for any other
+      purpose. Refer to <a href="https://ai.google.dev/gemini-api/terms" target="_blank" rel="noopener">Google's Gemini API terms</a>
+      for how Google handles data sent to their API.
+    </p>
+
+    <h2>What this app does not do</h2>
+    <ul>
+      <li>No advertising or ad tracking</li>
+      <li>No selling or sharing your data with third parties for marketing</li>
+      <li>No analytics/tracking SDKs beyond basic, self-hosted view/rating counters on recipes</li>
+    </ul>
+
+    <h2>Data retention & deletion</h2>
+    <p>
+      Your recipes, favorites, and account data are retained as long as your account exists.
+      To request deletion of your account and associated data, email
+      <a href="mailto:tugmica@gmail.com">tugmica@gmail.com</a>.
+    </p>
+
+    <h2>Contact</h2>
+    <p>
+      Questions about this policy: <a href="mailto:tugmica@gmail.com">tugmica@gmail.com</a>.
+    </p>
+
+    <hr />
+    <a class="back" href="/">&larr; Back to Tugy's Cookbook</a>
+  </main>
+</body>
+</html>
