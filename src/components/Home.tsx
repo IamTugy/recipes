@@ -9,42 +9,58 @@ import RecipeCardSkeleton from './RecipeCardSkeleton'
 import RecipeStrip from './RecipeStrip'
 import AppSelect from './ui/AppSelect'
 import VirtualRecipeGrid from './VirtualRecipeGrid'
+import FilterInfoPopover from './FilterInfoPopover'
+import { DIFFICULTY_FILTERS, DIETARY_FILTERS, KOSHER_FILTERS } from '../lib/filterDefinitions'
 
 const categories: Category[] = ['breakfast', 'lunch', 'dinner', 'dessert', 'salad', 'soup', 'snack', 'bread', 'sauce']
-const difficulties: Difficulty[] = ['easy', 'medium', 'hard']
 
-const dietaryFilters = [
-  { key: 'vegetarian', label: { en: 'Vegetarian', he: 'צמחוני' }, keywords: ['vegetarian', 'צמחוני'] },
-  { key: 'vegan', label: { en: 'Vegan', he: 'טבעוני' }, keywords: ['vegan', 'טבעוני'] },
-  { key: 'gluten-free', label: { en: 'Gluten-free', he: 'ללא גלוטן' }, keywords: ['gluten-free', 'gluten free', 'ללא גלוטן'] },
-  { key: 'dairy-free', label: { en: 'Dairy-free', he: 'ללא חלב' }, keywords: ['dairy-free', 'dairy free', 'ללא חלב', 'ללא מוצרי חלב'] },
-] as const
+const dietaryKeywords: Record<string, string[]> = {
+  vegetarian: ['vegetarian', 'צמחוני'],
+  vegan: ['vegan', 'טבעוני'],
+  'gluten-free': ['gluten-free', 'gluten free', 'ללא גלוטן'],
+  'dairy-free': ['dairy-free', 'dairy free', 'ללא חלב', 'ללא מוצרי חלב'],
+}
 
 type SortOption = 'default' | 'rating' | 'quickest' | 'newest'
 
 export default function Home() {
   const navigate = useNavigate()
+  // Initial state is read from the URL once on mount (lazy initializers) so
+  // a shared link reproduces the exact filtered view. "tag" is kept as a
+  // legacy alias for "q" - old share links used it before this sync existed.
   const [searchParams, setSearchParams] = useSearchParams()
   const { lang } = useLanguage()
   const tx = t[lang]
-  const [search, setSearch] = useState(() => searchParams.get('tag') ?? '')
-
-  // Consume the ?tag= param once on load (clicking a tag elsewhere seeds the search box)
-  useEffect(() => {
-    if (searchParams.get('tag')) {
-      setSearchParams({}, { replace: true })
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-  const [activeCategory, setActiveCategory] = useState<Category | null>(null)
-  const [activeDifficulty, setActiveDifficulty] = useState<Difficulty | null>(null)
-  const [activeDietary, setActiveDietary] = useState<string | null>(null)
+  const [search, setSearch] = useState(() => searchParams.get('q') ?? searchParams.get('tag') ?? '')
+  const [activeCategory, setActiveCategory] = useState<Category | null>(() => (searchParams.get('category') as Category) || null)
+  const [activeDifficulty, setActiveDifficulty] = useState<Difficulty | null>(() => (searchParams.get('diff') as Difficulty) || null)
+  const [activeDietary, setActiveDietary] = useState<string | null>(() => searchParams.get('diet') || null)
+  const [activeKosher, setActiveKosher] = useState<string | null>(() => searchParams.get('kosher') || null)
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(() => searchParams.get('fav') === '1')
+  const [sortBy, setSortBy] = useState<SortOption>(() => (searchParams.get('sort') as SortOption) || 'default')
+  const [advancedOpen, setAdvancedOpen] = useState(false)
   const { recipes, loading, error } = useRecipes()
   const { favoriteSlugs, toggle: toggleFavorite } = useFavorites()
-  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false)
-  const [sortBy, setSortBy] = useState<SortOption>('default')
   const { trending } = useTrending()
   const searchInputRef = useRef<HTMLInputElement>(null)
+
+  // Keep the URL in sync with every filter/search/sort change (replace, not
+  // push, so typing in the search box doesn't spam browser history) - a
+  // shared link always reproduces the exact filtered view.
+  useEffect(() => {
+    const next = new URLSearchParams()
+    if (search.trim()) next.set('q', search.trim())
+    if (activeCategory) next.set('category', activeCategory)
+    if (activeDifficulty) next.set('diff', activeDifficulty)
+    if (activeDietary) next.set('diet', activeDietary)
+    if (activeKosher) next.set('kosher', activeKosher)
+    if (showFavoritesOnly) next.set('fav', '1')
+    if (sortBy !== 'default') next.set('sort', sortBy)
+    setSearchParams(next, { replace: true })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search, activeCategory, activeDifficulty, activeDietary, activeKosher, showFavoritesOnly, sortBy])
+
+  const advancedActiveCount = [activeDifficulty, activeDietary, activeKosher].filter(Boolean).length
 
   // "/" focuses search (from anywhere on the page), Escape clears + blurs it
   useEffect(() => {
@@ -71,14 +87,15 @@ export default function Home() {
     if (activeCategory) list = list.filter(r => r.category === activeCategory)
     if (activeDifficulty) list = list.filter(r => r.difficulty === activeDifficulty)
     if (activeDietary) {
-      const filter = dietaryFilters.find(f => f.key === activeDietary)
-      if (filter) {
+      const keywords = dietaryKeywords[activeDietary]
+      if (keywords) {
         list = list.filter(r => {
           const allTags = [...r.tags, ...(r.tagsEn ?? [])].map(t => t.toLowerCase())
-          return filter.keywords.some(k => allTags.some(tag => tag.includes(k.toLowerCase())))
+          return keywords.some(k => allTags.some(tag => tag.includes(k.toLowerCase())))
         })
       }
     }
+    if (activeKosher) list = list.filter(r => r.kosherType === activeKosher)
     if (search.trim()) {
       const q = search.toLowerCase()
       list = list.filter(r => {
@@ -114,7 +131,7 @@ export default function Home() {
       list = [...list].sort((a, b) => (b.createdAt ?? '').localeCompare(a.createdAt ?? ''))
     }
     return list
-  }, [search, activeCategory, activeDifficulty, activeDietary, lang, recipes, showFavoritesOnly, favoriteSlugs, sortBy])
+  }, [search, activeCategory, activeDifficulty, activeDietary, activeKosher, lang, recipes, showFavoritesOnly, favoriteSlugs, sortBy])
 
   function surpriseMe() {
     if (filtered.length === 0) return
@@ -204,45 +221,96 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Difficulty filter */}
+      {/* Advanced filters */}
       <div className="max-w-6xl mx-auto px-6 mb-6">
-        <div className="flex gap-1.5">
-          {difficulties.map(diff => (
-            <button type="button"
-              key={diff}
-              onClick={() => setActiveDifficulty(diff === activeDifficulty ? null : diff)}
-              className={`px-3 py-1.5 text-[11px] tracking-wider font-medium transition-colors rounded-lg border ${
-                activeDifficulty === diff
-                  ? 'text-amber bg-amber/10 border-amber/20'
-                  : 'text-cream/35 hover:text-cream/60 border-tint/10'
-              }`}
-            >
-              {tx.difficulty[diff]}
-            </button>
-          ))}
-        </div>
+        <button
+          type="button"
+          onClick={() => setAdvancedOpen(v => !v)}
+          className="flex items-center gap-1.5 text-xs font-medium text-cream/40 hover:text-cream/70 transition-colors"
+        >
+          <svg className={`w-3.5 h-3.5 transition-transform ${advancedOpen ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+          <span>{lang === 'he' ? 'סינון מתקדם' : 'Advanced filters'}</span>
+          {advancedActiveCount > 0 && (
+            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber/10 text-amber">
+              {advancedActiveCount}
+            </span>
+          )}
+        </button>
+
+        {advancedOpen && (
+          <div className="mt-3 space-y-4">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-cream/25 mb-1.5">
+                {lang === 'he' ? 'רמת קושי' : 'Difficulty'}
+              </p>
+              <div className="flex gap-1.5 flex-wrap">
+                {DIFFICULTY_FILTERS.map(f => (
+                  <button type="button"
+                    key={f.key}
+                    onClick={() => setActiveDifficulty(f.key === activeDifficulty ? null : f.key as Difficulty)}
+                    className={`flex items-center gap-1 px-3 py-1.5 text-[11px] tracking-wider font-medium transition-colors rounded-lg border ${
+                      activeDifficulty === f.key
+                        ? 'text-amber bg-amber/10 border-amber/20'
+                        : 'text-cream/35 hover:text-cream/60 border-tint/10'
+                    }`}
+                  >
+                    {f.label[lang]}
+                    <FilterInfoPopover text={f.tooltip[lang]} />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-cream/25 mb-1.5">
+                {lang === 'he' ? 'תזונה' : 'Dietary'}
+              </p>
+              <div className="flex gap-1.5 flex-wrap">
+                {DIETARY_FILTERS.map(f => (
+                  <button type="button"
+                    key={f.key}
+                    onClick={() => setActiveDietary(f.key === activeDietary ? null : f.key)}
+                    className={`flex items-center gap-1 px-3 py-1.5 text-[11px] tracking-wider font-medium transition-colors rounded-lg border ${
+                      activeDietary === f.key
+                        ? 'text-amber bg-amber/10 border-amber/20'
+                        : 'text-cream/35 hover:text-cream/60 border-tint/10'
+                    }`}
+                  >
+                    {f.label[lang]}
+                    <FilterInfoPopover text={f.tooltip[lang]} />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-cream/25 mb-1.5">
+                {lang === 'he' ? 'כשרות' : 'Kosher'}
+              </p>
+              <div className="flex gap-1.5 flex-wrap">
+                {KOSHER_FILTERS.map(f => (
+                  <button type="button"
+                    key={f.key}
+                    onClick={() => setActiveKosher(f.key === activeKosher ? null : f.key)}
+                    className={`flex items-center gap-1 px-3 py-1.5 text-[11px] tracking-wider font-medium transition-colors rounded-lg border ${
+                      activeKosher === f.key
+                        ? 'text-amber bg-amber/10 border-amber/20'
+                        : 'text-cream/35 hover:text-cream/60 border-tint/10'
+                    }`}
+                  >
+                    {f.label[lang]}
+                    <FilterInfoPopover text={f.tooltip[lang]} />
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Dietary filter */}
-      <div className="max-w-6xl mx-auto px-6 mb-6">
-        <div className="flex gap-1.5 flex-wrap">
-          {dietaryFilters.map(f => (
-            <button type="button"
-              key={f.key}
-              onClick={() => setActiveDietary(f.key === activeDietary ? null : f.key)}
-              className={`px-3 py-1.5 text-[11px] tracking-wider font-medium transition-colors rounded-lg border ${
-                activeDietary === f.key
-                  ? 'text-amber bg-amber/10 border-amber/20'
-                  : 'text-cream/35 hover:text-cream/60 border-tint/10'
-              }`}
-            >
-              {f.label[lang]}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {!loading && !search && !activeCategory && !activeDifficulty && !activeDietary && !showFavoritesOnly && (
+      {!loading && !search && !activeCategory && !activeDifficulty && !activeDietary && !activeKosher && !showFavoritesOnly && (
         <>
           <RecipeStrip title={lang === 'he' ? '🔥 פופולרי השבוע' : '🔥 Trending this week'} recipes={trending} />
         </>
@@ -252,7 +320,7 @@ export default function Home() {
       <div className="max-w-6xl mx-auto px-6 pb-24">
         <div className="flex items-center justify-between mb-5">
           <p className="text-cream/25 text-xs tracking-wider">
-            {(search || activeCategory || activeDifficulty || activeDietary || showFavoritesOnly)
+            {(search || activeCategory || activeDifficulty || activeDietary || activeKosher || showFavoritesOnly)
               ? `${filtered.length} / ${recipes.length}`
               : `${recipes.length}`
             }

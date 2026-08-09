@@ -54,6 +54,14 @@ export class Recipe {
   @Prop()
   difficulty?: string
 
+  // Kosher-style classification: 'dairy' means contains dairy and no meat/
+  // poultry/fish of any kind; 'meat' means contains any meat/poultry/fish;
+  // 'parve' means neither. Optional - never blocks submission. Set by AI at
+  // creation/import time, owner-editable, re-checked (not enforced) by the
+  // quality review for a mismatch against the actual ingredients.
+  @Prop()
+  kosherType?: 'meat' | 'dairy' | 'parve'
+
   // Per-100g estimate, typically produced by the AI nutrition-estimate
   // endpoint from the ingredient list - never independently validated
   // against the ingredients, so treat it as an approximation, not a fact.

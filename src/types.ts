@@ -13,6 +13,8 @@ export type Category =
 
 export type Difficulty = 'easy' | 'medium' | 'hard'
 
+export type KosherType = 'meat' | 'dairy' | 'parve'
+
 export interface IngredientItem {
   amount: number
   unit: string
@@ -66,6 +68,7 @@ export interface Recipe {
   cookTime: number       // minutes
   servings: number
   difficulty: Difficulty
+  kosherType?: KosherType
   nutrition?: Nutrition   // per-100g estimate, usually AI-generated
   ingredients: IngredientGroup[]
   steps: StepGroup[]

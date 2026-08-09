@@ -21,6 +21,7 @@ const STRUCTURE_PROMPT = `Convert the following recipe write-up into a strict JS
   "cookTime": "number, minutes",
   "servings": "number",
   "difficulty": "one of: easy, medium, hard",
+  "kosherType": "one of: meat, dairy, parve - meat if it contains any meat, poultry, or fish; dairy if it contains dairy and no meat/poultry/fish of any kind; parve if it contains neither. Omit only if you genuinely cannot tell.",
   "ingredients": [{ "group": "Hebrew group name or empty string", "groupEn": "English group name or empty string", "items": [{ "amount": "number", "unit": "one of: g, kg, ml, l, cup, tbsp, tsp, cm, mm, pcs, cloves, bunch, sprigs, or empty string if the ingredient has no unit (e.g. \\"1 onion\\")", "name": "Hebrew ingredient name", "nameEn": "English ingredient name" }] }],
   "steps": [{ "title": "Hebrew section title or empty string", "titleEn": "English section title or empty string", "items": [{ "instruction": "Hebrew step text", "instructionEn": "English step text", "timerMinutes": "number if this step mentions a specific duration" }] }],
   "tips": ["Hebrew tips"],
