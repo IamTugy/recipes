@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@clerk/react'
 import { DndContext, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
 import { SortableContext, arrayMove, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import type { Category, Difficulty, IngredientGroup, IngredientItem, Nutrition, Recipe, StepGroup, StepItem } from '../types'
+import type { Category, Difficulty, IngredientGroup, IngredientItem, KosherType, Nutrition, Recipe, StepGroup, StepItem } from '../types'
 import type { ImportedRecipe } from '../lib/recipeImport'
 import { createRecipe, updateRecipe, type RecipeInput } from '../hooks/useRecipes'
 import { t, categoryEmoji } from '../i18n'
@@ -26,6 +26,7 @@ interface RecipeFormProps {
 
 const CATEGORIES: Category[] = ['breakfast', 'lunch', 'dinner', 'dessert', 'salad', 'soup', 'snack', 'bread', 'sauce']
 const DIFFICULTIES: Difficulty[] = ['easy', 'medium', 'hard']
+const KOSHER_TYPES: KosherType[] = ['meat', 'dairy', 'parve']
 
 // The editor needs a stable identity per row to drive drag-and-drop
 // reordering, but the underlying Recipe data model has no id field on
@@ -100,6 +101,7 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
   const [titleHe, setTitleHe] = useState(prefill?.titleHe ? `${titlePrefix}${prefill.titleHe}` : '')
   const [category, setCategory] = useState<Category>(prefill?.category ?? 'dinner')
   const [difficulty, setDifficulty] = useState<Difficulty>(prefill?.difficulty ?? 'easy')
+  const [kosherType, setKosherType] = useState<KosherType | ''>(prefill?.kosherType ?? '')
   const [cuisine, setCuisine] = useState(prefill?.cuisine ?? '')
   const [image, setImage] = useState(prefill?.image ?? '')
   const [description, setDescription] = useState(prefill?.description ?? '')
@@ -313,6 +315,7 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
         titleHe: titleHe.trim() || undefined,
         category,
         difficulty,
+        kosherType: kosherType || undefined,
         cuisine: cuisine.trim() || undefined,
         image: image.trim(),
         description: description.trim(),
@@ -432,6 +435,20 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
             <div>
               <label className={labelClass}>{lang === 'he' ? 'מטבח' : 'Cuisine'}</label>
               <input value={cuisine} onChange={e => setCuisine(e.target.value)} className={inputClass} />
+            </div>
+            <div>
+              <label className={labelClass} title={lang === 'he' ? 'סיווג כשרות: בשרי, חלבי, או פרווה. אופציונלי.' : 'Kosher classification: meat, dairy, or parve. Optional.'}>
+                {lang === 'he' ? 'כשרות' : 'Kosher'}
+              </label>
+              <AppSelect
+                value={kosherType || 'unset'}
+                onValueChange={value => setKosherType(value === 'unset' ? '' : value as KosherType)}
+                triggerClassName={inputClass}
+                options={[
+                  { value: 'unset', label: lang === 'he' ? '(לא צוין)' : '(Not set)' },
+                  ...KOSHER_TYPES.map(k => ({ value: k, label: tx.kosherType[k] })),
+                ]}
+              />
             </div>
             <div className="flex items-end pb-2">
               <label

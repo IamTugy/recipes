@@ -1,5 +1,5 @@
 import { ApiError } from './api'
-import type { Category, Difficulty, Nutrition } from '../types'
+import type { Category, Difficulty, KosherType, Nutrition } from '../types'
 
 export interface ImportedRecipe {
   title: string
@@ -15,6 +15,7 @@ export interface ImportedRecipe {
   cookTime?: number
   servings?: number
   difficulty?: Difficulty
+  kosherType?: KosherType
   nutrition?: Nutrition
   featured?: boolean
   aiGenerated?: boolean

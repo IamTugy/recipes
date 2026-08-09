@@ -14,6 +14,7 @@ import {
 
 const CATEGORIES = ['breakfast', 'lunch', 'dinner', 'dessert', 'salad', 'soup', 'snack', 'bread', 'sauce']
 const DIFFICULTIES = ['easy', 'medium', 'hard']
+const KOSHER_TYPES = ['meat', 'dairy', 'parve']
 
 export class IngredientItemDto {
   // Not IsInt: fractional amounts are common and valid ("חצי כף" = 0.5 tbsp,
@@ -189,6 +190,10 @@ export class RecipeDto {
 
   @IsIn(DIFFICULTIES)
   difficulty!: string
+
+  @IsIn(KOSHER_TYPES)
+  @IsOptional()
+  kosherType?: string
 
   @ValidateNested()
   @Type(() => NutritionDto)

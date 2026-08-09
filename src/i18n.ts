@@ -1,4 +1,4 @@
-import type { Category, Difficulty } from './types'
+import type { Category, Difficulty, KosherType } from './types'
 
 // singular / plural pairs for Hebrew units
 const heUnitForms: Record<string, [string, string]> = {
@@ -67,6 +67,7 @@ export const t = {
     timerDone: "הסתיים! ✓",
     startTimer: (m: number) => `הפעל טיימר ${m} דקות`,
     difficulty: { easy: 'קל', medium: 'בינוני', hard: 'מאתגר' } as Record<Difficulty, string>,
+    kosherType: { meat: 'בשרי', dairy: 'חלבי', parve: 'פרווה' } as Record<KosherType, string>,
     categories: {
       all: 'הכל',
       breakfast: 'ארוחת בוקר',
@@ -113,6 +114,7 @@ export const t = {
     timerDone: "Done! ✓",
     startTimer: (m: number) => `Start ${m}m timer`,
     difficulty: { easy: 'Easy', medium: 'Medium', hard: 'Hard' } as Record<Difficulty, string>,
+    kosherType: { meat: 'Meat', dairy: 'Dairy', parve: 'Parve' } as Record<KosherType, string>,
     categories: {
       all: 'All',
       breakfast: 'Breakfast',
