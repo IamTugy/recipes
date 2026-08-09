@@ -711,7 +711,7 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
                                         value={step.timerMinutes ?? ''}
                                         onChange={e => updateStepItem(gi, si, { timerMinutes: e.target.value ? Number(e.target.value) : undefined })}
                                         placeholder={lang === 'he' ? 'טיימר (דק׳)' : 'Timer (min)'}
-                                        className={`${inputClass} w-32`}
+                                        className={`${inputClass} !w-32 shrink-0`}
                                       />
                                       <input
                                         value={step.tip ?? ''}
