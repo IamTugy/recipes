@@ -1,7 +1,8 @@
-import { Controller, Get, Param, Query, Res } from '@nestjs/common'
+import { Controller, Get, Logger, Param, Query, Res } from '@nestjs/common'
 import type { Response } from 'express'
 import { RecipesService } from '../recipes/recipes.service'
 import { Public } from '../auth/public.decorator'
+import { ShareImageService } from './share-image.service'
 
 const APP_URL = 'https://recipes.tugy.dev'
 const FALLBACK_IMAGE = 'https://assets.tugy.dev/a-quick-date-and-honey-cake.jpg'
@@ -20,7 +21,12 @@ function escapeHtml(value: string): string {
 // a static page with the right tags, then bounce real visitors into the app.
 @Controller('share')
 export class ShareController {
-  constructor(private readonly recipesService: RecipesService) {}
+  private readonly logger = new Logger(ShareController.name)
+
+  constructor(
+    private readonly recipesService: RecipesService,
+    private readonly shareImageService: ShareImageService,
+  ) {}
 
   @Public()
   @Get('recipes/:id')
@@ -54,10 +60,17 @@ export class ShareController {
 
     const title = escapeHtml(String(content.title ?? ''))
     const description = escapeHtml(String(content.description || content.descriptionEn || ''))
-    // encodeURI, not encodeURIComponent - it leaves an already-valid URL's
-    // structure (:, /, ?) intact while escaping raw non-ASCII characters
-    // (e.g. an unencoded "pão" in the path), which crawlers reject outright.
-    const image = encodeURI(String(content.image || FALLBACK_IMAGE))
+    const rawImage = String(content.image || FALLBACK_IMAGE)
+    // Recipe photos are uploaded at full camera resolution - crawlers like
+    // WhatsApp's silently drop oversized og:images, so route our own hosted
+    // photos through the resize proxy. Anything else (the static fallback,
+    // or an unexpected foreign URL) is served as-is.
+    const image = this.shareImageService.isAllowedSource(rawImage)
+      ? `${APP_URL}/share/image?src=${encodeURIComponent(rawImage)}`
+      // encodeURI, not encodeURIComponent - it leaves an already-valid URL's
+      // structure (:, /, ?) intact while escaping raw non-ASCII characters
+      // (e.g. an unencoded "pão" in the path), which crawlers reject outright.
+      : encodeURI(rawImage)
 
     res.type('html').send(`<!doctype html>
 <html>
@@ -79,5 +92,22 @@ export class ShareController {
 </head>
 <body>Redirecting to <a href="${appUrl}">${title}</a>&hellip;</body>
 </html>`)
+  }
+
+  @Public()
+  @Get('image')
+  async shareImage(@Query('src') src: string | undefined, @Res() res: Response) {
+    if (!src || !this.shareImageService.isAllowedSource(src)) {
+      res.redirect(302, FALLBACK_IMAGE)
+      return
+    }
+    try {
+      const buffer = await this.shareImageService.getResized(src)
+      res.set('Cache-Control', 'public, max-age=2592000, immutable')
+      res.type('image/jpeg').send(buffer)
+    } catch (err) {
+      this.logger.warn(`Failed to resize share image for ${src}: ${err instanceof Error ? err.message : err}`)
+      res.redirect(302, FALLBACK_IMAGE)
+    }
   }
 }
