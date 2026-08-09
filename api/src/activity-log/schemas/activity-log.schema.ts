@@ -8,8 +8,8 @@ export class ActivityLog {
   @Prop({ required: true, index: true })
   userId!: string
 
-  @Prop({ required: true, index: true })
-  recipeId!: string
+  @Prop({ index: true })
+  recipeId?: string
 
   @Prop({ required: true, index: true })
   action!: string

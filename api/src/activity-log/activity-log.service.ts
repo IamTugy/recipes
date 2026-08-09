@@ -16,7 +16,7 @@ export class ActivityLogService {
 
   async record(
     userId: string,
-    recipeId: string,
+    recipeId: string | undefined,
     action: string,
     metadata?: Record<string, unknown>,
   ): Promise<void> {
