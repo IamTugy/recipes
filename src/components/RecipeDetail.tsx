@@ -282,6 +282,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
   }
 
   const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
   const [reviewResult, setReviewResult] = useState<QualityReview | null>(null)
   const [revisionsOpen, setRevisionsOpen] = useState(false)
   const [viewingRevision, setViewingRevision] = useState<RecipeRevision | null>(null)
@@ -332,6 +333,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
     if (!id) return
     setSubmitting(true)
     setReviewResult(null)
+    setSubmitError(null)
     try {
       const result = await submitForReview(id, getToken)
       setReviewResult(result.qualityReview ?? null)
@@ -343,7 +345,13 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
       )
       await reloadRecipe()
     } catch (err) {
-      showToast(err instanceof ApiError ? err.message : (lang === 'he' ? 'השליחה נכשלה' : 'Submission failed'), 'error')
+      // The missing-fields message is a list the user needs time to read and
+      // act on - a 3s toast disappears before they can even finish reading
+      // it. Keep it pinned near the Submit button until they dismiss it or
+      // try again.
+      const message = err instanceof ApiError ? err.message : (lang === 'he' ? 'השליחה נכשלה' : 'Submission failed')
+      setSubmitError(message)
+      showToast(message, 'error')
     } finally {
       setSubmitting(false)
     }
@@ -676,6 +684,37 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
               </button>
             </div>
           )}
+
+          {submitError && canEdit && (() => {
+            const match = submitError.match(/missing\/invalid:\s*(.+)$/i)
+            const items = match ? match[1].split(',').map(s => s.trim()).filter(Boolean) : null
+            return (
+              <div className="card p-3 mb-4 border border-red-400/20">
+                <div className="flex items-start justify-between gap-3">
+                  <p className="text-sm text-red-400 font-medium">
+                    {lang === 'he' ? 'לא ניתן לשלוח - יש להשלים:' : "Can't submit yet - needs:"}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setSubmitError(null)}
+                    aria-label={lang === 'he' ? 'סגור' : 'Dismiss'}
+                    className="shrink-0 text-cream/30 hover:text-cream/60 transition-colors"
+                  >
+                    ✕
+                  </button>
+                </div>
+                {items ? (
+                  <ul className="mt-2 space-y-1 list-disc ps-5">
+                    {items.map((item, i) => (
+                      <li key={i} className="text-xs text-red-400/90">{item}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="mt-1 text-xs text-red-400/90">{submitError}</p>
+                )}
+              </div>
+            )
+          })()}
 
           {/* AI review results - either the outcome of the submission just
               made, or the recipe's last stored review (so a rejected recipe
