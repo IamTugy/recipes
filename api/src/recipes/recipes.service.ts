@@ -9,6 +9,7 @@ import { ActivityLogService } from '../activity-log/activity-log.service'
 import { CookLogService } from '../cook-log/cook-log.service'
 import { UsersService } from '../users/users.service'
 import { SaveRecipeDraftDto } from './dto/save-recipe-draft.dto'
+import { RecipeQualityService } from './quality/recipe-quality.service'
 
 function slugify(text: string): string {
   return text
@@ -51,6 +52,7 @@ export class RecipesService implements OnModuleInit {
     private readonly cookLogService: CookLogService,
     private readonly usersService: UsersService,
     private readonly config: ConfigService,
+    private readonly qualityService: RecipeQualityService,
   ) {}
 
   // One-time backfill: recipes seeded before the ownership/publish-workflow
@@ -332,14 +334,32 @@ export class RecipesService implements OnModuleInit {
     return updated
   }
 
+  // Score threshold an AI review must meet to publish. Below this, the
+  // recipe is rejected with the review's findings instead.
+  private static readonly PUBLISH_THRESHOLD = 95
+
   async submitForReview(id: string, userId: string, isAdmin: boolean): Promise<RecipeDocument> {
     const recipe = await this.getEditableOrThrow(id, userId, isAdmin)
     const missing = this.missingRequiredFields(recipe)
     if (missing.length > 0) {
       throw new BadRequestException(`Cannot submit for review, missing/invalid: ${missing.join(', ')}`)
     }
-    recipe.status = 'pending_review'
-    recipe.reviewComment = undefined
+
+    const review = await this.qualityService.review(recipe.toObject())
+
+    if (review.score >= RecipesService.PUBLISH_THRESHOLD) {
+      await this.revisionModel.updateOne(
+        { recipeId: id, revisionNumber: recipe.currentRevision },
+        { $set: { published: true } },
+      )
+      recipe.publishedRevision = recipe.currentRevision
+      recipe.status = 'published'
+      recipe.reviewComment = undefined
+    } else {
+      recipe.status = 'rejected'
+      recipe.reviewComment = undefined
+    }
+    recipe.qualityReview = review
     await recipe.save()
     return recipe
   }
@@ -354,51 +374,38 @@ export class RecipesService implements OnModuleInit {
     if (!recipe.cookTime && recipe.cookTime !== 0) missing.push('cookTime')
     if (!recipe.servings) missing.push('servings')
     if (!recipe.difficulty) missing.push('difficulty')
-    if (!recipe.ingredients || (recipe.ingredients as unknown[]).length === 0) missing.push('ingredients')
-    if (!recipe.steps || (recipe.steps as unknown[]).length === 0) missing.push('steps')
+
+    const ingredientGroups = (recipe.ingredients ?? []) as { items?: { name?: string; unit?: string }[] }[]
+    if (ingredientGroups.length === 0) {
+      missing.push('ingredients')
+    } else {
+      const hasIncompleteItem = ingredientGroups.some(g =>
+        !g.items || g.items.length === 0 || g.items.some(item => !item.name?.trim() || !item.unit?.trim())
+      )
+      if (hasIncompleteItem) missing.push('ingredients (every item needs a name and unit)')
+    }
+
+    const stepGroups = (recipe.steps ?? []) as { items?: { instruction?: string }[] }[]
+    if (stepGroups.length === 0) {
+      missing.push('steps')
+    } else {
+      const hasIncompleteStep = stepGroups.some(g => !g.items || !g.items.some(item => item.instruction?.trim()))
+      if (hasIncompleteStep) missing.push('steps (every section needs at least one instruction)')
+    }
+
     return missing
   }
 
-  async cancelSubmission(id: string, userId: string, isAdmin: boolean): Promise<RecipeDocument> {
-    const recipe = await this.recipeModel.findOne({ _id: id }).exec()
-    if (!recipe) throw new NotFoundException(`Recipe '${id}' not found`)
-    if (recipe.ownerId !== userId && !isAdmin) throw new ForbiddenException('Only the owner or an admin can cancel this submission')
-    if (recipe.status !== 'pending_review') throw new BadRequestException('This recipe is not pending review')
-    recipe.status = recipe.publishedRevision != null ? 'published' : 'draft'
-    await recipe.save()
-    return recipe
-  }
-
-  async listPendingSubmissions() {
-    const recipes = await this.recipeModel.find({ status: 'pending_review' }).sort({ updatedAt: 1 }).exec()
+  // Recent AI review outcomes across every user's recipes - the public
+  // "in progress" feed. Anything that's ever been through the AI gate has
+  // qualityReview set, whether it ended up published or rejected.
+  async listRecentSubmissions(limit = 50) {
+    const recipes = await this.recipeModel
+      .find({ qualityReview: { $exists: true } })
+      .sort({ 'qualityReview.checkedAt': -1 })
+      .limit(limit)
+      .exec()
     return recipes.map(r => r.toObject())
-  }
-
-  async approveSubmission(id: string, adminId: string): Promise<RecipeDocument> {
-    const recipe = await this.recipeModel.findOne({ _id: id }).exec()
-    if (!recipe) throw new NotFoundException(`Recipe '${id}' not found`)
-    if (recipe.status !== 'pending_review') throw new BadRequestException('This recipe is not pending review')
-
-    await this.revisionModel.updateOne(
-      { recipeId: id, revisionNumber: recipe.currentRevision },
-      { $set: { published: true } },
-    )
-
-    recipe.publishedRevision = recipe.currentRevision
-    recipe.status = 'published'
-    recipe.reviewComment = undefined
-    await recipe.save()
-    return recipe
-  }
-
-  async rejectSubmission(id: string, comment: string): Promise<RecipeDocument> {
-    const recipe = await this.recipeModel.findOne({ _id: id }).exec()
-    if (!recipe) throw new NotFoundException(`Recipe '${id}' not found`)
-    if (recipe.status !== 'pending_review') throw new BadRequestException('This recipe is not pending review')
-    recipe.status = 'rejected'
-    recipe.reviewComment = comment
-    await recipe.save()
-    return recipe
   }
 
   async canViewDraftRevisions(id: string, userId: string, isAdmin: boolean): Promise<boolean> {

@@ -108,6 +108,16 @@ export class Recipe {
   @Prop()
   reviewComment?: string
 
+  // Result of the automated AI quality review that gates publishing.
+  // Overwritten on each resubmission - no history kept for v1.
+  @Prop({ type: MongooseSchema.Types.Mixed })
+  qualityReview?: {
+    score: number
+    checkedAt: string
+    findings: { category: string; severity: 'critical' | 'major' | 'minor'; message: string; field?: string }[]
+    suggestedFields?: Record<string, unknown>
+  }
+
   @Prop({ default: 0 })
   currentRevision!: number
 

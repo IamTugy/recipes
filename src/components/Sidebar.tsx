@@ -1,11 +1,9 @@
 import { type ReactNode } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { useAuth } from '@clerk/react'
 import { Dialog } from '@base-ui/react/dialog'
 import { useLanguage } from '../hooks/useLanguage'
 import { useTheme } from '../hooks/useTheme'
-import { useMyRecipes, usePendingSubmissions } from '../hooks/useRecipes'
-import { OWNER_USER_ID } from '../lib/admin'
+import { useMyRecipes } from '../hooks/useRecipes'
 import type { useSidebar } from '../hooks/useSidebar'
 
 interface SidebarProps {
@@ -26,13 +24,8 @@ export default function Sidebar({ sidebar }: SidebarProps) {
   const location = useLocation()
   const { lang, setLang } = useLanguage()
   const { mode, cycleTheme } = useTheme()
-  const { userId } = useAuth()
-  const isAdmin = userId === OWNER_USER_ID
-  const { recipes: pendingSubmissions } = usePendingSubmissions(isAdmin)
-  const { recipes: myRecipes } = useMyRecipes(!isAdmin)
-  const attentionCount = isAdmin
-    ? pendingSubmissions.length
-    : myRecipes.filter(r => r.status === 'rejected').length
+  const { recipes: myRecipes } = useMyRecipes()
+  const attentionCount = myRecipes.filter(r => r.status === 'rejected').length
 
   const recipeLinks: SidebarLinkDef[] = [
     {
@@ -50,7 +43,7 @@ export default function Sidebar({ sidebar }: SidebarProps) {
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
         </svg>
       ),
-      badge: !isAdmin && attentionCount > 0 ? attentionCount : undefined,
+      badge: attentionCount > 0 ? attentionCount : undefined,
     },
     { key: 'collections', label: lang === 'he' ? 'שמורים' : 'My Collections', path: '/collections', icon: <span className="w-4 h-4 flex items-center justify-center text-sm">📚</span> },
     { key: 'meal-plan', label: lang === 'he' ? 'תפריט שבועי' : 'Meal Plan', path: '/meal-plan', icon: <span className="w-4 h-4 flex items-center justify-center text-sm">🗓️</span> },
@@ -58,13 +51,12 @@ export default function Sidebar({ sidebar }: SidebarProps) {
 
   const moreLinks: SidebarLinkDef[] = [
     { key: 'feature-requests', label: lang === 'he' ? 'בקש פיצ\'ר חדש' : 'Feature Requests', path: '/feature-requests', icon: <span className="w-4 h-4 flex items-center justify-center text-sm">💡</span> },
-    ...(isAdmin ? [{
-      key: 'admin-submissions',
-      label: lang === 'he' ? 'תור אישורים' : 'Review Queue',
-      path: '/admin/submissions',
+    {
+      key: 'submissions',
+      label: lang === 'he' ? 'הגשות' : 'Submissions',
+      path: '/submissions',
       icon: <span className="w-4 h-4 flex items-center justify-center text-sm">✅</span>,
-      badge: attentionCount > 0 ? attentionCount : undefined,
-    }] : []),
+    },
   ]
 
   function renderLink(link: SidebarLinkDef, showLabel: boolean, onNavigate?: () => void) {

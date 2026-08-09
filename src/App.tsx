@@ -15,7 +15,7 @@ import RecipeForm from './components/RecipeForm'
 import EditRecipePage from './components/EditRecipePage'
 import FeatureRequestsPage from './components/FeatureRequestsPage'
 import MyRecipesPage from './components/MyRecipesPage'
-import AdminSubmissionsPage from './components/AdminSubmissionsPage'
+import SubmissionsPage from './components/SubmissionsPage'
 import MealPlanPage from './components/MealPlanPage'
 import ChefProfilePage from './components/ChefProfilePage'
 import TimerPanel from './components/TimerPanel'
@@ -113,7 +113,7 @@ export default function App() {
           <Route path="/recipes/:id/edit" element={<EditRecipePage />} />
           <Route path="/feature-requests" element={<FeatureRequestsPage />} />
           <Route path="/my-recipes" element={<MyRecipesPage />} />
-          <Route path="/admin/submissions" element={<AdminSubmissionsPage />} />
+          <Route path="/submissions" element={<SubmissionsPage />} />
           <Route path="/meal-plan" element={<MealPlanPage onAddToShoppingList={shoppingList.addItems} />} />
           <Route path="/chef/:userId" element={<ChefProfilePage />} />
           <Route

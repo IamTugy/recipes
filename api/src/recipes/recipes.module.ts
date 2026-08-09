@@ -15,6 +15,7 @@ import { NutritionController } from './nutrition/nutrition.controller'
 import { NutritionService } from './nutrition/nutrition.service'
 import { RecipeAiGenerateController } from './ai-generate/recipe-ai-generate.controller'
 import { RecipeAiGenerateService } from './ai-generate/recipe-ai-generate.service'
+import { RecipeQualityService } from './quality/recipe-quality.service'
 
 @Module({
   imports: [
@@ -28,7 +29,7 @@ import { RecipeAiGenerateService } from './ai-generate/recipe-ai-generate.servic
     UsersModule,
     AiModule,
   ],
-  providers: [RecipesService, RecipeImportService, NutritionService, RecipeAiGenerateService],
+  providers: [RecipesService, RecipeImportService, NutritionService, RecipeAiGenerateService, RecipeQualityService],
   controllers: [RecipesController, RecipeImportController, NutritionController, RecipeAiGenerateController],
   exports: [RecipesService],
 })

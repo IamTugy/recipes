@@ -1,11 +1,10 @@
-import { Body, Controller, Delete, ForbiddenException, Get, NotFoundException, Param, Post, Put, Req } from '@nestjs/common'
+import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Put, Req } from '@nestjs/common'
 import { Request } from 'express'
 import { ConfigService } from '@nestjs/config'
 import { RecipesService } from './recipes.service'
 import { ActivityLogService } from '../activity-log/activity-log.service'
 import { UsersService } from '../users/users.service'
 import { SaveRecipeDraftDto } from './dto/save-recipe-draft.dto'
-import { RejectSubmissionDto } from './dto/reject-submission.dto'
 
 @Controller('recipes')
 export class RecipesController {
@@ -46,10 +45,13 @@ export class RecipesController {
     return { userId, name: names[userId] ?? null, recipes }
   }
 
-  @Get('admin/submissions')
-  async listPendingSubmissions(@Req() req: Request & { userId: string }) {
-    if (!this.isAdmin(req.userId)) throw new ForbiddenException('Admins only')
-    return this.recipesService.listPendingSubmissions()
+  // Public "in progress" feed - any signed-in user can see recent AI review
+  // outcomes across everyone's recipes, not just their own.
+  @Get('submissions')
+  async listRecentSubmissions() {
+    const recipes = await this.recipesService.listRecentSubmissions()
+    const names = await this.usersService.namesByIds([...new Set(recipes.map(r => r.ownerId).filter((id): id is string => !!id))])
+    return recipes.map(r => ({ ...r, ownerName: r.ownerId ? names[r.ownerId] ?? null : null }))
   }
 
   @Get('public/:id')
@@ -98,30 +100,6 @@ export class RecipesController {
   @Post(':id/submit')
   async submit(@Param('id') id: string, @Req() req: Request & { userId: string }) {
     const recipe = await this.recipesService.submitForReview(id, req.userId, this.isAdmin(req.userId))
-    return recipe.toObject()
-  }
-
-  @Post(':id/cancel-submission')
-  async cancelSubmission(@Param('id') id: string, @Req() req: Request & { userId: string }) {
-    const recipe = await this.recipesService.cancelSubmission(id, req.userId, this.isAdmin(req.userId))
-    return recipe.toObject()
-  }
-
-  @Post(':id/approve')
-  async approve(@Param('id') id: string, @Req() req: Request & { userId: string }) {
-    if (!this.isAdmin(req.userId)) throw new ForbiddenException('Admins only')
-    const recipe = await this.recipesService.approveSubmission(id, req.userId)
-    return recipe.toObject()
-  }
-
-  @Post(':id/reject')
-  async reject(
-    @Param('id') id: string,
-    @Body() body: RejectSubmissionDto,
-    @Req() req: Request & { userId: string },
-  ) {
-    if (!this.isAdmin(req.userId)) throw new ForbiddenException('Admins only')
-    const recipe = await this.recipesService.rejectSubmission(id, body.comment)
     return recipe.toObject()
   }
 

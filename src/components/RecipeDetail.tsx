@@ -5,7 +5,7 @@ import RecipeDetailSkeleton from './RecipeDetailSkeleton'
 import Breadcrumbs from './Breadcrumbs'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { useRecipe, useRecipes, deleteRecipe, submitForReview, cancelSubmission } from '../hooks/useRecipes'
+import { useRecipe, useRecipes, deleteRecipe, submitForReview } from '../hooks/useRecipes'
 import { OWNER_USER_ID } from '../lib/admin'
 import { ApiError, apiFetch } from '../lib/api'
 import { useWakeLock } from '../hooks/useWakeLock'
@@ -22,7 +22,7 @@ import { useLanguage } from '../hooks/useLanguage'
 import { useToast } from '../hooks/useToast'
 import ReviewItem, { type Review } from './ReviewItem'
 import ConfirmDialog from './ConfirmDialog'
-import type { TimerState, RecipeRevision } from '../types'
+import type { TimerState, RecipeRevision, QualityReview } from '../types'
 
 interface RecipeDetailProps {
   onAddTimer: (label: string, minutes: number, recipeId: string, stepIndex: number) => void
@@ -40,7 +40,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
   const [searchParams, setSearchParams] = useSearchParams()
   const { lang } = useLanguage()
   const tx = t[lang]
-  const { recipe, loading: recipeLoading } = useRecipe(id)
+  const { recipe, loading: recipeLoading, reload: reloadRecipe } = useRecipe(id)
   const { recipes: allRecipes } = useRecipes()
   const { favoriteSlugs, toggle: toggleFavorite } = useFavorites()
   const { cookedSlugs, toggle: toggleCooked } = useCookedRecipes()
@@ -282,6 +282,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
   }
 
   const [submitting, setSubmitting] = useState(false)
+  const [reviewResult, setReviewResult] = useState<QualityReview | null>(null)
   const [revisionsOpen, setRevisionsOpen] = useState(false)
   const [viewingRevision, setViewingRevision] = useState<RecipeRevision | null>(null)
   const [revisions, setRevisions] = useState<RecipeRevision[] | null>(null)
@@ -323,29 +324,26 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
 
+  // Submission is synchronous now: the deterministic required-field check
+  // and the AI quality review both run server-side in this one request, and
+  // the response already carries the outcome (published or rejected, with
+  // qualityReview.findings/suggestedFields set) - no reload/poll needed.
   async function handleSubmitForReview() {
     if (!id) return
     setSubmitting(true)
+    setReviewResult(null)
     try {
-      await submitForReview(id, getToken)
-      showToast(lang === 'he' ? 'נשלח לבדיקה' : 'Submitted for review')
-      window.location.reload()
+      const result = await submitForReview(id, getToken)
+      setReviewResult(result.qualityReview ?? null)
+      showToast(
+        result.status === 'published'
+          ? (lang === 'he' ? 'המתכון פורסם!' : 'Recipe published!')
+          : (lang === 'he' ? 'המתכון לא עבר את הבדיקה' : "Recipe didn't pass review"),
+        result.status === 'published' ? 'success' : 'error'
+      )
+      await reloadRecipe()
     } catch (err) {
       showToast(err instanceof ApiError ? err.message : (lang === 'he' ? 'השליחה נכשלה' : 'Submission failed'), 'error')
-    } finally {
-      setSubmitting(false)
-    }
-  }
-
-  async function handleCancelSubmission() {
-    if (!id) return
-    setSubmitting(true)
-    try {
-      await cancelSubmission(id, getToken)
-      showToast(lang === 'he' ? 'הבקשה בוטלה' : 'Submission cancelled')
-      window.location.reload()
-    } catch {
-      showToast(lang === 'he' ? 'הביטול נכשל' : 'Cancel failed', 'error')
     } finally {
       setSubmitting(false)
     }
@@ -478,6 +476,8 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
         }
       })
     : []
+
+  const review = reviewResult ?? recipe.qualityReview ?? null
 
   const displayTitle = lang === 'he' ? (displayRecipe.titleHe ?? displayRecipe.title) : displayRecipe.title
   const displaySubtitle = lang === 'he' ? displayRecipe.title : displayRecipe.titleHe
@@ -652,24 +652,14 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
             )}
             {recipe.status && recipe.status !== 'published' && canEdit && (
               <span className={`tag font-semibold ${
-                recipe.status === 'draft' ? 'bg-tint/10 text-cream/40'
-                : recipe.status === 'pending_review' ? 'bg-amber/10 text-amber'
-                : 'bg-red-500/10 text-red-400'
+                recipe.status === 'draft' ? 'bg-tint/10 text-cream/40' : 'bg-red-500/10 text-red-400'
               }`}>
                 {recipe.status === 'draft'
                   ? (lang === 'he' ? 'טיוטה' : 'Draft')
-                  : recipe.status === 'pending_review'
-                    ? (lang === 'he' ? 'ממתין לאישור' : 'Pending review')
-                    : (lang === 'he' ? 'נדחה' : 'Rejected')}
+                  : (lang === 'he' ? 'נדחה' : 'Rejected')}
               </span>
             )}
           </div>
-
-          {recipe.status === 'rejected' && recipe.reviewComment && canEdit && (
-            <div className="card p-3 mb-4 text-sm text-red-400 border border-red-400/20">
-              <strong>{lang === 'he' ? 'הערת מנהל: ' : "Admin's note: "}</strong>{recipe.reviewComment}
-            </div>
-          )}
 
           {canEdit && recipe.status === 'published' && recipe.currentRevision !== recipe.publishedRevision && (
             <p className="text-xs text-amber mb-2">
@@ -679,15 +669,55 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
 
           {recipe.status && (recipe.status !== 'published' || recipe.currentRevision !== recipe.publishedRevision) && canEdit && (
             <div className="flex items-center gap-3 mb-4">
-              {recipe.status === 'pending_review' ? (
-                <button type="button" disabled={submitting} onClick={handleCancelSubmission} className="btn-ghost text-xs disabled:opacity-50">
-                  {lang === 'he' ? 'בטל שליחה' : 'Cancel submission'}
-                </button>
+              <button type="button" disabled={submitting} onClick={handleSubmitForReview} className="btn-primary text-xs disabled:opacity-50">
+                {submitting
+                  ? (lang === 'he' ? 'בודק עם AI...' : 'Reviewing with AI...')
+                  : (lang === 'he' ? 'פרסם מתכון' : 'Submit for review')}
+              </button>
+            </div>
+          )}
+
+          {/* AI review results - either the outcome of the submission just
+              made, or the recipe's last stored review (so a rejected recipe
+              still shows its findings on reload, not just right after
+              submitting). */}
+          {canEdit && review && recipe.status !== 'published' && (
+            <div className={`card p-4 mb-4 border ${review.score >= 95 ? 'border-herb/30' : 'border-red-400/20'}`}>
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-semibold text-cream">
+                  {lang === 'he' ? 'תוצאת בדיקת AI' : 'AI review result'}
+                </span>
+                <span className={`text-lg font-bold ${review.score >= 95 ? 'text-herb' : 'text-red-400'}`}>
+                  {review.score}%
+                </span>
+              </div>
+              {review.findings.length > 0 ? (
+                <ul className="space-y-1.5 mb-3">
+                  {review.findings.map((f, i) => (
+                    <li key={i} className="flex items-start gap-2 text-xs text-cream/60">
+                      <span className={`shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded ${
+                        f.severity === 'critical' ? 'bg-red-500/10 text-red-400'
+                        : f.severity === 'major' ? 'bg-amber/10 text-amber'
+                        : 'bg-tint/10 text-cream/50'
+                      }`}>
+                        {f.severity}
+                      </span>
+                      <span>{f.message}</span>
+                    </li>
+                  ))}
+                </ul>
               ) : (
-                <button type="button" disabled={submitting} onClick={handleSubmitForReview} className="btn-primary text-xs disabled:opacity-50">
-                  {submitting
-                    ? (lang === 'he' ? 'שולח...' : 'Submitting...')
-                    : (lang === 'he' ? 'פרסם מתכון' : 'Submit for review')}
+                <p className="text-xs text-cream/40 mb-3">
+                  {lang === 'he' ? 'לא נמצאו בעיות' : 'No issues found'}
+                </p>
+              )}
+              {recipe.status === 'rejected' && review.suggestedFields && (
+                <button
+                  type="button"
+                  onClick={() => navigate(`/recipes/${id}/edit?applySuggestions=1`)}
+                  className="btn-ghost text-xs"
+                >
+                  {lang === 'he' ? 'החל תיקונים' : 'Apply changes'}
                 </button>
               )}
             </div>

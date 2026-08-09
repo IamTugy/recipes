@@ -60,26 +60,13 @@ async function postAction(path: string, getToken: () => Promise<string | null>, 
   return res.json()
 }
 
+// Synchronous: the required-field check and AI quality review both run
+// server-side within this one request. The returned recipe already carries
+// the outcome - status is 'published' (score met the threshold) or
+// 'rejected' (with qualityReview.findings/suggestedFields set) - there's no
+// separate pending state to poll for.
 export async function submitForReview(id: string, getToken: () => Promise<string | null>): Promise<Recipe> {
   const recipe = await postAction(`/recipes/${id}/submit`, getToken)
-  notifyRecipeStatusChanged()
-  return recipe
-}
-
-export async function cancelSubmission(id: string, getToken: () => Promise<string | null>): Promise<Recipe> {
-  const recipe = await postAction(`/recipes/${id}/cancel-submission`, getToken)
-  notifyRecipeStatusChanged()
-  return recipe
-}
-
-export async function approveSubmission(id: string, getToken: () => Promise<string | null>): Promise<Recipe> {
-  const recipe = await postAction(`/recipes/${id}/approve`, getToken)
-  notifyRecipeStatusChanged()
-  return recipe
-}
-
-export async function rejectSubmission(id: string, comment: string, getToken: () => Promise<string | null>): Promise<Recipe> {
-  const recipe = await postAction(`/recipes/${id}/reject`, getToken, { comment })
   notifyRecipeStatusChanged()
   return recipe
 }
@@ -109,13 +96,15 @@ export function useMyRecipes(enabled = true) {
   return { recipes, loading, reload }
 }
 
-export function usePendingSubmissions(enabled = true) {
+// Public "in progress" feed - recent AI review outcomes across every user's
+// recipes, visible to any signed-in user (not admin-gated).
+export function useSubmissionsFeed(enabled = true) {
   const { getToken, isLoaded, isSignedIn } = useAuth()
   const [recipes, setRecipes] = useState<Recipe[]>([])
   const [loading, setLoading] = useState(true)
 
   function reload() {
-    return apiFetch<Recipe[]>('/recipes/admin/submissions', getToken).then(data => setRecipes(data))
+    return apiFetch<Recipe[]>('/recipes/submissions', getToken).then(data => setRecipes(data))
   }
 
   useEffect(() => {
@@ -170,6 +159,13 @@ export function useRecipe(id: string | undefined) {
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
 
+  function reload() {
+    if (!id) return Promise.resolve()
+    return apiFetch<Recipe>(`/recipes/${id}`, getToken)
+      .then(data => setRecipe(data))
+      .catch(() => setNotFound(true))
+  }
+
   useEffect(() => {
     if (!isLoaded || !isSignedIn || !id) return
     let cancelled = false
@@ -190,7 +186,7 @@ export function useRecipe(id: string | undefined) {
     return () => { cancelled = true }
   }, [isLoaded, isSignedIn, id, getToken])
 
-  return { recipe, loading, notFound }
+  return { recipe, loading, notFound, reload }
 }
 
 export function useChefProfile(userId: string | undefined) {

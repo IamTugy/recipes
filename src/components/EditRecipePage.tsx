@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useRecipe } from '../hooks/useRecipes'
 import RecipeForm from './RecipeForm'
 import { useLanguage } from '../hooks/useLanguage'
@@ -6,6 +6,7 @@ import { t } from '../i18n'
 
 export default function EditRecipePage() {
   const { id } = useParams<{ id: string }>()
+  const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const { lang } = useLanguage()
   const tx = t[lang]
@@ -29,5 +30,12 @@ export default function EditRecipePage() {
     )
   }
 
-  return <RecipeForm existing={recipe} />
+  // Coming from the AI review's "Apply changes" button - layer the AI's
+  // suggested field fixes on top of the current recipe before handing it to
+  // the form, so the owner reviews/edits them rather than having them
+  // silently auto-saved.
+  const applySuggestions = searchParams.get('applySuggestions') === '1' && recipe.qualityReview?.suggestedFields
+  const existing = applySuggestions ? { ...recipe, ...recipe.qualityReview!.suggestedFields } : recipe
+
+  return <RecipeForm existing={existing} />
 }
