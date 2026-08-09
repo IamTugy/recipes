@@ -44,10 +44,11 @@ export interface StepGroup {
 }
 
 export interface Nutrition {
-  calories?: number
-  protein?: number
-  carbs?: number
-  fat?: number
+  calories?: number       // per 100g
+  protein?: number        // per 100g
+  carbs?: number          // per 100g
+  fat?: number            // per 100g
+  servingWeight?: number  // estimated grams per serving
 }
 
 export interface Recipe {
@@ -65,7 +66,7 @@ export interface Recipe {
   cookTime: number       // minutes
   servings: number
   difficulty: Difficulty
-  nutrition?: Nutrition   // per-serving estimate, usually AI-generated
+  nutrition?: Nutrition   // per-100g estimate, usually AI-generated
   ingredients: IngredientGroup[]
   steps: StepGroup[]
   source?: string
