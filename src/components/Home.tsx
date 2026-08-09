@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useAuth } from '@clerk/react'
 import type { Category, Difficulty } from '../types'
 import { useRecipes, useTrending } from '../hooks/useRecipes'
 import { useFavorites } from '../hooks/useFavorites'
@@ -11,6 +12,7 @@ import AppSelect from './ui/AppSelect'
 import VirtualRecipeGrid from './VirtualRecipeGrid'
 import FilterInfoPopover from './FilterInfoPopover'
 import { DIFFICULTY_FILTERS, DIETARY_FILTERS, KOSHER_FILTERS } from '../lib/filterDefinitions'
+import { logSearch } from '../lib/logSearch'
 
 const categories: Category[] = ['breakfast', 'lunch', 'dinner', 'dessert', 'salad', 'soup', 'snack', 'bread', 'sauce']
 
@@ -25,6 +27,7 @@ type SortOption = 'default' | 'rating' | 'quickest' | 'newest'
 
 export default function Home() {
   const navigate = useNavigate()
+  const { getToken } = useAuth()
   // Initial state is read from the URL once on mount (lazy initializers) so
   // a shared link reproduces the exact filtered view. "tag" is kept as a
   // legacy alias for "q" - old share links used it before this sync existed.
@@ -132,6 +135,23 @@ export default function Home() {
     }
     return list
   }, [search, activeCategory, activeDifficulty, activeDietary, activeKosher, lang, recipes, showFavoritesOnly, favoriteSlugs, sortBy])
+
+  // Debounced search-event log: fires 1s after the user stops typing a
+  // non-empty query, reading the *current* result count via a ref so
+  // unrelated filter changes (category, sort, etc.) don't reset the debounce
+  // timer or cause extra log calls - only changes to the search text do.
+  const filteredCountRef = useRef(filtered.length)
+  filteredCountRef.current = filtered.length
+
+  useEffect(() => {
+    const trimmed = search.trim()
+    if (!trimmed) return
+    const timer = setTimeout(() => {
+      logSearch(trimmed, filteredCountRef.current, getToken)
+    }, 1000)
+    return () => clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search])
 
   function surpriseMe() {
     if (filtered.length === 0) return
