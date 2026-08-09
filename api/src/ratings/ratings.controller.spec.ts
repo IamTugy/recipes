@@ -4,6 +4,7 @@ describe('RatingsController', () => {
   const ratingsService = { rate: jest.fn(), reviewsForRecipe: jest.fn(), distributionForRecipe: jest.fn(), myRating: jest.fn(), deleteRating: jest.fn(), toggleUpvote: jest.fn() }
   const reviewRepliesService = { countsByRatingIds: jest.fn(), listByRating: jest.fn(), create: jest.fn(), toggleUpvote: jest.fn() }
   const usersService = { namesByIds: jest.fn() }
+  const activityLog = { record: jest.fn() }
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -12,7 +13,7 @@ describe('RatingsController', () => {
   })
 
   function makeController() {
-    return new RatingsController(ratingsService as any, reviewRepliesService as any, usersService as any)
+    return new RatingsController(ratingsService as any, reviewRepliesService as any, usersService as any, activityLog as any)
   }
 
   it('PUT /ratings/:slug rates the recipe as the current user', async () => {
@@ -36,6 +37,13 @@ describe('RatingsController', () => {
     const photoUrl = 'https://recipes-assets.tugy.dev/reviews/a/photo.jpg'
     await controller.rate('a', { score: 5, comment: 'Great!', photoUrl }, { userId: 'user_1' } as any)
     expect(ratingsService.rate).toHaveBeenCalledWith('user_1', 'a', 5, 'Great!', photoUrl)
+  })
+
+  it('PUT /ratings/:slug logs a rating_given event with the score', async () => {
+    ratingsService.rate.mockResolvedValue({ score: 5 })
+    const controller = makeController()
+    await controller.rate('a', { score: 5 }, { userId: 'user_1' } as any)
+    expect(activityLog.record).toHaveBeenCalledWith('user_1', 'a', 'rating_given', { score: 5 })
   })
 
   it("GET /ratings/:slug/mine returns the current user's own rating", async () => {

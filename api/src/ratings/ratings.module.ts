@@ -7,6 +7,7 @@ import { RatingsService } from './ratings.service'
 import { ReviewRepliesService } from './review-replies.service'
 import { RatingsController } from './ratings.controller'
 import { UsersModule } from '../users/users.module'
+import { ActivityLogModule } from '../activity-log/activity-log.module'
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { UsersModule } from '../users/users.module'
       { name: Recipe.name, schema: RecipeSchema },
     ]),
     UsersModule,
+    ActivityLogModule,
   ],
   providers: [RatingsService, ReviewRepliesService],
   controllers: [RatingsController],

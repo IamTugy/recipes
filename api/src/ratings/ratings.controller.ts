@@ -3,6 +3,7 @@ import { Request } from 'express'
 import { RatingsService } from './ratings.service'
 import { ReviewRepliesService } from './review-replies.service'
 import { UsersService } from '../users/users.service'
+import { ActivityLogService } from '../activity-log/activity-log.service'
 import { RateRecipeDto } from './dto/rate-recipe.dto'
 import { ReplyToReviewDto } from './dto/reply-to-review.dto'
 
@@ -12,6 +13,7 @@ export class RatingsController {
     private readonly ratingsService: RatingsService,
     private readonly reviewRepliesService: ReviewRepliesService,
     private readonly usersService: UsersService,
+    private readonly activityLog: ActivityLogService,
   ) {}
 
   @Get(':id/mine')
@@ -46,7 +48,9 @@ export class RatingsController {
     @Body() body: RateRecipeDto,
     @Req() req: Request & { userId: string },
   ) {
-    return this.ratingsService.rate(req.userId, id, body.score, body.comment, body.photoUrl)
+    const result = await this.ratingsService.rate(req.userId, id, body.score, body.comment, body.photoUrl)
+    await this.activityLog.record(req.userId, id, 'rating_given', { score: body.score })
+    return result
   }
 
   @Delete(':id')
