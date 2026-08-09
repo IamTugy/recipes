@@ -121,6 +121,11 @@ export class NutritionDto {
   @Min(0)
   @IsOptional()
   fat?: number
+
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  servingWeight?: number
 }
 
 export class SourceDto {

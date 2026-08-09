@@ -486,7 +486,7 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
 
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className={labelClass}>{lang === 'he' ? 'ערכים תזונתיים (למנה)' : 'Nutrition (per serving)'}</label>
+              <label className={labelClass}>{lang === 'he' ? 'ערכים תזונתיים (ל-100 גרם)' : 'Nutrition (per 100g)'}</label>
               <button
                 type="button"
                 onClick={handleEstimateNutrition}
@@ -516,6 +516,10 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
               <div>
                 <label className={labelClass}>{lang === 'he' ? 'שומן (גרם)' : 'Fat (g)'}</label>
                 <input type="number" min={0} value={nutrition.fat ?? ''} onChange={e => setNutrition(n => ({ ...n, fat: e.target.value ? Number(e.target.value) : undefined }))} className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>{lang === 'he' ? 'משקל מנה משוער (גרם)' : 'Est. serving weight (g)'}</label>
+                <input type="number" min={0} value={nutrition.servingWeight ?? ''} onChange={e => setNutrition(n => ({ ...n, servingWeight: e.target.value ? Number(e.target.value) : undefined }))} className={inputClass} />
               </div>
             </div>
           </div>

@@ -451,6 +451,27 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
   const totalTime = displayRecipe.prepTime + displayRecipe.cookTime
   const scaledServings = Math.round(displayRecipe.servings * multiplier)
 
+  const nutrition = displayRecipe.nutrition
+  const hasNutrition = !!nutrition && [nutrition.calories, nutrition.protein, nutrition.carbs, nutrition.fat].some(v => v !== undefined)
+  const nutritionRows = hasNutrition
+    ? ([
+        ['calories', tx.calories],
+        ['protein', tx.protein],
+        ['carbs', tx.carbs],
+        ['fat', tx.fat],
+      ] as const)
+      .filter(([key]) => nutrition![key] !== undefined)
+      .map(([key, label]) => {
+        const per100g = nutrition![key]!
+        const perServing = nutrition!.servingWeight ? (per100g * nutrition!.servingWeight) / 100 : undefined
+        return {
+          label,
+          per100g: Math.round(per100g).toString(),
+          perServing: perServing !== undefined ? Math.round(perServing).toString() : undefined,
+        }
+      })
+    : []
+
   const displayTitle = lang === 'he' ? (displayRecipe.titleHe ?? displayRecipe.title) : displayRecipe.title
   const displaySubtitle = lang === 'he' ? displayRecipe.title : displayRecipe.titleHe
   const displayDescription = lang === 'he'
@@ -730,9 +751,6 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
               { label: tx.cook, value: formatTime(displayRecipe.cookTime), icon: '🔥' },
               { label: tx.total, value: formatTime(totalTime), icon: '⏱' },
               { label: tx.servings, value: scaledServings.toString(), icon: '🍽' },
-              ...(displayRecipe.nutrition?.calories
-                ? [{ label: tx.calories, value: Math.round(displayRecipe.nutrition.calories).toString(), icon: '🔢' }]
-                : []),
             ].map(item => (
               <div key={item.label} className="bg-tint/[0.03] print:bg-transparent print:border print:border-tint/15 rounded-xl print:rounded-lg p-3 print:p-2 text-center border border-tint/5">
                 <p className="text-xl mb-1">{item.icon}</p>
@@ -741,6 +759,37 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
               </div>
             ))}
           </div>
+
+          {hasNutrition && (
+            <div className="mt-5">
+              <h2 className="font-serif text-lg font-bold text-cream mb-2">{tx.nutritionTitle}</h2>
+              <table className="w-full text-sm border-collapse">
+                <thead>
+                  <tr className="border-b border-tint/10">
+                    <th className="text-start py-1.5 font-medium text-cream/50"></th>
+                    <th className="text-end py-1.5 font-medium text-cream/50">{tx.per100g}</th>
+                    {displayRecipe.nutrition?.servingWeight && (
+                      <th className="text-end py-1.5 font-medium text-cream/50">
+                        {tx.perServing} ({Math.round(displayRecipe.nutrition.servingWeight)}g)
+                      </th>
+                    )}
+                  </tr>
+                </thead>
+                <tbody>
+                  {nutritionRows.map(row => (
+                    <tr key={row.label} className="border-b border-tint/5">
+                      <td className="py-1.5 text-cream/70">{row.label}</td>
+                      <td className="py-1.5 text-end text-cream font-medium">{row.per100g}</td>
+                      {displayRecipe.nutrition?.servingWeight && (
+                        <td className="py-1.5 text-end text-cream font-medium">{row.perServing}</td>
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <p className="text-cream/30 text-xs mt-2">{tx.nutritionDisclaimer}</p>
+            </div>
+          )}
 
           {/* Primary actions: mark as cooked + rating get the strongest visual weight */}
           {isViewingPublishedContent && (

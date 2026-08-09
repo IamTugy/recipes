@@ -7,18 +7,20 @@ export interface NutritionEstimate {
   protein?: number
   carbs?: number
   fat?: number
+  servingWeight?: number
 }
 
-const PROMPT = `You are a nutritionist estimating the nutritional content of a recipe from its ingredient list. Given the ingredients and the number of servings the recipe makes, estimate the nutrition PER SERVING and produce a single JSON object with exactly these fields (omit any field you cannot reasonably estimate):
+const PROMPT = `You are a nutritionist estimating the nutritional content of a recipe from its ingredient list. Given the ingredients and the number of servings the recipe makes, estimate the nutrition PER 100g of the finished dish, as well as the estimated weight in grams of a single serving, and produce a single JSON object with exactly these fields (omit any field you cannot reasonably estimate):
 
 {
-  "calories": "number, kcal per serving",
-  "protein": "number, grams per serving",
-  "carbs": "number, grams per serving",
-  "fat": "number, grams per serving"
+  "calories": "number, kcal per 100g",
+  "protein": "number, grams of protein per 100g",
+  "carbs": "number, grams of carbs per 100g",
+  "fat": "number, grams of fat per 100g",
+  "servingWeight": "number, estimated grams per serving"
 }
 
-Base the estimate on standard nutritional data for the listed ingredients and their amounts, divided across the servings. Respond with ONLY the JSON object, no other text.
+Base the estimate on standard nutritional data for the listed ingredients and their amounts, and the total weight of the dish divided across the servings. Respond with ONLY the JSON object, no other text.
 
 Servings: `
 
