@@ -17,7 +17,6 @@ export interface ImportedRecipe {
   difficulty?: Difficulty
   kosherType?: KosherType
   nutrition?: Nutrition
-  featured?: boolean
   aiGenerated?: boolean
   sources?: { title: string; url: string }[]
   ingredients?: { group?: string; groupEn?: string; items: { amount: number; unit: string; name: string; nameEn?: string }[] }[]

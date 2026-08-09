@@ -79,7 +79,6 @@ export interface Recipe {
   // Citations shown in an "extra info" section. Editable for regular
   // recipes, hidden when empty; read-only once aiGenerated is true.
   sources?: { title: string; url: string }[]
-  featured?: boolean
   hidden?: boolean
   tips?: string[]        // Hebrew tips
   tipsEn?: string[]      // English tips

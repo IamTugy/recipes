@@ -295,6 +295,28 @@ describe('RecipesService', () => {
     expect(revisionCreate).toHaveBeenCalledWith(expect.objectContaining({ recipeId: 'tomato-soup', revisionNumber: 1, authorId: 'user_1' }))
   })
 
+  it('createDraft drops sources that repeat the same URL as an earlier one', async () => {
+    const exists = jest.fn().mockResolvedValue(null)
+    const dto = {
+      ...minimalDto,
+      sources: [
+        { title: 'A', url: 'https://example.com/recipe' },
+        { title: 'A again', url: 'https://example.com/recipe' },
+        { title: 'B', url: 'https://example.com/other' },
+      ],
+    }
+    const create = jest.fn().mockResolvedValue({ id: 'tomato-soup', slug: 'tomato-soup', ...dto, currentRevision: 1 })
+    const service = await makeService({ exists, create }, { create: jest.fn().mockResolvedValue({}) })
+    await service.createDraft('user_1', dto as any)
+
+    expect(create).toHaveBeenCalledWith(expect.objectContaining({
+      sources: [
+        { title: 'A', url: 'https://example.com/recipe' },
+        { title: 'B', url: 'https://example.com/other' },
+      ],
+    }))
+  })
+
   it('createDraft appends a numeric suffix when the slug is already taken', async () => {
     const exists = jest.fn().mockResolvedValueOnce({ _id: '1' }).mockResolvedValueOnce(null)
     const created = { slug: 'tomato-soup-2', ...minimalDto, currentRevision: 1 }
@@ -467,12 +489,21 @@ describe('RecipesService', () => {
     expect(quality.review).not.toHaveBeenCalled()
   })
 
-  it('submitForReview flags ingredient items missing a name or unit', async () => {
-    const recipe: any = completeRecipe({ ingredients: [{ group: 'Main', items: [{ name: 'Tomato', amount: 1, unit: '' }] }] })
+  it('submitForReview flags ingredient items missing a name', async () => {
+    const recipe: any = completeRecipe({ ingredients: [{ group: 'Main', items: [{ name: '', amount: 1, unit: 'kg' }] }] })
     const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
     const service = await makeService({ findOne })
 
-    await expect(service.submitForReview('a', 'user_1', false)).rejects.toThrow(/every item needs a name and unit/)
+    await expect(service.submitForReview('a', 'user_1', false)).rejects.toThrow(/every item needs a name/)
+  })
+
+  it('submitForReview does not require a unit on ingredient items (optional for countable items like "1 clove")', async () => {
+    const recipe: any = completeRecipe({ ingredients: [{ group: 'Main', items: [{ name: 'Garlic clove', amount: 1, unit: '' }] }] })
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
+    const updateOne = jest.fn().mockResolvedValue({})
+    const service = await makeService({ findOne }, { updateOne })
+
+    await expect(service.submitForReview('a', 'user_1', false)).resolves.toBe(recipe)
   })
 
   it('submitForReview flags a step section with no non-empty instruction', async () => {

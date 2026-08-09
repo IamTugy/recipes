@@ -95,10 +95,6 @@ export class SaveRecipeDraftDto {
 
   @IsBoolean()
   @IsOptional()
-  featured?: boolean
-
-  @IsBoolean()
-  @IsOptional()
   aiGenerated?: boolean
 
   @IsArray()

@@ -38,6 +38,8 @@ Check for all of the following and report a finding for each problem you find (n
 - Steps that would benefit from a timer but have none set (use judgment - not every step needs one)
 - Ingredients listed but never referenced in any step, or a step referencing an ingredient that isn't listed
 - Duplicate or near-duplicate ingredient entries
+- An ingredient with an empty unit where that's actually wrong: empty unit is fine for a naturally countable whole item ("1 onion", "10 grapes", "1 garlic clove"), but wrong for something measured by mass/volume ("1 milk" or "1 butter" needs a unit like g or ml)
+- The exact same source URL appearing more than once in "sources"
 - Servings count doesn't match the scale of the ingredient quantities
 - Category or difficulty tag doesn't match the actual content
 - Prep/cook time is implausible for what the steps describe

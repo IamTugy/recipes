@@ -80,12 +80,8 @@ export default function RecipeCard({
                   {statusBadge.label}
                 </span>
               )}
-              {recipe.featured && (
-                <span className="tag-terra text-[10px] font-semibold px-2 py-0.5">{tx.featured}</span>
-              )}
               {recipe.aiGenerated && (
                 <span className="flex items-center gap-1 bg-amber/90 text-bg text-[10px] font-semibold px-2 py-0.5 rounded-full">
-                  <span>🤖</span>
                   <span>AI</span>
                 </span>
               )}

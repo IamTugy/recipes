@@ -652,7 +652,6 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
             <span className={`tag font-semibold ${difficultyColor[displayRecipe.difficulty]}`}>
               {tx.difficulty[displayRecipe.difficulty]}
             </span>
-            {displayRecipe.featured && <span className="tag-terra text-xs font-semibold">{tx.featured}</span>}
             {isViewingNonLatestRevision && (
               <span className="tag font-semibold bg-amber/10 text-amber">
                 {lang === 'he' ? `צופה בגרסה v${viewingRevision!.revisionNumber}` : `Viewing v${viewingRevision!.revisionNumber}`}
@@ -764,7 +763,6 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
 
           {displayRecipe.aiGenerated && (
             <div className="print:hidden inline-flex items-center gap-1.5 text-xs font-semibold text-amber bg-amber/10 border border-amber/20 rounded-full px-3 py-1 mb-3">
-              <span>🤖</span>
               <span>{lang === 'he' ? 'נוצר בעזרת AI' : 'AI generated'}</span>
             </div>
           )}

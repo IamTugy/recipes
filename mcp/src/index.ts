@@ -73,7 +73,6 @@ const recipeFieldsSchema = {
   steps: z.array(stepGroupSchema).optional(),
   tips: z.array(z.string()).optional().describe('Hebrew tips'),
   tipsEn: z.array(z.string()).optional().describe('English tips'),
-  featured: z.boolean().optional(),
 }
 
 function textResult(text: string) {

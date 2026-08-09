@@ -92,9 +92,6 @@ export class Recipe {
   sources?: { title: string; url: string }[]
 
   @Prop({ default: false })
-  featured?: boolean
-
-  @Prop({ default: false })
   hidden?: boolean
 
   @Prop({ type: [String] })

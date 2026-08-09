@@ -28,6 +28,21 @@ function isCastError(err: unknown): boolean {
   return err instanceof Error && err.name === 'CastError'
 }
 
+// Drops sources whose URL exactly repeats an earlier one (trimmed,
+// case-insensitive) - a client or the AI import/generate flow occasionally
+// cites the same page twice, and the "Sources" section shouldn't show a
+// duplicate link.
+function dedupeSources(sources?: { title: string; url: string }[]): { title: string; url: string }[] | undefined {
+  if (!sources) return sources
+  const seen = new Set<string>()
+  return sources.filter(s => {
+    const key = s.url.trim().toLowerCase()
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
+}
+
 interface RatingAggregate {
   _id: string
   avg: number
@@ -37,7 +52,7 @@ interface RatingAggregate {
 const RECIPE_FIELDS = [
   'title', 'titleHe', 'category', 'tags', 'tagsEn', 'cuisine', 'image', 'description',
   'descriptionEn', 'prepTime', 'cookTime', 'servings', 'difficulty', 'ingredients',
-  'steps', 'tips', 'tipsEn', 'featured', 'aiGenerated', 'sources',
+  'steps', 'tips', 'tipsEn', 'aiGenerated', 'sources',
 ] as const
 
 @Injectable()
@@ -285,7 +300,9 @@ export class RecipesService implements OnModuleInit {
 
   async createDraft(userId: string, dto: SaveRecipeDraftDto): Promise<RecipeDocument> {
     const slug = await this.generateUniqueSlug(dto.title)
-    const recipe = await this.recipeModel.create({ ...dto, slug, ownerId: userId, status: 'draft', currentRevision: 1 })
+    const recipe = await this.recipeModel.create({
+      ...dto, sources: dedupeSources(dto.sources), slug, ownerId: userId, status: 'draft', currentRevision: 1,
+    })
     await this.saveNewRevision(recipe, userId)
     return recipe
   }
@@ -324,7 +341,7 @@ export class RecipesService implements OnModuleInit {
     // what the request body contains.
     const aiLock = recipe.aiGenerated ? { aiGenerated: true, sources: recipe.sources } : {}
     const update: Record<string, unknown> = {
-      $set: { ...dto, ...aiLock, ...(wasRejected ? { status: 'draft' } : {}) },
+      $set: { ...dto, sources: dedupeSources(dto.sources), ...aiLock, ...(wasRejected ? { status: 'draft' } : {}) },
       $inc: { currentRevision: 1 },
     }
     if (wasRejected) update.$unset = { reviewComment: '' }
@@ -375,14 +392,19 @@ export class RecipesService implements OnModuleInit {
     if (!recipe.servings) missing.push('servings')
     if (!recipe.difficulty) missing.push('difficulty')
 
-    const ingredientGroups = (recipe.ingredients ?? []) as { items?: { name?: string; unit?: string }[] }[]
+    // Unit is deliberately not required here - it's genuinely optional for
+    // countable items ("1 garlic clove", "10 grapes"), so this can't be a
+    // hard deterministic rule. Whether a missing unit is actually a problem
+    // ("1 milk" is ambiguous, "1 clove" isn't) is a judgment call left to
+    // the AI quality review instead.
+    const ingredientGroups = (recipe.ingredients ?? []) as { items?: { name?: string }[] }[]
     if (ingredientGroups.length === 0) {
       missing.push('ingredients')
     } else {
       const hasIncompleteItem = ingredientGroups.some(g =>
-        !g.items || g.items.length === 0 || g.items.some(item => !item.name?.trim() || !item.unit?.trim())
+        !g.items || g.items.length === 0 || g.items.some(item => !item.name?.trim())
       )
-      if (hasIncompleteItem) missing.push('ingredients (every item needs a name and unit)')
+      if (hasIncompleteItem) missing.push('ingredients (every item needs a name)')
     }
 
     const stepGroups = (recipe.steps ?? []) as { items?: { instruction?: string }[] }[]

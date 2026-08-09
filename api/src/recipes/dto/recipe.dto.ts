@@ -222,10 +222,6 @@ export class RecipeDto {
 
   @IsBoolean()
   @IsOptional()
-  featured?: boolean
-
-  @IsBoolean()
-  @IsOptional()
   aiGenerated?: boolean
 
   @IsArray()

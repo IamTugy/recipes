@@ -114,7 +114,6 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
   const [tags, setTags] = useState((prefill?.tags ?? []).join(', '))
   const [tips, setTips] = useState((prefill?.tips ?? []).join('\n'))
   const [tipsEn, setTipsEn] = useState((prefill?.tipsEn ?? []).join('\n'))
-  const [featured, setFeatured] = useState(prefill?.featured ?? false)
   const aiGenerated = prefill?.aiGenerated ?? false
   const [sources, setSources] = useState(prefill?.sources ?? [])
   const [ingredientGroups, setIngredientGroups] = useState<LocalIngredientGroup[]>(
@@ -327,7 +326,6 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
         tags: tags.split(',').map(s => s.trim()).filter(Boolean),
         tips: tips.split('\n').map(s => s.trim()).filter(Boolean),
         tipsEn: tipsEn.split('\n').map(s => s.trim()).filter(Boolean),
-        featured,
         aiGenerated,
         sources: sources.filter(s => s.title.trim() && s.url.trim()),
         ingredients: stripIngredientKeys(
@@ -388,7 +386,6 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
 
         {aiGenerated && (
           <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber bg-amber/10 border border-amber/20 rounded-full px-3 py-1">
-            <span>🤖</span>
             <span>{lang === 'he' ? 'נוצר בעזרת AI' : 'AI generated'}</span>
           </div>
         )}
@@ -449,15 +446,6 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
                   ...KOSHER_TYPES.map(k => ({ value: k, label: tx.kosherType[k] })),
                 ]}
               />
-            </div>
-            <div className="flex items-end pb-2">
-              <label
-                className="flex items-center gap-2 text-sm text-cream/70"
-                title={lang === 'he' ? 'מציג תג "מומלץ" על כרטיס המתכון' : 'Shows a "Featured" badge on the recipe card'}
-              >
-                <input type="checkbox" checked={featured} onChange={e => setFeatured(e.target.checked)} />
-                {lang === 'he' ? 'מומלץ (מציג תג על הכרטיס)' : 'Featured (shows a badge on the card)'}
-              </label>
             </div>
           </div>
 

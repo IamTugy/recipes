@@ -22,7 +22,7 @@ const STRUCTURE_PROMPT = `Convert the following recipe write-up into a strict JS
   "servings": "number",
   "difficulty": "one of: easy, medium, hard",
   "kosherType": "one of: meat, dairy, parve - meat if it contains any meat, poultry, or fish; dairy if it contains dairy and no meat/poultry/fish of any kind; parve if it contains neither. Omit only if you genuinely cannot tell.",
-  "ingredients": [{ "group": "Hebrew group name or empty string", "groupEn": "English group name or empty string", "items": [{ "amount": "number", "unit": "one of: g, kg, ml, l, cup, tbsp, tsp, cm, mm, pcs, cloves, bunch, sprigs, or empty string if the ingredient has no unit (e.g. \\"1 onion\\")", "name": "Hebrew ingredient name", "nameEn": "English ingredient name" }] }],
+  "ingredients": [{ "group": "Hebrew group name or empty string", "groupEn": "English group name or empty string", "items": [{ "amount": "number", "unit": "one of: g, kg, ml, l, cup, tbsp, tsp, cm, mm, pcs, cloves, bunch, sprigs, or empty string - but ONLY leave it empty for a naturally countable whole item (e.g. \\"1 onion\\", \\"10 grapes\\", \\"1 garlic clove\\"). Never leave it empty for something measured by mass or volume (e.g. milk, butter, flour, oil) - \\"1 milk\\" or \\"1 butter\\" with no unit is wrong, use g/ml/etc for those.", "name": "Hebrew ingredient name", "nameEn": "English ingredient name" }] }],
   "steps": [{ "title": "Hebrew section title or empty string", "titleEn": "English section title or empty string", "items": [{ "instruction": "Hebrew step text", "instructionEn": "English step text", "timerMinutes": "number if this step mentions a specific duration" }] }],
   "tips": ["Hebrew tips"],
   "tipsEn": ["English tips"]
