@@ -11,6 +11,8 @@ import { useLanguage } from '../hooks/useLanguage'
 import { useToast } from '../hooks/useToast'
 import { translateText } from '../lib/translate'
 import { estimateNutrition } from '../lib/recipeNutrition'
+import { useHistoryStack } from '../hooks/useHistoryStack'
+import ConfirmDialog from './ConfirmDialog'
 import SortableRow from './SortableRow'
 import DragHandle from './DragHandle'
 import PhotoUploadField from './PhotoUploadField'
@@ -36,6 +38,31 @@ const KOSHER_TYPES: KosherType[] = ['meat', 'dairy', 'parve']
 type Keyed<T> = T & { _key: string }
 type LocalIngredientGroup = Omit<IngredientGroup, 'items'> & { _key: string; items: Keyed<IngredientItem>[] }
 type LocalStepGroup = Omit<StepGroup, 'items'> & { _key: string; items: Keyed<StepItem>[] }
+
+// Everything the undo/redo stack tracks - every editable field except
+// transient UI state (saving/error/estimatingNutrition/regenerating), which
+// undoing shouldn't touch.
+interface DraftSnapshot {
+  title: string
+  titleHe: string
+  category: Category
+  difficulty: Difficulty
+  kosherType: KosherType | ''
+  cuisine: string
+  image: string
+  description: string
+  descriptionEn: string
+  prepTime: number
+  cookTime: number
+  servings: number
+  nutrition: Nutrition
+  tags: string
+  tips: string
+  tipsEn: string
+  sources: { title: string; url: string }[]
+  ingredientGroups: LocalIngredientGroup[]
+  stepGroups: LocalStepGroup[]
+}
 
 function makeKey(): string {
   return Math.random().toString(36).slice(2)
@@ -124,38 +151,132 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
     prefill?.steps?.length ? prefill.steps.map(keyStepGroup) : [emptyStepGroup()]
   )
   const [saving, setSaving] = useState(false)
+  const [exitConfirmOpen, setExitConfirmOpen] = useState(false)
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }))
 
-  // Auto-fills the other-language field shortly after the user pauses
-  // typing, but only when that field is still empty - it never overwrites
-  // something the user already typed or a previous auto-fill.
-  const translateTimers = useRef(new Map<string, ReturnType<typeof setTimeout>>())
-  function scheduleAutoTranslate(key: string, text: string, targetLang: 'he' | 'en', apply: (translated: string) => void) {
-    const existing = translateTimers.current.get(key)
-    if (existing) clearTimeout(existing)
-    if (!text.trim()) return
-    const timer = setTimeout(async () => {
-      const translated = await translateText(text, targetLang, getToken)
-      if (translated) apply(translated)
-    }, 900)
-    translateTimers.current.set(key, timer)
+  function snapshotDraft(): DraftSnapshot {
+    return {
+      title, titleHe, category, difficulty, kosherType, cuisine, image, description, descriptionEn,
+      prepTime, cookTime, servings, nutrition, tags, tips, tipsEn, sources, ingredientGroups, stepGroups,
+    }
+  }
+
+  function restoreDraft(s: DraftSnapshot) {
+    setTitle(s.title); setTitleHe(s.titleHe); setCategory(s.category); setDifficulty(s.difficulty)
+    setKosherType(s.kosherType); setCuisine(s.cuisine); setImage(s.image); setDescription(s.description)
+    setDescriptionEn(s.descriptionEn); setPrepTime(s.prepTime); setCookTime(s.cookTime); setServings(s.servings)
+    setNutrition(s.nutrition); setTags(s.tags); setTips(s.tips); setTipsEn(s.tipsEn); setSources(s.sources)
+    setIngredientGroups(s.ingredientGroups); setStepGroups(s.stepGroups)
+  }
+
+  const history = useHistoryStack<DraftSnapshot>()
+  // Call right before applying a change that should be its own undo step -
+  // every add/remove/reorder action, an image change, a translate-regenerate
+  // result, or a text field losing focus with a changed value. Never called
+  // per-keystroke (that would make every character its own undo step).
+  function commitHistory() {
+    history.commit(snapshotDraft())
+  }
+  function undo() { history.undo(snapshotDraft(), restoreDraft) }
+  function redo() { history.redo(snapshotDraft(), restoreDraft) }
+
+  // Undo/redo keyboard shortcuts - only when focus isn't inside a text
+  // field, so the browser's own native per-field undo takes priority while
+  // actively typing; the app-level stack takes over once focus leaves it.
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      const target = e.target as HTMLElement
+      const isTyping = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable
+      if (isTyping) return
+      const mod = e.metaKey || e.ctrlKey
+      if (!mod || e.key.toLowerCase() !== 'z') return
+      e.preventDefault()
+      if (e.shiftKey) redo()
+      else undo()
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Warn on tab close/refresh when there are unsaved changes - in-app
+  // navigation (Cancel button) is handled separately via exitConfirmOpen,
+  // since beforeunload can't show a custom confirm dialog.
+  useEffect(() => {
+    function handleBeforeUnload(e: BeforeUnloadEvent) {
+      if (!history.canUndo) return
+      e.preventDefault()
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [history.canUndo])
+
+  // Tracks which translatable fields the user has typed into directly
+  // (vs auto-filled/AI-filled content never touched by hand) - see
+  // handleFieldBlur. Never includes a field whose value came only from
+  // auto-fill or a regenerate-translation result.
+  const touchedFields = useRef<Set<string>>(new Set())
+
+  // Refs backing the shared per-field focus/blur bookkeeping in
+  // fieldBindings() below - only one field can be focused at a time in a
+  // form, so a single set of refs (not a per-key map) is enough.
+  const focusedKeyRef = useRef<string | null>(null)
+  const focusedValueRef = useRef<string>('')
+  const focusedSnapshotRef = useRef<DraftSnapshot | null>(null)
+
+  // Shared value/onChange/onFocus/onBlur bindings for every translatable
+  // text field. onChange marks the field as user-touched (so it's never
+  // silently overwritten again) and updates the value live, without
+  // pushing an undo step per keystroke. onFocus snapshots the whole draft.
+  // onBlur does two independent things: (1) if the value actually changed
+  // since focus, commits that pre-change snapshot as one undo step; (2)
+  // translates into the counterpart field - always when the counterpart is
+  // empty, and also when the counterpart is non-empty but was never
+  // touched by hand (keeps an untouched auto-filled field in sync); never
+  // when the counterpart was touched directly (respects the manual edit).
+  function fieldBindings(
+    key: string, value: string, setValue: (v: string) => void,
+    counterpartKey: string, counterpartValue: string, setCounterpart: (v: string) => void,
+    targetLang: 'he' | 'en'
+  ) {
+    return {
+      value,
+      onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        touchedFields.current.add(key)
+        setValue(e.target.value)
+      },
+      onFocus: () => {
+        focusedKeyRef.current = key
+        focusedValueRef.current = value
+        focusedSnapshotRef.current = snapshotDraft()
+      },
+      onBlur: async () => {
+        if (focusedKeyRef.current === key && focusedValueRef.current !== value && focusedSnapshotRef.current) {
+          history.commit(focusedSnapshotRef.current)
+        }
+        focusedKeyRef.current = null
+        if (!value.trim()) return
+        if (counterpartValue.trim() && touchedFields.current.has(counterpartKey)) return
+        const translated = await translateText(value, targetLang, getToken)
+        if (translated) setCounterpart(translated)
+      },
+    }
   }
 
   // Manual "regenerate translation" button - unlike auto-fill, this always
   // overwrites the target field, using whichever source field currently
-  // has content (Hebrew takes priority if both are filled).
+  // has content (Hebrew takes priority if both are filled). One undo step.
   const [regenerating, setRegenerating] = useState<Set<string>>(new Set())
   async function regenerateTranslation(key: string, heText: string, enText: string, setHe: (v: string) => void, setEn: (v: string) => void) {
-    const existing = translateTimers.current.get(key)
-    if (existing) clearTimeout(existing)
     setRegenerating(prev => new Set(prev).add(key))
     try {
+      const before = snapshotDraft()
       if (heText.trim()) {
         const translated = await translateText(heText, 'en', getToken)
-        if (translated) setEn(translated)
+        if (translated) { history.commit(before); setEn(translated) }
       } else if (enText.trim()) {
         const translated = await translateText(enText, 'he', getToken)
-        if (translated) setHe(translated)
+        if (translated) { history.commit(before); setHe(translated) }
       }
     } finally {
       setRegenerating(prev => { const next = new Set(prev); next.delete(key); return next })
@@ -177,28 +298,33 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
   }
 
   function addIngredientItem(gi: number) {
+    commitHistory()
     setIngredientGroups(prev => prev.map((g, i) => (
       i === gi ? { ...g, items: [...g.items, { amount: 0, unit: '', name: '', _key: makeKey() }] } : g
     )))
   }
 
   function removeIngredientItem(gi: number, ii: number) {
+    commitHistory()
     setIngredientGroups(prev => prev.map((g, i) => (
       i === gi ? { ...g, items: g.items.filter((_, j) => j !== ii) } : g
     )))
   }
 
   function addIngredientGroup() {
+    commitHistory()
     setIngredientGroups(prev => [...prev, emptyIngredientGroup()])
   }
 
   function removeIngredientGroup(gi: number) {
+    commitHistory()
     setIngredientGroups(prev => prev.filter((_, i) => i !== gi))
   }
 
   function reorderIngredientGroups(event: DragEndEvent) {
     const { active, over } = event
     if (!over || active.id === over.id) return
+    commitHistory()
     setIngredientGroups(prev => {
       const oldIndex = prev.findIndex(g => g._key === active.id)
       const newIndex = prev.findIndex(g => g._key === over.id)
@@ -209,6 +335,7 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
   function reorderIngredientItems(gi: number, event: DragEndEvent) {
     const { active, over } = event
     if (!over || active.id === over.id) return
+    commitHistory()
     setIngredientGroups(prev => prev.map((g, i) => {
       if (i !== gi) return g
       const oldIndex = g.items.findIndex(item => item._key === active.id)
@@ -229,28 +356,33 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
   }
 
   function addStepItem(gi: number) {
+    commitHistory()
     setStepGroups(prev => prev.map((g, i) => (
       i === gi ? { ...g, items: [...g.items, { instruction: '', _key: makeKey() }] } : g
     )))
   }
 
   function removeStepItem(gi: number, si: number) {
+    commitHistory()
     setStepGroups(prev => prev.map((g, i) => (
       i === gi ? { ...g, items: g.items.filter((_, j) => j !== si) } : g
     )))
   }
 
   function addStepGroup() {
+    commitHistory()
     setStepGroups(prev => [...prev, emptyStepGroup()])
   }
 
   function removeStepGroup(gi: number) {
+    commitHistory()
     setStepGroups(prev => prev.filter((_, i) => i !== gi))
   }
 
   function reorderStepGroups(event: DragEndEvent) {
     const { active, over } = event
     if (!over || active.id === over.id) return
+    commitHistory()
     setStepGroups(prev => {
       const oldIndex = prev.findIndex(g => g._key === active.id)
       const newIndex = prev.findIndex(g => g._key === over.id)
@@ -261,6 +393,7 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
   function reorderStepItems(gi: number, event: DragEndEvent) {
     const { active, over } = event
     if (!over || active.id === over.id) return
+    commitHistory()
     setStepGroups(prev => prev.map((g, i) => {
       if (i !== gi) return g
       const oldIndex = g.items.findIndex(item => item._key === active.id)
@@ -283,6 +416,7 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
     try {
       const estimate = await estimateNutrition(ingredients, servings, getToken)
       if (estimate) {
+        commitHistory()
         setNutrition(estimate)
       } else {
         showToast(lang === 'he' ? 'הערכת הערכים התזונתיים נכשלה' : 'Nutrition estimate failed', 'error')
@@ -377,20 +511,46 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
                 { label: lang === 'he' ? 'מתכון חדש' : 'New Recipe' },
               ]
         } />
-        <h1 className="font-serif text-2xl font-bold text-cream">
-          {isEditing
-            ? (lang === 'he' ? 'עריכת מתכון' : 'Edit Recipe')
-            : duplicateFrom
-              ? (lang === 'he' ? 'שכפול מתכון' : 'Duplicate Recipe')
-              : (lang === 'he' ? 'מתכון חדש' : 'New Recipe')}
-        </h1>
+        <div className="flex items-center justify-between gap-3">
+          <h1 className="font-serif text-2xl font-bold text-cream">
+            {isEditing
+              ? (lang === 'he' ? 'עריכת מתכון' : 'Edit Recipe')
+              : duplicateFrom
+                ? (lang === 'he' ? 'שכפול מתכון' : 'Duplicate Recipe')
+                : (lang === 'he' ? 'מתכון חדש' : 'New Recipe')}
+          </h1>
+          <div className="flex items-center gap-1 shrink-0">
+            <button
+              type="button"
+              onClick={undo}
+              disabled={!history.canUndo}
+              title={lang === 'he' ? 'בטל' : 'Undo'}
+              className="p-2 rounded-lg text-cream/60 hover:text-cream hover:bg-tint/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                <path d="M9 14 4 9l5-5" /><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              onClick={redo}
+              disabled={!history.canRedo}
+              title={lang === 'he' ? 'בצע שוב' : 'Redo'}
+              className="p-2 rounded-lg text-cream/60 hover:text-cream hover:bg-tint/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                <path d="m15 14 5-5-5-5" /><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13" />
+              </svg>
+            </button>
+          </div>
+        </div>
 
         {aiGenerated && (
           <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber bg-amber/10 border border-amber/20 rounded-full px-3 py-1">
-            <span>{lang === 'he' ? 'נוצר בעזרת AI' : 'AI generated'}</span>
+            <span>{lang === 'he' ? 'נוצר בשיתוף AI' : 'AI co-authored'}</span>
             <FilterInfoPopover text={lang === 'he'
-              ? 'המתכון הזה נוצר על ידי AI שחיפש ברשת מתכונים אמיתיים ובנה מהם את המתכון - הוא לא הומצא, אלא מבוסס על מקורות אמיתיים.'
-              : 'This recipe was generated by AI that searched the web for real recipes and wrote this one up based on them - not invented from scratch.'}
+              ? 'המתכון הזה נכתב בשיתוף AI שחיפש ברשת מתכונים אמיתיים והתחיל מהם - אך מי שפרסם אותו בדק, אישר, ויכול לערוך כל חלק בו. הוא לא הומצא על ידי AI.'
+              : 'This recipe was co-authored with AI - it started from real recipes AI found online, then was reviewed and approved by the person who posted it, who can edit any part of it. Not invented by AI.'}
             />
           </div>
         )}
@@ -404,14 +564,14 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className={labelClass}>{lang === 'he' ? 'כותרת (אנגלית)' : 'Title (English)'}</label>
-              <input required value={title} onChange={e => { const v = e.target.value; setTitle(v); if (!titleHe.trim()) scheduleAutoTranslate('title', v, 'he', setTitleHe) }} className={inputClass} />
+              <input required {...fieldBindings('title', title, setTitle, 'titleHe', titleHe, setTitleHe, 'he')} className={inputClass} />
             </div>
             <div>
               <div className="flex items-center justify-between mb-1">
                 <label className={labelClass}>{lang === 'he' ? 'כותרת (עברית)' : 'Title (Hebrew)'}</label>
                 <RegenerateButton lang={lang} busy={regenerating.has('title')} onClick={() => regenerateTranslation('title', titleHe, title, setTitleHe, setTitle)} />
               </div>
-              <input value={titleHe} onChange={e => { const v = e.target.value; setTitleHe(v); if (!title.trim()) scheduleAutoTranslate('titleHe', v, 'en', setTitle) }} className={inputClass} dir="rtl" />
+              <input {...fieldBindings('titleHe', titleHe, setTitleHe, 'title', title, setTitle, 'en')} className={inputClass} dir="rtl" />
             </div>
           </div>
 
@@ -458,7 +618,7 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
             <label className={labelClass}>{lang === 'he' ? 'תמונה' : 'Photo'}</label>
             <PhotoUploadField
               image={image}
-              onChange={setImage}
+              onChange={url => { commitHistory(); setImage(url) }}
               uploadRecipeId={uploadRecipeIdRef.current}
               lang={lang}
               onError={message => showToast(message, 'error')}
@@ -468,14 +628,14 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className={labelClass}>{lang === 'he' ? 'תיאור (עברית)' : 'Description (Hebrew)'}</label>
-              <textarea required value={description} onChange={e => { const v = e.target.value; setDescription(v); if (!descriptionEn.trim()) scheduleAutoTranslate('description', v, 'en', setDescriptionEn) }} rows={2} className={inputClass} dir="rtl" />
+              <textarea required {...fieldBindings('description', description, setDescription, 'descriptionEn', descriptionEn, setDescriptionEn, 'en')} rows={2} className={inputClass} dir="rtl" />
             </div>
             <div>
               <div className="flex items-center justify-between mb-1">
                 <label className={labelClass}>{lang === 'he' ? 'תיאור (אנגלית)' : 'Description (English)'}</label>
                 <RegenerateButton lang={lang} busy={regenerating.has('description')} onClick={() => regenerateTranslation('description', description, descriptionEn, setDescription, setDescriptionEn)} />
               </div>
-              <textarea value={descriptionEn} onChange={e => { const v = e.target.value; setDescriptionEn(v); if (!description.trim()) scheduleAutoTranslate('descriptionEn', v, 'he', setDescription) }} rows={2} className={inputClass} />
+              <textarea {...fieldBindings('descriptionEn', descriptionEn, setDescriptionEn, 'description', description, setDescription, 'he')} rows={2} className={inputClass} />
             </div>
           </div>
 
@@ -542,14 +702,14 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className={labelClass}>{lang === 'he' ? 'טיפים (עברית, שורה לכל טיפ)' : 'Tips (Hebrew, one per line)'}</label>
-              <textarea value={tips} onChange={e => { const v = e.target.value; setTips(v); if (!tipsEn.trim()) scheduleAutoTranslate('tips', v, 'en', setTipsEn) }} rows={2} className={inputClass} dir="rtl" />
+              <textarea {...fieldBindings('tips', tips, setTips, 'tipsEn', tipsEn, setTipsEn, 'en')} rows={2} className={inputClass} dir="rtl" />
             </div>
             <div>
               <div className="flex items-center justify-between mb-1">
                 <label className={labelClass}>{lang === 'he' ? 'טיפים (אנגלית, שורה לכל טיפ)' : 'Tips (English, one per line)'}</label>
                 <RegenerateButton lang={lang} busy={regenerating.has('tips')} onClick={() => regenerateTranslation('tips', tips, tipsEn, setTips, setTipsEn)} />
               </div>
-              <textarea value={tipsEn} onChange={e => { const v = e.target.value; setTipsEn(v); if (!tips.trim()) scheduleAutoTranslate('tipsEn', v, 'he', setTips) }} rows={2} className={inputClass} />
+              <textarea {...fieldBindings('tipsEn', tipsEn, setTipsEn, 'tips', tips, setTips, 'he')} rows={2} className={inputClass} />
             </div>
           </div>
         </div>
@@ -568,15 +728,13 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
                         <div className="flex flex-col gap-2 flex-1 min-w-0">
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             <input
-                              value={group.group ?? ''}
-                              onChange={e => { const v = e.target.value; updateIngredientGroup(gi, { group: v }); if (!(group.groupEn ?? '').trim()) scheduleAutoTranslate(`ing-group-${group._key}`, v, 'en', translated => updateIngredientGroup(gi, { groupEn: translated })) }}
+                              {...fieldBindings(`ing-group-${group._key}`, group.group ?? '', v => updateIngredientGroup(gi, { group: v }), `ing-groupEn-${group._key}`, group.groupEn ?? '', v => updateIngredientGroup(gi, { groupEn: v }), 'en')}
                               placeholder={lang === 'he' ? 'שם הקבוצה (עברית, אופציונלי)' : 'Group name (Hebrew, optional)'}
                               className={inputClass}
                               dir="rtl"
                             />
                             <input
-                              value={group.groupEn ?? ''}
-                              onChange={e => { const v = e.target.value; updateIngredientGroup(gi, { groupEn: v }); if (!(group.group ?? '').trim()) scheduleAutoTranslate(`ing-groupEn-${group._key}`, v, 'he', translated => updateIngredientGroup(gi, { group: translated })) }}
+                              {...fieldBindings(`ing-groupEn-${group._key}`, group.groupEn ?? '', v => updateIngredientGroup(gi, { groupEn: v }), `ing-group-${group._key}`, group.group ?? '', v => updateIngredientGroup(gi, { group: v }), 'he')}
                               placeholder={lang === 'he' ? 'שם הקבוצה (אנגלית, אופציונלי)' : 'Group name (English, optional)'}
                               className={inputClass}
                             />
@@ -609,8 +767,8 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
                                       <button type="button" onClick={() => removeIngredientItem(gi, ii)} className="shrink-0 text-red-400/60 hover:text-red-400 text-xs px-1">✕</button>
                                     </div>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                      <input value={item.name} onChange={e => { const v = e.target.value; updateIngredientItem(gi, ii, { name: v }); if (!(item.nameEn ?? '').trim()) scheduleAutoTranslate(`ing-${item._key}`, v, 'en', translated => updateIngredientItem(gi, ii, { nameEn: translated })) }} className={inputClass} placeholder={lang === 'he' ? 'שם (עברית)' : 'Name (Hebrew)'} dir="rtl" />
-                                      <input value={item.nameEn ?? ''} onChange={e => { const v = e.target.value; updateIngredientItem(gi, ii, { nameEn: v }); if (!item.name.trim()) scheduleAutoTranslate(`ingEn-${item._key}`, v, 'he', translated => updateIngredientItem(gi, ii, { name: translated })) }} className={inputClass} placeholder={lang === 'he' ? 'שם (אנגלית)' : 'Name (English)'} />
+                                      <input {...fieldBindings(`ing-${item._key}`, item.name, v => updateIngredientItem(gi, ii, { name: v }), `ingEn-${item._key}`, item.nameEn ?? '', v => updateIngredientItem(gi, ii, { nameEn: v }), 'en')} className={inputClass} placeholder={lang === 'he' ? 'שם (עברית)' : 'Name (Hebrew)'} dir="rtl" />
+                                      <input {...fieldBindings(`ingEn-${item._key}`, item.nameEn ?? '', v => updateIngredientItem(gi, ii, { nameEn: v }), `ing-${item._key}`, item.name, v => updateIngredientItem(gi, ii, { name: v }), 'he')} className={inputClass} placeholder={lang === 'he' ? 'שם (אנגלית)' : 'Name (English)'} />
                                     </div>
                                   </div>
                                   <RegenerateButton
@@ -652,15 +810,13 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
                         <div className="flex flex-col gap-2 flex-1 min-w-0">
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             <input
-                              value={group.title ?? ''}
-                              onChange={e => { const v = e.target.value; updateStepGroup(gi, { title: v }); if (!(group.titleEn ?? '').trim()) scheduleAutoTranslate(`step-group-${group._key}`, v, 'en', translated => updateStepGroup(gi, { titleEn: translated })) }}
+                              {...fieldBindings(`step-group-${group._key}`, group.title ?? '', v => updateStepGroup(gi, { title: v }), `step-groupEn-${group._key}`, group.titleEn ?? '', v => updateStepGroup(gi, { titleEn: v }), 'en')}
                               placeholder={lang === 'he' ? 'שם השלב (עברית, אופציונלי)' : 'Section title (Hebrew, optional)'}
                               className={inputClass}
                               dir="rtl"
                             />
                             <input
-                              value={group.titleEn ?? ''}
-                              onChange={e => { const v = e.target.value; updateStepGroup(gi, { titleEn: v }); if (!(group.title ?? '').trim()) scheduleAutoTranslate(`step-groupEn-${group._key}`, v, 'he', translated => updateStepGroup(gi, { title: translated })) }}
+                              {...fieldBindings(`step-groupEn-${group._key}`, group.titleEn ?? '', v => updateStepGroup(gi, { titleEn: v }), `step-group-${group._key}`, group.title ?? '', v => updateStepGroup(gi, { title: v }), 'he')}
                               placeholder={lang === 'he' ? 'שם השלב (אנגלית, אופציונלי)' : 'Section title (English, optional)'}
                               className={inputClass}
                             />
@@ -688,23 +844,21 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
                                   <DragHandle attributes={itemAttrs} listeners={itemListeners} className="mt-2" />
                                   <StepPhotoField
                                     image={step.image}
-                                    onChange={url => updateStepItem(gi, si, { image: url })}
+                                    onChange={url => { commitHistory(); updateStepItem(gi, si, { image: url }) }}
                                     uploadRecipeId={uploadRecipeIdRef.current}
                                     lang={lang}
                                   />
                                   <div className="flex flex-col gap-2 flex-1 min-w-0">
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                       <textarea
-                                        value={step.instruction}
-                                        onChange={e => { const v = e.target.value; updateStepItem(gi, si, { instruction: v }); if (!(step.instructionEn ?? '').trim()) scheduleAutoTranslate(`step-${step._key}`, v, 'en', translated => updateStepItem(gi, si, { instructionEn: translated })) }}
+                                        {...fieldBindings(`step-${step._key}`, step.instruction, v => updateStepItem(gi, si, { instruction: v }), `stepEn-${step._key}`, step.instructionEn ?? '', v => updateStepItem(gi, si, { instructionEn: v }), 'en')}
                                         placeholder={lang === 'he' ? `שלב ${si + 1} (עברית)` : `Step ${si + 1} (Hebrew)`}
                                         rows={2}
                                         className={inputClass}
                                         dir="rtl"
                                       />
                                       <textarea
-                                        value={step.instructionEn ?? ''}
-                                        onChange={e => { const v = e.target.value; updateStepItem(gi, si, { instructionEn: v }); if (!step.instruction.trim()) scheduleAutoTranslate(`stepEn-${step._key}`, v, 'he', translated => updateStepItem(gi, si, { instruction: translated })) }}
+                                        {...fieldBindings(`stepEn-${step._key}`, step.instructionEn ?? '', v => updateStepItem(gi, si, { instructionEn: v }), `step-${step._key}`, step.instruction, v => updateStepItem(gi, si, { instruction: v }), 'he')}
                                         placeholder={lang === 'he' ? `שלב ${si + 1} (אנגלית)` : `Step ${si + 1} (English)`}
                                         rows={2}
                                         className={inputClass}
@@ -802,11 +956,24 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
               ? (lang === 'he' ? 'שומר...' : 'Saving...')
               : isEditing ? (lang === 'he' ? 'שמור שינויים' : 'Save changes') : (lang === 'he' ? 'צור מתכון' : 'Create recipe')}
           </button>
-          <button type="button" onClick={() => navigate(-1)} className="btn-ghost">
+          <button type="button" onClick={() => history.canUndo ? setExitConfirmOpen(true) : navigate(-1)} className="btn-ghost">
             {lang === 'he' ? 'ביטול' : 'Cancel'}
           </button>
         </div>
       </form>
+
+      <ConfirmDialog
+        open={exitConfirmOpen}
+        title={lang === 'he' ? 'לצאת בלי לשמור?' : 'Discard unsaved changes?'}
+        message={lang === 'he'
+          ? 'יש לך שינויים שלא נשמרו. אם תצא עכשיו הם יאבדו.'
+          : 'You have unsaved changes. Leaving now will discard them.'}
+        confirmLabel={lang === 'he' ? 'צא בלי לשמור' : 'Discard'}
+        cancelLabel={lang === 'he' ? 'המשך עריכה' : 'Keep editing'}
+        danger
+        onConfirm={() => { setExitConfirmOpen(false); navigate(-1) }}
+        onCancel={() => setExitConfirmOpen(false)}
+      />
     </div>
   )
 }
