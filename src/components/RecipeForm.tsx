@@ -65,6 +65,7 @@ interface DraftSnapshot {
   servings: number
   nutrition: Nutrition
   tags: string
+  tagsEn: string
   tips: string
   tipsEn: string
   sources: { title: string; url: string }[]
@@ -148,6 +149,7 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft, rev
   const [nutrition, setNutrition] = useState<Nutrition>(prefill?.nutrition ?? {})
   const [estimatingNutrition, setEstimatingNutrition] = useState(false)
   const [tags, setTags] = useState((prefill?.tags ?? []).join(', '))
+  const [tagsEn, setTagsEn] = useState((prefill?.tagsEn ?? []).join(', '))
   const [tips, setTips] = useState((prefill?.tips ?? []).join('\n'))
   const [tipsEn, setTipsEn] = useState((prefill?.tipsEn ?? []).join('\n'))
   const aiGenerated = prefill?.aiGenerated ?? false
@@ -165,7 +167,7 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft, rev
   function snapshotDraft(): DraftSnapshot {
     return {
       title, titleHe, category, difficulty, kosherType, cuisine, image, description, descriptionEn,
-      prepTime, cookTime, servings, nutrition, tags, tips, tipsEn, sources, ingredientGroups, stepGroups,
+      prepTime, cookTime, servings, nutrition, tags, tagsEn, tips, tipsEn, sources, ingredientGroups, stepGroups,
     }
   }
 
@@ -173,7 +175,7 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft, rev
     setTitle(s.title); setTitleHe(s.titleHe); setCategory(s.category); setDifficulty(s.difficulty)
     setKosherType(s.kosherType); setCuisine(s.cuisine); setImage(s.image); setDescription(s.description)
     setDescriptionEn(s.descriptionEn); setPrepTime(s.prepTime); setCookTime(s.cookTime); setServings(s.servings)
-    setNutrition(s.nutrition); setTags(s.tags); setTips(s.tips); setTipsEn(s.tipsEn); setSources(s.sources)
+    setNutrition(s.nutrition); setTags(s.tags); setTagsEn(s.tagsEn); setTips(s.tips); setTipsEn(s.tipsEn); setSources(s.sources)
     setIngredientGroups(s.ingredientGroups); setStepGroups(s.stepGroups)
   }
 
@@ -468,6 +470,7 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft, rev
         servings,
         nutrition: Object.values(nutrition).some(v => v !== undefined) ? nutrition : undefined,
         tags: tags.split(',').map(s => s.trim()).filter(Boolean),
+        tagsEn: tagsEn.split(',').map(s => s.trim()).filter(Boolean),
         tips: tips.split('\n').map(s => s.trim()).filter(Boolean),
         tipsEn: tipsEn.split('\n').map(s => s.trim()).filter(Boolean),
         aiGenerated,
@@ -731,9 +734,18 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft, rev
             </div>
           </div>
 
-          <div>
-            <label className={labelClass}>{lang === 'he' ? 'תגיות (מופרדות בפסיק)' : 'Tags (comma-separated)'}</label>
-            <input value={tags} onChange={e => setTags(e.target.value)} className={inputClass} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className={labelClass}>{lang === 'he' ? 'תגיות (עברית, מופרדות בפסיק)' : 'Tags (Hebrew, comma-separated)'}</label>
+              <input {...fieldBindings('tags', tags, setTags, 'tagsEn', tagsEn, setTagsEn, 'en')} className={inputClass} dir="rtl" />
+            </div>
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className={labelClass}>{lang === 'he' ? 'תגיות (אנגלית, מופרדות בפסיק)' : 'Tags (English, comma-separated)'}</label>
+                <RegenerateButton lang={lang} busy={regenerating.has('tags')} onClick={() => regenerateTranslation('tags', tags, tagsEn, setTags, setTagsEn)} />
+              </div>
+              <input {...fieldBindings('tagsEn', tagsEn, setTagsEn, 'tags', tags, setTags, 'he')} className={inputClass} />
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
