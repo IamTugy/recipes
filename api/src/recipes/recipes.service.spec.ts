@@ -454,6 +454,37 @@ describe('RecipesService', () => {
     expect(activityLog.record).toHaveBeenCalledWith('user_1', 'tomato-soup', 'recipe_updated')
   })
 
+  it('updateImage sets just the image field, without bumping the revision or writing a new revision snapshot', async () => {
+    const existing = { slug: 'tomato-soup', ownerId: 'user_1', status: 'draft' }
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(existing) })
+    const updated = { slug: 'tomato-soup', image: 'https://r2.example.com/new.jpg', currentRevision: 1 }
+    const findOneAndUpdate = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(updated) })
+    const revisionCreate = jest.fn()
+    const service = await makeService({ findOne, findOneAndUpdate }, { create: revisionCreate })
+    const result = await service.updateImage('tomato-soup', 'user_1', false, 'https://r2.example.com/new.jpg')
+
+    expect(findOneAndUpdate).toHaveBeenCalledWith(
+      { _id: 'tomato-soup' },
+      { $set: { image: 'https://r2.example.com/new.jpg' } },
+      { new: true },
+    )
+    expect(revisionCreate).not.toHaveBeenCalled()
+    expect(result).toBe(updated)
+  })
+
+  it('updateImage throws ForbiddenException when a non-owner, non-admin tries to change the photo', async () => {
+    const recipe = { slug: 'a', ownerId: 'user_1', status: 'draft' }
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
+    const service = await makeService({ findOne })
+    await expect(service.updateImage('a', 'user_2', false, 'https://r2.example.com/x.jpg')).rejects.toThrow(ForbiddenException)
+  })
+
+  it('updateImage throws NotFoundException when the recipe does not exist', async () => {
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(null) })
+    const service = await makeService({ findOne })
+    await expect(service.updateImage('missing', 'user_1', false, 'https://r2.example.com/x.jpg')).rejects.toThrow(NotFoundException)
+  })
+
   function completeRecipe(overrides: Record<string, unknown> = {}) {
     return {
       ...minimalDto,
