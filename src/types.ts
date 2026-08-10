@@ -94,6 +94,8 @@ export interface Recipe {
   currentRevision?: number
   publishedRevision?: number | null
   qualityReview?: QualityReview
+  pendingReview?: boolean
+  batchId?: string
 }
 
 export interface QualityFinding {
