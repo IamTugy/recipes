@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common'
 import { GeminiService } from '../../ai/gemini.service'
-import { extractFromUrl, extractFromPdf, extractFromDocx, type ImportedRecipe } from './source-extractor'
+import { extractFromUrl, extractFromPdf, extractFromDocx, isSocialMediaUrl, extractTikTokOembed, type ImportedRecipe } from './source-extractor'
 
 const EXTRACTION_PROMPT = `You are extracting a cooking recipe from raw text into a strict JSON object. Read the following source text and produce a single JSON object with exactly these fields (omit any field you cannot determine, but always include "title"):
 
@@ -88,12 +88,41 @@ export class RecipeImportService {
     return this.gemini.generateStructured<ImportedRecipe>(`${EXTRACTION_PROMPT}${text}`)
   }
 
-  async importFromUrl(url: string): Promise<ImportedRecipe> {
+  // captionText is the text the OS share sheet hands along with the link
+  // (e.g. an Instagram/TikTok caption) - it's the richest signal available
+  // for social posts, since those pages can't be fetched directly.
+  async importFromUrl(url: string, captionText?: string): Promise<ImportedRecipe> {
+    if (isSocialMediaUrl(url)) {
+      return this.importFromSocialUrl(url, captionText)
+    }
     const { text, structured } = await extractFromUrl(url)
     if (structured) {
       return this.gemini.generateStructured<ImportedRecipe>(`${JSON_LD_TO_RECIPE_PROMPT}${JSON.stringify(structured)}`)
     }
-    return this.importFromText(text)
+    return this.importFromText(captionText ? `${captionText}\n\n${text}` : text)
+  }
+
+  // Instagram/Facebook/TikTok post pages are JS-rendered and often
+  // auth-walled, so there is no reliable server-side fetch here. Instead this
+  // combines whatever caption text was shared, TikTok's public oEmbed title
+  // (Instagram/Facebook oEmbed both require a Meta access token, so those are
+  // skipped), and a Gemini web-search pass grounded on the post URL - then
+  // feeds the combined text through the normal text-extraction prompt.
+  async importFromSocialUrl(url: string, captionText?: string): Promise<ImportedRecipe> {
+    const [oembedText, search] = await Promise.all([
+      extractTikTokOembed(url),
+      this.gemini.generateWithSearch(
+        `Find the cooking recipe posted at this social media link: ${url}\n` +
+          'Search for the post\'s caption and any linked description or comments that contain the recipe. ' +
+          'Reply in plain text with everything you find: the full caption, ingredient list, and instructions, in as much detail as possible. ' +
+          'If you cannot find the actual recipe content, say so plainly instead of guessing.',
+      ),
+    ])
+    const combined = [captionText, oembedText, search.text].filter(Boolean).join('\n\n')
+    if (!combined.trim()) {
+      throw new BadRequestException('Could not find recipe content for that link - try sharing again with the caption text included, or paste the caption in manually.')
+    }
+    return this.importFromText(combined)
   }
 
   async importFromFile(buffer: Buffer, mimeType: string, promptText?: string): Promise<ImportedRecipe> {

@@ -24,15 +24,15 @@ export class RecipeImportController {
     if (!body.text && !body.url && !file && !image) {
       throw new BadRequestException('Provide text, a URL, a file, or a photo')
     }
-    if (body.url && (body.text || file || image)) {
-      throw new BadRequestException('Provide a URL on its own, not combined with text, a file, or a photo')
+    if (body.url && (file || image)) {
+      throw new BadRequestException('Provide a URL on its own or with caption text, not combined with a file or a photo')
     }
     if (file && image) {
       throw new BadRequestException('Provide a document file or a photo, not both')
     }
 
     const result = body.url
-      ? await this.importService.importFromUrl(body.url)
+      ? await this.importService.importFromUrl(body.url, body.text)
       : file
         ? await this.importService.importFromFile(file.buffer, file.mimetype, body.text)
         : image

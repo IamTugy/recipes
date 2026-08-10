@@ -5,7 +5,7 @@ import { GeminiService } from '../../ai/gemini.service'
 jest.mock('./source-extractor')
 
 describe('RecipeImportService', () => {
-  const geminiService = { generateStructured: jest.fn(), generateStructuredWithImage: jest.fn() }
+  const geminiService = { generateStructured: jest.fn(), generateStructuredWithImage: jest.fn(), generateWithSearch: jest.fn() }
   const service = new RecipeImportService(geminiService as unknown as GeminiService)
 
   beforeEach(() => jest.clearAllMocks())
@@ -30,6 +30,34 @@ describe('RecipeImportService', () => {
     const result = await service.importFromUrl('https://example.com/soup')
     expect(geminiService.generateStructured).toHaveBeenCalledWith(expect.stringContaining('Tomato Soup recipe text'))
     expect(result).toEqual({ title: 'Tomato Soup' })
+  })
+
+  it('importFromUrl routes social media links to importFromSocialUrl instead of extractFromUrl', async () => {
+    ;(sourceExtractor.isSocialMediaUrl as jest.Mock).mockReturnValue(true)
+    ;(sourceExtractor.extractTikTokOembed as jest.Mock).mockResolvedValue('A great soup. By chef')
+    geminiService.generateWithSearch.mockResolvedValue({ text: 'Full recipe: 2 tomatoes, boil them', sources: [] })
+    geminiService.generateStructured.mockResolvedValue({ title: 'Tomato Soup' })
+
+    const result = await service.importFromUrl('https://www.tiktok.com/@chef/video/123', 'Best soup ever')
+
+    expect(sourceExtractor.extractFromUrl).not.toHaveBeenCalled()
+    expect(geminiService.generateStructured).toHaveBeenCalledWith(expect.stringContaining('Best soup ever'))
+    expect(geminiService.generateStructured).toHaveBeenCalledWith(expect.stringContaining('A great soup. By chef'))
+    expect(geminiService.generateStructured).toHaveBeenCalledWith(expect.stringContaining('Full recipe: 2 tomatoes, boil them'))
+    expect(result).toEqual({ title: 'Tomato Soup' })
+  })
+
+  it('importFromSocialUrl throws when no caption, oEmbed, or search result is found', async () => {
+    ;(sourceExtractor.extractTikTokOembed as jest.Mock).mockResolvedValue(null)
+    geminiService.generateWithSearch.mockResolvedValue({ text: '', sources: [] })
+    await expect(service.importFromSocialUrl('https://www.instagram.com/reel/abc')).rejects.toThrow('Could not find recipe content')
+  })
+
+  it('importFromUrl includes the caption text with regular JSON-LD-less pages', async () => {
+    ;(sourceExtractor.extractFromUrl as jest.Mock).mockResolvedValue({ text: 'Tomato Soup recipe text' })
+    geminiService.generateStructured.mockResolvedValue({ title: 'Tomato Soup' })
+    await service.importFromUrl('https://example.com/soup', 'make it vegan')
+    expect(geminiService.generateStructured).toHaveBeenCalledWith(expect.stringContaining('make it vegan'))
   })
 
   it('importFromFile dispatches to PDF extraction for application/pdf', async () => {
