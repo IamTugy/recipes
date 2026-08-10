@@ -37,6 +37,11 @@ export class RecipesController {
     return this.recipesService.findMine(req.userId)
   }
 
+  @Get('pending')
+  async findPending(@Req() req: Request & { userId: string }) {
+    return this.recipesService.findPending(req.userId)
+  }
+
   @Get('chef/:userId')
   async chefProfile(@Param('userId') userId: string) {
     const [recipes, names] = await Promise.all([

@@ -280,6 +280,17 @@ export class RecipesService implements OnModuleInit {
     return recipes.map(r => r.toObject())
   }
 
+  // Bulk-AI drafts the user hasn't reviewed/saved yet - the "drafts in
+  // progress" panel's data source. Ordered by batch so one bulk-generate
+  // call's recipes stay grouped, then by creation order within a batch.
+  async findPending(userId: string) {
+    const recipes = await this.recipeModel
+      .find({ ownerId: userId, pendingReview: true, deletedAt: { $exists: false } })
+      .sort({ batchId: 1, createdAt: 1 })
+      .exec()
+    return recipes.map(r => r.toObject())
+  }
+
   private async generateUniqueSlug(title: string): Promise<string> {
     const base = slugify(title) || 'recipe'
     let candidate = base

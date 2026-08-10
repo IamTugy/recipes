@@ -282,6 +282,18 @@ describe('RecipesService', () => {
     expect(result).toEqual([{ slug: 'a', id: 'a' }])
   })
 
+  it('findPending returns the caller\'s pending-review recipes ordered by batch then creation time', async () => {
+    const find = jest.fn().mockReturnValue({
+      sort: jest.fn().mockReturnThis(),
+      exec: jest.fn().mockResolvedValue([{ toObject: () => ({ id: 'a', title: 'Soup', pendingReview: true }) }]),
+    })
+    const service = await makeService({ find })
+    const result = await service.findPending('user_1')
+
+    expect(find).toHaveBeenCalledWith({ ownerId: 'user_1', pendingReview: true, deletedAt: { $exists: false } })
+    expect(result).toEqual([{ id: 'a', title: 'Soup', pendingReview: true }])
+  })
+
   it('createDraft slugifies the title, stores the recipe as a revision-1 draft, and snapshots it', async () => {
     const exists = jest.fn().mockResolvedValue(null)
     const created = { id: 'tomato-soup', slug: 'tomato-soup', ...minimalDto, currentRevision: 1 }
