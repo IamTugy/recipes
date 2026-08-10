@@ -27,7 +27,7 @@ export default function RecipeLinkPicker({ excludeId, onSelect, onClose }: Recip
 
   const options = useMemo(() => {
     const merged = new Map<string, LinkTarget>()
-    for (const r of [...mine, ...published]) {
+    for (const r of [...published, ...mine]) {
       if (r.id === excludeId) continue
       merged.set(r.id, { id: r.id, title: r.title, titleHe: r.titleHe })
     }
