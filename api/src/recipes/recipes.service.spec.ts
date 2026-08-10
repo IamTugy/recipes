@@ -578,7 +578,7 @@ describe('RecipesService', () => {
 
   it('submitForReview publishes immediately when the AI review score meets the threshold', async () => {
     const recipe: any = completeRecipe()
-    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe), select: jest.fn().mockReturnThis(), lean: jest.fn().mockReturnThis() })
     const updateOne = jest.fn().mockResolvedValue({})
     const quality = makeQualityService({ score: 95, checkedAt: '2026-08-09T00:00:00.000Z', findings: [] })
     const service = await makeService({ findOne }, { updateOne }, undefined, undefined, undefined, undefined, undefined, quality)
@@ -596,7 +596,7 @@ describe('RecipesService', () => {
 
   it('submitForReview rejects when the AI review score is below the threshold', async () => {
     const recipe: any = completeRecipe()
-    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe), select: jest.fn().mockReturnThis(), lean: jest.fn().mockReturnThis() })
     const updateOne = jest.fn().mockResolvedValue({})
     const review = { score: 94, checkedAt: '2026-08-09T00:00:00.000Z', findings: [{ category: 'image', severity: 'major', message: 'blurry' }] }
     const quality = makeQualityService(review)
@@ -631,7 +631,7 @@ describe('RecipesService', () => {
 
   it('submitForReview does not require a unit on ingredient items (optional for countable items like "1 clove")', async () => {
     const recipe: any = completeRecipe({ ingredients: [{ group: 'Main', items: [{ name: 'Garlic clove', amount: 1, unit: '' }] }] })
-    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe), select: jest.fn().mockReturnThis(), lean: jest.fn().mockReturnThis() })
     const updateOne = jest.fn().mockResolvedValue({})
     const service = await makeService({ findOne }, { updateOne })
 
@@ -642,12 +642,44 @@ describe('RecipesService', () => {
     const recipe = completeRecipe({
       ingredients: [{ group: 'Main', items: [{ linkedRecipeId: 'other-recipe', amount: 800, unit: 'g' }] }],
     })
-    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
+    const findOne = jest.fn()
+      .mockReturnValueOnce({ exec: jest.fn().mockResolvedValue(recipe) }) // getEditableOrThrow
+      .mockReturnValueOnce({ select: jest.fn().mockReturnThis(), lean: jest.fn().mockReturnThis(), exec: jest.fn().mockResolvedValue({ ingredients: recipe.ingredients }) }) // linkedIdsOf(recipe.id)
+      .mockReturnValueOnce({ select: jest.fn().mockReturnThis(), lean: jest.fn().mockReturnThis(), exec: jest.fn().mockResolvedValue({ ingredients: [] }) }) // linkedIdsOf('other-recipe') during the BFS walk
+    const find = jest.fn().mockReturnValue({ select: jest.fn().mockReturnThis(), lean: jest.fn().mockReturnThis(), exec: jest.fn().mockResolvedValue([{ _id: 'other-recipe', publishedRevision: 1, title: 'Other' }]) })
     const updateOne = jest.fn().mockResolvedValue({})
     const quality = makeQualityService({ score: 100, checkedAt: 'now', findings: [] })
-    const service = await makeService({ findOne }, { updateOne }, undefined, undefined, undefined, undefined, undefined, quality)
+    const service = await makeService({ findOne, find }, { updateOne }, undefined, undefined, undefined, undefined, undefined, quality)
 
     // Should reach the quality-review step rather than throwing "missing/invalid: ingredients"
+    await expect(service.submitForReview('a', 'user_1', false)).resolves.toBeDefined()
+  })
+
+  it('submitForReview throws BadRequestException when a directly linked recipe is not published', async () => {
+    const recipe = completeRecipe({
+      ingredients: [{ group: 'Main', items: [{ linkedRecipeId: 'dough-recipe', amount: 800, unit: 'g' }] }],
+    })
+    const findOne = jest.fn()
+      .mockReturnValueOnce({ exec: jest.fn().mockResolvedValue(recipe) }) // getEditableOrThrow
+      .mockReturnValueOnce({ select: jest.fn().mockReturnThis(), lean: jest.fn().mockReturnThis(), exec: jest.fn().mockResolvedValue({ ingredients: recipe.ingredients }) }) // linkedIdsOf(recipe.id)
+      .mockReturnValueOnce({ select: jest.fn().mockReturnThis(), lean: jest.fn().mockReturnThis(), exec: jest.fn().mockResolvedValue({ ingredients: [] }) }) // linkedIdsOf('dough-recipe') during the BFS walk
+    const find = jest.fn().mockReturnValue({ select: jest.fn().mockReturnThis(), lean: jest.fn().mockReturnThis(), exec: jest.fn().mockResolvedValue([{ _id: 'dough-recipe', publishedRevision: null, title: 'Dough' }]) })
+    const service = await makeService({ findOne, find })
+    await expect(service.submitForReview('a', 'user_1', false)).rejects.toThrow(BadRequestException)
+  })
+
+  it('submitForReview allows publishing when every linked recipe is already published', async () => {
+    const recipe = completeRecipe({
+      ingredients: [{ group: 'Main', items: [{ linkedRecipeId: 'dough-recipe', amount: 800, unit: 'g' }] }],
+    })
+    const findOne = jest.fn()
+      .mockReturnValueOnce({ exec: jest.fn().mockResolvedValue(recipe) })
+      .mockReturnValueOnce({ select: jest.fn().mockReturnThis(), lean: jest.fn().mockReturnThis(), exec: jest.fn().mockResolvedValue({ ingredients: recipe.ingredients }) })
+      .mockReturnValueOnce({ select: jest.fn().mockReturnThis(), lean: jest.fn().mockReturnThis(), exec: jest.fn().mockResolvedValue({ ingredients: [] }) }) // linkedIdsOf('dough-recipe') during the BFS walk
+    const find = jest.fn().mockReturnValue({ select: jest.fn().mockReturnThis(), lean: jest.fn().mockReturnThis(), exec: jest.fn().mockResolvedValue([{ _id: 'dough-recipe', publishedRevision: 1, title: 'Dough' }]) })
+    const updateOne = jest.fn().mockResolvedValue({})
+    const quality = makeQualityService({ score: 100, checkedAt: 'now', findings: [] })
+    const service = await makeService({ findOne, find }, { updateOne }, undefined, undefined, undefined, undefined, undefined, quality)
     await expect(service.submitForReview('a', 'user_1', false)).resolves.toBeDefined()
   })
 
@@ -661,7 +693,7 @@ describe('RecipesService', () => {
 
   it('submitForReview logs submitted, AI-quality-review-used, and published events on a passing score', async () => {
     const recipe = completeRecipe()
-    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe), select: jest.fn().mockReturnThis(), lean: jest.fn().mockReturnThis() })
     const updateOne = jest.fn().mockResolvedValue({})
     const quality = makeQualityService({ score: 100, checkedAt: 'now', findings: [] })
     const activityLog = makeActivityLog()
@@ -675,7 +707,7 @@ describe('RecipesService', () => {
 
   it('submitForReview logs a recipe_rejected event with the score on a failing score', async () => {
     const recipe = completeRecipe()
-    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe), select: jest.fn().mockReturnThis(), lean: jest.fn().mockReturnThis() })
     const quality = makeQualityService({ score: 40, checkedAt: 'now', findings: [{ category: 'x', severity: 'critical', message: 'bad' }] })
     const activityLog = makeActivityLog()
     const service = await makeService({ findOne }, undefined, undefined, activityLog, undefined, undefined, undefined, quality)

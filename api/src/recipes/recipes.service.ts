@@ -396,6 +396,7 @@ export class RecipesService implements OnModuleInit {
     if (missing.length > 0) {
       throw new BadRequestException(`Cannot submit for review, missing/invalid: ${missing.join(', ')}`)
     }
+    await this.assertLinksPublishable(id)
 
     await this.activityLogService.record(userId, id, 'recipe_submitted_for_review')
     const review = await this.qualityService.review(recipe.toObject())
@@ -493,6 +494,21 @@ export class RecipesService implements OnModuleInit {
     const reachable = await this.walkLinkedRecipes(directLinks, recipeId)
     if (reachable.has(recipeId)) {
       throw new BadRequestException('This would create a circular recipe link')
+    }
+  }
+
+  // Walks this recipe's linked ingredients transitively (reusing the same
+  // graph walk the cycle-detection guard uses) and confirms every reachable
+  // recipe is published - a recipe can't go live while something it depends
+  // on as an ingredient isn't publicly visible yet.
+  private async assertLinksPublishable(recipeId: string): Promise<void> {
+    const directLinks = await this.linkedIdsOf(recipeId)
+    if (directLinks.length === 0) return
+    const reachable = await this.walkLinkedRecipes(directLinks)
+    const linked = await this.recipeModel.find({ _id: { $in: [...reachable] } }).select('publishedRevision title').lean().exec()
+    const unpublished = linked.filter(r => r.publishedRevision == null)
+    if (unpublished.length > 0) {
+      throw new BadRequestException(`Cannot publish: linked recipe(s) not yet published: ${unpublished.map(r => r.title).join(', ')}`)
     }
   }
 
