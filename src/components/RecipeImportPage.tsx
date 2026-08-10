@@ -2,7 +2,10 @@ import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '@clerk/react'
 import { useLanguage } from '../hooks/useLanguage'
-import { importRecipe } from '../lib/recipeImport'
+import { importRecipe, MAX_UPLOAD_BYTES } from '../lib/recipeImport'
+import { ApiError } from '../lib/api'
+
+const MAX_UPLOAD_MB = Math.round(MAX_UPLOAD_BYTES / (1024 * 1024))
 
 const URL_PATTERN = /^https?:\/\/\S+$/i
 const URL_IN_TEXT = /https?:\/\/\S+/i
@@ -55,11 +58,21 @@ export default function RecipeImportPage() {
   const canSubmit = (!!trimmedSource || !!docFile || !!photoFile) && !loading
 
   function selectDocFile(selected: File | null) {
+    if (selected && selected.size > MAX_UPLOAD_BYTES) {
+      setError(lang === 'he' ? `הקובץ גדול מדי (מקסימום ${MAX_UPLOAD_MB}MB)` : `That file is too large (max ${MAX_UPLOAD_MB}MB)`)
+      return
+    }
+    setError(null)
     setDocFile(selected)
     if (selected) setPhotoFile(null)
   }
 
   function selectPhotoFile(selected: File | null) {
+    if (selected && selected.size > MAX_UPLOAD_BYTES) {
+      setError(lang === 'he' ? `התמונה גדולה מדי (מקסימום ${MAX_UPLOAD_MB}MB)` : `That photo is too large (max ${MAX_UPLOAD_MB}MB)`)
+      return
+    }
+    setError(null)
     setPhotoFile(selected)
     if (selected) setDocFile(null)
   }
@@ -86,7 +99,13 @@ export default function RecipeImportPage() {
       )
       navigate('/recipes/new', { state: { importedDraft: draft } })
     } catch (err) {
-      setError(err instanceof Error ? err.message : (lang === 'he' ? 'הייבוא נכשל' : 'Import failed'))
+      if (err instanceof ApiError && err.status === 0) {
+        setError(lang === 'he' ? 'החיבור נכשל - בדקו את האינטרנט ונסו שוב (או שהקובץ גדול מדי)' : 'Connection failed - check your internet and try again (or the file may be too large)')
+      } else if (err instanceof ApiError && err.status === 413) {
+        setError(lang === 'he' ? `הקובץ גדול מדי (מקסימום ${MAX_UPLOAD_MB}MB)` : `That file is too large (max ${MAX_UPLOAD_MB}MB)`)
+      } else {
+        setError(err instanceof Error ? err.message : (lang === 'he' ? 'הייבוא נכשל' : 'Import failed'))
+      }
     } finally {
       setLoading(false)
     }

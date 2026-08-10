@@ -25,6 +25,11 @@ export interface ImportedRecipe {
   tipsEn?: string[]
 }
 
+// Keep in sync with client_max_body_size in nginx.conf - checking client-side
+// gives an instant, specific error instead of the upload running for a while
+// and then failing with a raw network error once nginx cuts it off.
+export const MAX_UPLOAD_BYTES = 25 * 1024 * 1024
+
 export async function importRecipe(
   input: { text?: string; url?: string; file?: File; image?: File },
   getToken: () => Promise<string | null>
@@ -36,12 +41,25 @@ export async function importRecipe(
   if (input.file) formData.append('file', input.file)
   if (input.image) formData.append('image', input.image)
 
-  const res = await fetch('/api/recipes/import', {
-    method: 'POST',
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-    body: formData,
-  })
+  let res: Response
+  try {
+    res = await fetch('/api/recipes/import', {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: formData,
+    })
+  } catch {
+    // A failed fetch() call itself (as opposed to a non-ok response) means
+    // the request never completed - could be a dropped connection, an
+    // upload that exceeded the server's size limit mid-transfer, or no
+    // network at all. Status 0 marks this as a network-level failure so
+    // callers can show a message distinct from a normal API error.
+    throw new ApiError(0, 'Network error - check your connection and try again')
+  }
   if (!res.ok) {
+    if (res.status === 413) {
+      throw new ApiError(413, 'That file is too large to upload')
+    }
     const message = await res.json().then(d => d.message).catch(() => undefined)
     throw new ApiError(res.status, Array.isArray(message) ? message.join(', ') : message ?? 'Import failed')
   }
