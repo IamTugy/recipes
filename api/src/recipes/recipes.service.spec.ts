@@ -291,7 +291,7 @@ describe('RecipesService', () => {
     await service.createDraft('user_1', minimalDto as any)
 
     expect(exists).toHaveBeenCalledWith({ slug: 'tomato-soup' })
-    expect(create).toHaveBeenCalledWith({ ...minimalDto, slug: 'tomato-soup', ownerId: 'user_1', status: 'draft', currentRevision: 1 })
+    expect(create).toHaveBeenCalledWith({ ...minimalDto, sources: undefined, slug: 'tomato-soup', ownerId: 'user_1', status: 'draft', currentRevision: 1, pendingReview: false, batchId: undefined })
     expect(revisionCreate).toHaveBeenCalledWith(expect.objectContaining({ recipeId: 'tomato-soup', revisionNumber: 1, authorId: 'user_1' }))
   })
 
@@ -351,7 +351,7 @@ describe('RecipesService', () => {
 
     expect(findOneAndUpdate).toHaveBeenCalledWith(
       { _id: 'tomato-soup' },
-      { $set: minimalDto, $inc: { currentRevision: 1 } },
+      { $set: { ...minimalDto, sources: undefined, pendingReview: false }, $inc: { currentRevision: 1 } },
       { new: true },
     )
     expect(revisionCreate).toHaveBeenCalledWith(expect.objectContaining({ recipeId: 'tomato-soup', revisionNumber: 2, authorId: 'user_1' }))
@@ -369,7 +369,7 @@ describe('RecipesService', () => {
     expect(findOneAndUpdate).toHaveBeenCalledWith(
       { _id: 'a' },
       {
-        $set: { ...minimalDto, status: 'draft' },
+        $set: { ...minimalDto, sources: undefined, pendingReview: false, status: 'draft' },
         $inc: { currentRevision: 1 },
         $unset: { reviewComment: '' },
       },
@@ -401,7 +401,7 @@ describe('RecipesService', () => {
     expect(findOneAndUpdate).toHaveBeenCalledWith(
       { _id: 'a' },
       {
-        $set: { ...tamperedDto, aiGenerated: true, sources: existing.sources },
+        $set: { ...tamperedDto, aiGenerated: true, sources: existing.sources, pendingReview: false },
         $inc: { currentRevision: 1 },
       },
       { new: true },
