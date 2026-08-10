@@ -435,14 +435,14 @@ export class RecipesService implements OnModuleInit {
     // hard deterministic rule. Whether a missing unit is actually a problem
     // ("1 milk" is ambiguous, "1 clove" isn't) is a judgment call left to
     // the AI quality review instead.
-    const ingredientGroups = (recipe.ingredients ?? []) as { items?: { name?: string }[] }[]
+    const ingredientGroups = (recipe.ingredients ?? []) as { items?: { name?: string; linkedRecipeId?: string }[] }[]
     if (ingredientGroups.length === 0) {
       missing.push('ingredients')
     } else {
       const hasIncompleteItem = ingredientGroups.some(g =>
-        !g.items || g.items.length === 0 || g.items.some(item => !item.name?.trim())
+        !g.items || g.items.length === 0 || g.items.some(item => !item.name?.trim() && !item.linkedRecipeId)
       )
-      if (hasIncompleteItem) missing.push('ingredients (every item needs a name)')
+      if (hasIncompleteItem) missing.push('ingredients (every item needs a name or a linked recipe)')
     }
 
     const stepGroups = (recipe.steps ?? []) as { items?: { instruction?: string }[] }[]

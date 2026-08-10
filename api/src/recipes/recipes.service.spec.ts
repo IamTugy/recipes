@@ -607,6 +607,19 @@ describe('RecipesService', () => {
     await expect(service.submitForReview('a', 'user_1', false)).resolves.toBe(recipe)
   })
 
+  it('submitForReview treats a linked ingredient (no name) as complete', async () => {
+    const recipe = completeRecipe({
+      ingredients: [{ group: 'Main', items: [{ linkedRecipeId: 'other-recipe', amount: 800, unit: 'g' }] }],
+    })
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
+    const updateOne = jest.fn().mockResolvedValue({})
+    const quality = makeQualityService({ score: 100, checkedAt: 'now', findings: [] })
+    const service = await makeService({ findOne }, { updateOne }, undefined, undefined, undefined, undefined, undefined, quality)
+
+    // Should reach the quality-review step rather than throwing "missing/invalid: ingredients"
+    await expect(service.submitForReview('a', 'user_1', false)).resolves.toBeDefined()
+  })
+
   it('submitForReview flags a step section with no non-empty instruction', async () => {
     const recipe: any = completeRecipe({ steps: [{ group: 'Main', items: [{ instruction: '  ' }] }] })
     const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })

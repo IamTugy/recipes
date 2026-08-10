@@ -9,6 +9,7 @@ import {
   IsString,
   Min,
   MinLength,
+  ValidateIf,
   ValidateNested,
 } from 'class-validator'
 
@@ -28,9 +29,12 @@ export class IngredientItemDto {
   @IsOptional()
   unit?: string
 
+  // Required unless this ingredient links to another recipe instead of
+  // having a free-text name (see linkedRecipeId below).
+  @ValidateIf(o => !o.linkedRecipeId)
   @IsString()
   @MinLength(1)
-  name!: string
+  name?: string
 
   @IsString()
   @IsOptional()
@@ -43,6 +47,14 @@ export class IngredientItemDto {
   @IsString()
   @IsOptional()
   noteEn?: string
+
+  // References another Recipe's id, used as this ingredient instead of a
+  // typed name (e.g. "800g of [linked dough recipe]"). See
+  // RecipesService.assertLinksResolve/assertNoCycle for the save-time
+  // guards and submitForReview for the publish-time guard.
+  @IsString()
+  @IsOptional()
+  linkedRecipeId?: string
 }
 
 export class IngredientGroupDto {
