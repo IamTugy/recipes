@@ -19,6 +19,7 @@ import EditableImageField from './EditableImageField'
 import Breadcrumbs from './Breadcrumbs'
 import AppSelect from './ui/AppSelect'
 import FilterInfoPopover from './FilterInfoPopover'
+import AiDraftsPanel from './AiDraftsPanel'
 
 interface RecipeFormProps {
   existing?: Recipe
@@ -497,6 +498,7 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
 
   return (
     <div className="min-h-dvh bg-bg pt-20 pb-16 px-4">
+      <AiDraftsPanel />
       <form onSubmit={handleSubmit} className="max-w-3xl mx-auto space-y-6">
         <Breadcrumbs crumbs={
           isEditing
