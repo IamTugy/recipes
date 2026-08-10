@@ -653,22 +653,27 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
           </svg>
           {tx.back}
         </button>
-        {canEdit && recipe.status !== 'pending_review' && (
+        {canEdit && (
           <div className={`print:hidden absolute top-4 ${lang === 'he' ? 'left-4' : 'right-4'} flex items-center gap-2`}>
-            {recipe.currentRevision !== recipe.publishedRevision && (
+            {(recipe.currentRevision !== recipe.publishedRevision || recipe.status === 'pending_review') && (
               <button type="button"
                 onClick={() => setPublishConfirmOpen(true)}
-                disabled={submitting}
+                disabled={submitting || recipe.status === 'pending_review'}
+                title={recipe.status === 'pending_review' ? (lang === 'he' ? 'ממתין לבדיקת AI' : 'Pending AI review') : undefined}
                 className="flex items-center gap-1.5 px-3 py-2 bg-amber text-bg hover:bg-amber/90 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50"
               >
-                {submitting
-                  ? (lang === 'he' ? 'בודק עם AI...' : 'Reviewing with AI...')
-                  : (lang === 'he' ? 'פרסם' : 'Publish')}
+                {recipe.status === 'pending_review'
+                  ? (lang === 'he' ? 'ממתין לבדיקת AI...' : 'Pending AI review...')
+                  : submitting
+                    ? (lang === 'he' ? 'בודק עם AI...' : 'Reviewing with AI...')
+                    : (lang === 'he' ? 'פרסם' : 'Publish')}
               </button>
             )}
             <button type="button"
               onClick={() => navigate(`/recipes/${id}/edit`)}
-              className="flex items-center gap-2 px-3 py-2 bg-black/40 backdrop-blur-sm text-white/80 hover:text-white rounded-xl text-sm transition-colors border border-white/10"
+              disabled={recipe.status === 'pending_review'}
+              title={recipe.status === 'pending_review' ? (lang === 'he' ? 'המתכון נעול בזמן בדיקת AI' : 'Locked while pending AI review') : undefined}
+              className="flex items-center gap-2 px-3 py-2 bg-black/40 backdrop-blur-sm text-white/80 hover:text-white rounded-xl text-sm transition-colors border border-white/10 disabled:opacity-50"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -700,11 +705,17 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
             )}
             {recipe.status && recipe.status !== 'published' && canEdit && (
               <span className={`tag font-semibold ${
-                recipe.status === 'draft' ? 'bg-tint/10 text-cream/40' : 'bg-red-500/10 text-red-400'
+                recipe.status === 'draft'
+                  ? 'bg-tint/10 text-cream/40'
+                  : recipe.status === 'pending_review'
+                    ? 'bg-amber/10 text-amber'
+                    : 'bg-red-500/10 text-red-400'
               }`}>
                 {recipe.status === 'draft'
                   ? (lang === 'he' ? 'טיוטה' : 'Draft')
-                  : (lang === 'he' ? 'נדחה' : 'Rejected')}
+                  : recipe.status === 'pending_review'
+                    ? (lang === 'he' ? 'ממתין לבדיקת AI' : 'Pending AI review')
+                    : (lang === 'he' ? 'נדחה' : 'Rejected')}
               </span>
             )}
           </div>
