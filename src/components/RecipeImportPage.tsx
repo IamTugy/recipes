@@ -34,7 +34,6 @@ export default function RecipeImportPage() {
 
   function selectFile(selected: File | null) {
     setFile(selected)
-    if (selected) setSource('')
   }
 
   async function handleExtract(overrideSource?: string) {
@@ -80,8 +79,8 @@ export default function RecipeImportPage() {
         </h1>
         <p className="text-sm text-cream/50">
           {lang === 'he'
-            ? 'הדביקו טקסט או קישור לאתר, או העלו קובץ PDF/DOCX - בחרו מקור אחד. אפשר גם לצרף תמונה למתכון.'
-            : 'Paste recipe text or a website link, or upload a PDF/DOCX file - choose one source. You can also attach a photo.'}
+            ? 'הדביקו טקסט או קישור לאתר, ו/או העלו קובץ PDF/DOCX (קישור לא ניתן לשילוב עם קובץ). אפשר גם לצרף תמונה למתכון.'
+            : 'Paste recipe text and/or upload a PDF/DOCX file, or paste a website link on its own. You can also attach a photo.'}
         </p>
 
         {error && <div className="card p-3 text-sm text-red-400 border border-red-400/20">{error}</div>}
@@ -102,7 +101,7 @@ export default function RecipeImportPage() {
             <label className={labelClass}>{lang === 'he' ? 'טקסט או קישור' : 'Text or link'}</label>
             <textarea
               value={source}
-              onChange={e => { setSource(e.target.value); if (e.target.value.trim()) setFile(null) }}
+              onChange={e => { setSource(e.target.value); if (isUrl(e.target.value)) setFile(null) }}
               rows={6}
               className={inputClass}
               placeholder={lang === 'he' ? 'הדביקו כאן טקסט מתכון, או קישור לאתר...' : 'Paste recipe text, or a website URL...'}

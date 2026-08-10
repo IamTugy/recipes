@@ -72,7 +72,7 @@ export class RecipeImportService {
     return this.importFromText(text)
   }
 
-  async importFromFile(buffer: Buffer, mimeType: string): Promise<ImportedRecipe> {
+  async importFromFile(buffer: Buffer, mimeType: string, promptText?: string): Promise<ImportedRecipe> {
     let text: string
     if (mimeType === 'application/pdf') {
       text = await extractFromPdf(buffer)
@@ -81,6 +81,10 @@ export class RecipeImportService {
     } else {
       throw new BadRequestException(`Unsupported file type: ${mimeType}. Only PDF and DOCX are supported.`)
     }
-    return this.importFromText(text)
+    if (!text.trim()) {
+      throw new BadRequestException('Could not find any text in that file - it may be a scanned image with no text layer.')
+    }
+    const combined = promptText ? `${promptText}\n\n${text}` : text
+    return this.importFromText(combined)
   }
 }

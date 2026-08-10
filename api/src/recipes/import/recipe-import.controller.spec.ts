@@ -31,7 +31,15 @@ describe('RecipeImportController', () => {
     importService.importFromFile.mockResolvedValue({ title: 'Soup' })
     const file = { buffer: Buffer.from('x'), mimetype: 'application/pdf' } as Express.Multer.File
     const result = await controller.import({}, { userId: 'user_1' } as any, file)
-    expect(importService.importFromFile).toHaveBeenCalledWith(file.buffer, 'application/pdf')
+    expect(importService.importFromFile).toHaveBeenCalledWith(file.buffer, 'application/pdf', undefined)
+    expect(result).toEqual({ title: 'Soup' })
+  })
+
+  it('imports from file with the prompt text combined when both are provided', async () => {
+    importService.importFromFile.mockResolvedValue({ title: 'Soup' })
+    const file = { buffer: Buffer.from('x'), mimetype: 'application/pdf' } as Express.Multer.File
+    const result = await controller.import({ text: 'make it vegan' }, { userId: 'user_1' } as any, file)
+    expect(importService.importFromFile).toHaveBeenCalledWith(file.buffer, 'application/pdf', 'make it vegan')
     expect(result).toEqual({ title: 'Soup' })
   })
 
@@ -39,10 +47,10 @@ describe('RecipeImportController', () => {
     await expect(controller.import({}, { userId: 'user_1' } as any, undefined)).rejects.toThrow(BadRequestException)
   })
 
-  it('throws BadRequestException when more than one source is provided', async () => {
+  it('throws BadRequestException when a url is combined with text or a file', async () => {
     const file = { buffer: Buffer.from('x'), mimetype: 'application/pdf' } as Express.Multer.File
     await expect(controller.import({ text: 'a', url: 'https://example.com' }, { userId: 'user_1' } as any, undefined)).rejects.toThrow(BadRequestException)
-    await expect(controller.import({ text: 'a' }, { userId: 'user_1' } as any, file)).rejects.toThrow(BadRequestException)
+    await expect(controller.import({ url: 'https://example.com' }, { userId: 'user_1' } as any, file)).rejects.toThrow(BadRequestException)
   })
 
   it('logs an ai_recipe_import_used event after a successful import', async () => {

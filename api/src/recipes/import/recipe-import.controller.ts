@@ -18,19 +18,18 @@ export class RecipeImportController {
     @Req() req: Request & { userId: string },
     @UploadedFile() file?: Express.Multer.File,
   ) {
-    const sourcesProvided = [body.text, body.url, file].filter(Boolean).length
-    if (sourcesProvided === 0) {
+    if (!body.text && !body.url && !file) {
       throw new BadRequestException('Provide text, a URL, or a file')
     }
-    if (sourcesProvided > 1) {
-      throw new BadRequestException('Provide only one of text, a URL, or a file')
+    if (body.url && (body.text || file)) {
+      throw new BadRequestException('Provide a URL on its own, not combined with text or a file')
     }
 
-    const result = body.text
-      ? await this.importService.importFromText(body.text)
-      : body.url
-        ? await this.importService.importFromUrl(body.url)
-        : await this.importService.importFromFile(file!.buffer, file!.mimetype)
+    const result = body.url
+      ? await this.importService.importFromUrl(body.url)
+      : file
+        ? await this.importService.importFromFile(file.buffer, file.mimetype, body.text)
+        : await this.importService.importFromText(body.text!)
 
     await this.activityLog.record(req.userId, undefined, 'ai_recipe_import_used')
     return result

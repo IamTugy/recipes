@@ -52,6 +52,19 @@ describe('RecipeImportService', () => {
     await expect(service.importFromFile(Buffer.from('x'), 'application/msword')).rejects.toThrow('Unsupported file type')
   })
 
+  it('importFromFile combines the prompt text with the extracted file text', async () => {
+    ;(sourceExtractor.extractFromPdf as jest.Mock).mockResolvedValue('pdf recipe text')
+    geminiService.generateStructured.mockResolvedValue({ title: 'From PDF' })
+    await service.importFromFile(Buffer.from('x'), 'application/pdf', 'make it vegan')
+    expect(geminiService.generateStructured).toHaveBeenCalledWith(expect.stringContaining('make it vegan'))
+    expect(geminiService.generateStructured).toHaveBeenCalledWith(expect.stringContaining('pdf recipe text'))
+  })
+
+  it('importFromFile throws a clear error when the file has no extractable text', async () => {
+    ;(sourceExtractor.extractFromPdf as jest.Mock).mockResolvedValue('   ')
+    await expect(service.importFromFile(Buffer.from('x'), 'application/pdf')).rejects.toThrow('Could not find any text')
+  })
+
   it('propagates a Gemini error', async () => {
     geminiService.generateStructured.mockRejectedValue(new Error('Gemini quota exceeded'))
     await expect(service.importFromText('some text')).rejects.toThrow('Gemini quota exceeded')
