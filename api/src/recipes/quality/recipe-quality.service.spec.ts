@@ -91,10 +91,11 @@ describe('RecipeQualityService', () => {
     await service.review(recipe)
 
     expect(global.fetch).toHaveBeenCalledWith(recipe.image)
-    const [prompt, imageData, mimeType] = generateStructuredWithImage.mock.calls[0]
+    const [prompt, imageData, mimeType, temperature] = generateStructuredWithImage.mock.calls[0]
     expect(prompt).toContain(JSON.stringify(recipe))
     expect(imageData).toBe(Buffer.from('image-bytes').toString('base64'))
     expect(mimeType).toBe('image/jpeg')
+    expect(temperature).toBe(0)
   })
 
   it('rejects image URLs outside of our own bucket', async () => {

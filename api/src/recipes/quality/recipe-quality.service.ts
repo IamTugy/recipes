@@ -46,6 +46,8 @@ Check for all of the following and report a finding for each problem you find (n
 - Poor translation quality or missing translation between the Hebrew and English fields (if both are present)
 - Inappropriate, offensive, or 18+ content anywhere in the text
 
+Be exhaustive: go through every check in the list above one by one and report every problem you find, not just the most obvious ones. The owner only gets to see this list once per submission, so a check that's silently skipped this round means a real problem ships or comes back as a surprise on a future resubmission - don't hold anything back for a "later" pass.
+
 For each finding, set "severity" to "critical" (recipe is unusable/wrong/inappropriate as-is), "major" (a real problem but the recipe is still usable), or "minor" (small polish issue).
 
 If you can confidently fix a finding by rewriting the affected field(s), include your fix in "suggestedFields". Only include fields you're actually suggesting a change for. If you suggest a change to ingredients or steps, include the ENTIRE corrected ingredients or steps array in that field (not just the changed item) - it fully replaces the current value, it is not a partial patch.
@@ -72,7 +74,11 @@ export class RecipeQualityService {
     const { data, mimeType } = await this.fetchImage(imageUrl)
 
     const prompt = `${REVIEW_PROMPT}${JSON.stringify(recipe)}`
-    const response = await this.gemini.generateStructuredWithImage<GeminiReviewResponse>(prompt, data, mimeType)
+    // Low temperature: this is a checklist pass, not creative writing - keeping
+    // it near-deterministic means a resubmission with the same unresolved
+    // issue reliably surfaces it again instead of the model happening to omit
+    // it on one call and report it on the next.
+    const response = await this.gemini.generateStructuredWithImage<GeminiReviewResponse>(prompt, data, mimeType, 0)
     const findings = response.findings ?? []
     const score = this.computeScore(findings)
 

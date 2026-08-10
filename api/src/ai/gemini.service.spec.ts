@@ -57,6 +57,20 @@ describe('GeminiService', () => {
     })
   })
 
+  it('generateStructuredWithImage includes temperature in the config when provided', async () => {
+    mockGenerateContent.mockResolvedValue({ text: '{"score":90}' })
+    const config = { get: jest.fn().mockReturnValue('test-key') }
+    const service = new GeminiService(config as unknown as ConfigService)
+
+    await service.generateStructuredWithImage<{ score: number }>('review this', 'aW1n', 'image/jpeg', 0)
+
+    expect(mockGenerateContent).toHaveBeenCalledWith({
+      model: 'gemini-3.5-flash',
+      contents: [{ role: 'user', parts: [{ inlineData: { data: 'aW1n', mimeType: 'image/jpeg' } }, { text: 'review this' }] }],
+      config: { responseMimeType: 'application/json', temperature: 0 },
+    })
+  })
+
   it('generateStructuredWithImage throws when Gemini returns an empty response', async () => {
     mockGenerateContent.mockResolvedValue({ text: undefined })
     const config = { get: jest.fn().mockReturnValue('test-key') }

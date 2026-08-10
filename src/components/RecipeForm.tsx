@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@clerk/react'
 import { DndContext, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
 import { SortableContext, arrayMove, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import type { Category, Difficulty, IngredientGroup, IngredientItem, KosherType, Nutrition, Recipe, StepGroup, StepItem } from '../types'
+import type { Category, Difficulty, IngredientGroup, IngredientItem, KosherType, Nutrition, QualityFinding, Recipe, StepGroup, StepItem } from '../types'
 import type { ImportedRecipe } from '../lib/recipeImport'
 import { createRecipe, updateRecipe, type RecipeInput } from '../hooks/useRecipes'
 import { t, categoryEmoji } from '../i18n'
@@ -27,6 +27,12 @@ interface RecipeFormProps {
   existing?: Recipe
   duplicateFrom?: Recipe
   importedDraft?: ImportedRecipe
+  // The last AI review's findings, shown as a checklist while editing so
+  // issues without an auto-applied suggestedFields fix (e.g. "photo is
+  // blurry") don't silently linger past the fields that did get prefilled -
+  // resubmitting without addressing those just gets rejected again.
+  reviewFindings?: QualityFinding[]
+  autoFixedFieldKeys?: string[]
 }
 
 const CATEGORIES: Category[] = ['breakfast', 'lunch', 'dinner', 'dessert', 'salad', 'soup', 'snack', 'bread', 'sauce']
@@ -117,7 +123,7 @@ function RegenerateButton({ lang, busy, onClick }: { lang: 'he' | 'en'; busy: bo
   )
 }
 
-export default function RecipeForm({ existing, duplicateFrom, importedDraft }: RecipeFormProps) {
+export default function RecipeForm({ existing, duplicateFrom, importedDraft, reviewFindings, autoFixedFieldKeys }: RecipeFormProps) {
   const navigate = useNavigate()
   const { getToken } = useAuth()
   const { lang } = useLanguage()
@@ -548,6 +554,32 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
             </button>
           </div>
         </div>
+
+        {reviewFindings && reviewFindings.length > 0 && (
+          <div className="card p-4 border border-amber/20 space-y-2">
+            <p className="text-sm font-semibold text-cream">
+              {lang === 'he' ? 'מה-AI מהבדיקה האחרונה' : 'From the last AI review'}
+            </p>
+            <ul className="space-y-1.5">
+              {reviewFindings.map((f, i) => {
+                const autoFixed = !!f.field && !!autoFixedFieldKeys?.includes(f.field)
+                return (
+                  <li key={i} className="flex items-start gap-2 text-xs text-cream/60">
+                    <span className={`shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded ${
+                      autoFixed ? 'bg-herb/10 text-herb'
+                      : f.severity === 'critical' ? 'bg-red-500/10 text-red-400'
+                      : f.severity === 'major' ? 'bg-amber/10 text-amber'
+                      : 'bg-tint/10 text-cream/50'
+                    }`}>
+                      {autoFixed ? (lang === 'he' ? 'תוקן אוטומטית' : 'auto-fixed') : f.severity}
+                    </span>
+                    <span>{f.message}{autoFixed ? (lang === 'he' ? ' - כדאי לוודא שהתיקון נכון' : ' - double-check the fix below') : ''}</span>
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
+        )}
 
         {aiGenerated && (
           <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber bg-amber/10 border border-amber/20 rounded-full px-3 py-1">

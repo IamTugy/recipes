@@ -37,5 +37,11 @@ export default function EditRecipePage() {
   const applySuggestions = searchParams.get('applySuggestions') === '1' && recipe.qualityReview?.suggestedFields
   const existing = applySuggestions ? { ...recipe, ...recipe.qualityReview!.suggestedFields } : recipe
 
-  return <RecipeForm existing={existing} />
+  // Only show the findings checklist right after "Apply changes" - once the
+  // owner has edited and resubmitted, the stored qualityReview no longer
+  // reflects what's on screen.
+  const reviewFindings = applySuggestions ? recipe.qualityReview?.findings : undefined
+  const autoFixedFieldKeys = applySuggestions ? Object.keys(recipe.qualityReview?.suggestedFields ?? {}) : undefined
+
+  return <RecipeForm existing={existing} reviewFindings={reviewFindings} autoFixedFieldKeys={autoFixedFieldKeys} />
 }
