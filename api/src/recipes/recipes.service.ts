@@ -318,6 +318,7 @@ export class RecipesService implements OnModuleInit {
     dto: SaveRecipeDraftDto,
     opts: { pendingReview?: boolean; batchId?: string } = {},
   ): Promise<RecipeDocument> {
+    await this.assertLinksResolve(dto.ingredients)
     const slug = await this.generateUniqueSlug(dto.title)
     const recipe = await this.recipeModel.create({
       ...dto, sources: dedupeSources(dto.sources), slug, ownerId: userId, status: 'draft', currentRevision: 1,
@@ -354,6 +355,8 @@ export class RecipesService implements OnModuleInit {
   // whichever revision number ended up stored on it.
   async updateDraft(id: string, userId: string, isAdmin: boolean, dto: SaveRecipeDraftDto): Promise<RecipeDocument> {
     const recipe = await this.getEditableOrThrow(id, userId, isAdmin)
+    await this.assertLinksResolve(dto.ingredients)
+    await this.assertNoCycle(id, dto.ingredients)
     // Editing a rejected recipe means the owner is addressing the feedback -
     // clear the rejected state so it isn't stuck showing "rejected" forever.
     const wasRejected = recipe.status === 'rejected'
@@ -417,6 +420,80 @@ export class RecipesService implements OnModuleInit {
       await this.activityLogService.record(userId, id, 'recipe_rejected', { score: review.score })
     }
     return recipe
+  }
+
+  private extractLinkedIds(ingredients: { items: { linkedRecipeId?: string }[] }[]): string[] {
+    return [...new Set(ingredients.flatMap(g => g.items.map(i => i.linkedRecipeId).filter((v): v is string => !!v)))]
+  }
+
+  // Every linkedRecipeId in the payload must resolve to a real, non-deleted
+  // recipe - the link picker only ever offers already-persisted recipes, so
+  // this should be structurally unreachable from the UI; it's a defensive
+  // backend check (also catches a link target removed after being linked).
+  private async assertLinksResolve(ingredients?: { items: { linkedRecipeId?: string }[] }[]): Promise<void> {
+    const ids = this.extractLinkedIds(ingredients ?? [])
+    if (ids.length === 0) return
+    let found: { _id: unknown }[]
+    try {
+      found = await this.recipeModel.find({ _id: { $in: ids }, deletedAt: { $exists: false } }).select('_id').lean().exec()
+    } catch (err) {
+      if (isCastError(err)) found = []
+      else throw err
+    }
+    const foundIds = new Set(found.map(r => String(r._id)))
+    const missing = ids.filter(id => !foundIds.has(id))
+    if (missing.length > 0) {
+      throw new BadRequestException(`Cannot save: linked recipe(s) not found: ${missing.join(', ')}`)
+    }
+  }
+
+  // A recipe's own linked ingredients, read fresh from the database (used
+  // while walking the link graph - not the in-memory document being saved).
+  private async linkedIdsOf(id: string): Promise<string[]> {
+    let recipe: { ingredients?: { items: { linkedRecipeId?: string }[] }[] } | null
+    try {
+      recipe = await this.recipeModel.findOne({ _id: id, deletedAt: { $exists: false } }).select('ingredients').lean().exec() as unknown as { ingredients?: { items: { linkedRecipeId?: string }[] }[] } | null
+    } catch (err) {
+      if (isCastError(err)) return []
+      throw err
+    }
+    if (!recipe) return []
+    return this.extractLinkedIds(recipe.ingredients ?? [])
+  }
+
+  // BFS over the linkedRecipeId graph starting from `startIds`, depth-capped
+  // to guard against a runaway walk from bad data.
+  // Stops as soon as `stopAt` is discovered, without querying its own links -
+  // once the target is reachable the cycle is already proven, so there's no
+  // need to keep walking (and, for a target that's the recipe being saved,
+  // no need to re-fetch the in-flight document from the database).
+  private async walkLinkedRecipes(startIds: string[], stopAt?: string): Promise<Set<string>> {
+    const visited = new Set<string>()
+    let frontier = [...new Set(startIds)]
+    let depth = 0
+    while (frontier.length > 0 && depth < 50) {
+      const next: string[] = []
+      for (const id of frontier) {
+        if (visited.has(id)) continue
+        visited.add(id)
+        if (id === stopAt) return visited
+        next.push(...(await this.linkedIdsOf(id)))
+      }
+      frontier = next
+      depth += 1
+    }
+    return visited
+  }
+
+  // Only meaningful on update - a brand-new recipe has no id yet for
+  // anything else to reference, so it can't already be part of a cycle.
+  private async assertNoCycle(recipeId: string, ingredients?: { items: { linkedRecipeId?: string }[] }[]): Promise<void> {
+    const directLinks = this.extractLinkedIds(ingredients ?? [])
+    if (directLinks.length === 0) return
+    const reachable = await this.walkLinkedRecipes(directLinks, recipeId)
+    if (reachable.has(recipeId)) {
+      throw new BadRequestException('This would create a circular recipe link')
+    }
   }
 
   private missingRequiredFields(recipe: RecipeDocument): string[] {

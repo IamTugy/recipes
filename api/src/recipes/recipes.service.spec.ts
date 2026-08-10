@@ -352,6 +352,37 @@ describe('RecipesService', () => {
     expect(activityLog.record).toHaveBeenCalledWith('user_1', 'new-recipe', 'recipe_created')
   })
 
+  it('createDraft rejects a linkedRecipeId that does not resolve to a real recipe', async () => {
+    const find = jest.fn().mockReturnValue({ select: jest.fn().mockReturnThis(), lean: jest.fn().mockReturnThis(), exec: jest.fn().mockResolvedValue([]) })
+    const service = await makeService({ find })
+    const dto = { title: 'Cake', ingredients: [{ group: '', items: [{ linkedRecipeId: 'missing-recipe' }] }] }
+    await expect(service.createDraft('user_1', dto as any)).rejects.toThrow(BadRequestException)
+  })
+
+  it('createDraft allows a linkedRecipeId that resolves to a real recipe', async () => {
+    const find = jest.fn().mockReturnValue({ select: jest.fn().mockReturnThis(), lean: jest.fn().mockReturnThis(), exec: jest.fn().mockResolvedValue([{ _id: 'dough-recipe' }]) })
+    const exists = jest.fn().mockResolvedValue(false)
+    const create = jest.fn().mockResolvedValue({ id: 'cake', title: 'Cake' })
+    const service = await makeService({ find, exists, create }, { create: jest.fn().mockResolvedValue({}) })
+    const dto = { title: 'Cake', ingredients: [{ group: '', items: [{ linkedRecipeId: 'dough-recipe' }] }] }
+    await expect(service.createDraft('user_1', dto as any)).resolves.toBeDefined()
+  })
+
+  it('updateDraft rejects a direct circular link (A links to B, saving B to link back to A)', async () => {
+    const existing = { slug: 'b', ownerId: 'user_1', status: 'draft' }
+    // findOne is called twice: once by getEditableOrThrow (plain .exec()),
+    // once by linkedIdsOf('recipe-a') during the cycle walk (.select().lean().exec()).
+    const findOne = jest.fn()
+      .mockReturnValueOnce({ exec: jest.fn().mockResolvedValue(existing) })
+      .mockReturnValueOnce({ select: jest.fn().mockReturnThis(), lean: jest.fn().mockReturnThis(), exec: jest.fn().mockResolvedValue({ ingredients: [{ items: [{ linkedRecipeId: 'b' }] }] }) })
+    // find is called once, by assertLinksResolve, to confirm 'recipe-a' exists.
+    const find = jest.fn()
+      .mockReturnValueOnce({ select: jest.fn().mockReturnThis(), lean: jest.fn().mockReturnThis(), exec: jest.fn().mockResolvedValue([{ _id: 'recipe-a' }]) })
+    const service = await makeService({ findOne, find })
+    const dto = { title: 'B', ingredients: [{ group: '', items: [{ linkedRecipeId: 'recipe-a' }] }] }
+    await expect(service.updateDraft('b', 'user_1', false, dto as any)).rejects.toThrow(BadRequestException)
+  })
+
   it('updateDraft atomically increments the revision counter and saves a new snapshot', async () => {
     const existing = { slug: 'tomato-soup', ownerId: 'user_1', status: 'draft' }
     const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(existing) })
