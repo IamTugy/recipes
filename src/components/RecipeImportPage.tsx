@@ -5,9 +5,36 @@ import { useLanguage } from '../hooks/useLanguage'
 import { importRecipe } from '../lib/recipeImport'
 
 const URL_PATTERN = /^https?:\/\/\S+$/i
+const URL_IN_TEXT = /https?:\/\/\S+/i
+const SOCIAL_HOST_PATTERN = /(^|\.)((www|m|vm|vt)\.)?(instagram\.com|facebook\.com|fb\.watch|tiktok\.com)$/i
 
 function isUrl(value: string) {
   return URL_PATTERN.test(value.trim())
+}
+
+function isSocialUrl(value: string) {
+  try {
+    return SOCIAL_HOST_PATTERN.test(new URL(value).hostname)
+  } catch {
+    return false
+  }
+}
+
+// Instagram/TikTok/Facebook share sheets typically hand over a caption with
+// the link embedded inside it rather than a clean URL on its own - split
+// those out so the link goes through URL import and the rest becomes the
+// caption text sent alongside it. Non-social links are left as plain text
+// import, since a URL mentioned inside pasted recipe text shouldn't be
+// treated as an import source.
+function splitSource(value: string): { url?: string; text?: string } {
+  const trimmed = value.trim()
+  if (isUrl(trimmed)) return { url: trimmed }
+  const match = trimmed.match(URL_IN_TEXT)
+  if (match && isSocialUrl(match[0])) {
+    const caption = trimmed.replace(match[0], '').trim()
+    return { url: match[0], text: caption || undefined }
+  }
+  return { text: trimmed || undefined }
 }
 
 export default function RecipeImportPage() {
@@ -52,8 +79,9 @@ export default function RecipeImportPage() {
     setError(null)
     setLoading(true)
     try {
+      const { url, text } = splitSource(src)
       const draft = await importRecipe(
-        isUrl(src) ? { url: src } : { text: src || undefined, file: docFile ?? undefined, image: photoFile ?? undefined },
+        url ? { url, text } : { text: text || undefined, file: docFile ?? undefined, image: photoFile ?? undefined },
         getToken
       )
       navigate('/recipes/new', { state: { importedDraft: draft } })
@@ -65,16 +93,22 @@ export default function RecipeImportPage() {
   }
 
   // Handles both the PWA share-target redirect (share_target in
-  // manifest.webmanifest) and the bookmarklet on NewRecipePage: both land here with a
-  // ?url= (or ?text=, since some Android share sheets only fill that field)
-  // query param and expect the import to run immediately.
+  // manifest.webmanifest) and the bookmarklet on NewRecipePage. Both land here
+  // with ?url= and/or ?text= query params - Instagram/TikTok/Facebook share
+  // sheets commonly fill only ?text= with a caption that has the link embedded
+  // in it, so both params are combined and handed to splitSource above rather
+  // than picking just one.
   useEffect(() => {
     const params = new URLSearchParams(location.search)
-    const incoming = params.get('url') || params.get('text')
+    const urlParam = params.get('url')?.trim()
+    const textParam = params.get('text')?.trim()
+    const incoming = urlParam && textParam && !textParam.includes(urlParam)
+      ? `${textParam} ${urlParam}`
+      : textParam || urlParam
     if (!incoming) return
     setSource(incoming)
     navigate(location.pathname, { replace: true })
-    void handleExtract(incoming.trim())
+    void handleExtract(incoming)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -89,8 +123,8 @@ export default function RecipeImportPage() {
         </h1>
         <p className="text-sm text-cream/50">
           {lang === 'he'
-            ? 'הדביקו טקסט או קישור לאתר, ו/או העלו קובץ PDF/DOCX או תמונה של המתכון (קישור לא ניתן לשילוב). ה-AI יקרא את התמונה ויחלץ ממנה את המתכון.'
-            : 'Paste recipe text and/or upload a PDF/DOCX file or a photo of the recipe, or paste a website link on its own. The AI will read the photo and extract the recipe from it.'}
+            ? 'הדביקו טקסט, קישור לאתר, או שתפו פוסט מאינסטגרם/פייסבוק/טיקטוק (הכיתוב שמצורף לשיתוף עוזר ל-AI למצוא את המתכון). ניתן גם להעלות קובץ PDF/DOCX או תמונה של המתכון (קישור לא ניתן לשילוב עם קובץ או תמונה).'
+            : 'Paste recipe text, a website link, or share a post from Instagram/Facebook/TikTok (the caption that comes along helps the AI find the recipe). You can also upload a PDF/DOCX file or a photo of the recipe (a link can\'t be combined with a file or photo).'}
         </p>
 
         {error && <div className="card p-3 text-sm text-red-400 border border-red-400/20">{error}</div>}

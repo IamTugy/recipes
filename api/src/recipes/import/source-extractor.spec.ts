@@ -1,4 +1,4 @@
-import { extractFromUrl, extractFromPdf, extractFromDocx } from './source-extractor'
+import { extractFromUrl, extractFromPdf, extractFromDocx, isSocialMediaUrl, extractTikTokOembed } from './source-extractor'
 
 describe('extractFromUrl', () => {
   const originalFetch = global.fetch
@@ -34,6 +34,50 @@ describe('extractFromUrl', () => {
   it('throws a clear error when the URL is unreachable', async () => {
     global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 404 }) as unknown as typeof fetch
     await expect(extractFromUrl('https://example.com/missing')).rejects.toThrow('Could not reach')
+  })
+})
+
+describe('isSocialMediaUrl', () => {
+  it('recognizes Instagram, Facebook, and TikTok links including subdomains and share shortlinks', () => {
+    expect(isSocialMediaUrl('https://www.instagram.com/reel/abc123')).toBe(true)
+    expect(isSocialMediaUrl('https://m.facebook.com/story.php?id=1')).toBe(true)
+    expect(isSocialMediaUrl('https://fb.watch/abc123')).toBe(true)
+    expect(isSocialMediaUrl('https://vm.tiktok.com/ZMabc123')).toBe(true)
+    expect(isSocialMediaUrl('https://www.tiktok.com/@chef/video/123')).toBe(true)
+  })
+
+  it('returns false for regular recipe sites and invalid urls', () => {
+    expect(isSocialMediaUrl('https://www.seriouseats.com/tomato-soup')).toBe(false)
+    expect(isSocialMediaUrl('not a url')).toBe(false)
+  })
+})
+
+describe('extractTikTokOembed', () => {
+  const originalFetch = global.fetch
+
+  afterEach(() => {
+    global.fetch = originalFetch
+  })
+
+  it('returns the title and author from the oEmbed response', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ title: 'Tomato soup recipe', author_name: 'chef' }),
+    }) as unknown as typeof fetch
+    const result = await extractTikTokOembed('https://www.tiktok.com/@chef/video/123')
+    expect(result).toBe('Tomato soup recipe. By chef')
+  })
+
+  it('returns null when the request fails', async () => {
+    global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 404 }) as unknown as typeof fetch
+    const result = await extractTikTokOembed('https://www.tiktok.com/@chef/video/123')
+    expect(result).toBeNull()
+  })
+
+  it('returns null when fetch throws', async () => {
+    global.fetch = jest.fn().mockRejectedValue(new Error('network error')) as unknown as typeof fetch
+    const result = await extractTikTokOembed('https://www.tiktok.com/@chef/video/123')
+    expect(result).toBeNull()
   })
 })
 

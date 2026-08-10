@@ -23,6 +23,36 @@ export interface ImportedRecipe {
   tipsEn?: string[]
 }
 
+const SOCIAL_HOSTS = ['instagram.com', 'facebook.com', 'fb.watch', 'tiktok.com']
+
+// Social post pages are JS-rendered and often auth-walled, so the plain
+// fetch+JSON-LD approach in extractFromUrl below can't read them - callers
+// should route these to a search-grounded extraction instead.
+export function isSocialMediaUrl(url: string): boolean {
+  try {
+    const host = new URL(url).hostname.replace(/^(www|m|vm|vt)\./, '')
+    return SOCIAL_HOSTS.some(social => host === social || host.endsWith(`.${social}`))
+  } catch {
+    return false
+  }
+}
+
+// TikTok is the only one of the three with a public, keyless oEmbed endpoint;
+// Instagram/Facebook oEmbed both require a Meta Graph API access token, so
+// those rely entirely on the caption text the user shares plus Gemini search
+// grounding (see RecipeImportService.importFromSocialUrl).
+export async function extractTikTokOembed(url: string): Promise<string | null> {
+  try {
+    const res = await fetch(`https://www.tiktok.com/oembed?url=${encodeURIComponent(url)}`)
+    if (!res.ok) return null
+    const data = (await res.json()) as { title?: string; author_name?: string }
+    const parts = [data.title, data.author_name ? `By ${data.author_name}` : undefined].filter(Boolean)
+    return parts.length ? parts.join('. ') : null
+  } catch {
+    return null
+  }
+}
+
 export async function extractFromUrl(url: string): Promise<{ text: string; structured?: Partial<ImportedRecipe> }> {
   const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } })
   if (!res.ok) throw new Error(`Could not reach that page (HTTP ${res.status})`)

@@ -24,7 +24,18 @@ describe('RecipeImportController', () => {
   it('imports from url when only url is provided', async () => {
     importService.importFromUrl.mockResolvedValue({ title: 'Soup' })
     const result = await controller.import({ url: 'https://example.com/soup' }, { userId: 'user_1' } as any, undefined)
-    expect(importService.importFromUrl).toHaveBeenCalledWith('https://example.com/soup')
+    expect(importService.importFromUrl).toHaveBeenCalledWith('https://example.com/soup', undefined)
+    expect(result).toEqual({ title: 'Soup' })
+  })
+
+  it('imports from url with the caption text combined when a social share provides both', async () => {
+    importService.importFromUrl.mockResolvedValue({ title: 'Soup' })
+    const result = await controller.import(
+      { url: 'https://www.instagram.com/reel/abc', text: 'Best soup ever, recipe below' },
+      { userId: 'user_1' } as any,
+      undefined,
+    )
+    expect(importService.importFromUrl).toHaveBeenCalledWith('https://www.instagram.com/reel/abc', 'Best soup ever, recipe below')
     expect(result).toEqual({ title: 'Soup' })
   })
 
@@ -64,10 +75,9 @@ describe('RecipeImportController', () => {
     await expect(controller.import({}, { userId: 'user_1' } as any, undefined)).rejects.toThrow(BadRequestException)
   })
 
-  it('throws BadRequestException when a url is combined with text, a file, or a photo', async () => {
+  it('throws BadRequestException when a url is combined with a file or a photo', async () => {
     const file = { buffer: Buffer.from('x'), mimetype: 'application/pdf' } as Express.Multer.File
     const image = { buffer: Buffer.from('x'), mimetype: 'image/jpeg' } as Express.Multer.File
-    await expect(controller.import({ text: 'a', url: 'https://example.com' }, { userId: 'user_1' } as any, undefined)).rejects.toThrow(BadRequestException)
     await expect(controller.import({ url: 'https://example.com' }, { userId: 'user_1' } as any, { file: [file] })).rejects.toThrow(BadRequestException)
     await expect(controller.import({ url: 'https://example.com' }, { userId: 'user_1' } as any, { image: [image] })).rejects.toThrow(BadRequestException)
   })
