@@ -455,7 +455,7 @@ describe('RecipesService', () => {
   })
 
   it('createDraft sets pendingReview and batchId when opts are provided', async () => {
-    const exists = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(false) })
+    const exists = jest.fn().mockResolvedValue(false)
     const create = jest.fn().mockResolvedValue({ id: 'new-recipe', title: 'Soup' })
     const service = await makeService({ exists, create }, { create: jest.fn().mockResolvedValue({}) })
     await service.createDraft('user_1', { title: 'Soup' } as any, { pendingReview: true, batchId: 'batch-1' })
@@ -464,7 +464,7 @@ describe('RecipesService', () => {
   })
 
   it('createDraft defaults pendingReview to false when opts are omitted', async () => {
-    const exists = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(false) })
+    const exists = jest.fn().mockResolvedValue(false)
     const create = jest.fn().mockResolvedValue({ id: 'new-recipe', title: 'Soup' })
     const service = await makeService({ exists, create }, { create: jest.fn().mockResolvedValue({}) })
     await service.createDraft('user_1', { title: 'Soup' } as any)
