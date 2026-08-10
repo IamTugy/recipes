@@ -314,10 +314,24 @@ export default function MyRecipesPage() {
         )}
 
         {!loading && hasMore && (
-          <div ref={sentinelRef} className="flex items-center justify-center py-8">
-            <span className="text-xs text-cream/30 tracking-wider">
-              {lang === 'he' ? 'טוען עוד...' : 'Loading more...'}
-            </span>
+          <div ref={sentinelRef} className="py-4">
+            {viewMode === 'list' ? (
+              <ul className="space-y-1.5">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <li key={i} className="card w-full flex items-center gap-3 p-2 animate-pulse">
+                    <div className="w-12 h-12 rounded-lg bg-tint/[0.06] shrink-0" />
+                    <div className="min-w-0 flex-1 space-y-1.5">
+                      <div className="h-3.5 bg-tint/[0.06] rounded-md w-2/3" />
+                      <div className="h-2.5 bg-tint/[0.04] rounded-md w-1/3" />
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {Array.from({ length: 3 }).map((_, i) => <RecipeCardSkeleton key={i} />)}
+              </div>
+            )}
           </div>
         )}
       </div>
