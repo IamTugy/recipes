@@ -3,6 +3,7 @@ import { useFocusTrap } from '../hooks/useFocusTrap'
 import RecipePlaceholder from './RecipePlaceholder'
 import RecipeDetailSkeleton from './RecipeDetailSkeleton'
 import Breadcrumbs from './Breadcrumbs'
+import RecipeSectionNav from './RecipeSectionNav'
 import FilterInfoPopover from './FilterInfoPopover'
 import { useTranslatedReview } from '../hooks/useTranslatedReview'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
@@ -616,8 +617,17 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
     setWizardOpen(true)
   }
 
+  const sectionNavItems = [
+    displayRecipe.ingredients.length > 0 && { id: 'ingredients-heading', label: tx.ingredients, emoji: '🥕' },
+    flatSteps.length > 0 && { id: 'steps-heading', label: tx.instructions, emoji: '📋' },
+    displayTips.length > 0 && { id: 'tips-heading', label: tx.tipsTitle, emoji: '💡' },
+    { id: 'my-notes-heading', label: lang === 'he' ? 'ההערות שלי' : 'My Notes', emoji: '📝' },
+    isViewingPublishedContent && { id: 'reviews-heading', label: lang === 'he' ? 'ביקורות' : 'Reviews', emoji: '💬' },
+  ].filter((s): s is { id: string; label: string; emoji: string } => !!s)
+
   return (
     <div className="min-h-dvh bg-bg pt-14" dir={lang === 'he' ? 'rtl' : 'ltr'}>
+      <RecipeSectionNav sections={sectionNavItems} lang={lang} />
       {/* Hero image */}
       <div className="print:hidden relative h-64 sm:h-96 overflow-hidden">
         {displayRecipe.image?.includes('assets.tugy.dev') ? (
@@ -1134,7 +1144,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
         <div className="grid grid-cols-1 sm:grid-cols-5 print:grid-cols-5 gap-6 print:gap-0">
           {/* Ingredients */}
           {displayRecipe.ingredients.length > 0 && <div className="sm:col-span-2 print:col-span-2 card p-5 bg-amber/[0.04] border-amber/10 h-fit print:p-0 print:pe-5 print:border-0 print:border-e print:border-tint/20 print:bg-transparent print:rounded-none">
-            <h2 className="font-serif text-xl font-bold text-cream mb-4">{tx.ingredients}</h2>
+            <h2 id="ingredients-heading" className="font-serif text-xl font-bold text-cream mb-4 scroll-mt-20">{tx.ingredients}</h2>
             <div className="space-y-4">
               {displayRecipe.ingredients.map((group, gi) => {
                 const groupLabel = lang === 'he' ? (group.group || group.groupEn) : (group.groupEn || group.group)
@@ -1202,7 +1212,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
           {/* Steps */}
           <div className="sm:col-span-3 print:col-span-3 print:ps-5">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-serif text-xl font-bold text-cream">{tx.instructions}</h2>
+              <h2 id="steps-heading" className="font-serif text-xl font-bold text-cream scroll-mt-20">{tx.instructions}</h2>
               <div className="print:hidden flex items-center gap-2">
                 {flatSteps.length > 0 && (
                   <button type="button"
@@ -1345,7 +1355,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
         {/* Tips */}
         {displayTips.length > 0 && (
           <div className="mt-8 card p-5 print:mt-6 print:p-0 print:border-0 print:border-t print:border-tint/15 print:pt-4 print:rounded-none print:bg-transparent print:break-inside-avoid">
-            <h2 className="font-serif text-lg font-bold text-cream mb-3 flex items-center gap-2">
+            <h2 id="tips-heading" className="font-serif text-lg font-bold text-cream mb-3 flex items-center gap-2 scroll-mt-20">
               <span>💡</span> {tx.tipsTitle}
             </h2>
             <ul className="space-y-2">
@@ -1395,7 +1405,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
         {/* Personal notes */}
         <div className="print:hidden mt-8 card p-5">
           <div className="flex items-center justify-between mb-3">
-            <h2 id="my-notes-heading" className="font-serif text-lg font-bold text-cream flex items-center gap-2">
+            <h2 id="my-notes-heading" className="font-serif text-lg font-bold text-cream flex items-center gap-2 scroll-mt-20">
               <span>📝</span> {lang === 'he' ? 'ההערות שלי' : 'My Notes'}
               <span className="font-sans text-[11px] font-normal text-cream/30">
                 {lang === 'he' ? '(פרטי - גלוי רק לך)' : '(Private — only visible to you)'}
@@ -1422,7 +1432,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
         {/* Reviews */}
         {isViewingPublishedContent && (
         <div className="print:hidden mt-8 card p-5">
-          <h2 id="reviews-heading" className="font-serif text-lg font-bold text-cream mb-3 flex items-center gap-2">
+          <h2 id="reviews-heading" className="font-serif text-lg font-bold text-cream mb-3 flex items-center gap-2 scroll-mt-20">
             <span>💬</span> {lang === 'he' ? 'ביקורות' : 'Reviews'}
           </h2>
           {!!recipe.ratingCount && distribution && (
