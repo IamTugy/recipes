@@ -96,6 +96,33 @@ export function useMyRecipes(enabled = true) {
   return { recipes, loading, reload }
 }
 
+// Bulk-AI drafts the user hasn't reviewed/saved yet - powers the
+// "drafts in progress" panel on the recipe editor.
+export function usePendingDrafts(enabled = true) {
+  const { getToken, isLoaded, isSignedIn } = useAuth()
+  const [recipes, setRecipes] = useState<Recipe[]>([])
+  const [loading, setLoading] = useState(true)
+
+  function reload() {
+    return apiFetch<Recipe[]>('/recipes/pending', getToken).then(data => setRecipes(data))
+  }
+
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn || !enabled) return
+    let cancelled = false
+
+    reload()
+      .catch(() => { /* stale panel is a minor annoyance, not worth surfacing an error for */ })
+      .finally(() => { if (!cancelled) setLoading(false) })
+
+    const unsubscribe = onRecipeStatusChanged(() => { reload().catch(() => {}) })
+    return () => { cancelled = true; unsubscribe() }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoaded, isSignedIn, enabled, getToken])
+
+  return { recipes, loading, reload }
+}
+
 // Public "in progress" feed - recent AI review outcomes across every user's
 // recipes, visible to any signed-in user (not admin-gated).
 export function useSubmissionsFeed(enabled = true) {

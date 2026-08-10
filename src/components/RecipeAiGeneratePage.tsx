@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '@clerk/react'
 import { useLanguage } from '../hooks/useLanguage'
-import { generateRecipeWithAi } from '../lib/recipeAiGenerate'
+import { generateRecipesWithAi } from '../lib/recipeAiGenerate'
 
 export default function RecipeAiGeneratePage() {
   const navigate = useNavigate()
@@ -19,8 +19,8 @@ export default function RecipeAiGeneratePage() {
     setError(null)
     setLoading(true)
     try {
-      const draft = await generateRecipeWithAi(trimmed, getToken)
-      navigate('/recipes/new', { state: { importedDraft: draft } })
+      const created = await generateRecipesWithAi(trimmed, getToken)
+      navigate(`/recipes/${created[0].id}/edit`)
     } catch (err) {
       setError(err instanceof Error ? err.message : (lang === 'he' ? 'החיפוש נכשל' : 'Generation failed'))
     } finally {
