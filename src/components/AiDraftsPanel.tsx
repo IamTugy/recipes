@@ -2,6 +2,8 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '@clerk/react'
 import { usePendingDrafts, deleteRecipe } from '../hooks/useRecipes'
 import { useLanguage } from '../hooks/useLanguage'
+import { useToast } from '../hooks/useToast'
+import { ApiError } from '../lib/api'
 
 // Shown above the recipe editor whenever more than one bulk-AI-generated
 // draft is still pending review (not yet saved by the user). See the
@@ -14,13 +16,20 @@ export default function AiDraftsPanel() {
   const { getToken } = useAuth()
   const { id: currentId } = useParams<{ id: string }>()
   const { recipes, loading, reload } = usePendingDrafts()
+  const { showToast } = useToast()
 
   if (loading || recipes.length <= 1) return null
 
   async function handleRemove(id: string, e: React.MouseEvent) {
     e.preventDefault()
     e.stopPropagation()
-    await deleteRecipe(id, getToken)
+    try {
+      await deleteRecipe(id, getToken)
+    } catch (err) {
+      const message = err instanceof ApiError ? err.message : (lang === 'he' ? 'מחיקת המתכון נכשלה' : 'Failed to delete the recipe')
+      showToast(message, 'error')
+      return
+    }
     await reload()
     if (id !== currentId) return
     const next = recipes.find(r => r.id !== id)

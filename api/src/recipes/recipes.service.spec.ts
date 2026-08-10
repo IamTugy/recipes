@@ -668,6 +668,34 @@ describe('RecipesService', () => {
     await expect(service.submitForReview('a', 'user_1', false)).rejects.toThrow(BadRequestException)
   })
 
+  it('submitForReview clears pendingReview when it publishes successfully', async () => {
+    const recipe: any = completeRecipe({ pendingReview: true })
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe), select: jest.fn().mockReturnThis(), lean: jest.fn().mockReturnThis() })
+    const updateOne = jest.fn().mockResolvedValue({})
+    const quality = makeQualityService({ score: 100, checkedAt: 'now', findings: [] })
+    const service = await makeService({ findOne }, { updateOne }, undefined, undefined, undefined, undefined, undefined, quality)
+
+    await service.submitForReview('a', 'user_1', false)
+
+    expect(recipe.status).toBe('published')
+    expect(recipe.pendingReview).toBe(false)
+  })
+
+  it('submitForReview rejects when a linked recipe id does not resolve to any recipe at all', async () => {
+    const recipe = completeRecipe({
+      ingredients: [{ group: 'Main', items: [{ linkedRecipeId: 'ghost-recipe', amount: 800, unit: 'g' }] }],
+    })
+    const findOne = jest.fn()
+      .mockReturnValueOnce({ exec: jest.fn().mockResolvedValue(recipe) }) // getEditableOrThrow
+      .mockReturnValueOnce({ select: jest.fn().mockReturnThis(), lean: jest.fn().mockReturnThis(), exec: jest.fn().mockResolvedValue({ ingredients: recipe.ingredients }) }) // linkedIdsOf(recipe.id)
+      .mockReturnValueOnce({ select: jest.fn().mockReturnThis(), lean: jest.fn().mockReturnThis(), exec: jest.fn().mockResolvedValue(null) }) // linkedIdsOf('ghost-recipe') during the BFS walk - recipe not found
+    // 'ghost-recipe' resolves to nothing at all, not to a document with publishedRevision: null
+    const find = jest.fn().mockReturnValue({ select: jest.fn().mockReturnThis(), lean: jest.fn().mockReturnThis(), exec: jest.fn().mockResolvedValue([]) })
+    const service = await makeService({ findOne, find })
+
+    await expect(service.submitForReview('a', 'user_1', false)).rejects.toThrow(/ghost-recipe/)
+  })
+
   it('submitForReview allows publishing when every linked recipe is already published', async () => {
     const recipe = completeRecipe({
       ingredients: [{ group: 'Main', items: [{ linkedRecipeId: 'dough-recipe', amount: 800, unit: 'g' }] }],

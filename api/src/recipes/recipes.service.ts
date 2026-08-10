@@ -409,6 +409,7 @@ export class RecipesService implements OnModuleInit {
       )
       recipe.publishedRevision = recipe.currentRevision
       recipe.status = 'published'
+      recipe.pendingReview = false
       recipe.reviewComment = undefined
       recipe.qualityReview = review
       await recipe.save()
@@ -424,7 +425,7 @@ export class RecipesService implements OnModuleInit {
   }
 
   private extractLinkedIds(ingredients: { items: { linkedRecipeId?: string }[] }[]): string[] {
-    return [...new Set(ingredients.flatMap(g => g.items.map(i => i.linkedRecipeId).filter((v): v is string => !!v)))]
+    return [...new Set(ingredients.flatMap(g => (g.items ?? []).map(i => i.linkedRecipeId).filter((v): v is string => !!v)))]
   }
 
   // Every linkedRecipeId in the payload must resolve to a real, non-deleted
@@ -505,10 +506,27 @@ export class RecipesService implements OnModuleInit {
     const directLinks = await this.linkedIdsOf(recipeId)
     if (directLinks.length === 0) return
     const reachable = await this.walkLinkedRecipes(directLinks)
-    const linked = await this.recipeModel.find({ _id: { $in: [...reachable] } }).select('publishedRevision title').lean().exec()
+    let linked: { _id: unknown; publishedRevision?: number | null; title?: string }[]
+    try {
+      linked = await this.recipeModel
+        .find({ _id: { $in: [...reachable] }, deletedAt: { $exists: false } })
+        .select('publishedRevision title')
+        .lean()
+        .exec()
+    } catch (err) {
+      if (isCastError(err)) linked = []
+      else throw err
+    }
+    // A reachable id that doesn't come back at all (hard-missing, or filtered
+    // out as soft-deleted) is just as unpublishable as one that came back
+    // with no publishedRevision - it must not silently pass the guard by
+    // being absent from the results. It has no title, so it's named by id.
+    const foundIds = new Set(linked.map(r => String(r._id)))
+    const missingIds = [...reachable].filter(id => !foundIds.has(id))
     const unpublished = linked.filter(r => r.publishedRevision == null)
-    if (unpublished.length > 0) {
-      throw new BadRequestException(`Cannot publish: linked recipe(s) not yet published: ${unpublished.map(r => r.title).join(', ')}`)
+    const names = [...unpublished.map(r => r.title), ...missingIds]
+    if (names.length > 0) {
+      throw new BadRequestException(`Cannot publish: linked recipe(s) not yet published: ${names.join(', ')}`)
     }
   }
 
@@ -598,10 +616,6 @@ export class RecipesService implements OnModuleInit {
   async remove(id: string, userId: string, isAdmin: boolean): Promise<void> {
     const recipe = await this.recipeModel.findOne({ _id: id }).exec()
     if (!recipe) return
-    const isLinkedElsewhere = await this.recipeModel.exists({ 'ingredients.items.linkedRecipeId': id, deletedAt: { $exists: false } })
-    if (isLinkedElsewhere) {
-      throw new ForbiddenException('This recipe is used as a linked ingredient in another recipe and cannot be deleted')
-    }
     if (recipe.publishedRevision != null) {
       throw new ForbiddenException('A recipe that has ever been published can never be deleted')
     }
@@ -610,6 +624,10 @@ export class RecipesService implements OnModuleInit {
     }
     if (recipe.ownerId && recipe.ownerId !== userId && !isAdmin) {
       throw new ForbiddenException('Only the owner or an admin can delete this recipe')
+    }
+    const isLinkedElsewhere = await this.recipeModel.exists({ 'ingredients.items.linkedRecipeId': id, deletedAt: { $exists: false } })
+    if (isLinkedElsewhere) {
+      throw new ForbiddenException('This recipe is used as a linked ingredient in another recipe and cannot be deleted')
     }
     recipe.deletedAt = new Date()
     await recipe.save()

@@ -52,4 +52,24 @@ describe('RecipeAiGenerateController', () => {
     await controller.generate({ query: 'tomato soup' }, { userId: 'user_1' } as any)
     expect(activityLog.record).toHaveBeenCalledWith('user_1', undefined, 'ai_recipe_generate_used', { count: 1 })
   })
+
+  it('skips a malformed generated recipe (missing title) but still persists and returns the other valid one(s) in the batch', async () => {
+    aiGenerateService.generate.mockResolvedValue([
+      { aiGenerated: true, sources: [] }, // no title -> fails validation
+      { title: 'Vanilla Frosting', aiGenerated: true, sources: [] },
+    ])
+    recipesService.createDraft.mockResolvedValueOnce({ toObject: () => ({ id: 'b', title: 'Vanilla Frosting' }) })
+
+    const result = await controller.generate({ query: 'vanilla frosting' }, { userId: 'user_1' } as any)
+
+    expect(recipesService.createDraft).toHaveBeenCalledTimes(1)
+    expect(result).toEqual([{ id: 'b', title: 'Vanilla Frosting' }])
+  })
+
+  it('throws BadRequestException without persisting anything when every recipe in the batch fails validation', async () => {
+    aiGenerateService.generate.mockResolvedValue([{ aiGenerated: true, sources: [] }])
+
+    await expect(controller.generate({ query: 'anything' }, { userId: 'user_1' } as any)).rejects.toThrow(BadRequestException)
+    expect(recipesService.createDraft).not.toHaveBeenCalled()
+  })
 })

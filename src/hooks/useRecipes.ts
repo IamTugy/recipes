@@ -40,7 +40,10 @@ export async function deleteRecipe(id: string, getToken: () => Promise<string | 
     method: 'DELETE',
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   })
-  if (!res.ok) throw new ApiError(res.status, 'Failed to delete recipe')
+  if (!res.ok) {
+    const message = await res.json().then(d => d.message).catch(() => undefined)
+    throw new ApiError(res.status, Array.isArray(message) ? message.join(', ') : message ?? 'Failed to delete recipe')
+  }
 }
 
 async function postAction(path: string, getToken: () => Promise<string | null>, body?: unknown): Promise<Recipe> {
