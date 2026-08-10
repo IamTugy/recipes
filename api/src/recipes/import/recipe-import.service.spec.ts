@@ -5,7 +5,7 @@ import { GeminiService } from '../../ai/gemini.service'
 jest.mock('./source-extractor')
 
 describe('RecipeImportService', () => {
-  const geminiService = { generateStructured: jest.fn() }
+  const geminiService = { generateStructured: jest.fn(), generateStructuredWithImage: jest.fn() }
   const service = new RecipeImportService(geminiService as unknown as GeminiService)
 
   beforeEach(() => jest.clearAllMocks())
@@ -63,6 +63,28 @@ describe('RecipeImportService', () => {
   it('importFromFile throws a clear error when the file has no extractable text', async () => {
     ;(sourceExtractor.extractFromPdf as jest.Mock).mockResolvedValue('   ')
     await expect(service.importFromFile(Buffer.from('x'), 'application/pdf')).rejects.toThrow('Could not find any text')
+  })
+
+  it('importFromImage sends the photo straight to Gemini vision', async () => {
+    geminiService.generateStructuredWithImage.mockResolvedValue({ title: 'From photo' })
+    const buffer = Buffer.from('fake-jpeg-bytes')
+    const result = await service.importFromImage(buffer, 'image/jpeg')
+    expect(result).toEqual({ title: 'From photo' })
+    expect(geminiService.generateStructuredWithImage).toHaveBeenCalledWith(
+      expect.any(String),
+      buffer.toString('base64'),
+      'image/jpeg',
+    )
+  })
+
+  it('importFromImage includes the prompt text when provided', async () => {
+    geminiService.generateStructuredWithImage.mockResolvedValue({ title: 'From photo' })
+    await service.importFromImage(Buffer.from('x'), 'image/jpeg', 'make it vegan')
+    expect(geminiService.generateStructuredWithImage).toHaveBeenCalledWith(
+      expect.stringContaining('make it vegan'),
+      expect.any(String),
+      'image/jpeg',
+    )
   })
 
   it('propagates a Gemini error', async () => {

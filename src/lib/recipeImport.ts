@@ -26,7 +26,7 @@ export interface ImportedRecipe {
 }
 
 export async function importRecipe(
-  input: { text?: string; url?: string; file?: File },
+  input: { text?: string; url?: string; file?: File; image?: File },
   getToken: () => Promise<string | null>
 ): Promise<ImportedRecipe> {
   const token = await getToken()
@@ -34,6 +34,7 @@ export async function importRecipe(
   if (input.text) formData.append('text', input.text)
   if (input.url) formData.append('url', input.url)
   if (input.file) formData.append('file', input.file)
+  if (input.image) formData.append('image', input.image)
 
   const res = await fetch('/api/recipes/import', {
     method: 'POST',

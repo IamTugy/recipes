@@ -1,19 +1,13 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '@clerk/react'
 import { useLanguage } from '../hooks/useLanguage'
 import { importRecipe } from '../lib/recipeImport'
-import EditableImageField from './EditableImageField'
 
 const URL_PATTERN = /^https?:\/\/\S+$/i
 
 function isUrl(value: string) {
   return URL_PATTERN.test(value.trim())
-}
-
-function bookmarkletHref(origin: string) {
-  const script = `(function(){location.href=${JSON.stringify(`${origin}/recipes/import?url=`)}+encodeURIComponent(location.href);})();`
-  return `javascript:${script}`
 }
 
 export default function RecipeImportPage() {
@@ -22,19 +16,36 @@ export default function RecipeImportPage() {
   const { getToken } = useAuth()
   const { lang } = useLanguage()
   const [source, setSource] = useState('')
-  const [file, setFile] = useState<File | null>(null)
-  const [isDragging, setIsDragging] = useState(false)
-  const [image, setImage] = useState('')
+  const [docFile, setDocFile] = useState<File | null>(null)
+  const [photoFile, setPhotoFile] = useState<File | null>(null)
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null)
+  const [isDraggingDoc, setIsDraggingDoc] = useState(false)
+  const [isDraggingPhoto, setIsDraggingPhoto] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const uploadRecipeIdRef = useRef(`import-${Date.now()}`)
 
   const trimmedSource = source.trim()
-  const canSubmit = (!!trimmedSource || !!file) && !loading
+  const canSubmit = (!!trimmedSource || !!docFile || !!photoFile) && !loading
 
-  function selectFile(selected: File | null) {
-    setFile(selected)
+  function selectDocFile(selected: File | null) {
+    setDocFile(selected)
+    if (selected) setPhotoFile(null)
   }
+
+  function selectPhotoFile(selected: File | null) {
+    setPhotoFile(selected)
+    if (selected) setDocFile(null)
+  }
+
+  useEffect(() => {
+    if (!photoFile) {
+      setPhotoPreview(null)
+      return
+    }
+    const url = URL.createObjectURL(photoFile)
+    setPhotoPreview(url)
+    return () => URL.revokeObjectURL(url)
+  }, [photoFile])
 
   async function handleExtract(overrideSource?: string) {
     const src = (overrideSource ?? trimmedSource)
@@ -42,10 +53,9 @@ export default function RecipeImportPage() {
     setLoading(true)
     try {
       const draft = await importRecipe(
-        isUrl(src) ? { url: src } : { text: src || undefined, file: file ?? undefined },
+        isUrl(src) ? { url: src } : { text: src || undefined, file: docFile ?? undefined, image: photoFile ?? undefined },
         getToken
       )
-      if (image) draft.image = image
       navigate('/recipes/new', { state: { importedDraft: draft } })
     } catch (err) {
       setError(err instanceof Error ? err.message : (lang === 'he' ? 'הייבוא נכשל' : 'Import failed'))
@@ -55,7 +65,7 @@ export default function RecipeImportPage() {
   }
 
   // Handles both the PWA share-target redirect (share_target in
-  // manifest.webmanifest) and the bookmarklet below: both land here with a
+  // manifest.webmanifest) and the bookmarklet on NewRecipePage: both land here with a
   // ?url= (or ?text=, since some Android share sheets only fill that field)
   // query param and expect the import to run immediately.
   useEffect(() => {
@@ -79,29 +89,18 @@ export default function RecipeImportPage() {
         </h1>
         <p className="text-sm text-cream/50">
           {lang === 'he'
-            ? 'הדביקו טקסט או קישור לאתר, ו/או העלו קובץ PDF/DOCX (קישור לא ניתן לשילוב עם קובץ). אפשר גם לצרף תמונה למתכון.'
-            : 'Paste recipe text and/or upload a PDF/DOCX file, or paste a website link on its own. You can also attach a photo.'}
+            ? 'הדביקו טקסט או קישור לאתר, ו/או העלו קובץ PDF/DOCX או תמונה של המתכון (קישור לא ניתן לשילוב). ה-AI יקרא את התמונה ויחלץ ממנה את המתכון.'
+            : 'Paste recipe text and/or upload a PDF/DOCX file or a photo of the recipe, or paste a website link on its own. The AI will read the photo and extract the recipe from it.'}
         </p>
 
         {error && <div className="card p-3 text-sm text-red-400 border border-red-400/20">{error}</div>}
 
         <div className="card p-5 space-y-4">
           <div>
-            <label className={labelClass}>{lang === 'he' ? 'תמונה' : 'Photo'}</label>
-            <EditableImageField
-              image={image}
-              onChange={url => setImage(url ?? '')}
-              uploadRecipeId={uploadRecipeIdRef.current}
-              lang={lang}
-              onError={setError}
-            />
-          </div>
-
-          <div>
             <label className={labelClass}>{lang === 'he' ? 'טקסט או קישור' : 'Text or link'}</label>
             <textarea
               value={source}
-              onChange={e => { setSource(e.target.value); if (isUrl(e.target.value)) setFile(null) }}
+              onChange={e => { setSource(e.target.value); if (isUrl(e.target.value)) { setDocFile(null); setPhotoFile(null) } }}
               rows={6}
               className={inputClass}
               placeholder={lang === 'he' ? 'הדביקו כאן טקסט מתכון, או קישור לאתר...' : 'Paste recipe text, or a website URL...'}
@@ -111,17 +110,17 @@ export default function RecipeImportPage() {
           <div>
             <label className={labelClass}>{lang === 'he' ? 'קובץ PDF או DOCX' : 'PDF or DOCX file'}</label>
             <label
-              onDragEnter={e => { e.preventDefault(); setIsDragging(true) }}
+              onDragEnter={e => { e.preventDefault(); setIsDraggingDoc(true) }}
               onDragOver={e => e.preventDefault()}
-              onDragLeave={() => setIsDragging(false)}
+              onDragLeave={() => setIsDraggingDoc(false)}
               onDrop={e => {
                 e.preventDefault()
-                setIsDragging(false)
+                setIsDraggingDoc(false)
                 const dropped = e.dataTransfer.files?.[0]
-                if (dropped) selectFile(dropped)
+                if (dropped) selectDocFile(dropped)
               }}
               className={`flex flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed px-4 py-8 text-center text-sm transition-colors cursor-pointer ${
-                isDragging
+                isDraggingDoc
                   ? 'border-amber/50 bg-amber/[0.06] text-cream/70'
                   : 'border-tint/15 text-cream/40 hover:border-amber/30 hover:text-cream/60'
               }`}
@@ -129,11 +128,11 @@ export default function RecipeImportPage() {
               <input
                 type="file"
                 accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                onChange={e => selectFile(e.target.files?.[0] ?? null)}
+                onChange={e => selectDocFile(e.target.files?.[0] ?? null)}
                 className="hidden"
               />
-              {file ? (
-                <span className="text-cream/70">{file.name}</span>
+              {docFile ? (
+                <span className="text-cream/70">{docFile.name}</span>
               ) : (
                 <>
                   <span>{lang === 'he' ? 'גררו קובץ לכאן, או לחצו לבחירה' : 'Drag a file here, or click to browse'}</span>
@@ -142,24 +141,44 @@ export default function RecipeImportPage() {
               )}
             </label>
           </div>
-        </div>
 
-        <div className="card p-4 space-y-2">
-          <p className="text-xs font-semibold text-cream/50">
-            {lang === 'he' ? 'ייבוא מהיר' : 'Quick import'}
-          </p>
-          <p className="text-sm text-cream/50">
-            {lang === 'he'
-              ? 'גררו את הכפתור הזה לסרגל המועדפים בדפדפן. בכל דף מתכון, לחיצה עליו תשלח את הדף היישר לכאן.'
-              : 'Drag this button to your browser bookmarks bar. On any recipe page, click it to send that page straight here.'}
-          </p>
-          <a
-            href={bookmarkletHref(window.location.origin)}
-            className="btn-ghost inline-block text-sm"
-            draggable
-          >
-            {lang === 'he' ? 'ייבוא למתכונים' : 'Import to Cookbook'}
-          </a>
+          <div>
+            <label className={labelClass}>{lang === 'he' ? 'תמונה של המתכון' : 'Photo of the recipe'}</label>
+            <label
+              onDragEnter={e => { e.preventDefault(); setIsDraggingPhoto(true) }}
+              onDragOver={e => e.preventDefault()}
+              onDragLeave={() => setIsDraggingPhoto(false)}
+              onDrop={e => {
+                e.preventDefault()
+                setIsDraggingPhoto(false)
+                const dropped = e.dataTransfer.files?.[0]
+                if (dropped) selectPhotoFile(dropped)
+              }}
+              className={`flex flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed px-4 py-8 text-center text-sm transition-colors cursor-pointer overflow-hidden ${
+                isDraggingPhoto
+                  ? 'border-amber/50 bg-amber/[0.06] text-cream/70'
+                  : 'border-tint/15 text-cream/40 hover:border-amber/30 hover:text-cream/60'
+              }`}
+            >
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={e => selectPhotoFile(e.target.files?.[0] ?? null)}
+                className="hidden"
+              />
+              {photoFile && photoPreview ? (
+                <div className="flex items-center gap-3">
+                  <img src={photoPreview} alt="" className="w-16 h-16 object-cover rounded-md" />
+                  <span className="text-cream/70">{photoFile.name}</span>
+                </div>
+              ) : (
+                <>
+                  <span>{lang === 'he' ? 'גררו תמונה לכאן, או לחצו לבחירה' : 'Drag a photo here, or click to browse'}</span>
+                  <span className="text-xs text-cream/25">{lang === 'he' ? 'צילום עמוד מתכון, ספר בישול או פתק' : 'A photo of a cookbook page, printout, or handwritten card'}</span>
+                </>
+              )}
+            </label>
+          </div>
         </div>
 
         <div className="flex items-center gap-3">
@@ -169,10 +188,7 @@ export default function RecipeImportPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
             )}
-            {loading ? (lang === 'he' ? 'ה-AI מנתח את המתכון...' : 'AI is reading the recipe...') : (lang === 'he' ? 'ייבוא' : 'Import')}
-          </button>
-          <button type="button" onClick={() => navigate('/recipes/new/blank')} disabled={loading} className="btn-ghost disabled:opacity-50">
-            {lang === 'he' ? 'התחל מדף ריק' : 'Start from scratch instead'}
+            {loading ? (lang === 'he' ? 'ה-AI מנתח את המתכון...' : 'AI is reading the recipe...') : (lang === 'he' ? 'העלה' : 'Upload')}
           </button>
         </div>
       </div>

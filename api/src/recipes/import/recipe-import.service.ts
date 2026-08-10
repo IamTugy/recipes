@@ -56,6 +56,30 @@ The source is normally in English - translate every field into Hebrew as well as
 Source JSON-LD:
 `
 
+const IMAGE_EXTRACTION_PROMPT = `You are reading a photo of a recipe (a cookbook page, a handwritten card, a screenshot, etc.) and extracting it into a strict JSON object. Produce a single JSON object with exactly these fields (omit any field you cannot determine, but always include "title"):
+
+{
+  "title": "string, English title (required)",
+  "titleHe": "string, Hebrew title",
+  "category": "one of: breakfast, lunch, dinner, dessert, salad, soup, snack, bread, sauce",
+  "tags": ["Hebrew tags"],
+  "tagsEn": ["English tags"],
+  "cuisine": "string, e.g. Italian, Brazilian",
+  "description": "string, Hebrew short description",
+  "descriptionEn": "string, English short description",
+  "prepTime": "number, minutes",
+  "cookTime": "number, minutes",
+  "servings": "number",
+  "difficulty": "one of: easy, medium, hard",
+  "kosherType": "one of: meat, dairy, parve - meat if it contains any meat, poultry, or fish; dairy if it contains dairy and no meat/poultry/fish of any kind; parve if it contains neither. Omit only if you genuinely cannot tell.",
+  "ingredients": [{ "group": "Hebrew group name or empty string", "groupEn": "English group name or empty string", "items": [{ "amount": "number", "unit": "one of: g, kg, ml, l, cup, tbsp, tsp, cm, mm, pcs, cloves, bunch, sprigs, or empty string - but ONLY leave it empty for a naturally countable whole item (e.g. \"1 onion\", \"10 grapes\", \"1 garlic clove\"). Never leave it empty for something measured by mass or volume (e.g. milk, butter, flour, oil) - \"1 milk\" or \"1 butter\" with no unit is wrong, use g/ml/etc for those.", "name": "Hebrew ingredient name", "nameEn": "English ingredient name" }] }],
+  "steps": [{ "title": "Hebrew section title or empty string", "titleEn": "English section title or empty string", "items": [{ "instruction": "Hebrew step text", "instructionEn": "English step text", "timerMinutes": "number if this step mentions a specific duration" }] }],
+  "tips": ["Hebrew tips"],
+  "tipsEn": ["English tips"]
+}
+
+Always fill in both the Hebrew and English version of every text field, translating as needed if the source is only in one language. The "unit" field is displayed translated by the app itself, so it must always be one of the exact tokens listed above (in English), never a translated or free-form word. Do not set "image" - it is not part of this object. Respond with ONLY the JSON object, no other text.`
+
 @Injectable()
 export class RecipeImportService {
   constructor(private readonly gemini: GeminiService) {}
@@ -86,5 +110,12 @@ export class RecipeImportService {
     }
     const combined = promptText ? `${promptText}\n\n${text}` : text
     return this.importFromText(combined)
+  }
+
+  async importFromImage(buffer: Buffer, mimeType: string, promptText?: string): Promise<ImportedRecipe> {
+    const prompt = promptText
+      ? `${IMAGE_EXTRACTION_PROMPT}\n\nAdditional instructions from the user: ${promptText}`
+      : IMAGE_EXTRACTION_PROMPT
+    return this.gemini.generateStructuredWithImage<ImportedRecipe>(prompt, buffer.toString('base64'), mimeType)
   }
 }

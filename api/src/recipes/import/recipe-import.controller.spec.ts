@@ -7,6 +7,7 @@ describe('RecipeImportController', () => {
     importFromText: jest.fn(),
     importFromUrl: jest.fn(),
     importFromFile: jest.fn(),
+    importFromImage: jest.fn(),
   }
   const activityLog = { record: jest.fn() }
   const controller = new RecipeImportController(importService as unknown as RecipeImportService, activityLog as any)
@@ -30,7 +31,7 @@ describe('RecipeImportController', () => {
   it('imports from file when only a file is provided', async () => {
     importService.importFromFile.mockResolvedValue({ title: 'Soup' })
     const file = { buffer: Buffer.from('x'), mimetype: 'application/pdf' } as Express.Multer.File
-    const result = await controller.import({}, { userId: 'user_1' } as any, file)
+    const result = await controller.import({}, { userId: 'user_1' } as any, { file: [file] })
     expect(importService.importFromFile).toHaveBeenCalledWith(file.buffer, 'application/pdf', undefined)
     expect(result).toEqual({ title: 'Soup' })
   })
@@ -38,8 +39,24 @@ describe('RecipeImportController', () => {
   it('imports from file with the prompt text combined when both are provided', async () => {
     importService.importFromFile.mockResolvedValue({ title: 'Soup' })
     const file = { buffer: Buffer.from('x'), mimetype: 'application/pdf' } as Express.Multer.File
-    const result = await controller.import({ text: 'make it vegan' }, { userId: 'user_1' } as any, file)
+    const result = await controller.import({ text: 'make it vegan' }, { userId: 'user_1' } as any, { file: [file] })
     expect(importService.importFromFile).toHaveBeenCalledWith(file.buffer, 'application/pdf', 'make it vegan')
+    expect(result).toEqual({ title: 'Soup' })
+  })
+
+  it('imports from a photo when only an image is provided', async () => {
+    importService.importFromImage.mockResolvedValue({ title: 'Soup' })
+    const image = { buffer: Buffer.from('x'), mimetype: 'image/jpeg' } as Express.Multer.File
+    const result = await controller.import({}, { userId: 'user_1' } as any, { image: [image] })
+    expect(importService.importFromImage).toHaveBeenCalledWith(image.buffer, 'image/jpeg', undefined)
+    expect(result).toEqual({ title: 'Soup' })
+  })
+
+  it('imports from a photo with the prompt text combined when both are provided', async () => {
+    importService.importFromImage.mockResolvedValue({ title: 'Soup' })
+    const image = { buffer: Buffer.from('x'), mimetype: 'image/jpeg' } as Express.Multer.File
+    const result = await controller.import({ text: 'make it vegan' }, { userId: 'user_1' } as any, { image: [image] })
+    expect(importService.importFromImage).toHaveBeenCalledWith(image.buffer, 'image/jpeg', 'make it vegan')
     expect(result).toEqual({ title: 'Soup' })
   })
 
@@ -47,10 +64,18 @@ describe('RecipeImportController', () => {
     await expect(controller.import({}, { userId: 'user_1' } as any, undefined)).rejects.toThrow(BadRequestException)
   })
 
-  it('throws BadRequestException when a url is combined with text or a file', async () => {
+  it('throws BadRequestException when a url is combined with text, a file, or a photo', async () => {
     const file = { buffer: Buffer.from('x'), mimetype: 'application/pdf' } as Express.Multer.File
+    const image = { buffer: Buffer.from('x'), mimetype: 'image/jpeg' } as Express.Multer.File
     await expect(controller.import({ text: 'a', url: 'https://example.com' }, { userId: 'user_1' } as any, undefined)).rejects.toThrow(BadRequestException)
-    await expect(controller.import({ url: 'https://example.com' }, { userId: 'user_1' } as any, file)).rejects.toThrow(BadRequestException)
+    await expect(controller.import({ url: 'https://example.com' }, { userId: 'user_1' } as any, { file: [file] })).rejects.toThrow(BadRequestException)
+    await expect(controller.import({ url: 'https://example.com' }, { userId: 'user_1' } as any, { image: [image] })).rejects.toThrow(BadRequestException)
+  })
+
+  it('throws BadRequestException when a file and a photo are both provided', async () => {
+    const file = { buffer: Buffer.from('x'), mimetype: 'application/pdf' } as Express.Multer.File
+    const image = { buffer: Buffer.from('x'), mimetype: 'image/jpeg' } as Express.Multer.File
+    await expect(controller.import({}, { userId: 'user_1' } as any, { file: [file], image: [image] })).rejects.toThrow(BadRequestException)
   })
 
   it('logs an ai_recipe_import_used event after a successful import', async () => {
