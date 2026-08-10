@@ -454,6 +454,39 @@ describe('RecipesService', () => {
     expect(activityLog.record).toHaveBeenCalledWith('user_1', 'tomato-soup', 'recipe_updated')
   })
 
+  it('createDraft sets pendingReview and batchId when opts are provided', async () => {
+    const exists = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(false) })
+    const create = jest.fn().mockResolvedValue({ id: 'new-recipe', title: 'Soup' })
+    const service = await makeService({ exists, create }, { create: jest.fn().mockResolvedValue({}) })
+    await service.createDraft('user_1', { title: 'Soup' } as any, { pendingReview: true, batchId: 'batch-1' })
+
+    expect(create).toHaveBeenCalledWith(expect.objectContaining({ pendingReview: true, batchId: 'batch-1' }))
+  })
+
+  it('createDraft defaults pendingReview to false when opts are omitted', async () => {
+    const exists = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(false) })
+    const create = jest.fn().mockResolvedValue({ id: 'new-recipe', title: 'Soup' })
+    const service = await makeService({ exists, create }, { create: jest.fn().mockResolvedValue({}) })
+    await service.createDraft('user_1', { title: 'Soup' } as any)
+
+    expect(create).toHaveBeenCalledWith(expect.objectContaining({ pendingReview: false, batchId: undefined }))
+  })
+
+  it('updateDraft clears pendingReview on every save', async () => {
+    const existing = { slug: 'tomato-soup', ownerId: 'user_1', status: 'draft', pendingReview: true }
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(existing) })
+    const updated = { id: 'tomato-soup', slug: 'tomato-soup', currentRevision: 2, pendingReview: false }
+    const findOneAndUpdate = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(updated) })
+    const service = await makeService({ findOne, findOneAndUpdate }, { create: jest.fn().mockResolvedValue({}) })
+    await service.updateDraft('tomato-soup', 'user_1', false, { title: 'Tomato Soup' } as any)
+
+    expect(findOneAndUpdate).toHaveBeenCalledWith(
+      { _id: 'tomato-soup' },
+      expect.objectContaining({ $set: expect.objectContaining({ pendingReview: false }) }),
+      { new: true },
+    )
+  })
+
   it('updateImage sets just the image field, without bumping the revision or writing a new revision snapshot', async () => {
     const existing = { slug: 'tomato-soup', ownerId: 'user_1', status: 'draft' }
     const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(existing) })

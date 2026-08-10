@@ -302,10 +302,15 @@ export class RecipesService implements OnModuleInit {
     })
   }
 
-  async createDraft(userId: string, dto: SaveRecipeDraftDto): Promise<RecipeDocument> {
+  async createDraft(
+    userId: string,
+    dto: SaveRecipeDraftDto,
+    opts: { pendingReview?: boolean; batchId?: string } = {},
+  ): Promise<RecipeDocument> {
     const slug = await this.generateUniqueSlug(dto.title)
     const recipe = await this.recipeModel.create({
       ...dto, sources: dedupeSources(dto.sources), slug, ownerId: userId, status: 'draft', currentRevision: 1,
+      pendingReview: opts.pendingReview ?? false, batchId: opts.batchId,
     })
     await this.saveNewRevision(recipe, userId)
     await this.activityLogService.record(userId, recipe.id, 'recipe_created')
@@ -346,7 +351,7 @@ export class RecipesService implements OnModuleInit {
     // what the request body contains.
     const aiLock = recipe.aiGenerated ? { aiGenerated: true, sources: recipe.sources } : {}
     const update: Record<string, unknown> = {
-      $set: { ...dto, sources: dedupeSources(dto.sources), ...aiLock, ...(wasRejected ? { status: 'draft' } : {}) },
+      $set: { ...dto, sources: dedupeSources(dto.sources), ...aiLock, pendingReview: false, ...(wasRejected ? { status: 'draft' } : {}) },
       $inc: { currentRevision: 1 },
     }
     if (wasRejected) update.$unset = { reviewComment: '' }
