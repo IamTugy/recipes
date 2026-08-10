@@ -22,6 +22,10 @@ export interface IngredientItem {
   nameEn?: string     // English
   note?: string
   noteEn?: string
+  // When set, this ingredient references another recipe instead of a
+  // free-text name - see RecipeLinkPicker/LinkedIngredientDisplay. `name`/
+  // `nameEn` are cleared client-side whenever this is set.
+  linkedRecipeId?: string
 }
 
 export interface IngredientGroup {
@@ -94,6 +98,8 @@ export interface Recipe {
   currentRevision?: number
   publishedRevision?: number | null
   qualityReview?: QualityReview
+  pendingReview?: boolean
+  batchId?: string
 }
 
 export interface QualityFinding {

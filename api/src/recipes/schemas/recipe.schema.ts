@@ -139,6 +139,18 @@ export class Recipe {
   // can be restored by clearing this field.
   @Prop({ index: true })
   deletedAt?: Date
+
+  // True from the moment a bulk-AI-generated draft is created until the
+  // user does a real edit-and-save on it in the editor - drives the
+  // "drafts in progress" panel, independent of `status`. An ordinary
+  // manually-created draft never sets this at all (stays false).
+  @Prop({ default: false })
+  pendingReview?: boolean
+
+  // Shared by every recipe produced from one bulk-generate call, so the
+  // panel can group/order a batch and it survives a page refresh.
+  @Prop()
+  batchId?: string
 }
 
 export const RecipeSchema = SchemaFactory.createForClass(Recipe)

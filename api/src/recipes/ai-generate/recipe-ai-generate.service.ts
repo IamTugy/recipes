@@ -2,6 +2,10 @@ import { Injectable } from '@nestjs/common'
 import { GeminiService } from '../../ai/gemini.service'
 import type { ImportedRecipe } from '../import/source-extractor'
 
+const SPLIT_PROMPT = `Does the following request describe one recipe, or several separate recipes? List each recipe as its own short search-style request (the way you'd search for one recipe at a time), even if there's only one. Return ONLY JSON matching this shape: {"recipes": ["request 1", "request 2", ...]}
+
+Request: `
+
 const RESEARCH_PROMPT = `You are a professional recipe researcher. Use Google Search to find the best existing recipe (or the best combination of a few similar recipes) for the following request. Do not invent a recipe from imagination - base it on what real recipe sites/videos actually say. Write up the resulting recipe in full detail: title, a short description, cuisine, category, prep/cook time, servings, difficulty, full ingredient list with amounts and units, and full step-by-step instructions. Mention which sources you drew from.
 
 Request: `
@@ -42,11 +46,22 @@ export interface AiGeneratedRecipe extends ImportedRecipe {
 export class RecipeAiGenerateService {
   constructor(private readonly gemini: GeminiService) {}
 
+  // A single free-text request can name one recipe or several ("chocolate
+  // cake and vanilla frosting") - split it into individually-searchable
+  // requests first, then run the existing research->structure pipeline once
+  // per identified recipe, in parallel. Falls back to treating the whole
+  // request as one recipe if the split step comes back empty.
+  async generate(query: string): Promise<AiGeneratedRecipe[]> {
+    const { recipes: subQueries } = await this.gemini.generateStructured<{ recipes: string[] }>(`${SPLIT_PROMPT}${query}`)
+    const queries = subQueries.length > 0 ? subQueries : [query]
+    return Promise.all(queries.map(q => this.generateOne(q)))
+  }
+
   // Two-step because the Gemini API rejects combining the googleSearch tool
   // with JSON-constrained output: first research the request with live
   // search grounding (free-text result + cited source URLs), then convert
   // that write-up into the app's strict recipe JSON shape.
-  async generate(query: string): Promise<AiGeneratedRecipe> {
+  private async generateOne(query: string): Promise<AiGeneratedRecipe> {
     const { text, sources } = await this.gemini.generateWithSearch(`${RESEARCH_PROMPT}${query}`)
     const structured = await this.gemini.generateStructured<ImportedRecipe>(`${STRUCTURE_PROMPT}${text}`)
     return { ...structured, aiGenerated: true, sources }

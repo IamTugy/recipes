@@ -19,6 +19,9 @@ import EditableImageField from './EditableImageField'
 import Breadcrumbs from './Breadcrumbs'
 import AppSelect from './ui/AppSelect'
 import FilterInfoPopover from './FilterInfoPopover'
+import AiDraftsPanel from './AiDraftsPanel'
+import RecipeLinkPicker from './RecipeLinkPicker'
+import LinkedIngredientDisplay from './LinkedIngredientDisplay'
 
 interface RecipeFormProps {
   existing?: Recipe
@@ -283,6 +286,7 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
   }
 
   const [error, setError] = useState<string | null>(null)
+  const [linkPickerFor, setLinkPickerFor] = useState<{ gi: number; ii: number } | null>(null)
   const uploadRecipeIdRef = useRef(existing?.id ?? `new-${Date.now()}`)
 
   function updateIngredientGroup(gi: number, patch: Partial<Omit<IngredientGroup, 'items'>>) {
@@ -464,7 +468,7 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
         sources: sources.filter(s => s.title.trim() && s.url.trim()),
         ingredients: stripIngredientKeys(
           ingredientGroups
-            .map(g => ({ ...g, items: g.items.filter(item => item.name.trim() !== '') }))
+            .map(g => ({ ...g, items: g.items.filter(item => item.name.trim() !== '' || item.linkedRecipeId) }))
             .filter(g => g.items.length > 0)
         ),
         steps: stripStepKeys(
@@ -497,6 +501,7 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
 
   return (
     <div className="min-h-dvh bg-bg pt-20 pb-16 px-4">
+      <AiDraftsPanel />
       <form onSubmit={handleSubmit} className="max-w-3xl mx-auto space-y-6">
         <Breadcrumbs crumbs={
           isEditing
@@ -764,18 +769,32 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
                                     <div className="flex gap-2">
                                       <input type="number" step="any" value={item.amount ?? ''} onChange={e => updateIngredientItem(gi, ii, { amount: Number(e.target.value) })} className={`${inputClass} !w-16 shrink-0`} placeholder={lang === 'he' ? 'כמות' : 'Qty'} />
                                       <input value={item.unit ?? ''} onChange={e => updateIngredientItem(gi, ii, { unit: e.target.value })} className={`${inputClass} !w-16 shrink-0`} placeholder={lang === 'he' ? 'יחידה' : 'Unit'} />
+                                      {!item.linkedRecipeId && (
+                                        <button type="button" onClick={() => setLinkPickerFor({ gi, ii })} title={lang === 'he' ? 'קשר למתכון' : 'Link to recipe'} className="shrink-0 text-cream/30 hover:text-amber text-xs px-1">
+                                          🔗
+                                        </button>
+                                      )}
                                       <button type="button" onClick={() => removeIngredientItem(gi, ii)} className="shrink-0 text-red-400/60 hover:text-red-400 text-xs px-1">✕</button>
                                     </div>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                      <input {...fieldBindings(`ing-${item._key}`, item.name, v => updateIngredientItem(gi, ii, { name: v }), `ingEn-${item._key}`, item.nameEn ?? '', v => updateIngredientItem(gi, ii, { nameEn: v }), 'en')} className={inputClass} placeholder={lang === 'he' ? 'שם (עברית)' : 'Name (Hebrew)'} dir="rtl" />
-                                      <input {...fieldBindings(`ingEn-${item._key}`, item.nameEn ?? '', v => updateIngredientItem(gi, ii, { nameEn: v }), `ing-${item._key}`, item.name, v => updateIngredientItem(gi, ii, { name: v }), 'he')} className={inputClass} placeholder={lang === 'he' ? 'שם (אנגלית)' : 'Name (English)'} />
-                                    </div>
+                                    {item.linkedRecipeId ? (
+                                      <LinkedIngredientDisplay
+                                        recipeId={item.linkedRecipeId}
+                                        onUnlink={() => updateIngredientItem(gi, ii, { linkedRecipeId: undefined })}
+                                      />
+                                    ) : (
+                                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                        <input {...fieldBindings(`ing-${item._key}`, item.name, v => updateIngredientItem(gi, ii, { name: v }), `ingEn-${item._key}`, item.nameEn ?? '', v => updateIngredientItem(gi, ii, { nameEn: v }), 'en')} className={inputClass} placeholder={lang === 'he' ? 'שם (עברית)' : 'Name (Hebrew)'} dir="rtl" />
+                                        <input {...fieldBindings(`ingEn-${item._key}`, item.nameEn ?? '', v => updateIngredientItem(gi, ii, { nameEn: v }), `ing-${item._key}`, item.name, v => updateIngredientItem(gi, ii, { name: v }), 'he')} className={inputClass} placeholder={lang === 'he' ? 'שם (אנגלית)' : 'Name (English)'} />
+                                      </div>
+                                    )}
                                   </div>
-                                  <RegenerateButton
-                                    lang={lang}
-                                    busy={regenerating.has(`ing-${item._key}`)}
-                                    onClick={() => regenerateTranslation(`ing-${item._key}`, item.name, item.nameEn ?? '', v => updateIngredientItem(gi, ii, { name: v }), v => updateIngredientItem(gi, ii, { nameEn: v }))}
-                                  />
+                                  {!item.linkedRecipeId && (
+                                    <RegenerateButton
+                                      lang={lang}
+                                      busy={regenerating.has(`ing-${item._key}`)}
+                                      onClick={() => regenerateTranslation(`ing-${item._key}`, item.name, item.nameEn ?? '', v => updateIngredientItem(gi, ii, { name: v }), v => updateIngredientItem(gi, ii, { nameEn: v }))}
+                                    />
+                                  )}
                                 </div>
                               )}
                             </SortableRow>
@@ -795,6 +814,17 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft }: R
             + {lang === 'he' ? 'הוסף קבוצת רכיבים' : 'Add ingredient group'}
           </button>
         </div>
+
+        {linkPickerFor && (
+          <RecipeLinkPicker
+            excludeId={existing?.id}
+            onSelect={recipe => {
+              updateIngredientItem(linkPickerFor.gi, linkPickerFor.ii, { linkedRecipeId: recipe.id, name: '', nameEn: '' })
+              setLinkPickerFor(null)
+            }}
+            onClose={() => setLinkPickerFor(null)}
+          />
+        )}
 
         {/* Steps */}
         <div className="card p-5 space-y-4">

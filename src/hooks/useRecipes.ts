@@ -40,7 +40,10 @@ export async function deleteRecipe(id: string, getToken: () => Promise<string | 
     method: 'DELETE',
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   })
-  if (!res.ok) throw new ApiError(res.status, 'Failed to delete recipe')
+  if (!res.ok) {
+    const message = await res.json().then(d => d.message).catch(() => undefined)
+    throw new ApiError(res.status, Array.isArray(message) ? message.join(', ') : message ?? 'Failed to delete recipe')
+  }
 }
 
 async function postAction(path: string, getToken: () => Promise<string | null>, body?: unknown): Promise<Recipe> {
@@ -86,6 +89,33 @@ export function useMyRecipes(enabled = true) {
 
     reload()
       .catch(() => { /* stale badge/list is a minor annoyance, not worth surfacing an error for */ })
+      .finally(() => { if (!cancelled) setLoading(false) })
+
+    const unsubscribe = onRecipeStatusChanged(() => { reload().catch(() => {}) })
+    return () => { cancelled = true; unsubscribe() }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoaded, isSignedIn, enabled, getToken])
+
+  return { recipes, loading, reload }
+}
+
+// Bulk-AI drafts the user hasn't reviewed/saved yet - powers the
+// "drafts in progress" panel on the recipe editor.
+export function usePendingDrafts(enabled = true) {
+  const { getToken, isLoaded, isSignedIn } = useAuth()
+  const [recipes, setRecipes] = useState<Recipe[]>([])
+  const [loading, setLoading] = useState(true)
+
+  function reload() {
+    return apiFetch<Recipe[]>('/recipes/pending', getToken).then(data => setRecipes(data))
+  }
+
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn || !enabled) return
+    let cancelled = false
+
+    reload()
+      .catch(() => { /* stale panel is a minor annoyance, not worth surfacing an error for */ })
       .finally(() => { if (!cancelled) setLoading(false) })
 
     const unsubscribe = onRecipeStatusChanged(() => { reload().catch(() => {}) })

@@ -280,6 +280,17 @@ export class RecipesService implements OnModuleInit {
     return recipes.map(r => r.toObject())
   }
 
+  // Bulk-AI drafts the user hasn't reviewed/saved yet - the "drafts in
+  // progress" panel's data source. Ordered by batch so one bulk-generate
+  // call's recipes stay grouped, then by creation order within a batch.
+  async findPending(userId: string) {
+    const recipes = await this.recipeModel
+      .find({ ownerId: userId, pendingReview: true, deletedAt: { $exists: false } })
+      .sort({ batchId: 1, createdAt: 1 })
+      .exec()
+    return recipes.map(r => r.toObject())
+  }
+
   private async generateUniqueSlug(title: string): Promise<string> {
     const base = slugify(title) || 'recipe'
     let candidate = base
@@ -302,10 +313,16 @@ export class RecipesService implements OnModuleInit {
     })
   }
 
-  async createDraft(userId: string, dto: SaveRecipeDraftDto): Promise<RecipeDocument> {
+  async createDraft(
+    userId: string,
+    dto: SaveRecipeDraftDto,
+    opts: { pendingReview?: boolean; batchId?: string } = {},
+  ): Promise<RecipeDocument> {
+    await this.assertLinksResolve(dto.ingredients)
     const slug = await this.generateUniqueSlug(dto.title)
     const recipe = await this.recipeModel.create({
       ...dto, sources: dedupeSources(dto.sources), slug, ownerId: userId, status: 'draft', currentRevision: 1,
+      pendingReview: opts.pendingReview ?? false, batchId: opts.batchId,
     })
     await this.saveNewRevision(recipe, userId)
     await this.activityLogService.record(userId, recipe.id, 'recipe_created')
@@ -338,6 +355,8 @@ export class RecipesService implements OnModuleInit {
   // whichever revision number ended up stored on it.
   async updateDraft(id: string, userId: string, isAdmin: boolean, dto: SaveRecipeDraftDto): Promise<RecipeDocument> {
     const recipe = await this.getEditableOrThrow(id, userId, isAdmin)
+    await this.assertLinksResolve(dto.ingredients)
+    await this.assertNoCycle(id, dto.ingredients)
     // Editing a rejected recipe means the owner is addressing the feedback -
     // clear the rejected state so it isn't stuck showing "rejected" forever.
     const wasRejected = recipe.status === 'rejected'
@@ -346,7 +365,7 @@ export class RecipesService implements OnModuleInit {
     // what the request body contains.
     const aiLock = recipe.aiGenerated ? { aiGenerated: true, sources: recipe.sources } : {}
     const update: Record<string, unknown> = {
-      $set: { ...dto, sources: dedupeSources(dto.sources), ...aiLock, ...(wasRejected ? { status: 'draft' } : {}) },
+      $set: { ...dto, sources: dedupeSources(dto.sources), ...aiLock, pendingReview: false, ...(wasRejected ? { status: 'draft' } : {}) },
       $inc: { currentRevision: 1 },
     }
     if (wasRejected) update.$unset = { reviewComment: '' }
@@ -377,6 +396,7 @@ export class RecipesService implements OnModuleInit {
     if (missing.length > 0) {
       throw new BadRequestException(`Cannot submit for review, missing/invalid: ${missing.join(', ')}`)
     }
+    await this.assertLinksPublishable(id)
 
     await this.activityLogService.record(userId, id, 'recipe_submitted_for_review')
     const review = await this.qualityService.review(recipe.toObject())
@@ -389,6 +409,7 @@ export class RecipesService implements OnModuleInit {
       )
       recipe.publishedRevision = recipe.currentRevision
       recipe.status = 'published'
+      recipe.pendingReview = false
       recipe.reviewComment = undefined
       recipe.qualityReview = review
       await recipe.save()
@@ -401,6 +422,112 @@ export class RecipesService implements OnModuleInit {
       await this.activityLogService.record(userId, id, 'recipe_rejected', { score: review.score })
     }
     return recipe
+  }
+
+  private extractLinkedIds(ingredients: { items: { linkedRecipeId?: string }[] }[]): string[] {
+    return [...new Set(ingredients.flatMap(g => (g.items ?? []).map(i => i.linkedRecipeId).filter((v): v is string => !!v)))]
+  }
+
+  // Every linkedRecipeId in the payload must resolve to a real, non-deleted
+  // recipe - the link picker only ever offers already-persisted recipes, so
+  // this should be structurally unreachable from the UI; it's a defensive
+  // backend check (also catches a link target removed after being linked).
+  private async assertLinksResolve(ingredients?: { items: { linkedRecipeId?: string }[] }[]): Promise<void> {
+    const ids = this.extractLinkedIds(ingredients ?? [])
+    if (ids.length === 0) return
+    let found: { _id: unknown }[]
+    try {
+      found = await this.recipeModel.find({ _id: { $in: ids }, deletedAt: { $exists: false } }).select('_id').lean().exec()
+    } catch (err) {
+      if (isCastError(err)) found = []
+      else throw err
+    }
+    const foundIds = new Set(found.map(r => String(r._id)))
+    const missing = ids.filter(id => !foundIds.has(id))
+    if (missing.length > 0) {
+      throw new BadRequestException(`Cannot save: linked recipe(s) not found: ${missing.join(', ')}`)
+    }
+  }
+
+  // A recipe's own linked ingredients, read fresh from the database (used
+  // while walking the link graph - not the in-memory document being saved).
+  private async linkedIdsOf(id: string): Promise<string[]> {
+    let recipe: { ingredients?: { items: { linkedRecipeId?: string }[] }[] } | null
+    try {
+      recipe = await this.recipeModel.findOne({ _id: id, deletedAt: { $exists: false } }).select('ingredients').lean().exec() as unknown as { ingredients?: { items: { linkedRecipeId?: string }[] }[] } | null
+    } catch (err) {
+      if (isCastError(err)) return []
+      throw err
+    }
+    if (!recipe) return []
+    return this.extractLinkedIds(recipe.ingredients ?? [])
+  }
+
+  // BFS over the linkedRecipeId graph starting from `startIds`, depth-capped
+  // to guard against a runaway walk from bad data.
+  // Stops as soon as `stopAt` is discovered, without querying its own links -
+  // once the target is reachable the cycle is already proven, so there's no
+  // need to keep walking (and, for a target that's the recipe being saved,
+  // no need to re-fetch the in-flight document from the database).
+  private async walkLinkedRecipes(startIds: string[], stopAt?: string): Promise<Set<string>> {
+    const visited = new Set<string>()
+    let frontier = [...new Set(startIds)]
+    let depth = 0
+    while (frontier.length > 0 && depth < 50) {
+      const next: string[] = []
+      for (const id of frontier) {
+        if (visited.has(id)) continue
+        visited.add(id)
+        if (id === stopAt) return visited
+        next.push(...(await this.linkedIdsOf(id)))
+      }
+      frontier = next
+      depth += 1
+    }
+    return visited
+  }
+
+  // Only meaningful on update - a brand-new recipe has no id yet for
+  // anything else to reference, so it can't already be part of a cycle.
+  private async assertNoCycle(recipeId: string, ingredients?: { items: { linkedRecipeId?: string }[] }[]): Promise<void> {
+    const directLinks = this.extractLinkedIds(ingredients ?? [])
+    if (directLinks.length === 0) return
+    const reachable = await this.walkLinkedRecipes(directLinks, recipeId)
+    if (reachable.has(recipeId)) {
+      throw new BadRequestException('This would create a circular recipe link')
+    }
+  }
+
+  // Walks this recipe's linked ingredients transitively (reusing the same
+  // graph walk the cycle-detection guard uses) and confirms every reachable
+  // recipe is published - a recipe can't go live while something it depends
+  // on as an ingredient isn't publicly visible yet.
+  private async assertLinksPublishable(recipeId: string): Promise<void> {
+    const directLinks = await this.linkedIdsOf(recipeId)
+    if (directLinks.length === 0) return
+    const reachable = await this.walkLinkedRecipes(directLinks)
+    let linked: { _id: unknown; publishedRevision?: number | null; title?: string }[]
+    try {
+      linked = await this.recipeModel
+        .find({ _id: { $in: [...reachable] }, deletedAt: { $exists: false } })
+        .select('publishedRevision title')
+        .lean()
+        .exec()
+    } catch (err) {
+      if (isCastError(err)) linked = []
+      else throw err
+    }
+    // A reachable id that doesn't come back at all (hard-missing, or filtered
+    // out as soft-deleted) is just as unpublishable as one that came back
+    // with no publishedRevision - it must not silently pass the guard by
+    // being absent from the results. It has no title, so it's named by id.
+    const foundIds = new Set(linked.map(r => String(r._id)))
+    const missingIds = [...reachable].filter(id => !foundIds.has(id))
+    const unpublished = linked.filter(r => r.publishedRevision == null)
+    const names = [...unpublished.map(r => r.title), ...missingIds]
+    if (names.length > 0) {
+      throw new BadRequestException(`Cannot publish: linked recipe(s) not yet published: ${names.join(', ')}`)
+    }
   }
 
   private missingRequiredFields(recipe: RecipeDocument): string[] {
@@ -419,14 +546,14 @@ export class RecipesService implements OnModuleInit {
     // hard deterministic rule. Whether a missing unit is actually a problem
     // ("1 milk" is ambiguous, "1 clove" isn't) is a judgment call left to
     // the AI quality review instead.
-    const ingredientGroups = (recipe.ingredients ?? []) as { items?: { name?: string }[] }[]
+    const ingredientGroups = (recipe.ingredients ?? []) as { items?: { name?: string; linkedRecipeId?: string }[] }[]
     if (ingredientGroups.length === 0) {
       missing.push('ingredients')
     } else {
       const hasIncompleteItem = ingredientGroups.some(g =>
-        !g.items || g.items.length === 0 || g.items.some(item => !item.name?.trim())
+        !g.items || g.items.length === 0 || g.items.some(item => !item.name?.trim() && !item.linkedRecipeId)
       )
-      if (hasIncompleteItem) missing.push('ingredients (every item needs a name)')
+      if (hasIncompleteItem) missing.push('ingredients (every item needs a name or a linked recipe)')
     }
 
     const stepGroups = (recipe.steps ?? []) as { items?: { instruction?: string }[] }[]
@@ -497,6 +624,10 @@ export class RecipesService implements OnModuleInit {
     }
     if (recipe.ownerId && recipe.ownerId !== userId && !isAdmin) {
       throw new ForbiddenException('Only the owner or an admin can delete this recipe')
+    }
+    const isLinkedElsewhere = await this.recipeModel.exists({ 'ingredients.items.linkedRecipeId': id, deletedAt: { $exists: false } })
+    if (isLinkedElsewhere) {
+      throw new ForbiddenException('This recipe is used as a linked ingredient in another recipe and cannot be deleted')
     }
     recipe.deletedAt = new Date()
     await recipe.save()
