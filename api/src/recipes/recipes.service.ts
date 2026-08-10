@@ -582,6 +582,10 @@ export class RecipesService implements OnModuleInit {
   async remove(id: string, userId: string, isAdmin: boolean): Promise<void> {
     const recipe = await this.recipeModel.findOne({ _id: id }).exec()
     if (!recipe) return
+    const isLinkedElsewhere = await this.recipeModel.exists({ 'ingredients.items.linkedRecipeId': id, deletedAt: { $exists: false } })
+    if (isLinkedElsewhere) {
+      throw new ForbiddenException('This recipe is used as a linked ingredient in another recipe and cannot be deleted')
+    }
     if (recipe.publishedRevision != null) {
       throw new ForbiddenException('A recipe that has ever been published can never be deleted')
     }

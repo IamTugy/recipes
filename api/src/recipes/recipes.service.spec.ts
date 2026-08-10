@@ -745,8 +745,9 @@ describe('RecipesService', () => {
     const recipe: { status: string; ownerId: string; publishedRevision: undefined; save: jest.Mock; deletedAt?: Date } =
       { status: 'draft', ownerId: 'user_1', publishedRevision: undefined, save: jest.fn().mockResolvedValue(undefined) }
     const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
+    const exists = jest.fn().mockResolvedValue(false)
     const deleteOne = jest.fn()
-    const service = await makeService({ findOne, deleteOne })
+    const service = await makeService({ findOne, exists, deleteOne })
     await service.remove('tomato-soup', 'user_1', false)
 
     expect(deleteOne).not.toHaveBeenCalled()
@@ -757,8 +758,9 @@ describe('RecipesService', () => {
   it('remove throws ForbiddenException for an ever-published recipe regardless of admin status, and never deletes it', async () => {
     const recipe = { status: 'rejected', ownerId: 'user_1', publishedRevision: 1, save: jest.fn() }
     const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
+    const exists = jest.fn().mockResolvedValue(false)
     const deleteOne = jest.fn()
-    const service = await makeService({ findOne, deleteOne })
+    const service = await makeService({ findOne, exists, deleteOne })
 
     await expect(service.remove('tomato-soup', 'user_1', false)).rejects.toThrow(ForbiddenException)
     await expect(service.remove('tomato-soup', 'admin_1', true)).rejects.toThrow(ForbiddenException)
@@ -769,7 +771,8 @@ describe('RecipesService', () => {
   it('remove throws BadRequestException when the recipe is pending review', async () => {
     const recipe = { status: 'pending_review', ownerId: 'user_1', publishedRevision: undefined, save: jest.fn() }
     const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
-    const service = await makeService({ findOne })
+    const exists = jest.fn().mockResolvedValue(false)
+    const service = await makeService({ findOne, exists })
 
     await expect(service.remove('tomato-soup', 'user_1', false)).rejects.toThrow(BadRequestException)
     expect(recipe.save).not.toHaveBeenCalled()
@@ -778,7 +781,8 @@ describe('RecipesService', () => {
   it('remove throws ForbiddenException when a non-owner, non-admin tries to soft-delete a draft', async () => {
     const recipe = { status: 'draft', ownerId: 'user_1', publishedRevision: undefined, save: jest.fn() }
     const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
-    const service = await makeService({ findOne })
+    const exists = jest.fn().mockResolvedValue(false)
+    const service = await makeService({ findOne, exists })
 
     await expect(service.remove('tomato-soup', 'user_2', false)).rejects.toThrow(ForbiddenException)
     expect(recipe.save).not.toHaveBeenCalled()
@@ -787,10 +791,28 @@ describe('RecipesService', () => {
   it('remove logs a recipe_deleted event with a title/ownerId snapshot before soft-deleting', async () => {
     const recipe = { id: 'a', title: 'Tomato Soup', ownerId: 'user_1', status: 'draft', publishedRevision: null, save: jest.fn() }
     const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
+    const exists = jest.fn().mockResolvedValue(false)
     const activityLog = makeActivityLog()
-    const service = await makeService({ findOne }, undefined, undefined, activityLog)
+    const service = await makeService({ findOne, exists }, undefined, undefined, activityLog)
     await service.remove('a', 'user_1', false)
 
     expect(activityLog.record).toHaveBeenCalledWith('user_1', 'a', 'recipe_deleted', { title: 'Tomato Soup', ownerId: 'user_1' })
+  })
+
+  it('remove throws ForbiddenException when another recipe links to this one as an ingredient', async () => {
+    const recipe = { id: 'dough-recipe', title: 'Dough', ownerId: 'user_1', status: 'draft', publishedRevision: null, save: jest.fn() }
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
+    const exists = jest.fn().mockResolvedValue(true)
+    const service = await makeService({ findOne, exists })
+    await expect(service.remove('dough-recipe', 'user_1', false)).rejects.toThrow(ForbiddenException)
+    expect(exists).toHaveBeenCalledWith({ 'ingredients.items.linkedRecipeId': 'dough-recipe', deletedAt: { $exists: false } })
+  })
+
+  it('remove succeeds when no other recipe links to this one', async () => {
+    const recipe = { id: 'a', title: 'Solo', ownerId: 'user_1', status: 'draft', publishedRevision: null, save: jest.fn() }
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
+    const exists = jest.fn().mockResolvedValue(false)
+    const service = await makeService({ findOne, exists })
+    await expect(service.remove('a', 'user_1', false)).resolves.toBeUndefined()
   })
 })
