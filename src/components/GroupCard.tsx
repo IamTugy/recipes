@@ -12,11 +12,23 @@ interface GroupCardProps {
   imageLoading?: 'eager' | 'lazy'
 }
 
+function thumbnailGridClass(count: number): string {
+  switch (count) {
+    case 1:
+      return ''
+    case 2:
+      return 'grid grid-cols-2 grid-rows-1'
+    default:
+      return 'grid grid-cols-2 grid-rows-2'
+  }
+}
+
 export default function GroupCard({ group, index, onSelect, imageLoading }: GroupCardProps) {
   const { lang } = useLanguage()
   const tx = t[lang]
   const name = (lang === 'he' ? group.nameHe : group.name) ?? group.name
   const thumbs = group.previewRecipes.slice(0, 4)
+  const thumbGridClass = thumbnailGridClass(thumbs.length)
 
   return (
     <motion.div
@@ -27,7 +39,7 @@ export default function GroupCard({ group, index, onSelect, imageLoading }: Grou
     >
       <button type="button" onClick={() => onSelect(group.id)} className="block group h-full w-full text-start">
         <div className="card overflow-hidden h-full flex flex-col">
-          <div className="relative h-52 sm:h-60 overflow-hidden grid grid-cols-2 grid-rows-2 gap-0.5">
+          <div className={`relative h-52 sm:h-60 overflow-hidden gap-0.5 ${thumbGridClass}`}>
             {thumbs.map(recipe => (
               recipe.image?.includes('assets.tugy.dev') ? (
                 <SkeletonImage

@@ -467,19 +467,19 @@ export class RecipesService implements OnModuleInit {
     await this.activityLogService.record(userId, id, 'ai_quality_review_used')
 
     if (review.score >= RecipesService.PUBLISH_THRESHOLD) {
-      await this.revisionModel.updateOne(
-        { recipeId: id, revisionNumber: recipe.currentRevision },
-        { $set: { published: true } },
-      )
+      const group = await this.groupingService.assignGroup(recipe)
+      recipe.dishGroupId = group.id
+      recipe.dishGroupName = group.name
+      recipe.dishGroupNameHe = group.nameHe
       recipe.publishedRevision = recipe.currentRevision
       recipe.status = 'published'
       recipe.pendingReview = false
       recipe.reviewComment = undefined
       recipe.qualityReview = review
-      const group = await this.groupingService.assignGroup(recipe)
-      recipe.dishGroupId = group.id
-      recipe.dishGroupName = group.name
-      recipe.dishGroupNameHe = group.nameHe
+      await this.revisionModel.updateOne(
+        { recipeId: id, revisionNumber: recipe.currentRevision },
+        { $set: { published: true } },
+      )
       await recipe.save()
       await this.activityLogService.record(userId, id, 'recipe_published')
       await this.activityLogService.record(userId, id, 'recipe_dish_group_assigned', { dishGroupId: group.id })
