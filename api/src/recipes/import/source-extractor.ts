@@ -17,7 +17,7 @@ export interface ImportedRecipe {
   cookTime?: number
   servings?: number
   difficulty?: string
-  ingredients?: { group?: string; groupEn?: string; items: { amount?: number; unit?: string; name: string; nameEn?: string }[] }[]
+  ingredients?: { group?: string; groupEn?: string; items: { amount?: number; unit?: string; name: string; nameEn?: string; linkedRecipeId?: string }[] }[]
   steps?: { title?: string; titleEn?: string; items: { instruction: string; instructionEn?: string; timerMinutes?: number }[] }[]
   tips?: string[]
   tipsEn?: string[]

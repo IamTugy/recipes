@@ -142,4 +142,30 @@ describe('RecipeImportService', () => {
     geminiService.generateStructured.mockRejectedValue(new Error('Gemini quota exceeded'))
     await expect(service.importFromText('some text')).rejects.toThrow('Gemini quota exceeded')
   })
+
+  it('resolveLinks asks Gemini for matches and returns them', async () => {
+    geminiService.generateStructured.mockResolvedValue({
+      links: [{ recipeIndex: 0, groupIndex: 0, itemIndex: 0, linkToExistingId: 'existing-1' }],
+    })
+    const recipes = [{ title: 'Spring Rolls', ingredients: [{ items: [{ name: 'dipping sauce' }] }] }]
+    const candidates = [{ id: 'existing-1', title: 'Peanut Dipping Sauce' }]
+
+    const result = await service.resolveLinks(recipes, candidates)
+
+    expect(result).toEqual([{ recipeIndex: 0, groupIndex: 0, itemIndex: 0, linkToExistingId: 'existing-1' }])
+    expect(geminiService.generateStructured).toHaveBeenCalledWith(expect.stringContaining('dipping sauce'))
+    expect(geminiService.generateStructured).toHaveBeenCalledWith(expect.stringContaining('Peanut Dipping Sauce'))
+  })
+
+  it('resolveLinks skips the Gemini call entirely for a single recipe with no existing candidates', async () => {
+    const result = await service.resolveLinks([{ title: 'Spring Rolls' }], [])
+    expect(result).toEqual([])
+    expect(geminiService.generateStructured).not.toHaveBeenCalled()
+  })
+
+  it('resolveLinks returns an empty array when Gemini finds no matches', async () => {
+    geminiService.generateStructured.mockResolvedValue({ links: [] })
+    const result = await service.resolveLinks([{ title: 'A' }, { title: 'B' }], [])
+    expect(result).toEqual([])
+  })
 })

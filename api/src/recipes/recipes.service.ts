@@ -204,6 +204,24 @@ export class RecipesService implements OnModuleInit {
     return { ...plain, ...revision.snapshot }
   }
 
+  // Minimal id/title projection of every recipe the given user could
+  // plausibly want to link an ingredient to: their own (published or not)
+  // plus everyone else's published ones. Used by AI import/generate to spot
+  // an ingredient that's really a reference to a whole other recipe. Capped
+  // well above what any real library size needs, to keep the Gemini prompt
+  // built from this list bounded.
+  async findLinkCandidates(userId: string): Promise<{ id: string; title: string; titleHe?: string }[]> {
+    const recipes = await this.recipeModel
+      .find(
+        { $or: [{ ownerId: userId }, { publishedRevision: { $ne: null }, hidden: { $ne: true } }], deletedAt: { $exists: false } },
+        { title: 1, titleHe: 1 },
+      )
+      .limit(500)
+      .lean()
+      .exec()
+    return recipes.map(r => ({ id: String(r._id), title: r.title, titleHe: r.titleHe }))
+  }
+
   async findAll() {
     const recipes = await this.recipeModel.find({ hidden: { $ne: true }, publishedRevision: { $ne: null } }).exec()
     const plain = await Promise.all(recipes.map(r => this.overlayPublishedSnapshot(r)))

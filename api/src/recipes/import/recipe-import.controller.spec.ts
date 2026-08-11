@@ -9,8 +9,9 @@ describe('RecipeImportController', () => {
     importFromUrl: jest.fn(),
     importFromFile: jest.fn(),
     importFromImage: jest.fn(),
+    resolveLinks: jest.fn(),
   }
-  const recipesService = { createDraft: jest.fn() }
+  const recipesService = { createDraft: jest.fn(), updateDraft: jest.fn(), findLinkCandidates: jest.fn() }
   const activityLog = { record: jest.fn() }
   const controller = new RecipeImportController(
     importService as unknown as RecipeImportService,
@@ -18,7 +19,11 @@ describe('RecipeImportController', () => {
     activityLog as any,
   )
 
-  beforeEach(() => jest.clearAllMocks())
+  beforeEach(() => {
+    jest.clearAllMocks()
+    recipesService.findLinkCandidates.mockResolvedValue([])
+    importService.resolveLinks.mockResolvedValue([])
+  })
 
   it('imports from text when only text is provided', async () => {
     importService.importFromText.mockResolvedValue([{ title: 'Soup' }])
@@ -107,9 +112,9 @@ describe('RecipeImportController', () => {
       { title: 'Pho' },
     ])
     recipesService.createDraft
-      .mockResolvedValueOnce({ toObject: () => ({ id: 'a', title: 'Salad' }) })
-      .mockResolvedValueOnce({ toObject: () => ({ id: 'b', title: 'Spring Rolls' }) })
-      .mockResolvedValueOnce({ toObject: () => ({ id: 'c', title: 'Pho' }) })
+      .mockResolvedValueOnce({ id: 'a', toObject: () => ({ id: 'a', title: 'Salad' }) })
+      .mockResolvedValueOnce({ id: 'b', toObject: () => ({ id: 'b', title: 'Spring Rolls' }) })
+      .mockResolvedValueOnce({ id: 'c', toObject: () => ({ id: 'c', title: 'Pho' }) })
     const file = { buffer: Buffer.from('x'), mimetype: 'application/pdf' } as Express.Multer.File
 
     const result = await controller.import({}, { userId: 'user_1' } as any, { file: [file] })
@@ -126,7 +131,7 @@ describe('RecipeImportController', () => {
       {}, // no title -> fails validation
       { title: 'Spring Rolls' },
     ])
-    recipesService.createDraft.mockResolvedValueOnce({ toObject: () => ({ id: 'b', title: 'Spring Rolls' }) })
+    recipesService.createDraft.mockResolvedValueOnce({ id: 'b', toObject: () => ({ id: 'b', title: 'Spring Rolls' }) })
     const file = { buffer: Buffer.from('x'), mimetype: 'application/pdf' } as Express.Multer.File
 
     const result = await controller.import({}, { userId: 'user_1' } as any, { file: [file] })
@@ -141,5 +146,51 @@ describe('RecipeImportController', () => {
 
     await expect(controller.import({}, { userId: 'user_1' } as any, { file: [file] })).rejects.toThrow(BadRequestException)
     expect(recipesService.createDraft).not.toHaveBeenCalled()
+  })
+
+  it('links a single imported recipe\'s ingredient to an existing app recipe when a confident match is found', async () => {
+    importService.importFromText.mockResolvedValue([
+      { title: 'Spring Rolls', ingredients: [{ items: [{ name: 'dipping sauce' }] }] },
+    ])
+    recipesService.findLinkCandidates.mockResolvedValue([{ id: 'existing-1', title: 'Peanut Dipping Sauce' }])
+    importService.resolveLinks.mockResolvedValue([
+      { recipeIndex: 0, groupIndex: 0, itemIndex: 0, linkToExistingId: 'existing-1' },
+    ])
+
+    const result = await controller.import({ text: 'spring rolls recipe' }, { userId: 'user_1' } as any, undefined)
+
+    expect(importService.resolveLinks).toHaveBeenCalledWith(
+      [{ title: 'Spring Rolls', ingredients: [{ items: [{ name: 'dipping sauce', linkedRecipeId: 'existing-1' }] }] }],
+      [{ id: 'existing-1', title: 'Peanut Dipping Sauce' }],
+    )
+    expect(result).toEqual({ title: 'Spring Rolls', ingredients: [{ items: [{ name: 'dipping sauce', linkedRecipeId: 'existing-1' }] }] })
+  })
+
+  it('links a dish to its sauce within the same batch after both are created', async () => {
+    importService.importFromFile.mockResolvedValue([
+      { title: 'Spring Rolls', ingredients: [{ items: [{ name: 'dipping sauce' }] }] },
+      { title: 'Dipping Sauce', ingredients: [{ items: [{ name: 'fish sauce' }] }] },
+    ])
+    importService.resolveLinks.mockResolvedValue([
+      { recipeIndex: 0, groupIndex: 0, itemIndex: 0, linkToRecipeIndex: 1 },
+    ])
+    recipesService.createDraft
+      .mockResolvedValueOnce({ id: 'rolls-id', toObject: () => ({ id: 'rolls-id', title: 'Spring Rolls' }) })
+      .mockResolvedValueOnce({ id: 'sauce-id', toObject: () => ({ id: 'sauce-id', title: 'Dipping Sauce' }) })
+    recipesService.updateDraft.mockResolvedValue({ toObject: () => ({ id: 'rolls-id', title: 'Spring Rolls', linked: true }) })
+    const file = { buffer: Buffer.from('x'), mimetype: 'application/pdf' } as Express.Multer.File
+
+    const result = await controller.import({}, { userId: 'user_1' } as any, { file: [file] })
+
+    expect(recipesService.updateDraft).toHaveBeenCalledWith(
+      'rolls-id',
+      'user_1',
+      false,
+      expect.objectContaining({ ingredients: [{ items: [{ name: 'dipping sauce', linkedRecipeId: 'sauce-id' }] }] }),
+    )
+    expect(result).toEqual([
+      { id: 'rolls-id', title: 'Spring Rolls', linked: true },
+      { id: 'sauce-id', title: 'Dipping Sauce' },
+    ])
   })
 })

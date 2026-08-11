@@ -2,6 +2,16 @@ import { Injectable, BadRequestException } from '@nestjs/common'
 import { GeminiService } from '../../ai/gemini.service'
 import { extractFromUrl, extractFromPdf, extractFromDocx, isSocialMediaUrl, extractTikTokOembed, type ImportedRecipe } from './source-extractor'
 
+// Mutates recipe.ingredients[groupIndex].items[itemIndex].linkedRecipeId in
+// place - shared by any caller applying a LinkMatch (recipe import,
+// AI-generate). Out-of-range indices (a hallucinated match) are silently
+// ignored rather than throwing, since a missed/bad link is a no-op, not a
+// failure worth failing the whole batch over.
+export function applyRecipeLink(recipe: ImportedRecipe, groupIndex: number, itemIndex: number, linkedRecipeId: string): void {
+  const item = recipe.ingredients?.[groupIndex]?.items?.[itemIndex]
+  if (item) item.linkedRecipeId = linkedRecipeId
+}
+
 const RECIPE_SHAPE = `{
   "title": "string, English title (required)",
   "titleHe": "string, Hebrew title",
@@ -56,9 +66,53 @@ interface MultiRecipeResponse {
   recipes: ImportedRecipe[]
 }
 
+export interface LinkCandidate {
+  id: string
+  title: string
+  titleHe?: string
+}
+
+export interface LinkMatch {
+  recipeIndex: number
+  groupIndex: number
+  itemIndex: number
+  linkToRecipeIndex?: number
+  linkToExistingId?: string
+}
+
+const LINK_MATCH_PROMPT = `You are matching recipe ingredients to other whole recipes. You're given a batch of recipes (0-indexed) and a list of existing recipes already saved in the app. Find ingredient items that actually refer to another whole recipe as a component - e.g. an ingredient item named "dipping sauce" or "pizza dough" where that's really a reference to a separate recipe for that sauce/dough, not just a plain ingredient. Only match when you're genuinely confident: a plain ingredient that happens to share a word with an existing recipe's title is NOT a match (e.g. "chicken stock" as a measured ingredient should not match a recipe titled "Chicken Stock" unless the dish's own text makes clear it means the prepared component). A recipe never links to itself, and never link two items to each other in a cycle.
+
+For every confident match, add one entry to a "links" array:
+{"recipeIndex": <index into "recipes" of the recipe whose ingredient links out>, "groupIndex": <its ingredient group index>, "itemIndex": <item index within that group>, "linkToRecipeIndex": <index into "recipes", if the match is another recipe in this same batch> OR "linkToExistingId": <id string, if the match is one of the existing app recipes>}
+
+Return ONLY JSON: {"links": [...]}. If there are no confident matches, return {"links": []}.
+
+Recipes in this batch:
+`
+
 @Injectable()
 export class RecipeImportService {
   constructor(private readonly gemini: GeminiService) {}
+
+  // Only worth a Gemini call when there's more than one recipe to
+  // cross-reference within the batch, or an existing library to match
+  // against - a single freshly-imported recipe with no existing recipes to
+  // compare to has nothing to link.
+  async resolveLinks(recipes: ImportedRecipe[], candidates: LinkCandidate[]): Promise<LinkMatch[]> {
+    if (recipes.length < 2 && candidates.length === 0) return []
+    const recipeSummaries = recipes.map((r, index) => ({
+      index,
+      title: r.title,
+      titleHe: r.titleHe,
+      ingredients: (r.ingredients ?? []).map((g, groupIndex) => ({
+        groupIndex,
+        items: (g.items ?? []).map((item, itemIndex) => ({ itemIndex, name: item.name, nameEn: item.nameEn })),
+      })),
+    }))
+    const prompt = `${LINK_MATCH_PROMPT}${JSON.stringify(recipeSummaries)}\n\nExisting recipes already in the app:\n${JSON.stringify(candidates)}`
+    const { links } = await this.gemini.generateStructured<{ links?: LinkMatch[] }>(prompt)
+    return links ?? []
+  }
 
   async importFromText(text: string): Promise<ImportedRecipe[]> {
     const { recipes } = await this.gemini.generateStructured<MultiRecipeResponse>(`${EXTRACTION_PROMPT}${text}`)
