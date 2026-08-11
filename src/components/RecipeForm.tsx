@@ -25,7 +25,6 @@ import LinkedIngredientDisplay from './LinkedIngredientDisplay'
 
 interface RecipeFormProps {
   existing?: Recipe
-  duplicateFrom?: Recipe
   importedDraft?: ImportedRecipe
   // The last AI review's findings, shown as a checklist while editing so
   // issues without an auto-applied suggestedFields fix (e.g. "photo is
@@ -124,18 +123,17 @@ function RegenerateButton({ lang, busy, onClick }: { lang: 'he' | 'en'; busy: bo
   )
 }
 
-export default function RecipeForm({ existing, duplicateFrom, importedDraft, reviewFindings, autoFixedFieldKeys }: RecipeFormProps) {
+export default function RecipeForm({ existing, importedDraft, reviewFindings, autoFixedFieldKeys }: RecipeFormProps) {
   const navigate = useNavigate()
   const { getToken } = useAuth()
   const { lang } = useLanguage()
   const { showToast } = useToast()
   const tx = t[lang]
   const isEditing = !!existing
-  const prefill = existing ?? duplicateFrom ?? importedDraft
-  const titlePrefix = duplicateFrom ? (lang === 'he' ? 'העתק של ' : 'Copy of ') : ''
+  const prefill = existing ?? importedDraft
 
-  const [title, setTitle] = useState(prefill ? `${titlePrefix}${prefill.title}` : '')
-  const [titleHe, setTitleHe] = useState(prefill?.titleHe ? `${titlePrefix}${prefill.titleHe}` : '')
+  const [title, setTitle] = useState(prefill?.title ?? '')
+  const [titleHe, setTitleHe] = useState(prefill?.titleHe ?? '')
   const [category, setCategory] = useState<Category>(prefill?.category ?? 'dinner')
   const [difficulty, setDifficulty] = useState<Difficulty>(prefill?.difficulty ?? 'easy')
   const [kosherType, setKosherType] = useState<KosherType | ''>(prefill?.kosherType ?? '')
@@ -528,9 +526,7 @@ export default function RecipeForm({ existing, duplicateFrom, importedDraft, rev
           <h1 className="font-serif text-2xl font-bold text-cream">
             {isEditing
               ? (lang === 'he' ? 'עריכת מתכון' : 'Edit Recipe')
-              : duplicateFrom
-                ? (lang === 'he' ? 'שכפול מתכון' : 'Duplicate Recipe')
-                : (lang === 'he' ? 'מתכון חדש' : 'New Recipe')}
+              : (lang === 'he' ? 'מתכון חדש' : 'New Recipe')}
           </h1>
           <div className="flex items-center gap-1 shrink-0">
             <button

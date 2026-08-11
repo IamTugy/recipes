@@ -1,5 +1,4 @@
-import { useSearchParams, useLocation, useNavigate } from 'react-router-dom'
-import { useRecipe } from '../hooks/useRecipes'
+import { useLocation, useNavigate } from 'react-router-dom'
 import RecipeForm from './RecipeForm'
 import { useLanguage } from '../hooks/useLanguage'
 import type { ImportedRecipe } from '../lib/recipeImport'
@@ -14,21 +13,10 @@ function bookmarkletHref(origin: string) {
 }
 
 export default function NewRecipePage() {
-  const [searchParams] = useSearchParams()
   const location = useLocation()
   const navigate = useNavigate()
-  const fromSlug = searchParams.get('from') ?? undefined
   const { lang } = useLanguage()
-  const { recipe, loading } = useRecipe(fromSlug)
   const importedDraft = (location.state as { importedDraft?: ImportedRecipe } | null)?.importedDraft
-
-  if (fromSlug && loading) {
-    return <div className="min-h-dvh bg-bg pt-20 px-4 text-center text-cream/30 text-sm">{lang === 'he' ? 'טוען...' : 'Loading...'}</div>
-  }
-
-  if (fromSlug) {
-    return <RecipeForm duplicateFrom={recipe} />
-  }
 
   if (importedDraft) {
     return <RecipeForm importedDraft={importedDraft} />

@@ -79,6 +79,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
   const [checkedSteps, setCheckedSteps] = useState<Set<string>>(new Set())
   const [checkedIngredients, setCheckedIngredients] = useState<Set<string>>(new Set())
   const [userRating, setUserRating] = useState<number | null>(null)
+  const [hoverRating, setHoverRating] = useState<number | null>(null)
   const [shareState, setShareState] = useState<'idle' | 'copied'>('idle')
   const [noteInput, setNoteInput] = useState('')
   const [reviews, setReviews] = useState<Review[]>([])
@@ -923,10 +924,16 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                 )}
               </button>
 
-              <div className="flex items-center">
+              <div className="flex items-center" onMouseLeave={() => setHoverRating(null)}>
                 {[1, 2, 3, 4, 5].map(n => (
-                  <button type="button" key={n} onClick={() => rate(n)} className="text-2xl leading-none p-1">
-                    <span className={n <= (userRating ?? 0) ? 'text-amber' : 'text-cream/20'}>★</span>
+                  <button
+                    type="button"
+                    key={n}
+                    onClick={() => rate(n)}
+                    onMouseEnter={() => setHoverRating(n)}
+                    className="text-2xl leading-none p-1"
+                  >
+                    <span className={n <= (hoverRating ?? userRating ?? 0) ? 'text-amber' : 'text-cream/20'}>★</span>
                   </button>
                 ))}
                 {!!recipe.averageRating && (
@@ -1088,16 +1095,6 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
               {lang === 'he' ? 'הדפס' : 'Print'}
             </button>
 
-
-            <button type="button"
-              onClick={() => navigate(`/recipes/new?from=${id}`)}
-              className="flex items-center gap-1.5 text-sm font-medium text-cream/40 hover:text-cream/70 transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-              </svg>
-              {lang === 'he' ? 'שכפל' : 'Duplicate'}
-            </button>
 
             {(isAdmin || (isOwner && recipe.publishedRevision == null)) && (
               <button type="button"

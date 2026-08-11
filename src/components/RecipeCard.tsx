@@ -60,9 +60,8 @@ export default function RecipeCard({
             ) : (
               <RecipePlaceholder recipe={recipe} />
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-card/95 via-card/30 to-transparent" />
             <div className="absolute top-3 left-3 flex items-center gap-1.5">
-              <span className="tag flex items-center gap-1">
+              <span className="flex items-center gap-1 h-9 sm:h-7 px-2.5 rounded-full backdrop-blur-sm border bg-black/30 border-white/20 text-white/80 text-xs font-medium">
                 <span>{categoryEmoji[recipe.category]}</span>
                 <span>{tx.categories[recipe.category]}</span>
               </span>
