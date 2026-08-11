@@ -16,6 +16,7 @@ import EditRecipePage from './components/EditRecipePage'
 import FeatureRequestsPage from './components/FeatureRequestsPage'
 import MyRecipesPage from './components/MyRecipesPage'
 import SubmissionsPage from './components/SubmissionsPage'
+import JobsPage from './components/JobsPage'
 import MealPlanPage from './components/MealPlanPage'
 import ChefProfilePage from './components/ChefProfilePage'
 import LeaderboardPage from './components/LeaderboardPage'
@@ -156,6 +157,7 @@ export default function App() {
           <Route path="/feature-requests" element={<FeatureRequestsPage />} />
           <Route path="/my-recipes" element={<MyRecipesPage />} />
           <Route path="/submissions" element={<SubmissionsPage />} />
+          <Route path="/jobs" element={<JobsPage />} />
           <Route path="/meal-plan" element={<MealPlanPage onAddToShoppingList={shoppingList.addItems} />} />
           <Route path="/chef/:userId" element={<ChefProfilePage />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />

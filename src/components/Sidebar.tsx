@@ -58,6 +58,7 @@ export default function Sidebar({ sidebar }: SidebarProps) {
       path: '/submissions',
       icon: <span className="w-4 h-4 flex items-center justify-center text-sm">✅</span>,
     },
+    { key: 'jobs', label: tx.jobs, path: '/jobs', icon: <span className="w-4 h-4 flex items-center justify-center text-sm">⏳</span> },
   ]
 
   function renderLink(link: SidebarLinkDef, showLabel: boolean, onNavigate?: () => void) {
