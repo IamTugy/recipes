@@ -98,6 +98,9 @@ export interface Recipe {
   currentRevision?: number
   publishedRevision?: number | null
   qualityReview?: QualityReview
+  duplicateReview?: DuplicateReview
+  disputeStatus?: 'none' | 'pending' | 'approved' | 'denied'
+  disputeMessage?: string
   pendingReview?: boolean
   batchId?: string
 }
@@ -114,6 +117,14 @@ export interface QualityReview {
   checkedAt: string
   findings: QualityFinding[]
   suggestedFields?: Record<string, unknown>
+}
+
+export interface DuplicateReview {
+  isDuplicate: boolean
+  matchedRecipeId: string
+  matchedRecipeTitle: string
+  reason: string
+  checkedAt: string
 }
 
 export interface RecipeRevision {

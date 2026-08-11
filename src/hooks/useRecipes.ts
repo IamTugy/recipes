@@ -74,6 +74,18 @@ export async function submitForReview(id: string, getToken: () => Promise<string
   return recipe
 }
 
+export async function disputeDuplicate(id: string, message: string | undefined, getToken: () => Promise<string | null>): Promise<Recipe> {
+  const recipe = await postAction(`/recipes/${id}/dispute-duplicate`, getToken, message ? { message } : undefined)
+  notifyRecipeStatusChanged()
+  return recipe
+}
+
+export async function resolveDuplicateDispute(id: string, approve: boolean, getToken: () => Promise<string | null>): Promise<Recipe> {
+  const recipe = await postAction(`/recipes/${id}/dispute-duplicate/resolve`, getToken, { approve })
+  notifyRecipeStatusChanged()
+  return recipe
+}
+
 export function useMyRecipes(enabled = true) {
   const { getToken, isLoaded, isSignedIn } = useAuth()
   const [recipes, setRecipes] = useState<Recipe[]>([])
@@ -116,6 +128,34 @@ export function usePendingDrafts(enabled = true) {
 
     reload()
       .catch(() => { /* stale panel is a minor annoyance, not worth surfacing an error for */ })
+      .finally(() => { if (!cancelled) setLoading(false) })
+
+    const unsubscribe = onRecipeStatusChanged(() => { reload().catch(() => {}) })
+    return () => { cancelled = true; unsubscribe() }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoaded, isSignedIn, enabled, getToken])
+
+  return { recipes, loading, reload }
+}
+
+// Admin-only: recipes with a pending duplicate-block dispute. The backend
+// itself 403s a non-owner call - this hook is only ever mounted from the
+// owner-gated section of SubmissionsPage.
+export function useDuplicateDisputes(enabled = true) {
+  const { getToken, isLoaded, isSignedIn } = useAuth()
+  const [recipes, setRecipes] = useState<Recipe[]>([])
+  const [loading, setLoading] = useState(true)
+
+  function reload() {
+    return apiFetch<Recipe[]>('/recipes/disputes', getToken).then(data => setRecipes(data))
+  }
+
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn || !enabled) return
+    let cancelled = false
+
+    reload()
+      .catch(() => { /* stale admin panel is a minor annoyance, not worth surfacing an error for */ })
       .finally(() => { if (!cancelled) setLoading(false) })
 
     const unsubscribe = onRecipeStatusChanged(() => { reload().catch(() => {}) })
