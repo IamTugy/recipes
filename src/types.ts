@@ -103,6 +103,9 @@ export interface Recipe {
   disputeMessage?: string
   pendingReview?: boolean
   batchId?: string
+  dishGroupId?: string
+  dishGroupName?: string
+  dishGroupNameHe?: string
 }
 
 export interface QualityFinding {

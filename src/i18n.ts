@@ -439,6 +439,11 @@ export const t = {
       ownerSDisputeMessage: 'הודעת הבעלים:',
       disputeApprovedTitle: 'הערעור שלכם אושר',
       disputeApprovedIntro: 'ניתן להגיש שוב לבדיקה.',
+      groupSameDish: 'קבץ מנות זהות',
+      dishGroupCount: (n: number) => `${n} מתכונים`,
+      dishGroupTapToSeeAll: 'הקישו לצפייה בכל המתכונים',
+      showingDishGroup: (name: string, count: number) => `מציג את קבוצת "${name}" (${count} מתכונים)`,
+      clearGroupFilter: 'נקה קבוצה',
 },
   en: {
     siteTitle: "Tugy's Cookbook",
@@ -845,6 +850,11 @@ export const t = {
     ownerSDisputeMessage: "Owner's message:",
     disputeApprovedTitle: 'Your dispute was approved',
     disputeApprovedIntro: 'You can submit for review again.',
+    groupSameDish: 'Group same dish',
+    dishGroupCount: (n: number) => `${n} recipes`,
+    dishGroupTapToSeeAll: 'Tap to see all recipes',
+    showingDishGroup: (name: string, count: number) => `Showing "${name}" (${count} recipes)`,
+    clearGroupFilter: 'Clear group',
 },
 }
 
