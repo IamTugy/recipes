@@ -10,6 +10,7 @@ import RecipeCardSkeleton from './RecipeCardSkeleton'
 import RecipePlaceholder from './RecipePlaceholder'
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll'
 import { resizedImage } from '../lib/image'
+import TranslatedText from './TranslatedText'
 import SkeletonImage from './SkeletonImage'
 
 const categories: Category[] = ['breakfast', 'lunch', 'dinner', 'dessert', 'salad', 'soup', 'snack', 'bread', 'sauce']
@@ -248,7 +249,6 @@ export default function MyRecipesPage() {
             {paged.map(r => {
               const status = (r.status ?? 'published') as StatusFilter
               const showBadge = !(status === 'published' && r.currentRevision === r.publishedRevision)
-              const displayTitle = lang === 'he' ? (r.titleHe ?? r.title) : r.title
               return (
                 <li key={r.id}>
                   <button type="button"
@@ -264,7 +264,10 @@ export default function MyRecipesPage() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium text-cream truncate" dir={lang === 'he' ? 'rtl' : 'ltr'}>
-                        {displayTitle}
+                        <TranslatedText
+                          primary={lang === 'he' ? r.titleHe : r.title}
+                          secondary={lang === 'he' ? r.title : r.titleHe}
+                        />
                       </p>
                       <p className="text-[11px] text-cream/30 flex items-center gap-1.5">
                         <span>{categoryEmoji[r.category]} {tx.categories[r.category]}</span>

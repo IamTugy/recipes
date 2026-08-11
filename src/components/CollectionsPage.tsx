@@ -5,6 +5,7 @@ import { useRecipes } from '../hooks/useRecipes'
 import { useLanguage } from '../hooks/useLanguage'
 import { useToast } from '../hooks/useToast'
 import { resizedImage } from '../lib/image'
+import TranslatedText from './TranslatedText'
 import SkeletonImage from './SkeletonImage'
 
 interface CollectionsPageProps {
@@ -161,16 +162,21 @@ export default function CollectionsPage({ onAddToShoppingList }: CollectionsPage
                     {col.recipeIds.map(slug => {
                       const r = recipes.find(rec => rec.id === slug)
                       if (!r) return null
-                      const title = lang === 'he' ? (r.titleHe ?? r.title) : r.title
+                      const altFallback = lang === 'he' ? (r.titleHe ?? r.title) : r.title
                       return (
                         <div key={slug} className="group relative">
                           <Link to={`/recipes/${slug}`}>
                             <div className="relative h-24 rounded-xl overflow-hidden mb-2 bg-tint/[0.04]">
                               {r.image?.includes('assets.tugy.dev') && (
-                                <SkeletonImage src={resizedImage(r.image, 320)} alt={title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+                                <SkeletonImage src={resizedImage(r.image, 320)} alt={altFallback} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
                               )}
                             </div>
-                            <p className="text-xs text-cream/70 line-clamp-1">{title}</p>
+                            <p className="text-xs text-cream/70 line-clamp-1">
+                              <TranslatedText
+                                primary={lang === 'he' ? r.titleHe : r.title}
+                                secondary={lang === 'he' ? r.title : r.titleHe}
+                              />
+                            </p>
                           </Link>
                           <button type="button"
                             onClick={() => removeRecipe(col._id, slug)}

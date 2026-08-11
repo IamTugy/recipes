@@ -28,6 +28,8 @@ import ConfirmDialog from './ConfirmDialog'
 import type { TimerState, RecipeRevision, QualityReview } from '../types'
 import { resizedImage } from '../lib/image'
 import SkeletonImage from './SkeletonImage'
+import { useTranslatedText } from '../hooks/useTranslatedText'
+import TranslatedText from './TranslatedText'
 
 interface RecipeDetailProps {
   onAddTimer: (label: string, minutes: number, recipeId: string, stepIndex: number) => void
@@ -498,14 +500,20 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
     : []
 
 
-  const displayTitle = lang === 'he' ? (displayRecipe.titleHe ?? displayRecipe.title) : displayRecipe.title
-  const displaySubtitle = lang === 'he' ? displayRecipe.title : displayRecipe.titleHe
-  const displayDescription = lang === 'he'
-    ? displayRecipe.description
-    : (displayRecipe.descriptionEn ?? displayRecipe.description)
-  const displayTips = lang === 'he'
-    ? (displayRecipe.tips ?? [])
-    : (displayRecipe.tipsEn ?? displayRecipe.tips ?? [])
+  const { text: displayTitle, loading: titleLoading } = useTranslatedText(
+    lang === 'he' ? displayRecipe.titleHe : displayRecipe.title,
+    lang === 'he' ? displayRecipe.title : displayRecipe.titleHe,
+  )
+  const { text: displayDescription, loading: descriptionLoading } = useTranslatedText(
+    lang === 'he' ? displayRecipe.description : displayRecipe.descriptionEn,
+    lang === 'he' ? displayRecipe.descriptionEn : displayRecipe.description,
+  )
+  // tips/tipsEn are parallel arrays (line N of one corresponds to line N of
+  // the other, same as how they're edited in RecipeForm) - the longer of
+  // the two decides how many rows to render, and each row is translated
+  // independently via TranslatedText below if its own-language line is
+  // missing.
+  const displayTipsCount = Math.max(displayRecipe.tips?.length ?? 0, displayRecipe.tipsEn?.length ?? 0)
 
   const relatedRecipes = allRecipes
     .filter(r => r.id !== recipe.id && r.category === displayRecipe.category && !r.hidden)
@@ -608,6 +616,8 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
       stepIdx: si,
       stepNum: stepNums[gi][si],
       instruction: lang === 'he' ? step.instruction : (step.instructionEn ?? step.instruction),
+      instructionHe: step.instruction,
+      instructionEn: step.instructionEn,
       tip: lang === 'he' ? step.tip : (step.tipEn ?? step.tip),
       timerMinutes: step.timerMinutes,
       image: step.image,
@@ -623,7 +633,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
   const sectionNavItems = [
     displayRecipe.ingredients.length > 0 && { id: 'ingredients-heading', label: tx.ingredients, emoji: '🥕' },
     flatSteps.length > 0 && { id: 'steps-heading', label: tx.instructions, emoji: '📋' },
-    displayTips.length > 0 && { id: 'tips-heading', label: tx.tipsTitle, emoji: '💡' },
+    displayTipsCount > 0 && { id: 'tips-heading', label: tx.tipsTitle, emoji: '💡' },
     { id: 'my-notes-heading', label: lang === 'he' ? 'ההערות שלי' : 'My Notes', emoji: '📝' },
     isViewingPublishedContent && { id: 'reviews-heading', label: lang === 'he' ? 'ביקורות' : 'Reviews', emoji: '💬' },
   ].filter((s): s is { id: string; label: string; emoji: string } => !!s)
@@ -820,16 +830,8 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
             className="font-serif text-3xl sm:text-4xl font-bold text-cream leading-tight mb-1"
             dir={lang === 'he' ? 'rtl' : 'ltr'}
           >
-            {displayTitle}
+            {titleLoading ? <span className="inline-block h-8 w-2/3 bg-tint/10 rounded animate-pulse" /> : displayTitle}
           </h1>
-          {displaySubtitle && (
-            <p
-              className="text-cream/40 text-lg mb-3"
-              dir={lang === 'he' ? 'ltr' : 'rtl'}
-            >
-              {displaySubtitle}
-            </p>
-          )}
           {recipe.status === 'published' && recipe.ownerName && (
             <p className="text-cream/30 text-xs mb-3">
               {lang === 'he' ? 'פורסם על ידי ' : 'Published by '}
@@ -842,7 +844,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
             className="text-cream/70 text-base leading-relaxed mb-5"
             dir={lang === 'he' ? 'rtl' : 'ltr'}
           >
-            {displayDescription}
+            {descriptionLoading ? <span className="inline-block h-4 w-full bg-tint/10 rounded animate-pulse" /> : displayDescription}
           </p>
 
           {recipe.source && (
@@ -1160,18 +1162,19 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
             <h2 id="ingredients-heading" className="font-serif text-xl font-bold text-cream mb-4 scroll-mt-20">{tx.ingredients}</h2>
             <div className="space-y-4">
               {displayRecipe.ingredients.map((group, gi) => {
-                const groupLabel = lang === 'he' ? (group.group || group.groupEn) : (group.groupEn || group.group)
+                const hasGroupLabel = !!(group.group || group.groupEn)
                 return (
                   <div key={gi}>
-                    {groupLabel && (
+                    {hasGroupLabel && (
                       <h3 className="text-amber text-xs font-semibold uppercase tracking-wider mb-2">
-                        {groupLabel}
+                        <TranslatedText
+                          primary={lang === 'he' ? group.group : group.groupEn}
+                          secondary={lang === 'he' ? group.groupEn : group.group}
+                        />
                       </h3>
                     )}
                     <ul className="space-y-2">
                       {group.items.map((item, ii) => {
-                        const itemName = lang === 'he' ? item.name : (item.nameEn ?? item.name)
-                        const itemNote = lang === 'he' ? item.note : (item.noteEn ?? item.note)
                         const ingredientKey = `${gi}-${ii}`
                         const checked = checkedIngredients.has(ingredientKey)
                         return (
@@ -1209,8 +1212,20 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                               })()}
                             </span>
                             <span className={`transition-colors ${checked ? 'text-cream/30 line-through' : 'text-cream/70'}`}>
-                              {itemName}
-                              {itemNote && <span className="text-cream/40 italic"> ({itemNote})</span>}
+                              <TranslatedText
+                                primary={lang === 'he' ? item.name : item.nameEn}
+                                secondary={lang === 'he' ? item.nameEn : item.name}
+                              />
+                              {(item.note || item.noteEn) && (
+                                <span className="text-cream/40 italic">
+                                  {' ('}
+                                  <TranslatedText
+                                    primary={lang === 'he' ? item.note : item.noteEn}
+                                    secondary={lang === 'he' ? item.noteEn : item.note}
+                                  />
+                                  {')'}
+                                </span>
+                              )}
                             </span>
                           </li>
                         )
@@ -1244,12 +1259,15 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
             </div>
             <div className="space-y-6">
               {displayRecipe.steps.map((group, gi) => {
-                const groupTitle = lang === 'he' ? (group.title || group.titleEn) : (group.titleEn || group.title)
+                const hasGroupTitle = !!(group.title || group.titleEn)
                 return (
                   <div key={gi}>
-                    {groupTitle && (
+                    {hasGroupTitle && (
                       <h3 className="text-amber text-xs font-semibold uppercase tracking-wider mb-3">
-                        {groupTitle}
+                        <TranslatedText
+                          primary={lang === 'he' ? group.title : group.titleEn}
+                          secondary={lang === 'he' ? group.titleEn : group.title}
+                        />
                       </h3>
                     )}
                     <div className="space-y-3">
@@ -1258,10 +1276,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                         const checked = checkedSteps.has(stepKey)
                         const existingTimer = getTimerForStep(gi, si)
                         const stepNum = stepNums[gi][si]
-                        const instruction = lang === 'he'
-                          ? step.instruction
-                          : (step.instructionEn ?? step.instruction)
-                        const tip = lang === 'he' ? step.tip : (step.tipEn ?? step.tip)
+                        const hasTip = !!(step.tip || step.tipEn)
 
                         return (
                           <motion.div
@@ -1296,7 +1311,10 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                                   }`}
                                   dir={lang === 'he' ? 'rtl' : 'ltr'}
                                 >
-                                  {instruction}
+                                  <TranslatedText
+                                    primary={lang === 'he' ? step.instruction : step.instructionEn}
+                                    secondary={lang === 'he' ? step.instructionEn : step.instruction}
+                                  />
                                 </p>
 
                                 {step.image && (
@@ -1312,10 +1330,14 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                                   </div>
                                 )}
 
-                                {tip && !checked && (
+                                {hasTip && !checked && (
                                   <p className="mt-2 text-xs text-amber/70 flex items-start gap-1.5">
                                     <span className="mt-0.5">💡</span>
-                                    <span dir={lang === 'he' ? 'rtl' : 'ltr'}>{tip}</span>
+                                    <TranslatedText
+                                      as="span"
+                                      primary={lang === 'he' ? step.tip : step.tipEn}
+                                      secondary={lang === 'he' ? step.tipEn : step.tip}
+                                    />
                                   </p>
                                 )}
 
@@ -1341,11 +1363,17 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                                       </div>
                                     ) : (
                                       <button type="button"
-                                        onClick={() => startTimer(
-                                          `${stepNum}: ${instruction.length > 40 ? instruction.slice(0, 40) + '…' : instruction}`,
-                                          step.timerMinutes!,
-                                          gi, si
-                                        )}
+                                        onClick={() => {
+                                          // The timer label is a plain string needed synchronously on click - it
+                                          // uses whatever's already available (no live-translate wait) since it's
+                                          // a secondary, transient bit of UI, not the main reading content.
+                                          const label = lang === 'he' ? step.instruction : (step.instructionEn ?? step.instruction)
+                                          startTimer(
+                                            `${stepNum}: ${label.length > 40 ? label.slice(0, 40) + '…' : label}`,
+                                            step.timerMinutes!,
+                                            gi, si
+                                          )
+                                        }}
                                         className="btn-ghost text-xs flex items-center gap-1.5"
                                       >
                                         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1370,16 +1398,19 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
         </div>
 
         {/* Tips */}
-        {displayTips.length > 0 && (
+        {displayTipsCount > 0 && (
           <div className="mt-8 card p-5 print:mt-6 print:p-0 print:border-0 print:border-t print:border-tint/15 print:pt-4 print:rounded-none print:bg-transparent print:break-inside-avoid">
             <h2 id="tips-heading" className="font-serif text-lg font-bold text-cream mb-3 flex items-center gap-2 scroll-mt-20">
               <span>💡</span> {tx.tipsTitle}
             </h2>
             <ul className="space-y-2">
-              {displayTips.map((tip, i) => (
+              {Array.from({ length: displayTipsCount }).map((_, i) => (
                 <li key={i} className="flex gap-2 text-sm text-cream/70" dir={lang === 'he' ? 'rtl' : 'ltr'}>
                   <span className="text-amber/60 shrink-0 mt-0.5">-</span>
-                  <span>{tip}</span>
+                  <TranslatedText
+                    primary={lang === 'he' ? displayRecipe.tips?.[i] : displayRecipe.tipsEn?.[i]}
+                    secondary={lang === 'he' ? displayRecipe.tipsEn?.[i] : displayRecipe.tips?.[i]}
+                  />
                 </li>
               ))}
             </ul>
@@ -1698,14 +1729,14 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {relatedRecipes.map(r => {
-                const title = lang === 'he' ? (r.titleHe ?? r.title) : r.title
+                const altFallback = lang === 'he' ? (r.titleHe ?? r.title) : r.title
                 return (
                   <Link key={r.id} to={`/recipes/${r.id}`} className="group">
                     <div className="relative h-24 rounded-xl overflow-hidden mb-2">
                       {r.image?.includes('assets.tugy.dev') ? (
                         <SkeletonImage
                           src={resizedImage(r.image, 320)}
-                          alt={title}
+                          alt={altFallback}
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                           loading="lazy"
                         />
@@ -1716,7 +1747,10 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                       )}
                     </div>
                     <p className="text-xs text-cream/70 group-hover:text-amber transition-colors line-clamp-2" dir={lang === 'he' ? 'rtl' : 'ltr'}>
-                      {title}
+                      <TranslatedText
+                        primary={lang === 'he' ? r.titleHe : r.title}
+                        secondary={lang === 'he' ? r.title : r.titleHe}
+                      />
                     </p>
                   </Link>
                 )
@@ -1764,7 +1798,10 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                 {checked ? '✓' : step.stepNum}
               </div>
               <p className="max-w-lg text-xl sm:text-2xl leading-relaxed text-cream">
-                {step.instruction}
+                <TranslatedText
+                  primary={lang === 'he' ? step.instructionHe : step.instructionEn}
+                  secondary={lang === 'he' ? step.instructionEn : step.instructionHe}
+                />
               </p>
               {step.image && (
                 <img

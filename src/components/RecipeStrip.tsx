@@ -4,6 +4,7 @@ import { categoryEmoji } from '../i18n'
 import { useLanguage } from '../hooks/useLanguage'
 import { resizedImage } from '../lib/image'
 import SkeletonImage from './SkeletonImage'
+import TranslatedText from './TranslatedText'
 
 interface RecipeStripProps {
   title: string
@@ -31,14 +32,16 @@ export default function RecipeStrip({ title, recipes, loading }: RecipeStripProp
       ) : (
       <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-none">
         {recipes.map(r => {
-          const recipeTitle = lang === 'he' ? (r.titleHe ?? r.title) : r.title
+          // Just for the alt attribute (not visible) - the actual displayed
+          // title below goes through TranslatedText instead.
+          const altFallback = lang === 'he' ? (r.titleHe ?? r.title) : r.title
           return (
             <Link key={r.id} to={`/recipes/${r.id}`} className="shrink-0 w-32 group">
               <div className="relative h-20 w-32 rounded-lg overflow-hidden mb-1.5">
                 {r.image?.includes('assets.tugy.dev') ? (
                   <SkeletonImage
                     src={resizedImage(r.image, 320)}
-                    alt={recipeTitle}
+                    alt={altFallback}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     loading="lazy"
                   />
@@ -49,7 +52,10 @@ export default function RecipeStrip({ title, recipes, loading }: RecipeStripProp
                 )}
               </div>
               <p className="text-xs text-cream/70 group-hover:text-amber transition-colors line-clamp-1" dir={lang === 'he' ? 'rtl' : 'ltr'}>
-                {recipeTitle}
+                <TranslatedText
+                  primary={lang === 'he' ? r.titleHe : r.title}
+                  secondary={lang === 'he' ? r.title : r.titleHe}
+                />
               </p>
             </Link>
           )

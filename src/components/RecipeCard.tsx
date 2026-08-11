@@ -4,6 +4,7 @@ import type { Recipe } from '../types'
 import { formatTime, isRecentlyAdded } from '../utils/format'
 import { t, categoryEmoji, difficultyColor } from '../i18n'
 import { useLanguage } from '../hooks/useLanguage'
+import { useTranslatedText } from '../hooks/useTranslatedText'
 import Highlight from './Highlight'
 import RecipePlaceholder from './RecipePlaceholder'
 import SkeletonImage from './SkeletonImage'
@@ -30,11 +31,14 @@ export default function RecipeCard({
   const tx = t[lang]
   const totalTime = recipe.prepTime + recipe.cookTime
 
-  const displayTitle = lang === 'he' ? (recipe.titleHe ?? recipe.title) : recipe.title
-  const displaySubtitle = lang === 'he' ? recipe.title : recipe.titleHe
-  const displayDescription = lang === 'he'
-    ? recipe.description
-    : (recipe.descriptionEn ?? recipe.description)
+  const { text: displayTitle, loading: titleLoading } = useTranslatedText(
+    lang === 'he' ? recipe.titleHe : recipe.title,
+    lang === 'he' ? recipe.title : recipe.titleHe,
+  )
+  const { text: displayDescription, loading: descriptionLoading } = useTranslatedText(
+    lang === 'he' ? recipe.description : recipe.descriptionEn,
+    lang === 'he' ? recipe.descriptionEn : recipe.description,
+  )
   const displayTags = lang === 'he' ? recipe.tags : (recipe.tagsEn ?? recipe.tags)
   const isNew = isRecentlyAdded(recipe.createdAt)
 
@@ -119,21 +123,21 @@ export default function RecipeCard({
               className="font-serif text-lg font-medium text-cream leading-snug mb-0.5 group-hover:text-amber transition-colors line-clamp-1"
               dir={lang === 'he' ? 'rtl' : 'ltr'}
             >
-              <Highlight text={displayTitle} query={searchQuery} />
+              {titleLoading ? (
+                <span className="inline-block h-4 w-2/3 bg-tint/10 rounded animate-pulse" />
+              ) : (
+                <Highlight text={displayTitle} query={searchQuery} />
+              )}
             </h3>
-            {displaySubtitle && displaySubtitle !== displayTitle && (
-              <p
-                className="text-cream/25 text-[11px] mb-2 font-light tracking-wide"
-                dir={lang === 'he' ? 'ltr' : 'rtl'}
-              >
-                {displaySubtitle}
-              </p>
-            )}
             <p
               className="text-cream/50 text-xs leading-relaxed line-clamp-2 mb-3"
               dir={lang === 'he' ? 'rtl' : 'ltr'}
             >
-              <Highlight text={displayDescription} query={searchQuery} />
+              {descriptionLoading ? (
+                <span className="inline-block h-3 w-full bg-tint/10 rounded animate-pulse" />
+              ) : (
+                <Highlight text={displayDescription} query={searchQuery} />
+              )}
             </p>
 
             {/* Meta row */}
