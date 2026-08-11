@@ -10,6 +10,7 @@ import { CookLogService } from '../cook-log/cook-log.service'
 import { UsersService } from '../users/users.service'
 import { SaveRecipeDraftDto } from './dto/save-recipe-draft.dto'
 import { RecipeQualityService } from './quality/recipe-quality.service'
+import { RecipeSimilarityService, SimilaritySourceRecipe } from './similarity/recipe-similarity.service'
 
 function slugify(text: string): string {
   return text
@@ -72,6 +73,7 @@ export class RecipesService implements OnModuleInit {
     private readonly usersService: UsersService,
     private readonly config: ConfigService,
     private readonly qualityService: RecipeQualityService,
+    private readonly similarityService: RecipeSimilarityService,
   ) {}
 
   // One-time backfill: recipes seeded before the ownership/publish-workflow
@@ -417,6 +419,31 @@ export class RecipesService implements OnModuleInit {
     await this.assertLinksPublishable(id)
 
     await this.activityLogService.record(userId, id, 'recipe_submitted_for_review')
+
+    if (!recipe.duplicateCheckOverride) {
+      const candidates = await this.similarityService.findCandidates(recipe as unknown as SimilaritySourceRecipe, id)
+      if (candidates.length > 0) {
+        const verdict = await this.similarityService.judge(recipe as unknown as SimilaritySourceRecipe, candidates)
+        await this.activityLogService.record(userId, id, 'ai_duplicate_check_used')
+        if (verdict.isDuplicate && verdict.matchedRecipeId) {
+          const matched = candidates.find(c => c.id === verdict.matchedRecipeId)
+          recipe.status = 'rejected'
+          recipe.duplicateReview = {
+            isDuplicate: true,
+            matchedRecipeId: verdict.matchedRecipeId,
+            matchedRecipeTitle: matched?.title ?? '',
+            reason: verdict.reason,
+            checkedAt: new Date().toISOString(),
+          }
+          recipe.qualityReview = undefined
+          recipe.disputeStatus = 'none'
+          await recipe.save()
+          await this.activityLogService.record(userId, id, 'recipe_duplicate_blocked', { matchedRecipeId: verdict.matchedRecipeId })
+          return recipe
+        }
+      }
+    }
+
     const review = await this.qualityService.review(recipe.toObject())
     await this.activityLogService.record(userId, id, 'ai_quality_review_used')
 

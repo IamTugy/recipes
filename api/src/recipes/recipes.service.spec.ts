@@ -10,6 +10,7 @@ import { ActivityLogService } from '../activity-log/activity-log.service'
 import { CookLogService } from '../cook-log/cook-log.service'
 import { UsersService } from '../users/users.service'
 import { RecipeQualityService } from './quality/recipe-quality.service'
+import { RecipeSimilarityService } from './similarity/recipe-similarity.service'
 
 describe('RecipesService', () => {
   function makeActivityLog(viewCounts: Map<string, number> = new Map()) {
@@ -36,6 +37,10 @@ describe('RecipesService', () => {
     return { review: jest.fn().mockResolvedValue(review) }
   }
 
+  function makeSimilarityService(candidates: unknown[] = [], verdict: Record<string, unknown> = { isDuplicate: false, reason: 'not a duplicate' }) {
+    return { findCandidates: jest.fn().mockResolvedValue(candidates), judge: jest.fn().mockResolvedValue(verdict) }
+  }
+
   async function makeService(
     recipeModel: Record<string, unknown>,
     revisionModel: Record<string, unknown> = noRevisionFound(),
@@ -45,6 +50,7 @@ describe('RecipesService', () => {
     config: Record<string, unknown> = { get: jest.fn().mockReturnValue('owner_1') },
     usersService = makeUsers(),
     qualityService = makeQualityService(),
+    similarityService = makeSimilarityService(),
   ) {
     const moduleRef = await Test.createTestingModule({
       providers: [
@@ -57,6 +63,7 @@ describe('RecipesService', () => {
         { provide: UsersService, useValue: usersService },
         { provide: ConfigService, useValue: config },
         { provide: RecipeQualityService, useValue: qualityService },
+        { provide: RecipeSimilarityService, useValue: similarityService },
       ],
     }).compile()
     return moduleRef.get(RecipesService)
@@ -608,6 +615,74 @@ describe('RecipesService', () => {
     expect(recipe.status).toBe('rejected')
     expect(recipe.publishedRevision).toBeUndefined()
     expect(recipe.qualityReview).toEqual(review)
+  })
+
+  it('submitForReview does not call the duplicate judge when there are no candidates', async () => {
+    const recipe: any = completeRecipe()
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe), select: jest.fn().mockReturnThis(), lean: jest.fn().mockReturnThis() })
+    const updateOne = jest.fn().mockResolvedValue({})
+    const quality = makeQualityService({ score: 100, checkedAt: 'now', findings: [] })
+    const similarity = makeSimilarityService([])
+    const service = await makeService({ findOne }, { updateOne }, undefined, undefined, undefined, undefined, undefined, quality, similarity)
+
+    await service.submitForReview('a', 'user_1', false)
+
+    expect(similarity.findCandidates).toHaveBeenCalledWith(recipe, 'a')
+    expect(similarity.judge).not.toHaveBeenCalled()
+    expect(recipe.status).toBe('published')
+  })
+
+  it('submitForReview rejects and skips the quality review when the AI judges a duplicate', async () => {
+    const recipe: any = completeRecipe()
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe), select: jest.fn().mockReturnThis(), lean: jest.fn().mockReturnThis() })
+    const quality = makeQualityService()
+    const candidates = [{ id: 'other-1', title: 'Other Soup', titleHe: undefined, ingredients: [], steps: [] }]
+    const similarity = makeSimilarityService(candidates, { isDuplicate: true, matchedRecipeId: 'other-1', reason: 'same dish, rescaled' })
+    const service = await makeService({ findOne }, undefined, undefined, undefined, undefined, undefined, undefined, quality, similarity)
+
+    const result = await service.submitForReview('a', 'user_1', false)
+
+    expect(quality.review).not.toHaveBeenCalled()
+    expect(recipe.status).toBe('rejected')
+    expect(recipe.qualityReview).toBeUndefined()
+    expect(recipe.duplicateReview).toMatchObject({
+      isDuplicate: true,
+      matchedRecipeId: 'other-1',
+      matchedRecipeTitle: 'Other Soup',
+      reason: 'same dish, rescaled',
+    })
+    expect(recipe.save).toHaveBeenCalled()
+    expect(result).toBe(recipe)
+  })
+
+  it('submitForReview proceeds to the quality review when the AI judges no duplicate among candidates', async () => {
+    const recipe: any = completeRecipe()
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe), select: jest.fn().mockReturnThis(), lean: jest.fn().mockReturnThis() })
+    const updateOne = jest.fn().mockResolvedValue({})
+    const quality = makeQualityService({ score: 100, checkedAt: 'now', findings: [] })
+    const candidates = [{ id: 'other-1', title: 'Other Soup', titleHe: undefined, ingredients: [], steps: [] }]
+    const similarity = makeSimilarityService(candidates, { isDuplicate: false, reason: 'different dish' })
+    const service = await makeService({ findOne }, { updateOne }, undefined, undefined, undefined, undefined, undefined, quality, similarity)
+
+    await service.submitForReview('a', 'user_1', false)
+
+    expect(quality.review).toHaveBeenCalled()
+    expect(recipe.status).toBe('published')
+  })
+
+  it('submitForReview skips the duplicate check entirely when duplicateCheckOverride is set', async () => {
+    const recipe: any = completeRecipe({ duplicateCheckOverride: true })
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe), select: jest.fn().mockReturnThis(), lean: jest.fn().mockReturnThis() })
+    const updateOne = jest.fn().mockResolvedValue({})
+    const quality = makeQualityService({ score: 100, checkedAt: 'now', findings: [] })
+    const similarity = makeSimilarityService()
+    const service = await makeService({ findOne }, { updateOne }, undefined, undefined, undefined, undefined, undefined, quality, similarity)
+
+    await service.submitForReview('a', 'user_1', false)
+
+    expect(similarity.findCandidates).not.toHaveBeenCalled()
+    expect(quality.review).toHaveBeenCalled()
+    expect(recipe.status).toBe('published')
   })
 
   it('submitForReview throws BadRequestException listing missing required fields, without calling the AI', async () => {

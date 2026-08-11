@@ -123,6 +123,40 @@ export class Recipe {
     suggestedFields?: Record<string, unknown>
   }
 
+  // Result of the local-heuristic + AI duplicate check that runs before the
+  // quality review on submit. Only ever set when the AI judged this
+  // submission a duplicate - overwritten (not appended) on each
+  // resubmission, same "no history" tradeoff as qualityReview.
+  @Prop({ type: MongooseSchema.Types.Mixed })
+  duplicateReview?: {
+    isDuplicate: boolean
+    matchedRecipeId: string
+    matchedRecipeTitle: string
+    reason: string
+    checkedAt: string
+  }
+
+  // Dispute lifecycle for a duplicate-blocked submission. 'none' is also the
+  // resting state for a recipe that was never blocked at all.
+  @Prop({ enum: ['none', 'pending', 'approved', 'denied'], default: 'none' })
+  disputeStatus!: 'none' | 'pending' | 'approved' | 'denied'
+
+  @Prop()
+  disputeMessage?: string
+
+  @Prop()
+  disputeCreatedAt?: Date
+
+  @Prop()
+  disputeResolvedAt?: Date
+
+  // Set true only when an admin approves a dispute - permanently exempts
+  // this recipe document from future duplicate checks, since its content
+  // was already judged a false positive and re-submitting the same content
+  // shouldn't re-trigger the same block.
+  @Prop({ default: false })
+  duplicateCheckOverride!: boolean
+
   @Prop({ default: 0 })
   currentRevision!: number
 
