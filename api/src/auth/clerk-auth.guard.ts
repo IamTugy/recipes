@@ -78,8 +78,8 @@ export class ClerkAuthGuard implements CanActivate {
     try {
       const clerkUser = await this.clerkClient.users.getUser(userId)
       const email = clerkUser.emailAddresses[0]?.emailAddress ?? ''
-      const name = clerkUser.firstName ?? undefined
-      await this.usersService.upsertFromClerk(userId, email, name)
+      const name = [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(' ') || undefined
+      await this.usersService.upsertFromClerk(userId, email, name, clerkUser.imageUrl)
     } catch (err) {
       this.logger.error(`Failed to sync Clerk profile for user ${userId}`, err instanceof Error ? err.stack : err)
     }

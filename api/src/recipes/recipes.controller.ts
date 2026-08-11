@@ -44,11 +44,11 @@ export class RecipesController {
 
   @Get('chef/:userId')
   async chefProfile(@Param('userId') userId: string) {
-    const [recipes, names] = await Promise.all([
+    const [recipes, profiles] = await Promise.all([
       this.recipesService.findPublishedByOwner(userId),
-      this.usersService.namesByIds([userId]),
+      this.usersService.profilesByIds([userId]),
     ])
-    return { userId, name: names[userId] ?? null, recipes }
+    return { userId, name: profiles[userId]?.name ?? null, imageUrl: profiles[userId]?.imageUrl ?? null, recipes }
   }
 
   // Public "in progress" feed - any signed-in user can see recent AI review

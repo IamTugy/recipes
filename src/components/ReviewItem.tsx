@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { resizedImage } from '../lib/image'
 import SkeletonImage from './SkeletonImage'
+import Avatar from './Avatar'
 
 export interface Review {
   id: string
   userId: string
   userName: string | null
+  userImageUrl: string | null
   score: number
   comment: string
   photoUrl: string | null
@@ -20,6 +22,7 @@ interface Reply {
   id: string
   userId: string
   userName: string | null
+  userImageUrl: string | null
   text: string
   mentionedUserId: string | null
   mentionedName: string | null
@@ -159,6 +162,7 @@ export default function ReviewItem({ recipeId, review, lang, getToken, onOpenLig
   return (
     <li className="border-t border-tint/[0.06] pt-3 first:border-t-0 first:pt-0">
       <div className="flex items-center gap-2 mb-1">
+        <Avatar name={displayName(review.userName, lang)} imageUrl={review.userImageUrl} />
         <span className="text-xs font-semibold text-cream/60">{displayName(review.userName, lang)}</span>
         <span className="text-amber text-sm leading-none">
           {'★'.repeat(review.score)}
@@ -225,6 +229,7 @@ export default function ReviewItem({ recipeId, review, lang, getToken, onOpenLig
           {replies.map(reply => (
             <li key={reply.id}>
               <div className="flex items-center gap-2 mb-1">
+                <Avatar name={displayName(reply.userName, lang)} imageUrl={reply.userImageUrl} />
                 <span className="text-xs font-semibold text-cream/60">{displayName(reply.userName, lang)}</span>
                 <span className="text-cream/25 text-[11px]">
                   {new Date(reply.createdAt).toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-US')}

@@ -18,7 +18,7 @@ describe('RecipesController', () => {
     canViewDraftRevisions: jest.fn(),
     remove: jest.fn(),
   }
-  const usersService = { namesByIds: jest.fn().mockResolvedValue({}) }
+  const usersService = { namesByIds: jest.fn().mockResolvedValue({}), profilesByIds: jest.fn().mockResolvedValue({}) }
 
   function makeController(ownerUserId = 'admin_1') {
     const activityLog = { record: jest.fn(), trendingIds: jest.fn() }
@@ -105,22 +105,22 @@ describe('RecipesController', () => {
     expect(result).toEqual([{ id: 'a', title: 'Soup' }])
   })
 
-  it("GET /recipes/chef/:userId returns that owner's published recipes with their display name", async () => {
+  it("GET /recipes/chef/:userId returns that owner's published recipes with their display name and photo", async () => {
     recipesService.findPublishedByOwner.mockResolvedValue([{ slug: 'a' }])
-    usersService.namesByIds.mockResolvedValue({ user_1: 'Tugy' })
+    usersService.profilesByIds.mockResolvedValue({ user_1: { name: 'Tugy', imageUrl: 'https://img.clerk.dev/a.jpg' } })
     const controller = makeController()
     const result = await controller.chefProfile('user_1')
     expect(recipesService.findPublishedByOwner).toHaveBeenCalledWith('user_1')
-    expect(usersService.namesByIds).toHaveBeenCalledWith(['user_1'])
-    expect(result).toEqual({ userId: 'user_1', name: 'Tugy', recipes: [{ slug: 'a' }] })
+    expect(usersService.profilesByIds).toHaveBeenCalledWith(['user_1'])
+    expect(result).toEqual({ userId: 'user_1', name: 'Tugy', imageUrl: 'https://img.clerk.dev/a.jpg', recipes: [{ slug: 'a' }] })
   })
 
-  it("GET /recipes/chef/:userId returns a null name when the user has no display name on record", async () => {
+  it("GET /recipes/chef/:userId returns a null name/image when the user has no profile on record", async () => {
     recipesService.findPublishedByOwner.mockResolvedValue([])
-    usersService.namesByIds.mockResolvedValue({})
+    usersService.profilesByIds.mockResolvedValue({})
     const controller = makeController()
     const result = await controller.chefProfile('user_2')
-    expect(result).toEqual({ userId: 'user_2', name: null, recipes: [] })
+    expect(result).toEqual({ userId: 'user_2', name: null, imageUrl: null, recipes: [] })
   })
 
   it('GET /recipes/submissions returns the recent AI-review feed, annotated with owner display names', async () => {

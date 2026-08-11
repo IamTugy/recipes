@@ -24,13 +24,14 @@ export class RatingsController {
   @Get(':id/reviews')
   async reviews(@Param('id') id: string, @Req() req: Request & { userId: string }) {
     const reviews = await this.ratingsService.reviewsForRecipe(id)
-    const [replyCounts, names] = await Promise.all([
+    const [replyCounts, profiles] = await Promise.all([
       this.reviewRepliesService.countsByRatingIds(reviews.map(r => r.id)),
-      this.usersService.namesByIds(reviews.map(r => r.userId)),
+      this.usersService.profilesByIds(reviews.map(r => r.userId)),
     ])
     return reviews.map(r => ({
       ...r,
-      userName: names[r.userId] ?? null,
+      userName: profiles[r.userId]?.name ?? null,
+      userImageUrl: profiles[r.userId]?.imageUrl ?? null,
       upvoteCount: r.upvotes.length,
       upvotedByMe: r.upvotes.includes(req.userId),
       replyCount: replyCounts[r.id] ?? 0,
@@ -71,11 +72,12 @@ export class RatingsController {
   @Get(':id/:ratingId/replies')
   async listReplies(@Param('ratingId') ratingId: string, @Req() req: Request & { userId: string }) {
     const replies = await this.reviewRepliesService.listByRating(ratingId)
-    const names = await this.usersService.namesByIds(replies.map(r => r.userId))
+    const profiles = await this.usersService.profilesByIds(replies.map(r => r.userId))
     return replies.map(r => ({
       id: String(r._id),
       userId: r.userId,
-      userName: names[r.userId] ?? null,
+      userName: profiles[r.userId]?.name ?? null,
+      userImageUrl: profiles[r.userId]?.imageUrl ?? null,
       text: r.text,
       mentionedUserId: r.mentionedUserId ?? null,
       mentionedName: r.mentionedName ?? null,
@@ -92,7 +94,10 @@ export class RatingsController {
     @Body() body: ReplyToReviewDto,
     @Req() req: Request & { userId: string },
   ) {
-    const names = body.mentionedUserId ? await this.usersService.namesByIds([body.mentionedUserId]) : {}
+    const names: Record<string, string | undefined> = body.mentionedUserId
+      ? await this.usersService.namesByIds([body.mentionedUserId])
+      : {}
+    const ownProfile = await this.usersService.profilesByIds([req.userId])
     const reply = await this.reviewRepliesService.create(
       ratingId,
       id,
@@ -105,6 +110,8 @@ export class RatingsController {
     return {
       id: String(reply._id),
       userId: reply.userId,
+      userName: ownProfile[req.userId]?.name ?? null,
+      userImageUrl: ownProfile[req.userId]?.imageUrl ?? null,
       text: reply.text,
       mentionedUserId: reply.mentionedUserId ?? null,
       mentionedName: reply.mentionedName ?? null,

@@ -831,9 +831,12 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
             </p>
           )}
           {recipe.status === 'published' && recipe.ownerName && (
-            <Link to={`/chef/${recipe.ownerId}`} className="inline-block text-cream/30 hover:text-cream/60 text-xs mb-3 transition-colors">
-              {lang === 'he' ? `פורסם על ידי ${recipe.ownerName}` : `Published by ${recipe.ownerName}`}
-            </Link>
+            <p className="text-cream/30 text-xs mb-3">
+              {lang === 'he' ? 'פורסם על ידי ' : 'Published by '}
+              <Link to={`/chef/${recipe.ownerId}`} className="text-cream/50 hover:text-amber underline decoration-cream/20 hover:decoration-amber underline-offset-2 transition-colors">
+                {recipe.ownerName}
+              </Link>
+            </p>
           )}
           <p
             className="text-cream/70 text-base leading-relaxed mb-5"

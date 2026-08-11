@@ -104,4 +104,38 @@ describe('UsersService', () => {
     )
     expect(result).toEqual({ lang: 'en', theme: undefined })
   })
+
+  it('profilesByIds returns a map of clerkUserId to name/imageUrl for known users', async () => {
+    const exec = jest.fn().mockResolvedValue([
+      { clerkUserId: 'user_1', name: 'A B', imageUrl: 'https://img.clerk.dev/a.jpg' },
+      { clerkUserId: 'user_2', name: undefined, imageUrl: undefined },
+    ])
+    const lean = jest.fn().mockReturnValue({ exec })
+    const find = jest.fn().mockReturnValue({ lean })
+    const moduleRef = await Test.createTestingModule({
+      providers: [UsersService, { provide: getModelToken(User.name), useValue: { find } }],
+    }).compile()
+
+    const service = moduleRef.get(UsersService)
+    const result = await service.profilesByIds(['user_1', 'user_2', 'user_1'])
+
+    expect(find).toHaveBeenCalledWith({ clerkUserId: { $in: ['user_1', 'user_2'] } })
+    expect(result).toEqual({
+      user_1: { name: 'A B', imageUrl: 'https://img.clerk.dev/a.jpg' },
+      user_2: { name: undefined, imageUrl: undefined },
+    })
+  })
+
+  it('profilesByIds returns an empty object without querying when given no ids', async () => {
+    const find = jest.fn()
+    const moduleRef = await Test.createTestingModule({
+      providers: [UsersService, { provide: getModelToken(User.name), useValue: { find } }],
+    }).compile()
+
+    const service = moduleRef.get(UsersService)
+    const result = await service.profilesByIds([])
+
+    expect(find).not.toHaveBeenCalled()
+    expect(result).toEqual({})
+  })
 })

@@ -26,7 +26,7 @@ describe('ClerkAuthGuard', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    mockGetUser.mockResolvedValue({ emailAddresses: [{ emailAddress: 'a@b.com' }], firstName: 'A' })
+    mockGetUser.mockResolvedValue({ emailAddresses: [{ emailAddress: 'a@b.com' }], firstName: 'A', lastName: 'B', imageUrl: 'https://img.clerk.dev/a.jpg' })
   })
 
   it('rejects when no Authorization header is present', async () => {
@@ -52,7 +52,18 @@ describe('ClerkAuthGuard', () => {
 
     await expect(guard.canActivate(context)).resolves.toBe(true)
     expect(req.userId).toBe('user_1')
-    expect(usersService.upsertFromClerk).toHaveBeenCalledWith('user_1', 'a@b.com', 'A')
+    expect(usersService.upsertFromClerk).toHaveBeenCalledWith('user_1', 'a@b.com', 'A B', 'https://img.clerk.dev/a.jpg')
+  })
+
+  it('falls back to just the first name when Clerk has no last name', async () => {
+    ;(verifyToken as jest.Mock).mockResolvedValue({ sub: 'user_1' })
+    mockGetUser.mockResolvedValue({ emailAddresses: [{ emailAddress: 'a@b.com' }], firstName: 'A', imageUrl: 'https://img.clerk.dev/a.jpg' })
+    const guard = new ClerkAuthGuard(reflector as any, configService as any, usersService as any)
+    const context = contextWithHeader('Bearer goodtoken')
+
+    await guard.canActivate(context)
+
+    expect(usersService.upsertFromClerk).toHaveBeenCalledWith('user_1', 'a@b.com', 'A', 'https://img.clerk.dev/a.jpg')
   })
 
   it('allows public routes through without a token', async () => {

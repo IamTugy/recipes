@@ -3,13 +3,14 @@ import { RatingsController } from './ratings.controller'
 describe('RatingsController', () => {
   const ratingsService = { rate: jest.fn(), reviewsForRecipe: jest.fn(), distributionForRecipe: jest.fn(), myRating: jest.fn(), deleteRating: jest.fn(), toggleUpvote: jest.fn() }
   const reviewRepliesService = { countsByRatingIds: jest.fn(), listByRating: jest.fn(), create: jest.fn(), toggleUpvote: jest.fn() }
-  const usersService = { namesByIds: jest.fn() }
+  const usersService = { namesByIds: jest.fn(), profilesByIds: jest.fn() }
   const activityLog = { record: jest.fn() }
 
   beforeEach(() => {
     jest.clearAllMocks()
     reviewRepliesService.countsByRatingIds.mockResolvedValue({})
     usersService.namesByIds.mockResolvedValue({})
+    usersService.profilesByIds.mockResolvedValue({})
   })
 
   function makeController() {
@@ -62,17 +63,17 @@ describe('RatingsController', () => {
     expect(result).toEqual({ score: 4, comment: 'Pretty good' })
   })
 
-  it('GET /ratings/:slug/reviews returns reviews enriched with names, upvotes and reply counts', async () => {
+  it('GET /ratings/:slug/reviews returns reviews enriched with names, photos, upvotes and reply counts', async () => {
     const reviews = [{ id: 'r1', userId: 'user_2', score: 5, comment: 'Loved it', upvotes: ['user_1'], createdAt: new Date('2026-01-01') }]
     ratingsService.reviewsForRecipe.mockResolvedValue(reviews)
     reviewRepliesService.countsByRatingIds.mockResolvedValue({ r1: 3 })
-    usersService.namesByIds.mockResolvedValue({ user_2: 'Dana' })
+    usersService.profilesByIds.mockResolvedValue({ user_2: { name: 'Dana', imageUrl: 'https://img.clerk.dev/dana.jpg' } })
     const controller = makeController()
     const result = await controller.reviews('a', { userId: 'user_1' } as any)
     expect(ratingsService.reviewsForRecipe).toHaveBeenCalledWith('a')
     expect(result).toEqual([{
       id: 'r1', userId: 'user_2', score: 5, comment: 'Loved it', upvotes: ['user_1'], createdAt: new Date('2026-01-01'),
-      userName: 'Dana', upvoteCount: 1, upvotedByMe: true, replyCount: 3,
+      userName: 'Dana', userImageUrl: 'https://img.clerk.dev/dana.jpg', upvoteCount: 1, upvotedByMe: true, replyCount: 3,
     }])
   })
 
@@ -101,22 +102,23 @@ describe('RatingsController', () => {
     expect(result).toEqual({ upvoted: true, count: 1 })
   })
 
-  it('GET /ratings/:slug/:ratingId/replies lists replies with resolved names and upvote state', async () => {
+  it('GET /ratings/:slug/:ratingId/replies lists replies with resolved names, photos and upvote state', async () => {
     reviewRepliesService.listByRating.mockResolvedValue([
       { _id: 'reply1', userId: 'user_2', text: 'Nice!', mentionedUserId: null, mentionedName: null, upvotes: ['user_1'], createdAt: new Date('2026-01-02') },
     ])
-    usersService.namesByIds.mockResolvedValue({ user_2: 'Dana' })
+    usersService.profilesByIds.mockResolvedValue({ user_2: { name: 'Dana', imageUrl: 'https://img.clerk.dev/dana.jpg' } })
     const controller = makeController()
     const result = await controller.listReplies('r1', { userId: 'user_1' } as any)
     expect(reviewRepliesService.listByRating).toHaveBeenCalledWith('r1')
     expect(result).toEqual([{
-      id: 'reply1', userId: 'user_2', userName: 'Dana', text: 'Nice!',
+      id: 'reply1', userId: 'user_2', userName: 'Dana', userImageUrl: 'https://img.clerk.dev/dana.jpg', text: 'Nice!',
       mentionedUserId: null, mentionedName: null, upvoteCount: 1, upvotedByMe: true, createdAt: new Date('2026-01-02'),
     }])
   })
 
-  it('POST /ratings/:slug/:ratingId/replies creates a reply, resolving the mentioned user name', async () => {
+  it('POST /ratings/:slug/:ratingId/replies creates a reply, resolving the mentioned user name and the poster\'s own profile', async () => {
     usersService.namesByIds.mockResolvedValue({ user_3: 'Avi' })
+    usersService.profilesByIds.mockResolvedValue({ user_1: { name: 'Dana', imageUrl: 'https://img.clerk.dev/dana.jpg' } })
     reviewRepliesService.create.mockResolvedValue({
       _id: 'reply1', userId: 'user_1', text: '@Avi thanks!', mentionedUserId: 'user_3', mentionedName: 'Avi', createdAt: new Date('2026-01-02'),
     })
@@ -125,7 +127,8 @@ describe('RatingsController', () => {
     expect(reviewRepliesService.create).toHaveBeenCalledWith('r1', 'a', 'user_1', '@Avi thanks!', 'user_3', 'Avi')
     expect(activityLog.record).toHaveBeenCalledWith('user_1', 'a', 'review_reply_posted')
     expect(result).toEqual({
-      id: 'reply1', userId: 'user_1', text: '@Avi thanks!', mentionedUserId: 'user_3', mentionedName: 'Avi',
+      id: 'reply1', userId: 'user_1', userName: 'Dana', userImageUrl: 'https://img.clerk.dev/dana.jpg',
+      text: '@Avi thanks!', mentionedUserId: 'user_3', mentionedName: 'Avi',
       upvoteCount: 0, upvotedByMe: false, createdAt: new Date('2026-01-02'),
     })
   })

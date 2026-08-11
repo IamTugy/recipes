@@ -7,11 +7,11 @@ import { User, UserDocument } from './schemas/user.schema'
 export class UsersService {
   constructor(@InjectModel(User.name) private readonly userModel: Model<UserDocument>) {}
 
-  async upsertFromClerk(clerkUserId: string, email: string, name?: string): Promise<UserDocument> {
+  async upsertFromClerk(clerkUserId: string, email: string, name?: string, imageUrl?: string): Promise<UserDocument> {
     return this.userModel
       .findOneAndUpdate(
         { clerkUserId },
-        { clerkUserId, email, name },
+        { clerkUserId, email, name, imageUrl },
         { upsert: true, new: true },
       )
       .exec()
@@ -24,6 +24,18 @@ export class UsersService {
     const names: Record<string, string | undefined> = {}
     for (const user of users) names[user.clerkUserId] = user.name
     return names
+  }
+
+  // Same as namesByIds but also carries the profile picture - used
+  // wherever a user's identity is shown prominently (chef profile page,
+  // review list) rather than just referenced in passing.
+  async profilesByIds(clerkUserIds: string[]): Promise<Record<string, { name?: string; imageUrl?: string }>> {
+    const uniqueIds = [...new Set(clerkUserIds)]
+    if (uniqueIds.length === 0) return {}
+    const users = await this.userModel.find({ clerkUserId: { $in: uniqueIds } }).lean().exec()
+    const profiles: Record<string, { name?: string; imageUrl?: string }> = {}
+    for (const user of users) profiles[user.clerkUserId] = { name: user.name, imageUrl: user.imageUrl }
+    return profiles
   }
 
   async getPreferences(clerkUserId: string): Promise<{ lang?: 'he' | 'en'; theme?: 'light' | 'dark' | 'system' }> {

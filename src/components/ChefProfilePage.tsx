@@ -4,19 +4,24 @@ import { useFavorites } from '../hooks/useFavorites'
 import { useLanguage } from '../hooks/useLanguage'
 import RecipeCard from './RecipeCard'
 import RecipeCardSkeleton from './RecipeCardSkeleton'
+import Avatar from './Avatar'
 
 export default function ChefProfilePage() {
   const { userId } = useParams<{ userId: string }>()
   const { lang } = useLanguage()
-  const { name, recipes, loading } = useChefProfile(userId)
+  const { name, imageUrl, recipes, loading } = useChefProfile(userId)
   const { favoriteSlugs, toggle: toggleFavorite } = useFavorites()
+  const displayName = name ?? (lang === 'he' ? 'שף' : 'Chef')
 
   return (
     <div className="min-h-dvh bg-bg pt-20 pb-16 px-4">
       <div className="max-w-6xl mx-auto">
-        <h1 className="font-serif text-2xl font-bold text-cream mb-1">
-          {name ?? (lang === 'he' ? 'שף' : 'Chef')}
-        </h1>
+        <div className="flex items-center gap-3 mb-1">
+          <Avatar name={displayName} imageUrl={imageUrl} size="md" />
+          <h1 className="font-serif text-2xl font-bold text-cream">
+            {displayName}
+          </h1>
+        </div>
         <p className="text-cream/30 text-xs mb-6">
           {loading
             ? (lang === 'he' ? 'טוען...' : 'Loading...')

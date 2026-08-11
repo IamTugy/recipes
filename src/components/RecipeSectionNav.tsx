@@ -60,9 +60,14 @@ export default function RecipeSectionNav({ sections, lang }: RecipeSectionNavPro
           }`}
         >
           <span aria-hidden="true">{s.emoji}</span>
+          {/* The rail sits at the left edge for Hebrew, right edge for
+              English (see the nav's own positioning below) - the tooltip
+              must point the opposite way, toward the center of the page,
+              or it flies off the edge of the screen instead of over the
+              content. */}
           <span
             role="presentation"
-            className={`pointer-events-none absolute ${lang === 'he' ? 'right-full mr-2' : 'left-full ml-2'} top-1/2 -translate-y-1/2 whitespace-nowrap rounded-lg bg-card px-2.5 py-1.5 text-xs font-medium text-cream/80 border border-tint/10 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity`}
+            className={`pointer-events-none absolute ${lang === 'he' ? 'left-full ml-2' : 'right-full mr-2'} top-1/2 -translate-y-1/2 whitespace-nowrap rounded-lg bg-card px-2.5 py-1.5 text-xs font-medium text-cream/80 border border-tint/10 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity`}
           >
             {s.label}
           </span>
