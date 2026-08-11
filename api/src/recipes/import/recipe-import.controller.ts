@@ -1,7 +1,7 @@
 import { Body, Controller, Post, BadRequestException, Logger, Req, UploadedFiles, UseInterceptors } from '@nestjs/common'
 import { FileFieldsInterceptor } from '@nestjs/platform-express'
 import { Request } from 'express'
-import { randomUUID } from 'crypto'
+import { randomUUID, createHash } from 'crypto'
 import { plainToInstance } from 'class-transformer'
 import { validate } from 'class-validator'
 import { RecipeImportService, applyRecipeLink, type LinkMatch } from './recipe-import.service'
@@ -9,12 +9,30 @@ import type { ImportedRecipe } from './source-extractor'
 import { RecipesService } from '../recipes.service'
 import { SaveRecipeDraftDto } from '../dto/save-recipe-draft.dto'
 import { ActivityLogService } from '../../activity-log/activity-log.service'
+import { JobsService } from '../../jobs/jobs.service'
 
 // Mirrors RecipeAiGenerateController's toDraftDto - this batch is constructed
 // in-process from Gemini output, never bound from an HTTP body, so it must be
 // validated manually rather than relying on the global ValidationPipe.
 function toDraftDto(recipe: ImportedRecipe): SaveRecipeDraftDto {
   return plainToInstance(SaveRecipeDraftDto, recipe)
+}
+
+function dedupeKeyFor(body: { text?: string; url?: string }, file?: Express.Multer.File, image?: Express.Multer.File): string {
+  const parts = [
+    body.url,
+    body.text,
+    file ? `file:${file.originalname}:${file.size}` : undefined,
+    image ? `image:${image.originalname}:${image.size}` : undefined,
+  ].filter(Boolean)
+  return createHash('sha256').update(parts.join('|')).digest('hex')
+}
+
+function labelFor(body: { text?: string; url?: string }, file?: Express.Multer.File, image?: Express.Multer.File): string {
+  if (body.url) return body.url
+  if (file) return file.originalname
+  if (image) return image.originalname
+  return (body.text ?? '').slice(0, 80) || 'Recipe import'
 }
 
 @Controller('recipes/import')
@@ -25,6 +43,7 @@ export class RecipeImportController {
     private readonly importService: RecipeImportService,
     private readonly recipesService: RecipesService,
     private readonly activityLog: ActivityLogService,
+    private readonly jobsService: JobsService,
   ) {}
 
   @Post()
@@ -33,7 +52,7 @@ export class RecipeImportController {
     @Body() body: { text?: string; url?: string },
     @Req() req: Request & { userId: string },
     @UploadedFiles() files?: { file?: Express.Multer.File[]; image?: Express.Multer.File[] },
-  ) {
+  ): Promise<{ jobId: string }> {
     const file = files?.file?.[0]
     const image = files?.image?.[0]
 
@@ -47,6 +66,28 @@ export class RecipeImportController {
       throw new BadRequestException('Provide a document file or a photo, not both')
     }
 
+    const userId = req.userId
+    const job = await this.jobsService.create(userId, 'import', labelFor(body, file, image), dedupeKeyFor(body, file, image))
+    void this.jobsService.run(job.id, () => this.runImport(body, userId, file, image))
+    return { jobId: job.id }
+  }
+
+  // Spot ingredients that are really references to another whole recipe -
+  // either another recipe in this same batch (a dish and its separately
+  // extracted sauce) or one already in the app (published, or the user's
+  // own). Matches against existing recipes are applied immediately; a match
+  // within the batch can't be applied yet since the target recipe doesn't
+  // have a real id until it's created below. Every result - one recipe or
+  // many - is persisted as a pendingReview draft sharing one batchId; there
+  // is no more "single recipe returns unsaved for live prefill" path, since
+  // the async model means the caller isn't waiting on this page for a
+  // hand-off.
+  private async runImport(
+    body: { text?: string; url?: string },
+    userId: string,
+    file?: Express.Multer.File,
+    image?: Express.Multer.File,
+  ): Promise<string[]> {
     const recipes = body.url
       ? await this.importService.importFromUrl(body.url, body.text)
       : file
@@ -55,31 +96,14 @@ export class RecipeImportController {
           ? await this.importService.importFromImage(image.buffer, image.mimetype, body.text)
           : await this.importService.importFromText(body.text!)
 
-    await this.activityLog.record(req.userId, undefined, 'ai_recipe_import_used')
+    await this.activityLog.record(userId, undefined, 'ai_recipe_import_used')
 
-    // Spot ingredients that are really references to another whole recipe -
-    // either another recipe in this same batch (a dish and its separately
-    // extracted sauce) or one already in the app (published, or the user's
-    // own). Matches against existing recipes are applied immediately; a
-    // match within the batch can't be applied yet since the target recipe
-    // doesn't have a real id until it's created below.
-    const candidates = await this.recipesService.findLinkCandidates(req.userId)
+    const candidates = await this.recipesService.findLinkCandidates(userId)
     const links = await this.importService.resolveLinks(recipes, candidates)
     for (const link of links) {
       if (!link.linkToExistingId) continue
       const recipe = recipes[link.recipeIndex]
       if (recipe) applyRecipeLink(recipe, link.groupIndex, link.itemIndex, link.linkToExistingId)
-    }
-
-    // A source describing exactly one recipe keeps the existing UX: the
-    // recipe object is handed straight back so the frontend can prefill the
-    // edit form before anything is saved. A source with several recipes (a
-    // cooking-class PDF, a multi-recipe photo, ...) instead gets saved as a
-    // batch of pending-review drafts, same as bulk AI generation - editing
-    // N recipes one at a time through the same prefill flow would mean
-    // discarding all but the first the moment the user navigates away.
-    if (recipes.length === 1) {
-      return recipes[0]
     }
 
     const validByOriginalIndex = new Map<number, SaveRecipeDraftDto>()
@@ -100,16 +124,13 @@ export class RecipeImportController {
 
     const batchId = randomUUID()
     const idByOriginalIndex = new Map<number, string>()
-    const created: Record<string, unknown>[] = []
+    const createdIds: string[] = []
     for (const [index, dto] of validByOriginalIndex) {
-      const recipe = await this.recipesService.createDraft(req.userId, dto, { pendingReview: true, batchId })
+      const recipe = await this.recipesService.createDraft(userId, dto, { pendingReview: true, batchId })
       idByOriginalIndex.set(index, recipe.id)
-      created.push(recipe.toObject())
+      createdIds.push(recipe.id)
     }
 
-    // Now that every recipe in the batch has a real id, apply the
-    // within-batch matches found above (e.g. a dish linking to its sauce,
-    // extracted a few indices later in the same source).
     const withinBatchLinks = links.filter((l): l is LinkMatch & { linkToRecipeIndex: number } => l.linkToRecipeIndex !== undefined)
     for (const link of withinBatchLinks) {
       const sourceDto = validByOriginalIndex.get(link.recipeIndex)
@@ -120,9 +141,7 @@ export class RecipeImportController {
       if (!item) continue
       item.linkedRecipeId = targetId
       try {
-        const updated = await this.recipesService.updateDraft(sourceId, req.userId, false, sourceDto)
-        const createdIndex = created.findIndex(r => r.id === sourceId)
-        if (createdIndex !== -1) created[createdIndex] = updated.toObject()
+        await this.recipesService.updateDraft(sourceId, userId, false, sourceDto)
       } catch (err) {
         // A cycle or other guard tripping here means the match was wrong -
         // leave that one recipe unlinked rather than failing the whole batch.
@@ -130,9 +149,6 @@ export class RecipeImportController {
       }
     }
 
-    // An array return (vs. the single-recipe case's plain object above) is
-    // exactly how the frontend tells the two outcomes apart - same contract
-    // RecipeAiGenerateController uses for its own batch response.
-    return created
+    return createdIds
   }
 }

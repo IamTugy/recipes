@@ -9,6 +9,7 @@ import { ActivityLogModule } from '../activity-log/activity-log.module'
 import { CookLogModule } from '../cook-log/cook-log.module'
 import { UsersModule } from '../users/users.module'
 import { AiModule } from '../ai/ai.module'
+import { JobsModule } from '../jobs/jobs.module'
 import { RecipeImportController } from './import/recipe-import.controller'
 import { RecipeImportService } from './import/recipe-import.service'
 import { NutritionController } from './nutrition/nutrition.controller'
@@ -32,6 +33,7 @@ import { RecipeGroupingService } from './grouping/recipe-grouping.service'
     CookLogModule,
     UsersModule,
     AiModule,
+    JobsModule,
   ],
   providers: [RecipesService, RecipeImportService, NutritionService, RecipeAiGenerateService, RecipeQualityService, RecipeSimilarityService, RecipeGroupingService],
   controllers: [RecipesController, RecipeImportController, NutritionController, RecipeAiGenerateController],
