@@ -419,12 +419,29 @@ describe('RecipesService', () => {
     expect(findOneAndUpdate).toHaveBeenCalledWith(
       { _id: 'a' },
       {
-        $set: { ...minimalDto, sources: undefined, pendingReview: false, status: 'draft' },
+        $set: { ...minimalDto, sources: undefined, pendingReview: false, status: 'draft', disputeStatus: 'none' },
         $inc: { currentRevision: 1 },
-        $unset: { reviewComment: '' },
+        $unset: { reviewComment: '', duplicateReview: '' },
       },
       { new: true },
     )
+  })
+
+  it('updateDraft clears a lingering duplicate dispute when a rejected recipe is edited', async () => {
+    const existing = {
+      slug: 'a', ownerId: 'user_1', status: 'rejected',
+      disputeStatus: 'pending',
+      duplicateReview: { isDuplicate: true, matchedRecipeId: 'other-1', matchedRecipeTitle: 'Other', reason: 'x', checkedAt: 'now' },
+    }
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(existing) })
+    const updated = { slug: 'a', status: 'draft', currentRevision: 2 }
+    const findOneAndUpdate = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(updated) })
+    const service = await makeService({ findOne, findOneAndUpdate }, { create: jest.fn().mockResolvedValue({}) })
+    await service.updateDraft('a', 'user_1', false, minimalDto as any)
+
+    const [, update] = findOneAndUpdate.mock.calls[0]
+    expect((update.$set as Record<string, unknown>).disputeStatus).toBe('none')
+    expect((update.$unset as Record<string, unknown>).duplicateReview).toBe('')
   })
 
   it('updateDraft is allowed on an already-published recipe (creates a new draft revision without touching what is live)', async () => {
@@ -670,6 +687,24 @@ describe('RecipesService', () => {
       reason: 'same dish, rescaled',
     })
     expect(recipe.save).toHaveBeenCalled()
+    expect(result).toBe(recipe)
+  })
+
+  it('submitForReview proceeds to the quality review instead of blocking when the AI hallucinates a matchedRecipeId outside the candidate list', async () => {
+    const recipe: any = completeRecipe()
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe), select: jest.fn().mockReturnThis(), lean: jest.fn().mockReturnThis() })
+    const updateOne = jest.fn().mockResolvedValue({})
+    const quality = makeQualityService({ score: 100, checkedAt: 'now', findings: [] })
+    const candidates = [{ id: 'other-1', title: 'Other Soup', titleHe: undefined, ingredients: [], steps: [] }]
+    // Gemini claims a duplicate match against an id that was never in the candidate list it was given.
+    const similarity = makeSimilarityService(candidates, { isDuplicate: true, matchedRecipeId: 'not-a-real-candidate', reason: 'hallucinated match' })
+    const service = await makeService({ findOne }, { updateOne }, undefined, undefined, undefined, undefined, undefined, quality, similarity)
+
+    const result = await service.submitForReview('a', 'user_1', false)
+
+    expect(quality.review).toHaveBeenCalled()
+    expect(recipe.status).toBe('published')
+    expect(recipe.duplicateReview).toBeUndefined()
     expect(result).toBe(recipe)
   })
 

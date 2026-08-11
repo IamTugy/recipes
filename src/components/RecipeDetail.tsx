@@ -292,6 +292,8 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
 
   const [submitting, setSubmitting] = useState(false)
   const [disputing, setDisputing] = useState(false)
+  const [disputeFormOpen, setDisputeFormOpen] = useState(false)
+  const [disputeMessageInput, setDisputeMessageInput] = useState('')
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [reviewResult, setReviewResult] = useState<QualityReview | null>(null)
   const [revisionsOpen, setRevisionsOpen] = useState(false)
@@ -371,8 +373,10 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
     if (!id) return
     setDisputing(true)
     try {
-      await disputeDuplicate(id, undefined, getToken)
+      await disputeDuplicate(id, disputeMessageInput.trim() || undefined, getToken)
       showToast(tx.disputeSubmitted, 'success')
+      setDisputeFormOpen(false)
+      setDisputeMessageInput('')
       await reloadRecipe()
     } catch {
       showToast(tx.submissionFailed, 'error')
@@ -797,8 +801,8 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                 <Link to={`/recipes/${recipe.duplicateReview.matchedRecipeId}`} className="text-xs text-amber hover:text-amber/80 transition-colors">
                   {tx.viewSimilarRecipe}
                 </Link>
-                {recipe.disputeStatus === 'none' && (
-                  <button type="button" onClick={handleDisputeDuplicate} disabled={disputing} className="btn-ghost text-xs">
+                {recipe.disputeStatus === 'none' && !disputeFormOpen && (
+                  <button type="button" onClick={() => setDisputeFormOpen(true)} disabled={disputing} className="btn-ghost text-xs">
                     {tx.disputeThisDecision}
                   </button>
                 )}
@@ -809,6 +813,38 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                   <span className="text-xs text-cream/40">{tx.disputeWasDenied}</span>
                 )}
               </div>
+              {recipe.disputeStatus === 'none' && disputeFormOpen && (
+                <div className="mt-3">
+                  <textarea
+                    value={disputeMessageInput}
+                    onChange={e => setDisputeMessageInput(e.target.value)}
+                    placeholder={tx.disputeMessagePlaceholder}
+                    rows={2}
+                    maxLength={500}
+                    className="w-full bg-tint/[0.03] border border-tint/10 rounded-md px-2 py-1.5 text-xs text-cream/80 placeholder-cream/25 outline-none focus:border-amber/30 transition-colors resize-none"
+                  />
+                  <div className="flex items-center gap-2 mt-2">
+                    <button type="button" onClick={handleDisputeDuplicate} disabled={disputing} className="btn-primary text-xs px-3 py-1.5">
+                      {tx.submitDispute}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setDisputeFormOpen(false); setDisputeMessageInput('') }}
+                      disabled={disputing}
+                      className="btn-ghost text-xs"
+                    >
+                      {tx.cancel}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {canEdit && recipe.duplicateReview?.isDuplicate && recipe.disputeStatus === 'approved' && (
+            <div className="card p-4 mb-4 border border-herb/30">
+              <p className="text-sm font-semibold text-herb mb-1">{tx.disputeApprovedTitle}</p>
+              <p className="text-xs text-cream/60">{tx.disputeApprovedIntro}</p>
             </div>
           )}
 

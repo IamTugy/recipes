@@ -384,11 +384,19 @@ export class RecipesService implements OnModuleInit {
     // recipe can never have its AI provenance edited or removed, no matter
     // what the request body contains.
     const aiLock = recipe.aiGenerated ? { aiGenerated: true, sources: recipe.sources } : {}
+    // A pending/resolved duplicate dispute is scoped to the specific rejected
+    // state it was raised against - once the owner edits the content, that
+    // dispute no longer describes anything real and must not linger in the
+    // admin's disputes queue (or keep showing stale duplicateReview info) for
+    // a recipe that's back to being an ordinary draft.
     const update: Record<string, unknown> = {
-      $set: { ...dto, sources: dedupeSources(dto.sources), ...aiLock, pendingReview: false, ...(wasRejected ? { status: 'draft' } : {}) },
+      $set: {
+        ...dto, sources: dedupeSources(dto.sources), ...aiLock, pendingReview: false,
+        ...(wasRejected ? { status: 'draft', disputeStatus: 'none' } : {}),
+      },
       $inc: { currentRevision: 1 },
     }
-    if (wasRejected) update.$unset = { reviewComment: '' }
+    if (wasRejected) update.$unset = { reviewComment: '', duplicateReview: '' }
     const updated = await this.recipeModel.findOneAndUpdate({ _id: id }, update, { new: true }).exec()
     if (!updated) throw new NotFoundException(`Recipe '${id}' not found`)
     await this.saveNewRevision(updated, userId)
@@ -427,19 +435,26 @@ export class RecipesService implements OnModuleInit {
         await this.activityLogService.record(userId, id, 'ai_duplicate_check_used')
         if (verdict.isDuplicate && verdict.matchedRecipeId) {
           const matched = candidates.find(c => c.id === verdict.matchedRecipeId)
-          recipe.status = 'rejected'
-          recipe.duplicateReview = {
-            isDuplicate: true,
-            matchedRecipeId: verdict.matchedRecipeId,
-            matchedRecipeTitle: matched?.title ?? '',
-            reason: verdict.reason,
-            checkedAt: new Date().toISOString(),
+          // Gemini is only given the candidate list to choose from, but a
+          // hallucinated id outside that list is unverifiable - blocking on
+          // it would show a broken "similar recipe" link with no real match
+          // behind it. Treat it as a non-duplicate verdict instead of
+          // trusting an unresolvable match.
+          if (matched) {
+            recipe.status = 'rejected'
+            recipe.duplicateReview = {
+              isDuplicate: true,
+              matchedRecipeId: verdict.matchedRecipeId,
+              matchedRecipeTitle: matched.title,
+              reason: verdict.reason,
+              checkedAt: new Date().toISOString(),
+            }
+            recipe.qualityReview = undefined
+            recipe.disputeStatus = 'none'
+            await recipe.save()
+            await this.activityLogService.record(userId, id, 'recipe_duplicate_blocked', { matchedRecipeId: verdict.matchedRecipeId })
+            return recipe
           }
-          recipe.qualityReview = undefined
-          recipe.disputeStatus = 'none'
-          await recipe.save()
-          await this.activityLogService.record(userId, id, 'recipe_duplicate_blocked', { matchedRecipeId: verdict.matchedRecipeId })
-          return recipe
         }
       }
     }

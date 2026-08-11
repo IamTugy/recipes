@@ -58,11 +58,19 @@ export class RecipeSimilarityService {
   ) {}
 
   async findCandidates(recipe: SimilaritySourceRecipe, excludeId: string): Promise<SimilarityCandidate[]> {
+    // Mongoose strips `undefined` values from query filters, so an
+    // unconditional `{ ownerId: recipe.ownerId }` clause collapses to `{}`
+    // (always-true) whenever ownerId is undefined - matching every other
+    // user's private drafts too. Only include the clause when there's an
+    // actual owner to scope by.
+    const orClauses: Record<string, unknown>[] = []
+    if (recipe.ownerId) orClauses.push({ ownerId: recipe.ownerId })
+    orClauses.push({ publishedRevision: { $ne: null }, hidden: { $ne: true } })
     const others = await this.recipeModel
       .find({
         _id: { $ne: excludeId },
         deletedAt: { $exists: false },
-        $or: [{ ownerId: recipe.ownerId }, { publishedRevision: { $ne: null }, hidden: { $ne: true } }],
+        $or: orClauses,
       })
       .select('title titleHe ingredients steps')
       .lean()

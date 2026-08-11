@@ -434,6 +434,11 @@ export const t = {
       noDuplicateDisputes: 'אין ערעורים ממתינים',
       approveDispute: 'אשר',
       denyDispute: 'דחה',
+      disputeMessagePlaceholder: 'הסבירו למה זה לא כפול (אופציונלי)',
+      submitDispute: 'שלח ערעור',
+      ownerSDisputeMessage: 'הודעת הבעלים:',
+      disputeApprovedTitle: 'הערעור שלכם אושר',
+      disputeApprovedIntro: 'ניתן להגיש שוב לבדיקה.',
 },
   en: {
     siteTitle: "Tugy's Cookbook",
@@ -835,6 +840,11 @@ export const t = {
     noDuplicateDisputes: 'No pending disputes',
     approveDispute: 'Approve',
     denyDispute: 'Deny',
+    disputeMessagePlaceholder: 'Explain why this isn\'t a duplicate (optional)',
+    submitDispute: 'Submit dispute',
+    ownerSDisputeMessage: "Owner's message:",
+    disputeApprovedTitle: 'Your dispute was approved',
+    disputeApprovedIntro: 'You can submit for review again.',
 },
 }
 

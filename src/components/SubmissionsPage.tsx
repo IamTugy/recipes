@@ -4,6 +4,7 @@ import { useAuth } from '@clerk/react'
 import { useSubmissionsFeed, useDuplicateDisputes, resolveDuplicateDispute } from '../hooks/useRecipes'
 import { useLanguage } from '../hooks/useLanguage'
 import { useTranslatedReview } from '../hooks/useTranslatedReview'
+import { useToast } from '../hooks/useToast'
 import type { QualityFinding, Recipe } from '../types'
 import { t } from "../i18n";
 import { OWNER_USER_ID } from '../lib/admin'
@@ -24,7 +25,7 @@ interface SubmissionCardProps {
 // useTranslatedReview - hooks can't be called inside a .map() callback.
 function SubmissionCard({ recipe: r, expanded: isExpanded, onToggle }: SubmissionCardProps) {
   const { lang } = useLanguage()
-        const tx = t[lang]
+  const tx = t[lang]
   const navigate = useNavigate()
   const { getToken } = useAuth()
   const review = useTranslatedReview(r.qualityReview ?? null, lang, getToken)
@@ -86,9 +87,10 @@ interface DisputeCardProps {
 
 function DisputeCard({ recipe: r, onResolved }: DisputeCardProps) {
   const { lang } = useLanguage()
-        const tx = t[lang]
+  const tx = t[lang]
   const navigate = useNavigate()
   const { getToken } = useAuth()
+  const { showToast } = useToast()
   const [resolving, setResolving] = useState(false)
 
   async function resolve(approve: boolean) {
@@ -96,6 +98,8 @@ function DisputeCard({ recipe: r, onResolved }: DisputeCardProps) {
     try {
       await resolveDuplicateDispute(r.id, approve, getToken)
       onResolved()
+    } catch {
+      showToast(tx.submissionFailed, 'error')
     } finally {
       setResolving(false)
     }
@@ -113,6 +117,11 @@ function DisputeCard({ recipe: r, onResolved }: DisputeCardProps) {
           </p>
           <p className="text-xs text-cream/30 mb-3">{r.duplicateReview.reason}</p>
         </>
+      )}
+      {r.disputeMessage && (
+        <p className="text-xs text-cream/60 mb-3 italic">
+          {tx.ownerSDisputeMessage} {r.disputeMessage}
+        </p>
       )}
       {r.duplicateReview && (
         <Link to={`/recipes/${r.duplicateReview.matchedRecipeId}`} className="text-xs text-amber hover:text-amber/80 transition-colors">
@@ -133,7 +142,7 @@ function DisputeCard({ recipe: r, onResolved }: DisputeCardProps) {
 
 export default function SubmissionsPage() {
   const { lang } = useLanguage()
-        const tx = t[lang]
+  const tx = t[lang]
   const { userId } = useAuth()
   const isOwner = userId === OWNER_USER_ID
   const { recipes: disputes, loading: disputesLoading, reload: reloadDisputes } = useDuplicateDisputes(isOwner)

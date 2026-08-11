@@ -55,6 +55,17 @@ describe('RecipeSimilarityService', () => {
     })
   })
 
+  it('omits the ownerId clause entirely when the recipe has no owner, instead of matching every recipe', async () => {
+    const { service, find } = await makeService([])
+    await service.findCandidates({ ...newRecipe, ownerId: undefined }, 'self-id')
+
+    expect(find).toHaveBeenCalledWith({
+      _id: { $ne: 'self-id' },
+      deletedAt: { $exists: false },
+      $or: [{ publishedRevision: { $ne: null }, hidden: { $ne: true } }],
+    })
+  })
+
   it('excludes recipes that cross none of the similarity thresholds', async () => {
     const { service } = await makeService([makeOther()])
     const candidates = await service.findCandidates(newRecipe, 'self-id')
