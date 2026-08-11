@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Put, Req } from '@nestjs/common'
+import { Body, Controller, Delete, ForbiddenException, Get, NotFoundException, Param, Patch, Post, Put, Req } from '@nestjs/common'
 import { Request } from 'express'
 import { ConfigService } from '@nestjs/config'
 import { RecipesService } from './recipes.service'
@@ -6,6 +6,8 @@ import { ActivityLogService } from '../activity-log/activity-log.service'
 import { UsersService } from '../users/users.service'
 import { SaveRecipeDraftDto } from './dto/save-recipe-draft.dto'
 import { UpdateRecipeImageDto } from './dto/update-recipe-image.dto'
+import { DisputeDuplicateDto } from './dto/dispute-duplicate.dto'
+import { ResolveDuplicateDisputeDto } from './dto/resolve-duplicate-dispute.dto'
 
 @Controller('recipes')
 export class RecipesController {
@@ -58,6 +60,15 @@ export class RecipesController {
     const recipes = await this.recipesService.listRecentSubmissions()
     const names = await this.usersService.namesByIds([...new Set(recipes.map(r => r.ownerId).filter((id): id is string => !!id))])
     return recipes.map(r => ({ ...r, ownerName: r.ownerId ? names[r.ownerId] ?? null : null }))
+  }
+
+  @Get('disputes')
+  async listDuplicateDisputes(@Req() req: Request & { userId: string }) {
+    if (!this.isAdmin(req.userId)) {
+      throw new ForbiddenException('Only the app owner can view duplicate disputes')
+    }
+    const recipes = await this.recipesService.listDuplicateDisputes()
+    return recipes.map(r => r.toObject())
   }
 
   @Get('public/:id')
@@ -116,6 +127,31 @@ export class RecipesController {
   @Post(':id/submit')
   async submit(@Param('id') id: string, @Req() req: Request & { userId: string }) {
     const recipe = await this.recipesService.submitForReview(id, req.userId, this.isAdmin(req.userId))
+    return recipe.toObject()
+  }
+
+  @Post(':id/dispute-duplicate')
+  async disputeDuplicate(
+    @Param('id') id: string,
+    @Body() body: DisputeDuplicateDto,
+    @Req() req: Request & { userId: string },
+  ) {
+    const recipe = await this.recipesService.disputeDuplicate(id, req.userId, this.isAdmin(req.userId), body.message)
+    await this.activityLog.record(req.userId, id, 'recipe_duplicate_disputed')
+    return recipe.toObject()
+  }
+
+  @Post(':id/dispute-duplicate/resolve')
+  async resolveDuplicateDispute(
+    @Param('id') id: string,
+    @Body() body: ResolveDuplicateDisputeDto,
+    @Req() req: Request & { userId: string },
+  ) {
+    if (!this.isAdmin(req.userId)) {
+      throw new ForbiddenException('Only the app owner can resolve duplicate disputes')
+    }
+    const recipe = await this.recipesService.resolveDuplicateDispute(id, body.approve)
+    await this.activityLog.record(req.userId, id, body.approve ? 'recipe_duplicate_dispute_approved' : 'recipe_duplicate_dispute_denied')
     return recipe.toObject()
   }
 

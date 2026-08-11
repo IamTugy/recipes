@@ -577,6 +577,8 @@ describe('RecipesService', () => {
       status: 'draft',
       currentRevision: 3,
       reviewComment: 'old',
+      disputeStatus: 'none',
+      duplicateCheckOverride: false,
       save: jest.fn().mockResolvedValue(undefined),
       toObject: function (this: Record<string, unknown>) { return this },
       ...overrides,
@@ -833,6 +835,91 @@ describe('RecipesService', () => {
     await service.submitForReview('a', 'user_1', false)
 
     expect(activityLog.record).toHaveBeenCalledWith('user_1', 'a', 'recipe_rejected', { score: 40 })
+  })
+
+  it('disputeDuplicate sets disputeStatus to pending on a duplicate-blocked recipe', async () => {
+    const recipe: any = completeRecipe({ duplicateReview: { isDuplicate: true, matchedRecipeId: 'other-1', matchedRecipeTitle: 'Other', reason: 'x', checkedAt: 'now' } })
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
+    const service = await makeService({ findOne })
+
+    const result = await service.disputeDuplicate('a', 'user_1', false, 'I made this myself')
+
+    expect(recipe.disputeStatus).toBe('pending')
+    expect(recipe.disputeMessage).toBe('I made this myself')
+    expect(recipe.disputeCreatedAt).toBeInstanceOf(Date)
+    expect(recipe.save).toHaveBeenCalled()
+    expect(result).toBe(recipe)
+  })
+
+  it('disputeDuplicate throws when the recipe was not blocked as a duplicate', async () => {
+    const recipe: any = completeRecipe()
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
+    const service = await makeService({ findOne })
+
+    await expect(service.disputeDuplicate('a', 'user_1', false)).rejects.toThrow(BadRequestException)
+  })
+
+  it('disputeDuplicate throws when already disputed', async () => {
+    const recipe: any = completeRecipe({
+      duplicateReview: { isDuplicate: true, matchedRecipeId: 'other-1', matchedRecipeTitle: 'Other', reason: 'x', checkedAt: 'now' },
+      disputeStatus: 'pending',
+    })
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
+    const service = await makeService({ findOne })
+
+    await expect(service.disputeDuplicate('a', 'user_1', false)).rejects.toThrow(BadRequestException)
+  })
+
+  it('listDuplicateDisputes queries recipes with a pending dispute', async () => {
+    const sort = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue([{ _id: 'a' }]) })
+    const find = jest.fn().mockReturnValue({ sort })
+    const service = await makeService({ find })
+
+    const result = await service.listDuplicateDisputes()
+
+    expect(find).toHaveBeenCalledWith({ disputeStatus: 'pending', deletedAt: { $exists: false } })
+    expect(result).toEqual([{ _id: 'a' }])
+  })
+
+  it('resolveDuplicateDispute approving sets duplicateCheckOverride and resets status to draft', async () => {
+    const recipe: any = completeRecipe({
+      duplicateReview: { isDuplicate: true, matchedRecipeId: 'other-1', matchedRecipeTitle: 'Other', reason: 'x', checkedAt: 'now' },
+      disputeStatus: 'pending',
+    })
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
+    const service = await makeService({ findOne })
+
+    const result = await service.resolveDuplicateDispute('a', true)
+
+    expect(recipe.disputeStatus).toBe('approved')
+    expect(recipe.duplicateCheckOverride).toBe(true)
+    expect(recipe.status).toBe('draft')
+    expect(recipe.disputeResolvedAt).toBeInstanceOf(Date)
+    expect(result).toBe(recipe)
+  })
+
+  it('resolveDuplicateDispute denying leaves the recipe rejected', async () => {
+    const recipe: any = completeRecipe({
+      status: 'rejected',
+      duplicateReview: { isDuplicate: true, matchedRecipeId: 'other-1', matchedRecipeTitle: 'Other', reason: 'x', checkedAt: 'now' },
+      disputeStatus: 'pending',
+    })
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
+    const service = await makeService({ findOne })
+
+    await service.resolveDuplicateDispute('a', false)
+
+    expect(recipe.disputeStatus).toBe('denied')
+    expect(recipe.duplicateCheckOverride).toBe(false)
+    expect(recipe.status).toBe('rejected')
+  })
+
+  it('resolveDuplicateDispute throws when there is no pending dispute', async () => {
+    const recipe: any = completeRecipe({ disputeStatus: 'none' })
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe) })
+    const service = await makeService({ findOne })
+
+    await expect(service.resolveDuplicateDispute('a', true)).rejects.toThrow(BadRequestException)
   })
 
   it('listRecentSubmissions returns recipes with a qualityReview, most recently checked first', async () => {

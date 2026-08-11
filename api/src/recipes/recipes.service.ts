@@ -471,6 +471,45 @@ export class RecipesService implements OnModuleInit {
     return recipe
   }
 
+  async disputeDuplicate(id: string, userId: string, isAdmin: boolean, message?: string): Promise<RecipeDocument> {
+    const recipe = await this.getEditableOrThrow(id, userId, isAdmin)
+    if (!recipe.duplicateReview?.isDuplicate) {
+      throw new BadRequestException('This recipe was not blocked as a duplicate')
+    }
+    if (recipe.disputeStatus !== 'none') {
+      throw new BadRequestException(`This recipe's duplicate block has already been disputed (status: ${recipe.disputeStatus})`)
+    }
+    recipe.disputeStatus = 'pending'
+    recipe.disputeMessage = message
+    recipe.disputeCreatedAt = new Date()
+    await recipe.save()
+    return recipe
+  }
+
+  async listDuplicateDisputes(): Promise<RecipeDocument[]> {
+    return this.recipeModel.find({ disputeStatus: 'pending', deletedAt: { $exists: false } }).sort({ disputeCreatedAt: 1 }).exec()
+  }
+
+  async resolveDuplicateDispute(id: string, approve: boolean): Promise<RecipeDocument> {
+    const recipe = await this.recipeModel.findOne({ _id: id, deletedAt: { $exists: false } }).exec()
+    if (!recipe) {
+      throw new NotFoundException(`Recipe '${id}' not found`)
+    }
+    if (recipe.disputeStatus !== 'pending') {
+      throw new BadRequestException(`This recipe has no pending dispute (status: ${recipe.disputeStatus})`)
+    }
+    recipe.disputeResolvedAt = new Date()
+    if (approve) {
+      recipe.disputeStatus = 'approved'
+      recipe.duplicateCheckOverride = true
+      recipe.status = 'draft'
+    } else {
+      recipe.disputeStatus = 'denied'
+    }
+    await recipe.save()
+    return recipe
+  }
+
   private extractLinkedIds(ingredients: { items: { linkedRecipeId?: string }[] }[]): string[] {
     return [...new Set(ingredients.flatMap(g => (g.items ?? []).map(i => i.linkedRecipeId).filter((v): v is string => !!v)))]
   }

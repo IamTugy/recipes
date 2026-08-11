@@ -1,4 +1,4 @@
-import { NotFoundException } from '@nestjs/common'
+import { ForbiddenException, NotFoundException } from '@nestjs/common'
 import { RecipesController } from './recipes.controller'
 
 describe('RecipesController', () => {
@@ -17,6 +17,9 @@ describe('RecipesController', () => {
     listRevisions: jest.fn(),
     canViewDraftRevisions: jest.fn(),
     remove: jest.fn(),
+    disputeDuplicate: jest.fn(),
+    listDuplicateDisputes: jest.fn(),
+    resolveDuplicateDispute: jest.fn(),
   }
   const usersService = { namesByIds: jest.fn().mockResolvedValue({}), profilesByIds: jest.fn().mockResolvedValue({}) }
 
@@ -203,5 +206,60 @@ describe('RecipesController', () => {
     const result = await controller.remove('tomato-soup', { userId: 'user_1' } as any)
     expect(recipesService.remove).toHaveBeenCalledWith('tomato-soup', 'user_1', false)
     expect(result).toEqual({ deleted: true })
+  })
+
+  it('POST /recipes/:id/dispute-duplicate disputes the block and logs the activity', async () => {
+    const disputed = { toObject: () => ({ slug: 'a', status: 'rejected', disputeStatus: 'pending' }) }
+    recipesService.disputeDuplicate.mockResolvedValue(disputed)
+    const activityLog = { record: jest.fn(), trendingIds: jest.fn() }
+    const config = { get: jest.fn().mockReturnValue('admin_1') }
+    const controller = new RecipesController(recipesService as any, activityLog as any, config as any, usersService as any)
+
+    const result = await controller.disputeDuplicate('a', { message: 'not a duplicate' }, { userId: 'user_1' } as any)
+
+    expect(recipesService.disputeDuplicate).toHaveBeenCalledWith('a', 'user_1', false, 'not a duplicate')
+    expect(activityLog.record).toHaveBeenCalledWith('user_1', 'a', 'recipe_duplicate_disputed')
+    expect(result).toEqual({ slug: 'a', status: 'rejected', disputeStatus: 'pending' })
+  })
+
+  it('GET /recipes/disputes returns the pending disputes for the app owner', async () => {
+    recipesService.listDuplicateDisputes.mockResolvedValue([{ toObject: () => ({ slug: 'a' }) }])
+    const config = { get: jest.fn().mockReturnValue('owner_1') }
+    const activityLog = { record: jest.fn(), trendingIds: jest.fn() }
+    const controller = new RecipesController(recipesService as any, activityLog as any, config as any, usersService as any)
+
+    const result = await controller.listDuplicateDisputes({ userId: 'owner_1' } as any)
+
+    expect(result).toEqual([{ slug: 'a' }])
+  })
+
+  it('GET /recipes/disputes throws ForbiddenException for a non-owner', async () => {
+    const config = { get: jest.fn().mockReturnValue('owner_1') }
+    const activityLog = { record: jest.fn(), trendingIds: jest.fn() }
+    const controller = new RecipesController(recipesService as any, activityLog as any, config as any, usersService as any)
+
+    await expect(controller.listDuplicateDisputes({ userId: 'user_1' } as any)).rejects.toThrow(ForbiddenException)
+  })
+
+  it('POST /recipes/:id/dispute-duplicate/resolve approves for the app owner and logs the activity', async () => {
+    const resolved = { toObject: () => ({ slug: 'a', status: 'draft', disputeStatus: 'approved' }) }
+    recipesService.resolveDuplicateDispute.mockResolvedValue(resolved)
+    const activityLog = { record: jest.fn(), trendingIds: jest.fn() }
+    const config = { get: jest.fn().mockReturnValue('owner_1') }
+    const controller = new RecipesController(recipesService as any, activityLog as any, config as any, usersService as any)
+
+    const result = await controller.resolveDuplicateDispute('a', { approve: true }, { userId: 'owner_1' } as any)
+
+    expect(recipesService.resolveDuplicateDispute).toHaveBeenCalledWith('a', true)
+    expect(activityLog.record).toHaveBeenCalledWith('owner_1', 'a', 'recipe_duplicate_dispute_approved')
+    expect(result).toEqual({ slug: 'a', status: 'draft', disputeStatus: 'approved' })
+  })
+
+  it('POST /recipes/:id/dispute-duplicate/resolve throws ForbiddenException for a non-owner', async () => {
+    const config = { get: jest.fn().mockReturnValue('owner_1') }
+    const activityLog = { record: jest.fn(), trendingIds: jest.fn() }
+    const controller = new RecipesController(recipesService as any, activityLog as any, config as any, usersService as any)
+
+    await expect(controller.resolveDuplicateDispute('a', { approve: false }, { userId: 'user_1' } as any)).rejects.toThrow(ForbiddenException)
   })
 })
