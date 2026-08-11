@@ -16,6 +16,18 @@ interface SkeletonImageProps {
 // same as every existing image container in this app.
 export default function SkeletonImage({ src, alt, className, onClick, loading, fetchPriority }: SkeletonImageProps) {
   const [loaded, setLoaded] = useState(false)
+  // React reuses this component instance across list re-renders (e.g. a
+  // filter/sort changing which recipe lands at a given grid position)
+  // rather than remounting it - without this, `loaded` would stay true from
+  // the previous src and the new image would show at full opacity (blank,
+  // since it hasn't actually loaded yet) instead of behind the skeleton.
+  // Adjusting state during render (not in an effect) avoids an extra
+  // render where the stale image would flash before resetting.
+  const [trackedSrc, setTrackedSrc] = useState(src)
+  if (src !== trackedSrc) {
+    setTrackedSrc(src)
+    setLoaded(false)
+  }
 
   if (!src) return null
 
