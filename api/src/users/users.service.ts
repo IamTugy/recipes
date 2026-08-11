@@ -25,4 +25,24 @@ export class UsersService {
     for (const user of users) names[user.clerkUserId] = user.name
     return names
   }
+
+  async getPreferences(clerkUserId: string): Promise<{ lang?: 'he' | 'en'; theme?: 'light' | 'dark' | 'system' }> {
+    const user = await this.userModel.findOne({ clerkUserId }).select('lang theme').lean().exec()
+    return { lang: user?.lang, theme: user?.theme }
+  }
+
+  async setPreferences(
+    clerkUserId: string,
+    prefs: { lang?: 'he' | 'en'; theme?: 'light' | 'dark' | 'system' },
+  ): Promise<{ lang?: 'he' | 'en'; theme?: 'light' | 'dark' | 'system' }> {
+    const update: Record<string, unknown> = {}
+    if (prefs.lang !== undefined) update.lang = prefs.lang
+    if (prefs.theme !== undefined) update.theme = prefs.theme
+    const user = await this.userModel
+      .findOneAndUpdate({ clerkUserId }, { $set: update }, { new: true, upsert: false })
+      .select('lang theme')
+      .lean()
+      .exec()
+    return { lang: user?.lang, theme: user?.theme }
+  }
 }

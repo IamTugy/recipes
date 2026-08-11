@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom'
-import { UserButton } from '@clerk/react'
+import { UserButton, useAuth } from '@clerk/react'
 import { useLanguage } from '../hooks/useLanguage'
 import { useTheme } from '../hooks/useTheme'
+import { savePreferences } from '../lib/preferences'
 
 interface NavProps {
   shoppingListCount: number
@@ -12,7 +13,8 @@ interface NavProps {
 export default function Nav({ shoppingListCount, onOpenShoppingList, onToggleMobileSidebar }: NavProps) {
   const navigate = useNavigate()
   const { lang, setLang } = useLanguage()
-  const { mode, cycleTheme } = useTheme()
+  const { mode, setMode } = useTheme()
+  const { isSignedIn, getToken } = useAuth()
 
   const themeLabel = mode === 'light'
     ? (lang === 'he' ? 'מצב כהה' : 'Dark mode')
@@ -20,6 +22,18 @@ export default function Nav({ shoppingListCount, onOpenShoppingList, onToggleMob
       ? (lang === 'he' ? 'לפי המערכת' : 'System theme')
       : (lang === 'he' ? 'מצב בהיר' : 'Light mode')
   const themeIcon = mode === 'light' ? '🌙' : mode === 'dark' ? '🖥️' : '☀️'
+
+  function handleLangClick() {
+    const next = lang === 'he' ? 'en' : 'he'
+    setLang(next)
+    if (isSignedIn) void savePreferences({ lang: next }, getToken)
+  }
+
+  function handleThemeClick() {
+    const next = mode === 'light' ? 'dark' : mode === 'dark' ? 'system' : 'light'
+    setMode(next)
+    if (isSignedIn) void savePreferences({ theme: next }, getToken)
+  }
 
   return (
     <nav className="print:hidden fixed top-0 inset-x-0 z-50 bg-bg/90 backdrop-blur-md border-b border-tint/[0.06]">
@@ -65,12 +79,12 @@ export default function Nav({ shoppingListCount, onOpenShoppingList, onToggleMob
               <UserButton.Action
                 label={lang === 'he' ? 'English' : 'עברית'}
                 labelIcon={<span>🌐</span>}
-                onClick={() => setLang(lang === 'he' ? 'en' : 'he')}
+                onClick={handleLangClick}
               />
               <UserButton.Action
                 label={themeLabel}
                 labelIcon={<span>{themeIcon}</span>}
-                onClick={cycleTheme}
+                onClick={handleThemeClick}
               />
             </UserButton.MenuItems>
           </UserButton>

@@ -25,6 +25,9 @@ import KeyboardShortcutsHelp from './components/KeyboardShortcutsHelp'
 import { useTimers } from './hooks/useTimers'
 import { useShoppingList } from './hooks/useShoppingList'
 import { useSidebar } from './hooks/useSidebar'
+import { useLanguage } from './hooks/useLanguage'
+import { useTheme } from './hooks/useTheme'
+import { fetchPreferences } from './lib/preferences'
 
 export default function App() {
   const { timers, addTimer, toggleTimer, removeTimer, resetTimer } = useTimers()
@@ -32,10 +35,28 @@ export default function App() {
   const sidebar = useSidebar()
   const [shoppingListOpen, setShoppingListOpen] = useState(false)
   const [shortcutsHelpOpen, setShortcutsHelpOpen] = useState(false)
-  const { isLoaded, isSignedIn } = useAuth()
+  const { isLoaded, isSignedIn, getToken } = useAuth()
   const timerPanelRef = useRef<HTMLDivElement>(null)
   const [timerBarHeight, setTimerBarHeight] = useState(0)
   const navigate = useNavigate()
+  const { setLang } = useLanguage()
+  const { setMode } = useTheme()
+
+  // A signed-in user's explicit lang/theme choice (if they've ever set one)
+  // follows them across devices - overrides whatever this device fell back
+  // to (browser language / OS color scheme) the moment we know it. Runs
+  // once per sign-in, not on every render.
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn) return
+    let cancelled = false
+    fetchPreferences(getToken).then(prefs => {
+      if (cancelled) return
+      if (prefs.lang) setLang(prefs.lang)
+      if (prefs.theme) setMode(prefs.theme)
+    })
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoaded, isSignedIn])
 
   // A shared recipe link lands here first (?share=/recipes/<id>) instead of
   // going straight to the hash route, so Home ends up as a real history

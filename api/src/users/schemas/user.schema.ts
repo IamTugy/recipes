@@ -13,6 +13,15 @@ export class User {
 
   @Prop()
   name?: string
+
+  // Explicit user choice, synced across devices - undefined means "no
+  // preference set", in which case the client falls back to the browser's
+  // language / the OS's prefers-color-scheme.
+  @Prop()
+  lang?: 'he' | 'en'
+
+  @Prop()
+  theme?: 'light' | 'dark' | 'system'
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)

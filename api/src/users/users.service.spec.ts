@@ -53,4 +53,55 @@ describe('UsersService', () => {
     expect(find).not.toHaveBeenCalled()
     expect(result).toEqual({})
   })
+
+  it('getPreferences returns lang/theme for a known user', async () => {
+    const exec = jest.fn().mockResolvedValue({ lang: 'he', theme: 'dark' })
+    const lean = jest.fn().mockReturnValue({ exec })
+    const select = jest.fn().mockReturnValue({ lean })
+    const findOne = jest.fn().mockReturnValue({ select })
+    const moduleRef = await Test.createTestingModule({
+      providers: [UsersService, { provide: getModelToken(User.name), useValue: { findOne } }],
+    }).compile()
+
+    const service = moduleRef.get(UsersService)
+    const result = await service.getPreferences('user_1')
+
+    expect(findOne).toHaveBeenCalledWith({ clerkUserId: 'user_1' })
+    expect(result).toEqual({ lang: 'he', theme: 'dark' })
+  })
+
+  it('getPreferences returns undefined fields when the user has none set', async () => {
+    const exec = jest.fn().mockResolvedValue(null)
+    const lean = jest.fn().mockReturnValue({ exec })
+    const select = jest.fn().mockReturnValue({ lean })
+    const findOne = jest.fn().mockReturnValue({ select })
+    const moduleRef = await Test.createTestingModule({
+      providers: [UsersService, { provide: getModelToken(User.name), useValue: { findOne } }],
+    }).compile()
+
+    const service = moduleRef.get(UsersService)
+    const result = await service.getPreferences('user_1')
+
+    expect(result).toEqual({ lang: undefined, theme: undefined })
+  })
+
+  it('setPreferences only $sets the provided fields', async () => {
+    const exec = jest.fn().mockResolvedValue({ lang: 'en', theme: undefined })
+    const lean = jest.fn().mockReturnValue({ exec })
+    const select = jest.fn().mockReturnValue({ lean })
+    const findOneAndUpdate = jest.fn().mockReturnValue({ select })
+    const moduleRef = await Test.createTestingModule({
+      providers: [UsersService, { provide: getModelToken(User.name), useValue: { findOneAndUpdate } }],
+    }).compile()
+
+    const service = moduleRef.get(UsersService)
+    const result = await service.setPreferences('user_1', { lang: 'en' })
+
+    expect(findOneAndUpdate).toHaveBeenCalledWith(
+      { clerkUserId: 'user_1' },
+      { $set: { lang: 'en' } },
+      { new: true, upsert: false },
+    )
+    expect(result).toEqual({ lang: 'en', theme: undefined })
+  })
 })

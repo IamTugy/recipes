@@ -37,7 +37,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <ThemeContext.Provider value={{ theme, mode, cycleTheme }}>
+    <ThemeContext.Provider value={{ theme, mode, cycleTheme, setMode }}>
       {children}
     </ThemeContext.Provider>
   )
