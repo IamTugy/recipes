@@ -444,6 +444,18 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
   const rawReview = reviewResult ?? recipe?.qualityReview ?? null
   const review = useTranslatedReview(rawReview, lang, getToken)
 
+  // Same "compute unconditionally before any early return" rule - these
+  // must run every render regardless of whether recipe/displayRecipe have
+  // loaded yet.
+  const { text: displayTitle, loading: titleLoading } = useTranslatedText(
+    lang === 'he' ? displayRecipe?.titleHe : displayRecipe?.title,
+    lang === 'he' ? displayRecipe?.title : displayRecipe?.titleHe,
+  )
+  const { text: displayDescription, loading: descriptionLoading } = useTranslatedText(
+    lang === 'he' ? displayRecipe?.description : displayRecipe?.descriptionEn,
+    lang === 'he' ? displayRecipe?.descriptionEn : displayRecipe?.description,
+  )
+
   if (recipeLoading) {
     return <RecipeDetailSkeleton />
   }
@@ -500,14 +512,6 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
     : []
 
 
-  const { text: displayTitle, loading: titleLoading } = useTranslatedText(
-    lang === 'he' ? displayRecipe.titleHe : displayRecipe.title,
-    lang === 'he' ? displayRecipe.title : displayRecipe.titleHe,
-  )
-  const { text: displayDescription, loading: descriptionLoading } = useTranslatedText(
-    lang === 'he' ? displayRecipe.description : displayRecipe.descriptionEn,
-    lang === 'he' ? displayRecipe.descriptionEn : displayRecipe.description,
-  )
   // tips/tipsEn are parallel arrays (line N of one corresponds to line N of
   // the other, same as how they're edited in RecipeForm) - the longer of
   // the two decides how many rows to render, and each row is translated
