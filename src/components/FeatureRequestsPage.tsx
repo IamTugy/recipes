@@ -1,9 +1,12 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useAuth } from '@clerk/react'
 import { useFeatureRequests } from '../hooks/useFeatureRequests'
 import { useLanguage } from '../hooks/useLanguage'
 import { useToast } from '../hooks/useToast'
 import { OWNER_USER_ID } from '../lib/admin'
+import { embedFeatureRequestImage, extractFeatureRequestImage } from '../lib/featureRequestImage'
+import { resizedImage } from '../lib/image'
+import SkeletonImage from './SkeletonImage'
 
 type RequestStatus = 'pending' | 'approved' | 'denied' | 'in-progress' | 'needs-input' | 'pr-open' | 'closed'
 
@@ -20,10 +23,12 @@ function getStatus(labels: string[], state: string): RequestStatus {
 export default function FeatureRequestsPage() {
   const { lang } = useLanguage()
   const { showToast } = useToast()
-  const { userId } = useAuth()
+  const { userId, getToken } = useAuth()
   const { requests, loading, create, approve, unapprove, update, withdraw, deny } = useFeatureRequests()
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null)
+  const [photoUploading, setPhotoUploading] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [denyingNumber, setDenyingNumber] = useState<number | null>(null)
   const [denyReason, setDenyReason] = useState('')
@@ -31,17 +36,64 @@ export default function FeatureRequestsPage() {
   const [editingNumber, setEditingNumber] = useState<number | null>(null)
   const [editTitle, setEditTitle] = useState('')
   const [editDescription, setEditDescription] = useState('')
+  const [editPhotoUrl, setEditPhotoUrl] = useState<string | null>(null)
+  const [editPhotoUploading, setEditPhotoUploading] = useState(false)
   const [savingEdit, setSavingEdit] = useState(false)
+  const uploadIdRef = useRef(`new-${Date.now()}`)
+
+  async function uploadPhoto(uploadId: string, file: File): Promise<string | null> {
+    const token = await getToken()
+    const presignRes = await fetch('/api/uploads/presign', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({ recipeId: uploadId, contentType: file.type, purpose: 'feature-request' }),
+    })
+    if (!presignRes.ok) return null
+    const { uploadUrl, publicUrl } = await presignRes.json()
+    const uploadResult = await fetch(uploadUrl, { method: 'PUT', headers: { 'Content-Type': file.type }, body: file })
+    return uploadResult.ok ? publicUrl : null
+  }
+
+  async function handlePhotoSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file || !['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) return
+    setPhotoUploading(true)
+    try {
+      const publicUrl = await uploadPhoto(uploadIdRef.current, file)
+      if (publicUrl) setPhotoUrl(publicUrl)
+    } finally {
+      setPhotoUploading(false)
+    }
+  }
+
+  async function handleEditPhotoSelect(number: number, e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file || !['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) return
+    setEditPhotoUploading(true)
+    try {
+      const publicUrl = await uploadPhoto(`edit-${number}`, file)
+      if (publicUrl) setEditPhotoUrl(publicUrl)
+    } finally {
+      setEditPhotoUploading(false)
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!title.trim() || !description.trim()) return
     setSubmitting(true)
-    const ok = await create(title.trim(), description.trim())
+    const ok = await create(title.trim(), embedFeatureRequestImage(description.trim(), photoUrl))
     setSubmitting(false)
     if (ok) {
       setTitle('')
       setDescription('')
+      setPhotoUrl(null)
+      uploadIdRef.current = `new-${Date.now()}`
       showToast(lang === 'he' ? 'הבקשה נשלחה' : 'Request submitted')
     }
   }
@@ -57,21 +109,24 @@ export default function FeatureRequestsPage() {
   }
 
   function startEdit(r: { number: number, title: string, body: string }) {
+    const { text, imageUrl } = extractFeatureRequestImage(r.body.split('\n---\n')[0])
     setEditingNumber(r.number)
     setEditTitle(r.title)
-    setEditDescription(r.body.split('\n---\n')[0])
+    setEditDescription(text)
+    setEditPhotoUrl(imageUrl)
   }
 
   function cancelEdit() {
     setEditingNumber(null)
     setEditTitle('')
     setEditDescription('')
+    setEditPhotoUrl(null)
   }
 
   async function handleSaveEdit(number: number) {
     if (!editTitle.trim() || !editDescription.trim()) return
     setSavingEdit(true)
-    const ok = await update(number, editTitle.trim(), editDescription.trim())
+    const ok = await update(number, editTitle.trim(), embedFeatureRequestImage(editDescription.trim(), editPhotoUrl))
     setSavingEdit(false)
     if (ok) {
       cancelEdit()
@@ -129,14 +184,50 @@ export default function FeatureRequestsPage() {
             required
             className="w-full bg-tint/[0.03] border border-tint/10 rounded-lg px-3 py-2 text-sm text-cream/80 placeholder-cream/25 outline-none focus:border-amber/30 transition-colors resize-none"
           />
-          <button type="submit"
-            disabled={submitting || !title.trim() || !description.trim()}
-            className="btn-primary disabled:opacity-50"
-          >
-            {submitting
-              ? (lang === 'he' ? 'שולח...' : 'Submitting...')
-              : (lang === 'he' ? 'שלח בקשה' : 'Submit request')}
-          </button>
+          {photoUrl && (
+            <div className="relative w-24 h-24">
+              <SkeletonImage
+                src={resizedImage(photoUrl, 160)}
+                alt=""
+                className="w-full h-full object-cover rounded-lg"
+              />
+              <button type="button"
+                onClick={() => setPhotoUrl(null)}
+                aria-label={lang === 'he' ? 'הסר תמונה' : 'Remove photo'}
+                className="absolute -top-1.5 -right-1.5 h-5 w-5 flex items-center justify-center rounded-full bg-black/60 text-white text-[10px] hover:bg-black/80"
+              >
+                ✕
+              </button>
+            </div>
+          )}
+          <div className="flex items-center gap-2">
+            <label className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-tint/10 text-cream/40 hover:text-cream/70 cursor-pointer transition-colors">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              {photoUploading
+                ? (lang === 'he' ? 'מעלה...' : 'Uploading...')
+                : photoUrl
+                  ? (lang === 'he' ? 'החלף תמונה' : 'Replace photo')
+                  : (lang === 'he' ? 'הוסף תמונה' : 'Add photo')}
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={handlePhotoSelect}
+                disabled={photoUploading}
+                className="hidden"
+              />
+            </label>
+            <button type="submit"
+              disabled={submitting || !title.trim() || !description.trim() || photoUploading}
+              className="btn-primary disabled:opacity-50"
+            >
+              {submitting
+                ? (lang === 'he' ? 'שולח...' : 'Submitting...')
+                : (lang === 'he' ? 'שלח בקשה' : 'Submit request')}
+            </button>
+          </div>
         </form>
 
         {loading ? (
@@ -171,6 +262,7 @@ export default function FeatureRequestsPage() {
               const canEdit = status === 'pending' && r.submittedBy === userId
               const canDeny = status === 'pending' || status === 'needs-input'
               const isEditing = editingNumber === r.number
+              const { text: bodyText, imageUrl: bodyImageUrl } = extractFeatureRequestImage(r.body.split('\n---\n')[0])
               return (
                 <div key={r.number} className="card p-4">
                   {isEditing ? (
@@ -190,10 +282,40 @@ export default function FeatureRequestsPage() {
                         required
                         className="w-full bg-tint/[0.03] border border-tint/10 rounded-lg px-3 py-2 text-sm text-cream/80 outline-none focus:border-amber/30 transition-colors resize-none"
                       />
+                      {editPhotoUrl && (
+                        <div className="relative w-24 h-24">
+                          <SkeletonImage
+                            src={resizedImage(editPhotoUrl, 160)}
+                            alt=""
+                            className="w-full h-full object-cover rounded-lg"
+                          />
+                          <button type="button"
+                            onClick={() => setEditPhotoUrl(null)}
+                            aria-label={lang === 'he' ? 'הסר תמונה' : 'Remove photo'}
+                            className="absolute -top-1.5 -right-1.5 h-5 w-5 flex items-center justify-center rounded-full bg-black/60 text-white text-[10px] hover:bg-black/80"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      )}
                       <div className="flex items-center gap-3">
+                        <label className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-tint/10 text-cream/40 hover:text-cream/70 cursor-pointer transition-colors">
+                          {editPhotoUploading
+                            ? (lang === 'he' ? 'מעלה...' : 'Uploading...')
+                            : editPhotoUrl
+                              ? (lang === 'he' ? 'החלף תמונה' : 'Replace photo')
+                              : (lang === 'he' ? 'הוסף תמונה' : 'Add photo')}
+                          <input
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp"
+                            onChange={e => handleEditPhotoSelect(r.number, e)}
+                            disabled={editPhotoUploading}
+                            className="hidden"
+                          />
+                        </label>
                         <button type="button"
                           onClick={() => handleSaveEdit(r.number)}
-                          disabled={savingEdit || !editTitle.trim() || !editDescription.trim()}
+                          disabled={savingEdit || !editTitle.trim() || !editDescription.trim() || editPhotoUploading}
                           className="btn-primary disabled:opacity-50 text-xs px-3 py-1.5"
                         >
                           {savingEdit
@@ -217,8 +339,17 @@ export default function FeatureRequestsPage() {
                         </span>
                       </div>
                       <p className="text-sm text-cream/60 whitespace-pre-wrap mb-2">
-                        {r.body.split('\n---\n')[0]}
+                        {bodyText}
                       </p>
+                      {bodyImageUrl && (
+                        <a href={bodyImageUrl} target="_blank" rel="noreferrer" className="block w-24 h-24 mb-2">
+                          <SkeletonImage
+                            src={resizedImage(bodyImageUrl, 160)}
+                            alt=""
+                            className="w-full h-full object-cover rounded-lg"
+                          />
+                        </a>
+                      )}
                       {status === 'denied' && r.denialReason && (
                         <p className="text-sm text-red-400/80 whitespace-pre-wrap mb-2">
                           {lang === 'he' ? 'סיבת הדחייה: ' : 'Denial reason: '}{r.denialReason}
