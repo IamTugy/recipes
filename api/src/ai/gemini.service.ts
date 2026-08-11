@@ -28,12 +28,12 @@ export class GeminiService {
   // itself must instruct Gemini on the exact shape to return, since this
   // relies on responseMimeType rather than a strict schema object (keeps
   // this method resilient to SDK schema-type API changes across versions).
-  async generateStructured<T>(prompt: string): Promise<T> {
+  async generateStructured<T>(prompt: string, temperature?: number): Promise<T> {
     const client = this.getClient()
     const response = await client.models.generateContent({
       model: this.model,
       contents: prompt,
-      config: { responseMimeType: 'application/json' },
+      config: { responseMimeType: 'application/json', ...(temperature !== undefined ? { temperature } : {}) },
     })
     if (!response.text) throw new Error('Gemini returned an empty response')
     return JSON.parse(response.text) as T
