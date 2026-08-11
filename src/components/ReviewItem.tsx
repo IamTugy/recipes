@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { resizedImage } from '../lib/image'
+import SkeletonImage from './SkeletonImage'
 
 export interface Review {
   id: string
@@ -188,12 +189,14 @@ export default function ReviewItem({ recipeId, review, lang, getToken, onOpenLig
         </button>
       )}
       {review.photoUrl && (
-        <img
-          src={resizedImage(review.photoUrl, 320)}
-          alt=""
-          onClick={() => onOpenLightbox(review.photoUrl!)}
-          className="mt-2 w-28 h-28 object-cover rounded-lg cursor-zoom-in"
-        />
+        <div className="relative mt-2 w-28 h-28 rounded-lg overflow-hidden">
+          <SkeletonImage
+            src={resizedImage(review.photoUrl, 320)}
+            alt=""
+            onClick={() => onOpenLightbox(review.photoUrl!)}
+            className="w-full h-full object-cover cursor-zoom-in"
+          />
+        </div>
       )}
       <div className="flex items-center gap-4 mt-2">
         <UpvoteButton upvoted={upvoted} count={upvoteCount} onToggle={toggleReviewUpvote} lang={lang} />

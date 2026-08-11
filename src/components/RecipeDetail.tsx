@@ -27,6 +27,7 @@ import ReviewItem, { type Review } from './ReviewItem'
 import ConfirmDialog from './ConfirmDialog'
 import type { TimerState, RecipeRevision, QualityReview } from '../types'
 import { resizedImage } from '../lib/image'
+import SkeletonImage from './SkeletonImage'
 
 interface RecipeDetailProps {
   onAddTimer: (label: string, minutes: number, recipeId: string, stepIndex: number) => void
@@ -632,7 +633,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
       {/* Hero image */}
       <div className="print:hidden relative h-64 sm:h-96 overflow-hidden">
         {displayRecipe.image?.includes('assets.tugy.dev') ? (
-          <img
+          <SkeletonImage
             src={resizedImage(displayRecipe.image, 1200)}
             alt={displayTitle}
             onClick={() => setLightboxUrl(displayRecipe.image!)}
@@ -1299,12 +1300,16 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                                 </p>
 
                                 {step.image && (
-                                  <img
-                                    src={resizedImage(step.image, 160)}
-                                    alt=""
+                                  <div
+                                    className="print:hidden relative mt-2 w-20 h-20 rounded-lg overflow-hidden cursor-zoom-in"
                                     onClick={e => { e.stopPropagation(); setLightboxUrl(step.image!) }}
-                                    className="print:hidden mt-2 w-20 h-20 object-cover rounded-lg cursor-zoom-in"
-                                  />
+                                  >
+                                    <SkeletonImage
+                                      src={resizedImage(step.image, 160)}
+                                      alt=""
+                                      className="w-full h-full object-cover"
+                                    />
+                                  </div>
                                 )}
 
                                 {tip && !checked && (
@@ -1495,12 +1500,14 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                 {reviewComment}
               </p>
               {reviewPhotoUrl && (
-                <img
-                  src={resizedImage(reviewPhotoUrl, 160)}
-                  alt=""
-                  onClick={() => setLightboxUrl(reviewPhotoUrl)}
-                  className="w-24 h-24 object-cover rounded-lg cursor-zoom-in"
-                />
+                <div className="relative w-24 h-24 rounded-lg overflow-hidden">
+                  <SkeletonImage
+                    src={resizedImage(reviewPhotoUrl, 160)}
+                    alt=""
+                    onClick={() => setLightboxUrl(reviewPhotoUrl)}
+                    className="w-full h-full object-cover cursor-zoom-in"
+                  />
+                </div>
               )}
             </div>
           ) : (
@@ -1522,7 +1529,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
             />
             {reviewPhotoUrl && (
               <div className="relative w-24 h-24">
-                <img
+                <SkeletonImage
                   src={resizedImage(reviewPhotoUrl, 160)}
                   alt=""
                   onClick={() => setLightboxUrl(reviewPhotoUrl)}
@@ -1696,7 +1703,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                   <Link key={r.id} to={`/recipes/${r.id}`} className="group">
                     <div className="relative h-24 rounded-xl overflow-hidden mb-2">
                       {r.image?.includes('assets.tugy.dev') ? (
-                        <img
+                        <SkeletonImage
                           src={resizedImage(r.image, 320)}
                           alt={title}
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"

@@ -3,6 +3,7 @@ import type { Recipe } from '../types'
 import { categoryEmoji } from '../i18n'
 import { useLanguage } from '../hooks/useLanguage'
 import { resizedImage } from '../lib/image'
+import SkeletonImage from './SkeletonImage'
 
 interface RecipeStripProps {
   title: string
@@ -24,7 +25,7 @@ export default function RecipeStrip({ title, recipes }: RecipeStripProps) {
             <Link key={r.id} to={`/recipes/${r.id}`} className="shrink-0 w-32 group">
               <div className="relative h-20 w-32 rounded-lg overflow-hidden mb-1.5">
                 {r.image?.includes('assets.tugy.dev') ? (
-                  <img
+                  <SkeletonImage
                     src={resizedImage(r.image, 320)}
                     alt={recipeTitle}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"

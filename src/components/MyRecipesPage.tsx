@@ -10,6 +10,7 @@ import RecipeCardSkeleton from './RecipeCardSkeleton'
 import RecipePlaceholder from './RecipePlaceholder'
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll'
 import { resizedImage } from '../lib/image'
+import SkeletonImage from './SkeletonImage'
 
 const categories: Category[] = ['breakfast', 'lunch', 'dinner', 'dessert', 'salad', 'soup', 'snack', 'bread', 'sauce']
 const difficulties: Difficulty[] = ['easy', 'medium', 'hard']
@@ -254,9 +255,9 @@ export default function MyRecipesPage() {
                     onClick={() => navigate(`/recipes/${r.id}`)}
                     className="card w-full flex items-center gap-3 p-2 text-start"
                   >
-                    <div className="w-12 h-12 rounded-lg overflow-hidden shrink-0">
+                    <div className="relative w-12 h-12 rounded-lg overflow-hidden shrink-0">
                       {r.image?.includes('assets.tugy.dev') ? (
-                        <img src={resizedImage(r.image, 160)} alt="" className="w-full h-full object-cover" />
+                        <SkeletonImage src={resizedImage(r.image, 160)} alt="" className="w-full h-full object-cover" />
                       ) : (
                         <RecipePlaceholder recipe={r} />
                       )}

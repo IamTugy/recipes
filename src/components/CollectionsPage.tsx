@@ -5,6 +5,7 @@ import { useRecipes } from '../hooks/useRecipes'
 import { useLanguage } from '../hooks/useLanguage'
 import { useToast } from '../hooks/useToast'
 import { resizedImage } from '../lib/image'
+import SkeletonImage from './SkeletonImage'
 
 interface CollectionsPageProps {
   onAddToShoppingList: (items: { name: string; amount: number | null; unit: string }[]) => void
@@ -166,7 +167,7 @@ export default function CollectionsPage({ onAddToShoppingList }: CollectionsPage
                           <Link to={`/recipes/${slug}`}>
                             <div className="relative h-24 rounded-xl overflow-hidden mb-2 bg-tint/[0.04]">
                               {r.image?.includes('assets.tugy.dev') && (
-                                <img src={resizedImage(r.image, 320)} alt={title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+                                <SkeletonImage src={resizedImage(r.image, 320)} alt={title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
                               )}
                             </div>
                             <p className="text-xs text-cream/70 line-clamp-1">{title}</p>
