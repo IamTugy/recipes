@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { UserButton } from '@clerk/react'
 import { useLanguage } from '../hooks/useLanguage'
+import { useTheme } from '../hooks/useTheme'
 
 interface NavProps {
   shoppingListCount: number
@@ -10,7 +11,15 @@ interface NavProps {
 
 export default function Nav({ shoppingListCount, onOpenShoppingList, onToggleMobileSidebar }: NavProps) {
   const navigate = useNavigate()
-  const { lang } = useLanguage()
+  const { lang, setLang } = useLanguage()
+  const { mode, cycleTheme } = useTheme()
+
+  const themeLabel = mode === 'light'
+    ? (lang === 'he' ? 'מצב כהה' : 'Dark mode')
+    : mode === 'dark'
+      ? (lang === 'he' ? 'לפי המערכת' : 'System theme')
+      : (lang === 'he' ? 'מצב בהיר' : 'Light mode')
+  const themeIcon = mode === 'light' ? '🌙' : mode === 'dark' ? '🖥️' : '☀️'
 
   return (
     <nav className="print:hidden fixed top-0 inset-x-0 z-50 bg-bg/90 backdrop-blur-md border-b border-tint/[0.06]">
@@ -51,7 +60,20 @@ export default function Nav({ shoppingListCount, onOpenShoppingList, onToggleMob
             )}
           </button>
 
-          <UserButton />
+          <UserButton>
+            <UserButton.MenuItems>
+              <UserButton.Action
+                label={lang === 'he' ? 'English' : 'עברית'}
+                labelIcon={<span>🌐</span>}
+                onClick={() => setLang(lang === 'he' ? 'en' : 'he')}
+              />
+              <UserButton.Action
+                label={themeLabel}
+                labelIcon={<span>{themeIcon}</span>}
+                onClick={cycleTheme}
+              />
+            </UserButton.MenuItems>
+          </UserButton>
         </div>
       </div>
     </nav>

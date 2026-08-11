@@ -2,7 +2,6 @@ import { type ReactNode } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Dialog } from '@base-ui/react/dialog'
 import { useLanguage } from '../hooks/useLanguage'
-import { useTheme } from '../hooks/useTheme'
 import { useMyRecipes } from '../hooks/useRecipes'
 import type { useSidebar } from '../hooks/useSidebar'
 
@@ -22,8 +21,7 @@ export default function Sidebar({ sidebar }: SidebarProps) {
   const { collapsed, setCollapsed, mobileOpen, setMobileOpen } = sidebar
   const navigate = useNavigate()
   const location = useLocation()
-  const { lang, setLang } = useLanguage()
-  const { mode, cycleTheme } = useTheme()
+  const { lang } = useLanguage()
   const { recipes: myRecipes } = useMyRecipes()
   const attentionCount = myRecipes.filter(r => r.status === 'rejected').length
 
@@ -110,26 +108,8 @@ export default function Sidebar({ sidebar }: SidebarProps) {
           </div>
         </nav>
 
-        <div className="p-3 border-t border-tint/[0.06] space-y-1">
-          <button
-            type="button"
-            onClick={() => setLang(lang === 'he' ? 'en' : 'he')}
-            title={lang === 'he' ? 'English' : 'עברית'}
-            className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm w-full text-cream/60 hover:text-cream/90 hover:bg-tint/[0.05] transition-colors ${showLabel ? '' : 'justify-center'}`}
-          >
-            <span className="w-4 h-4 flex items-center justify-center text-sm shrink-0">🌐</span>
-            {showLabel && (lang === 'he' ? 'English' : 'עברית')}
-          </button>
-          <button
-            type="button"
-            onClick={cycleTheme}
-            title={mode === 'light' ? 'Switch to dark mode' : mode === 'dark' ? 'Switch to system theme' : 'Switch to light mode'}
-            className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm w-full text-cream/60 hover:text-cream/90 hover:bg-tint/[0.05] transition-colors ${showLabel ? '' : 'justify-center'}`}
-          >
-            <span className="w-4 h-4 flex items-center justify-center text-sm shrink-0">{mode === 'light' ? '🌙' : mode === 'dark' ? '🖥️' : '☀️'}</span>
-            {showLabel && (mode === 'light' ? (lang === 'he' ? 'מצב כהה' : 'Dark mode') : mode === 'dark' ? (lang === 'he' ? 'לפי המערכת' : 'System theme') : (lang === 'he' ? 'מצב בהיר' : 'Light mode'))}
-          </button>
-          {showLabel && (
+        {showLabel && (
+          <div className="p-3 border-t border-tint/[0.06]">
             <button
               type="button"
               onClick={() => setCollapsed(true)}
@@ -140,8 +120,8 @@ export default function Sidebar({ sidebar }: SidebarProps) {
               </svg>
               {lang === 'he' ? 'כווץ' : 'Collapse'}
             </button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     )
   }
