@@ -83,7 +83,7 @@ export default function ShoppingListPanel({
           <Dialog.Backdrop className="print:hidden fixed inset-0 bg-black/40 z-40 transition-opacity duration-150 data-[starting-style]:opacity-0 data-[ending-style]:opacity-0" />
           <Dialog.Viewport className="print:hidden fixed inset-0 z-50">
             <Dialog.Popup
-              className="fixed top-0 right-0 h-full w-full sm:w-96 bg-card shadow-2xl flex flex-col transition-transform duration-150 data-[starting-style]:translate-x-full data-[ending-style]:translate-x-full"
+              className={`fixed top-0 h-full w-full sm:w-96 bg-card shadow-2xl flex flex-col transition-transform duration-150 ${lang === 'he' ? 'left-0 data-[starting-style]:-translate-x-full data-[ending-style]:-translate-x-full' : 'right-0 data-[starting-style]:translate-x-full data-[ending-style]:translate-x-full'}`}
               dir={lang === 'he' ? 'rtl' : 'ltr'}
             >
             <div className="flex items-center justify-between px-5 h-14 border-b border-tint/[0.06]">

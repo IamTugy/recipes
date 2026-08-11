@@ -39,7 +39,7 @@ export default function App() {
   const timerPanelRef = useRef<HTMLDivElement>(null)
   const [timerBarHeight, setTimerBarHeight] = useState(0)
   const navigate = useNavigate()
-  const { setLang } = useLanguage()
+  const { lang, setLang } = useLanguage()
   const { setMode } = useTheme()
 
   // A signed-in user's explicit lang/theme choice (if they've ever set one)
@@ -122,7 +122,9 @@ export default function App() {
         onToggleMobileSidebar={() => sidebar.setMobileOpen(o => !o)}
       />
       <Sidebar sidebar={sidebar} />
-      <div className={`app-routes transition-[padding] duration-200 print:pl-0 ${sidebar.collapsed ? 'sm:pl-16' : 'sm:pl-60'}`}>
+      <div className={`app-routes transition-[padding] duration-200 print:pl-0 ${lang === 'he'
+        ? (sidebar.collapsed ? 'sm:pr-16' : 'sm:pr-60')
+        : (sidebar.collapsed ? 'sm:pl-16' : 'sm:pl-60')}`}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/collections" element={<CollectionsPage onAddToShoppingList={shoppingList.addItems} />} />
