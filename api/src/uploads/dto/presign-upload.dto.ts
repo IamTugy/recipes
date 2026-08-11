@@ -1,7 +1,7 @@
 import { IsIn, IsOptional, IsString, MinLength } from 'class-validator'
 
 const ALLOWED_CONTENT_TYPES = ['image/jpeg', 'image/png', 'image/webp']
-const PURPOSES = ['review', 'recipe']
+const PURPOSES = ['review', 'recipe', 'feature-request']
 
 export class PresignUploadDto {
   @IsString()
@@ -13,5 +13,5 @@ export class PresignUploadDto {
 
   @IsIn(PURPOSES)
   @IsOptional()
-  purpose?: 'review' | 'recipe'
+  purpose?: 'review' | 'recipe' | 'feature-request'
 }

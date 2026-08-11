@@ -50,6 +50,13 @@ describe('UploadsService', () => {
     expect(result.publicUrl).toMatch(/^https:\/\/recipes-assets\.tugy\.dev\/recipes\/tomato-soup\/[^/]+\.jpg$/)
   })
 
+  it('uses the feature-requests/<slug>/ folder when purpose is "feature-request"', async () => {
+    const service = await makeService()
+    const result = await service.presignPhotoUpload('new-123', 'image/jpeg', 'feature-request')
+
+    expect(result.publicUrl).toMatch(/^https:\/\/recipes-assets\.tugy\.dev\/feature-requests\/new-123\/[^/]+\.jpg$/)
+  })
+
   it('maps content types to the correct file extension', async () => {
     const service = await makeService()
     const png = await service.presignPhotoUpload('tomato-soup', 'image/png')
