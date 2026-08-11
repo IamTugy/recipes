@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useAuth } from '@clerk/react'
 import { apiFetch } from '../lib/api'
+import { usePolling } from './usePolling'
+
+const POLL_INTERVAL_MS = 30_000
 
 export interface FeatureRequest {
   number: number
@@ -27,6 +30,11 @@ export function useFeatureRequests() {
   }, [isLoaded, isSignedIn, getToken])
 
   useEffect(() => { load() }, [load])
+
+  // Status (approved/denied/in-progress/pr-open/closed) is driven by a
+  // background worker + Claude agent acting on the GitHub issue, not by
+  // anything this tab does - poll so it shows up without a manual refresh.
+  usePolling(load, POLL_INTERVAL_MS, isLoaded && isSignedIn)
 
   const create = useCallback(async (title: string, description: string) => {
     const token = await getToken()
