@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { t } from "../i18n";
 
 interface Section {
   id: string
@@ -18,6 +19,7 @@ interface RecipeSectionNavProps {
 // collapsed/expanded state, which isn't worth the complexity for a
 // nice-to-have shortcut.
 export default function RecipeSectionNav({ sections, lang }: RecipeSectionNavProps) {
+  const tx = t[lang]
   const [activeId, setActiveId] = useState(sections[0]?.id ?? '')
 
   useEffect(() => {
@@ -45,7 +47,7 @@ export default function RecipeSectionNav({ sections, lang }: RecipeSectionNavPro
 
   return (
     <nav
-      aria-label={lang === 'he' ? 'ניווט מהיר במתכון' : 'Quick recipe navigation'}
+      aria-label={tx.quickRecipeNavigation}
       className={`print:hidden hidden xl:flex fixed top-1/2 -translate-y-1/2 ${lang === 'he' ? 'left-6' : 'right-6'} z-30 flex-col gap-1 card p-2`}
     >
       {sections.map(s => (

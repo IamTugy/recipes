@@ -1,6 +1,7 @@
 import { useLanguage } from '../hooks/useLanguage'
 import Modal from './Modal'
 import { Dialog } from '@base-ui/react/dialog'
+import { t } from "../i18n";
 
 interface KeyboardShortcutsHelpProps {
   open: boolean
@@ -9,31 +10,25 @@ interface KeyboardShortcutsHelpProps {
 
 export default function KeyboardShortcutsHelp({ open, onClose }: KeyboardShortcutsHelpProps) {
   const { lang } = useLanguage()
+        const tx = t[lang]
 
-  const shortcuts = lang === 'he'
-    ? [
-      { keys: '/', label: 'התמקדות בשדה החיפוש' },
-      { keys: 'Esc', label: 'ניקוי חיפוש / סגירת חלונות' },
-      { keys: '← →', label: 'ניווט בין שלבים במצב הדרכה' },
-      { keys: '?', label: 'הצגת המקשים האלה' },
-    ]
-    : [
-      { keys: '/', label: 'Focus the search box' },
-      { keys: 'Esc', label: 'Clear search / close dialogs' },
-      { keys: '← →', label: 'Navigate steps in Guided Mode' },
-      { keys: '?', label: 'Show this help' },
-    ]
+  const shortcuts = [
+    { keys: '/', label: tx.shortcutFocusSearch },
+    { keys: 'Esc', label: tx.shortcutClearSearch },
+    { keys: '← →', label: tx.shortcutNavigateSteps },
+    { keys: '?', label: tx.shortcutShowHelp },
+  ]
 
   return (
     <Modal open={open} onOpenChange={next => { if (!next) onClose() }} zIndexClassName="z-[60]" panelClassName="max-w-sm p-6">
       <div dir={lang === 'he' ? 'rtl' : 'ltr'}>
         <div className="flex items-center justify-between mb-4">
           <Dialog.Title className="font-serif text-lg font-bold text-cream">
-            {lang === 'he' ? 'מקשי קיצור' : 'Keyboard shortcuts'}
+            {tx.keyboardShortcuts}
           </Dialog.Title>
           <button type="button"
             onClick={onClose}
-            aria-label={lang === 'he' ? 'סגור' : 'Close'}
+            aria-label={tx.close}
             className="h-8 w-8 flex items-center justify-center rounded-lg text-cream/50 hover:text-cream hover:bg-tint/[0.06] transition-colors"
           >
             ✕

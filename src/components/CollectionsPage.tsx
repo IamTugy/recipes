@@ -7,6 +7,7 @@ import { useToast } from '../hooks/useToast'
 import { resizedImage } from '../lib/image'
 import TranslatedText from './TranslatedText'
 import SkeletonImage from './SkeletonImage'
+import { t } from "../i18n";
 
 interface CollectionsPageProps {
   onAddToShoppingList: (items: { name: string; amount: number | null; unit: string }[]) => void
@@ -14,6 +15,7 @@ interface CollectionsPageProps {
 
 export default function CollectionsPage({ onAddToShoppingList }: CollectionsPageProps) {
   const { lang } = useLanguage()
+        const tx = t[lang]
   const { showToast } = useToast()
   const { collections, loading, create, rename, remove, removeRecipe } = useCollections()
   const { recipes } = useRecipes()
@@ -37,12 +39,12 @@ export default function CollectionsPage({ onAddToShoppingList }: CollectionsPage
     if (!name) return
     create(name)
     setNewName('')
-    showToast(lang === 'he' ? `האוסף "${name}" נוצר` : `Collection "${name}" created`)
+    showToast(tx.collectionCreatedNamed(name))
   }
 
   function handleRemove(id: string, name: string) {
     remove(id)
-    showToast(lang === 'he' ? `האוסף "${name}" נמחק` : `Collection "${name}" deleted`)
+    showToast(tx.collectionDeletedNamed(name))
   }
 
   function handleAddCollectionToShoppingList(slugs: string[]) {
@@ -59,18 +61,14 @@ export default function CollectionsPage({ onAddToShoppingList }: CollectionsPage
       )
       onAddToShoppingList(items)
     }
-    showToast(
-      lang === 'he'
-        ? `המצרכים של ${recipeCount} מתכונים נוספו לרשימת הקניות`
-        : `Added ingredients from ${recipeCount} recipes to your shopping list`
-    )
+    showToast(tx.ingredientsFromRecipesAddedToShoppingList(recipeCount))
   }
 
   return (
     <div className="print:hidden min-h-dvh bg-bg pt-20 pb-16 px-4">
       <div className="max-w-3xl mx-auto">
         <h1 className="font-serif text-2xl font-bold text-cream mb-6">
-          {lang === 'he' ? 'שמורים' : 'My Collections'}
+          {tx.myCollections}
         </h1>
 
         <div className="card p-4 mb-6 flex gap-2">
@@ -78,9 +76,9 @@ export default function CollectionsPage({ onAddToShoppingList }: CollectionsPage
             value={newName}
             onChange={e => setNewName(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter') handleCreate() }}
-            placeholder={lang === 'he' ? 'שם אוסף חדש...' : 'New collection name...'}
+            placeholder={tx.newCollectionName2}
             maxLength={60}
-            aria-label={lang === 'he' ? 'שם אוסף חדש' : 'New collection name'}
+            aria-label={tx.newCollectionName}
             className="flex-1 bg-tint/[0.03] border border-tint/10 rounded-lg px-3 py-2 text-sm text-cream/80 placeholder-cream/25 outline-none focus:border-amber/30 transition-colors"
             dir={lang === 'he' ? 'rtl' : 'ltr'}
           />
@@ -89,15 +87,15 @@ export default function CollectionsPage({ onAddToShoppingList }: CollectionsPage
             disabled={!newName.trim()}
             className="px-4 py-2 rounded-lg text-xs font-semibold bg-amber/90 text-bg hover:bg-amber transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
           >
-            {lang === 'he' ? 'צור אוסף' : 'Create'}
+            {tx.create}
           </button>
         </div>
 
         {loading ? (
-          <p className="text-cream/30 text-sm">{lang === 'he' ? 'טוען...' : 'Loading...'}</p>
+          <p className="text-cream/30 text-sm">{tx.loading}</p>
         ) : collections.length === 0 ? (
           <p className="text-cream/30 text-sm">
-            {lang === 'he' ? 'אין עדיין אוספים. צרו את הראשון למעלה!' : 'No collections yet. Create your first one above!'}
+            {tx.noCollectionsYetCreateYourFirst}
           </p>
         ) : (
           <div className="space-y-6">
@@ -115,7 +113,7 @@ export default function CollectionsPage({ onAddToShoppingList }: CollectionsPage
                         if (e.key === 'Escape') setEditingId(null)
                       }}
                       maxLength={60}
-                      aria-label={lang === 'he' ? 'שם האוסף' : 'Collection name'}
+                      aria-label={tx.collectionName}
                       className="font-serif text-lg font-medium text-cream bg-tint/[0.03] border border-amber/30 rounded-lg px-2 py-0.5 outline-none flex-1 min-w-0"
                       dir={lang === 'he' ? 'rtl' : 'ltr'}
                     />
@@ -123,7 +121,7 @@ export default function CollectionsPage({ onAddToShoppingList }: CollectionsPage
                     <h2
                       className="font-serif text-lg font-medium text-cream cursor-pointer hover:text-amber transition-colors truncate"
                       onClick={() => startEditing(col._id, col.name)}
-                      title={lang === 'he' ? 'לחצו לעריכת השם' : 'Click to rename'}
+                      title={tx.clickToRename}
                     >
                       {col.name} <span className="text-cream/30 text-sm font-sans">({col.recipeIds.length})</span>
                     </h2>
@@ -134,7 +132,7 @@ export default function CollectionsPage({ onAddToShoppingList }: CollectionsPage
                         to={`/collections/${col._id}/print`}
                         className="text-xs text-cream/40 hover:text-amber transition-colors"
                       >
-                        {lang === 'he' ? 'ייצוא כ-PDF' : 'Export as PDF'}
+                        {tx.exportAsPDF}
                       </Link>
                     )}
                     {col.recipeIds.length > 0 && (
@@ -142,20 +140,20 @@ export default function CollectionsPage({ onAddToShoppingList }: CollectionsPage
                         onClick={() => handleAddCollectionToShoppingList(col.recipeIds)}
                         className="text-xs text-cream/40 hover:text-amber transition-colors"
                       >
-                        {lang === 'he' ? 'הוסף הכל לרשימת קניות' : 'Add all to shopping list'}
+                        {tx.addAllToShoppingList}
                       </button>
                     )}
                     <button type="button"
                       onClick={() => handleRemove(col._id, col.name)}
                       className="text-xs text-cream/30 hover:text-red-400 transition-colors"
                     >
-                      {lang === 'he' ? 'מחק' : 'Delete'}
+                      {tx.delete}
                     </button>
                   </div>
                 </div>
                 {col.recipeIds.length === 0 ? (
                   <p className="text-xs text-cream/25">
-                    {lang === 'he' ? 'אין עדיין מתכונים באוסף הזה' : 'No recipes in this collection yet'}
+                    {tx.noRecipesInThisCollectionYet}
                   </p>
                 ) : (
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -180,7 +178,7 @@ export default function CollectionsPage({ onAddToShoppingList }: CollectionsPage
                           </Link>
                           <button type="button"
                             onClick={() => removeRecipe(col._id, slug)}
-                            aria-label={lang === 'he' ? 'הסר מהאוסף' : 'Remove from collection'}
+                            aria-label={tx.removeFromCollection}
                             className="absolute top-1 right-1 h-6 w-6 flex items-center justify-center rounded-full bg-black/40 text-white/70 hover:text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity"
                           >
                             ✕

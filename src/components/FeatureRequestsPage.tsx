@@ -7,6 +7,7 @@ import { OWNER_USER_ID } from '../lib/admin'
 import { embedFeatureRequestImage, extractFeatureRequestImage } from '../lib/featureRequestImage'
 import { resizedImage } from '../lib/image'
 import SkeletonImage from './SkeletonImage'
+import { t } from "../i18n";
 
 type RequestStatus = 'pending' | 'approved' | 'denied' | 'in-progress' | 'needs-input' | 'pr-open' | 'closed'
 
@@ -22,6 +23,7 @@ function getStatus(labels: string[], state: string): RequestStatus {
 
 export default function FeatureRequestsPage() {
   const { lang } = useLanguage()
+        const tx = t[lang]
   const { showToast } = useToast()
   const { userId, getToken } = useAuth()
   const { requests, loading, create, approve, unapprove, update, withdraw, deny } = useFeatureRequests()
@@ -94,18 +96,18 @@ export default function FeatureRequestsPage() {
       setDescription('')
       setPhotoUrl(null)
       uploadIdRef.current = `new-${Date.now()}`
-      showToast(lang === 'he' ? 'הבקשה נשלחה' : 'Request submitted')
+      showToast(tx.requestSubmitted)
     }
   }
 
   async function handleApprove(number: number) {
     const ok = await approve(number)
-    if (ok) showToast(lang === 'he' ? 'אושר לביצוע' : 'Approved for Claude')
+    if (ok) showToast(tx.approvedForClaude)
   }
 
   async function handleUnapprove(number: number) {
     const ok = await unapprove(number)
-    if (ok) showToast(lang === 'he' ? 'האישור בוטל' : 'Approval removed')
+    if (ok) showToast(tx.approvalRemoved)
   }
 
   function startEdit(r: { number: number, title: string, body: string }) {
@@ -130,21 +132,21 @@ export default function FeatureRequestsPage() {
     setSavingEdit(false)
     if (ok) {
       cancelEdit()
-      showToast(lang === 'he' ? 'הבקשה עודכנה' : 'Request updated')
+      showToast(tx.requestUpdated)
     }
   }
 
   async function handleWithdraw(number: number) {
-    if (!window.confirm(lang === 'he' ? 'לבטל את הבקשה?' : 'Withdraw this request?')) return
+    if (!window.confirm(tx.withdrawThisRequest)) return
     const ok = await withdraw(number)
-    if (ok) showToast(lang === 'he' ? 'הבקשה בוטלה' : 'Request withdrawn')
+    if (ok) showToast(tx.requestWithdrawn)
   }
 
   async function handleDeny(number: number) {
     if (!denyReason.trim()) return
     const ok = await deny(number, denyReason.trim())
     if (ok) {
-      showToast(lang === 'he' ? 'הבקשה נדחתה' : 'Request denied')
+      showToast(tx.requestDenied)
       setDenyingNumber(null)
       setDenyReason('')
     }
@@ -154,23 +156,19 @@ export default function FeatureRequestsPage() {
     <div className="print:hidden min-h-dvh bg-bg pt-20 pb-16 px-4">
       <div className="max-w-2xl mx-auto">
         <h1 className="font-serif text-2xl font-bold text-cream mb-2">
-          {lang === 'he' ? 'בקש פיצ\'ר חדש' : 'Feature Requests'}
+          {tx.featureRequests}
         </h1>
         <p className="text-sm text-cream/40 mb-6">
           {isOwner
-            ? (lang === 'he'
-              ? 'יש לכם רעיון לתכונה שכדאי להוסיף? שתפו אותו כאן. כאן תוכלו לראות ולאשר את כל הבקשות.'
-              : 'Have an idea for something the app should do? Suggest it here. You can see and approve every request below.')
-            : (lang === 'he'
-              ? 'יש לכם רעיון לתכונה שכדאי להוסיף? שתפו אותו כאן. למטה תראו רק את הבקשות שלכם ואת הסטטוס שלהן.'
-              : "Have an idea for something the app should do? Suggest it here. Below you'll only see your own requests and their status.")}
+            ? (tx.haveAnIdeaForSomethingThe2)
+            : (tx.haveAnIdeaForSomethingThe)}
         </p>
 
         <form onSubmit={handleSubmit} className="card p-5 space-y-3 mb-8">
           <input
             value={title}
             onChange={e => setTitle(e.target.value)}
-            placeholder={lang === 'he' ? 'כותרת קצרה' : 'Short title'}
+            placeholder={tx.shortTitle}
             maxLength={120}
             required
             className="w-full bg-tint/[0.03] border border-tint/10 rounded-lg px-3 py-2 text-sm text-cream/80 placeholder-cream/25 outline-none focus:border-amber/30 transition-colors"
@@ -178,7 +176,7 @@ export default function FeatureRequestsPage() {
           <textarea
             value={description}
             onChange={e => setDescription(e.target.value)}
-            placeholder={lang === 'he' ? 'תארו את הרעיון...' : 'Describe the idea...'}
+            placeholder={tx.describeTheIdea}
             rows={4}
             maxLength={2000}
             required
@@ -193,7 +191,7 @@ export default function FeatureRequestsPage() {
               />
               <button type="button"
                 onClick={() => setPhotoUrl(null)}
-                aria-label={lang === 'he' ? 'הסר תמונה' : 'Remove photo'}
+                aria-label={tx.removePhoto}
                 className="absolute -top-1.5 -right-1.5 h-5 w-5 flex items-center justify-center rounded-full bg-black/60 text-white text-[10px] hover:bg-black/80"
               >
                 ✕
@@ -207,10 +205,10 @@ export default function FeatureRequestsPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
               {photoUploading
-                ? (lang === 'he' ? 'מעלה...' : 'Uploading...')
+                ? (tx.uploading)
                 : photoUrl
-                  ? (lang === 'he' ? 'החלף תמונה' : 'Replace photo')
-                  : (lang === 'he' ? 'הוסף תמונה' : 'Add photo')}
+                  ? (tx.replacePhoto)
+                  : (tx.addPhoto)}
               <input
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
@@ -224,30 +222,30 @@ export default function FeatureRequestsPage() {
               className="btn-primary disabled:opacity-50"
             >
               {submitting
-                ? (lang === 'he' ? 'שולח...' : 'Submitting...')
-                : (lang === 'he' ? 'שלח בקשה' : 'Submit request')}
+                ? (tx.submitting)
+                : (tx.submitRequest)}
             </button>
           </div>
         </form>
 
         {loading ? (
-          <p className="text-cream/30 text-sm">{lang === 'he' ? 'טוען...' : 'Loading...'}</p>
+          <p className="text-cream/30 text-sm">{tx.loading}</p>
         ) : requests.length === 0 ? (
           <p className="text-cream/30 text-sm">
-            {lang === 'he' ? 'אין עדיין בקשות' : 'No requests yet'}
+            {tx.noRequestsYet}
           </p>
         ) : (
           <div className="space-y-3">
             {requests.map(r => {
               const status = getStatus(r.labels, r.state)
               const statusLabel: Record<RequestStatus, string> = {
-                pending: lang === 'he' ? 'ממתין' : 'Pending',
-                approved: lang === 'he' ? 'אושר' : 'Approved',
-                denied: lang === 'he' ? 'נדחה' : 'Denied',
-                'in-progress': lang === 'he' ? 'קלוד עובד על זה' : 'Claude is working on it',
-                'needs-input': lang === 'he' ? 'דורש תשובה מכם' : 'Needs your input',
-                'pr-open': lang === 'he' ? 'PR פתוח לבדיקה' : 'PR open for review',
-                closed: lang === 'he' ? 'סגור' : 'Closed',
+                pending: tx.pending,
+                approved: tx.approved,
+                denied: tx.denied,
+                'in-progress': tx.claudeIsWorkingOnIt,
+                'needs-input': tx.needsYourInput,
+                'pr-open': tx.pROpenForReview,
+                closed: tx.closed,
               }
               const statusClass: Record<RequestStatus, string> = {
                 pending: 'bg-amber/10 text-amber',
@@ -291,7 +289,7 @@ export default function FeatureRequestsPage() {
                           />
                           <button type="button"
                             onClick={() => setEditPhotoUrl(null)}
-                            aria-label={lang === 'he' ? 'הסר תמונה' : 'Remove photo'}
+                            aria-label={tx.removePhoto}
                             className="absolute -top-1.5 -right-1.5 h-5 w-5 flex items-center justify-center rounded-full bg-black/60 text-white text-[10px] hover:bg-black/80"
                           >
                             ✕
@@ -301,10 +299,10 @@ export default function FeatureRequestsPage() {
                       <div className="flex items-center gap-3">
                         <label className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-tint/10 text-cream/40 hover:text-cream/70 cursor-pointer transition-colors">
                           {editPhotoUploading
-                            ? (lang === 'he' ? 'מעלה...' : 'Uploading...')
+                            ? (tx.uploading)
                             : editPhotoUrl
-                              ? (lang === 'he' ? 'החלף תמונה' : 'Replace photo')
-                              : (lang === 'he' ? 'הוסף תמונה' : 'Add photo')}
+                              ? (tx.replacePhoto)
+                              : (tx.addPhoto)}
                           <input
                             type="file"
                             accept="image/jpeg,image/png,image/webp"
@@ -319,14 +317,14 @@ export default function FeatureRequestsPage() {
                           className="btn-primary disabled:opacity-50 text-xs px-3 py-1.5"
                         >
                           {savingEdit
-                            ? (lang === 'he' ? 'שומר...' : 'Saving...')
-                            : (lang === 'he' ? 'שמור' : 'Save')}
+                            ? (tx.saving)
+                            : (tx.save)}
                         </button>
                         <button type="button"
                           onClick={cancelEdit}
                           className="text-xs text-cream/40 hover:text-cream/70 transition-colors"
                         >
-                          {lang === 'he' ? 'ביטול' : 'Cancel'}
+                          {tx.cancel}
                         </button>
                       </div>
                     </div>
@@ -352,7 +350,7 @@ export default function FeatureRequestsPage() {
                       )}
                       {status === 'denied' && r.denialReason && (
                         <p className="text-sm text-red-400/80 whitespace-pre-wrap mb-2">
-                          {lang === 'he' ? 'סיבת הדחייה: ' : 'Denial reason: '}{r.denialReason}
+                          {tx.denialReason}{r.denialReason}
                         </p>
                       )}
                       {denyingNumber === r.number ? (
@@ -360,7 +358,7 @@ export default function FeatureRequestsPage() {
                           <textarea
                             value={denyReason}
                             onChange={e => setDenyReason(e.target.value)}
-                            placeholder={lang === 'he' ? 'למה נדחתה הבקשה?' : 'Why is this being denied?'}
+                            placeholder={tx.whyIsThisBeingDenied}
                             rows={2}
                             className="w-full bg-tint/[0.03] border border-tint/10 rounded-lg px-3 py-2 text-sm text-cream/80 placeholder-cream/25 outline-none focus:border-amber/30 transition-colors"
                           />
@@ -370,17 +368,17 @@ export default function FeatureRequestsPage() {
                               onClick={() => handleDeny(r.number)}
                               className="text-xs font-semibold text-red-400 hover:text-red-300 disabled:opacity-40 transition-colors"
                             >
-                              {lang === 'he' ? 'שלח דחייה' : 'Send denial'}
+                              {tx.sendDenial}
                             </button>
                             <button type="button" onClick={() => { setDenyingNumber(null); setDenyReason('') }} className="text-xs text-cream/40 hover:text-cream/70 transition-colors">
-                              {lang === 'he' ? 'ביטול' : 'Cancel'}
+                              {tx.cancel}
                             </button>
                           </div>
                         </div>
                       ) : (
                         <div className="flex items-center gap-3 flex-wrap">
                           <a href={r.htmlUrl} target="_blank" rel="noreferrer" className="text-xs text-cream/30 hover:text-cream/60 transition-colors">
-                            {lang === 'he' ? 'צפה ב-GitHub' : 'View on GitHub'} #{r.number}
+                            {tx.viewOnGitHub} #{r.number}
                           </a>
                           {isOwner && canApprove && (
                             <button type="button"
@@ -388,8 +386,8 @@ export default function FeatureRequestsPage() {
                               className="text-xs font-semibold text-amber hover:text-amber/80 transition-colors"
                             >
                               {status === 'needs-input'
-                                ? (lang === 'he' ? 'נסה שוב' : 'Retry')
-                                : (lang === 'he' ? 'אשר לביצוע' : 'Approve for Claude')}
+                                ? (tx.retry)
+                                : (tx.approveForClaude)}
                             </button>
                           )}
                           {isOwner && status === 'approved' && (
@@ -397,7 +395,7 @@ export default function FeatureRequestsPage() {
                               onClick={() => handleUnapprove(r.number)}
                               className="text-xs font-semibold text-cream/50 hover:text-cream/80 transition-colors"
                             >
-                              {lang === 'he' ? 'בטל אישור' : 'Unapprove'}
+                              {tx.unapprove}
                             </button>
                           )}
                           {isOwner && canDeny && (
@@ -405,7 +403,7 @@ export default function FeatureRequestsPage() {
                               onClick={() => { setDenyingNumber(r.number); setDenyReason('') }}
                               className="text-xs font-semibold text-red-400 hover:text-red-300 transition-colors"
                             >
-                              {lang === 'he' ? 'דחה' : 'Deny'}
+                              {tx.deny}
                             </button>
                           )}
                           {canEdit && (
@@ -413,7 +411,7 @@ export default function FeatureRequestsPage() {
                               onClick={() => startEdit(r)}
                               className="text-xs font-semibold text-cream/50 hover:text-cream/80 transition-colors"
                             >
-                              {lang === 'he' ? 'ערוך' : 'Edit'}
+                              {tx.edit}
                             </button>
                           )}
                           {canEdit && (
@@ -421,7 +419,7 @@ export default function FeatureRequestsPage() {
                               onClick={() => handleWithdraw(r.number)}
                               className="text-xs font-semibold text-red-400/70 hover:text-red-400 transition-colors"
                             >
-                              {lang === 'he' ? 'בטל בקשה' : 'Withdraw'}
+                              {tx.withdraw}
                             </button>
                           )}
                         </div>

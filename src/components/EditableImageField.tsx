@@ -4,6 +4,7 @@ import Modal from './Modal'
 import { Dialog } from '@base-ui/react/dialog'
 import ImageCropModal from './ImageCropModal'
 import EnhanceImageModal from './EnhanceImageModal'
+import { t } from "../i18n";
 
 interface EditableImageFieldProps {
   image: string | undefined
@@ -22,6 +23,7 @@ interface EditableImageFieldProps {
 }
 
 export default function EditableImageField({ image, onChange, uploadRecipeId, lang, recipeId, onError, size = 'large' }: EditableImageFieldProps) {
+  const tx = t[lang]
   const { getToken } = useAuth()
   const [uploading, setUploading] = useState(false)
   const [cropSrc, setCropSrc] = useState<string | null>(null)
@@ -39,7 +41,7 @@ export default function EditableImageField({ image, onChange, uploadRecipeId, la
     e.target.value = ''
     if (!file) return
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-      onError?.(lang === 'he' ? 'סוג קובץ לא נתמך' : 'Unsupported file type')
+      onError?.(tx.unsupportedFileType)
       return
     }
     setCropSrc(URL.createObjectURL(file))
@@ -75,7 +77,7 @@ export default function EditableImageField({ image, onChange, uploadRecipeId, la
       setPreEnhanceImage(null)
       onChange(publicUrl)
     } catch {
-      onError?.(lang === 'he' ? 'העלאת התמונה נכשלה' : 'Photo upload failed')
+      onError?.(tx.photoUploadFailed)
     } finally {
       setUploading(false)
     }
@@ -96,7 +98,7 @@ export default function EditableImageField({ image, onChange, uploadRecipeId, la
       })
       if (!res.ok) throw new Error('save image failed')
     } catch {
-      onError?.(lang === 'he' ? 'שמירת התמונה נכשלה' : 'Saving the photo failed')
+      onError?.(tx.savingThePhotoFailed)
     } finally {
       setSaving(false)
     }
@@ -121,14 +123,14 @@ export default function EditableImageField({ image, onChange, uploadRecipeId, la
             <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M14 8h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            <span className="text-xs">{lang === 'he' ? 'העלה תמונה' : 'Upload a photo'}</span>
+            <span className="text-xs">{tx.uploadAPhoto}</span>
           </div>
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center gap-0.5 text-cream/25">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M14 8h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            <span className="text-[9px]">{lang === 'he' ? 'תמונה' : 'Photo'}</span>
+            <span className="text-[9px]">{tx.photo}</span>
           </div>
         )}
         <div className={`absolute inset-0 flex items-center justify-center bg-black/50 transition-opacity ${
@@ -136,10 +138,10 @@ export default function EditableImageField({ image, onChange, uploadRecipeId, la
         }`}>
           <span className={size === 'large' ? 'text-xs font-semibold text-white' : 'text-[9px] font-semibold text-white'}>
             {uploading
-              ? (lang === 'he' ? 'מעלה...' : 'Uploading...')
+              ? (tx.uploading)
               : image
-                ? (lang === 'he' ? 'ערוך' : 'Edit')
-                : (lang === 'he' ? 'העלה' : 'Upload')}
+                ? (tx.edit)
+                : (tx.upload)}
           </span>
         </div>
       </button>
@@ -161,7 +163,7 @@ export default function EditableImageField({ image, onChange, uploadRecipeId, la
       {modalOpen && image && (
         <Modal open onOpenChange={next => { if (!next) setModalOpen(false) }} zIndexClassName="z-40" panelClassName="max-w-sm p-5 space-y-4">
           <Dialog.Title className="font-serif text-lg font-bold text-cream">
-            {lang === 'he' ? 'תמונה' : 'Photo'}
+            {tx.photo}
           </Dialog.Title>
           <div className="relative w-full h-40 rounded-lg overflow-hidden bg-black/40">
             <img src={image} alt="" className="w-full h-full object-cover" />
@@ -172,7 +174,7 @@ export default function EditableImageField({ image, onChange, uploadRecipeId, la
               onClick={() => { setModalOpen(false); document.getElementById(`file-input-${uploadRecipeId}-${size}`)?.click() }}
               className="btn-ghost text-sm"
             >
-              {lang === 'he' ? 'החלף תמונה' : 'Replace photo'}
+              {tx.replacePhoto}
             </button>
             <button
               type="button"
@@ -182,7 +184,7 @@ export default function EditableImageField({ image, onChange, uploadRecipeId, la
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
               </svg>
-              {lang === 'he' ? 'שפר תמונה עם AI' : 'Enhance with AI'}
+              {tx.enhanceWithAI}
             </button>
             {preEnhanceImage && (
               <button
@@ -193,21 +195,21 @@ export default function EditableImageField({ image, onChange, uploadRecipeId, la
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
                 </svg>
-                {lang === 'he' ? 'בטל שיפור' : 'Undo enhance'}
+                {tx.undoEnhance}
               </button>
             )}
             {recipeId && (
               <button type="button" onClick={handleSaveImage} disabled={saving} className="btn-primary text-sm disabled:opacity-50">
-                {saving ? (lang === 'he' ? 'שומר...' : 'Saving...') : (lang === 'he' ? 'שמור תמונה' : 'Save image')}
+                {saving ? (tx.saving) : (tx.saveImage)}
               </button>
             )}
             <button type="button" onClick={() => onChange(undefined)} className="text-xs text-red-400/70 hover:text-red-400">
-              {lang === 'he' ? 'הסר תמונה' : 'Remove photo'}
+              {tx.removePhoto}
             </button>
           </div>
           <div className="flex justify-end">
             <button type="button" onClick={() => setModalOpen(false)} className="btn-ghost text-sm">
-              {lang === 'he' ? 'סגור' : 'Close'}
+              {tx.close}
             </button>
           </div>
         </Modal>

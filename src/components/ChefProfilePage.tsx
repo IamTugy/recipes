@@ -5,13 +5,15 @@ import { useLanguage } from '../hooks/useLanguage'
 import RecipeCard from './RecipeCard'
 import RecipeCardSkeleton from './RecipeCardSkeleton'
 import Avatar from './Avatar'
+import { t } from "../i18n";
 
 export default function ChefProfilePage() {
   const { userId } = useParams<{ userId: string }>()
   const { lang } = useLanguage()
+        const tx = t[lang]
   const { name, imageUrl, recipes, loading } = useChefProfile(userId)
   const { favoriteSlugs, toggle: toggleFavorite } = useFavorites()
-  const displayName = name ?? (lang === 'he' ? 'שף' : 'Chef')
+  const displayName = name ?? (tx.chef)
 
   return (
     <div className="min-h-dvh bg-bg pt-20 pb-16 px-4">
@@ -24,8 +26,8 @@ export default function ChefProfilePage() {
         </div>
         <p className="text-cream/30 text-xs mb-6">
           {loading
-            ? (lang === 'he' ? 'טוען...' : 'Loading...')
-            : `${recipes.length} ${lang === 'he' ? 'מתכונים שפורסמו' : 'published recipes'}`}
+            ? (tx.loading)
+            : `${recipes.length} ${tx.publishedRecipes}`}
         </p>
 
         {loading ? (
@@ -34,7 +36,7 @@ export default function ChefProfilePage() {
           </div>
         ) : recipes.length === 0 ? (
           <p className="text-cream/30 text-sm">
-            {lang === 'he' ? 'עדיין אין מתכונים שפורסמו' : 'No published recipes yet'}
+            {tx.noPublishedRecipesYet}
           </p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

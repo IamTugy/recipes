@@ -13,7 +13,7 @@ export default function EditRecipePage() {
   const { recipe, loading } = useRecipe(id)
 
   if (loading) {
-    return <div className="min-h-dvh bg-bg pt-20 px-4 text-center text-cream/30 text-sm">{lang === 'he' ? 'טוען...' : 'Loading...'}</div>
+    return <div className="min-h-dvh bg-bg pt-20 px-4 text-center text-cream/30 text-sm">{tx.loading}</div>
   }
 
   if (!recipe) {

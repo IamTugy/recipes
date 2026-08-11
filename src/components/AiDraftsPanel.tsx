@@ -4,6 +4,7 @@ import { usePendingDrafts, deleteRecipe } from '../hooks/useRecipes'
 import { useLanguage } from '../hooks/useLanguage'
 import { useToast } from '../hooks/useToast'
 import { ApiError } from '../lib/api'
+import { t } from "../i18n";
 
 // Shown above the recipe editor whenever more than one bulk-AI-generated
 // draft is still pending review (not yet saved by the user). See the
@@ -12,6 +13,7 @@ import { ApiError } from '../lib/api'
 // single-column layout doesn't have room for one without a page rewrite.
 export default function AiDraftsPanel() {
   const { lang } = useLanguage()
+        const tx = t[lang]
   const navigate = useNavigate()
   const { getToken } = useAuth()
   const { id: currentId } = useParams<{ id: string }>()
@@ -26,7 +28,7 @@ export default function AiDraftsPanel() {
     try {
       await deleteRecipe(id, getToken)
     } catch (err) {
-      const message = err instanceof ApiError ? err.message : (lang === 'he' ? 'מחיקת המתכון נכשלה' : 'Failed to delete the recipe')
+      const message = err instanceof ApiError ? err.message : (tx.failedToDeleteTheRecipe)
       showToast(message, 'error')
       return
     }
@@ -40,7 +42,7 @@ export default function AiDraftsPanel() {
     <div className="max-w-3xl mx-auto mb-4">
       <div className="card p-3 space-y-1.5">
         <p className="text-xs font-semibold text-cream/50 px-1">
-          {lang === 'he' ? `מתכונים בתהליך (${recipes.length})` : `Drafts in progress (${recipes.length})`}
+          {tx.draftsInProgress(recipes.length)}
         </p>
         <div className="flex flex-wrap gap-1.5">
           {recipes.map(r => (
@@ -52,7 +54,7 @@ export default function AiDraftsPanel() {
                 r.id === currentId ? 'bg-amber/10 text-amber' : 'text-cream/70 hover:bg-tint/5'
               }`}
             >
-              <span className="max-w-[10rem] truncate">{r.title || (lang === 'he' ? 'ללא שם' : 'Untitled')}</span>
+              <span className="max-w-[10rem] truncate">{r.title || (tx.untitled)}</span>
               <span
                 role="button"
                 tabIndex={0}

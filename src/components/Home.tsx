@@ -203,10 +203,10 @@ export default function Home() {
             onClick={surpriseMe}
             disabled={filtered.length === 0}
             className="shrink-0 flex items-center gap-1.5 px-4 h-11 rounded-lg text-xs font-semibold tracking-wide border border-tint/10 bg-tint/[0.03] hover:bg-tint/[0.07] text-cream/60 hover:text-cream/90 transition-colors disabled:opacity-30"
-            title={lang === 'he' ? 'הפתע אותי' : 'Surprise me'}
+            title={tx.surpriseMe}
           >
             <span className="text-base">🎲</span>
-            <span className="hidden sm:inline">{lang === 'he' ? 'הפתע אותי' : 'Surprise me'}</span>
+            <span className="hidden sm:inline">{tx.surpriseMe}</span>
           </button>
         </div>
       </div>
@@ -233,7 +233,7 @@ export default function Home() {
             }`}
           >
             <span>♥</span>
-            <span>{lang === 'he' ? 'מועדפים' : 'Favorites'}</span>
+            <span>{tx.favorites}</span>
           </button>
           {categories.map(cat => (
             <button type="button"
@@ -262,7 +262,7 @@ export default function Home() {
           <svg className={`w-3.5 h-3.5 transition-transform ${advancedOpen ? 'rotate-90' : lang === 'he' ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
           </svg>
-          <span>{lang === 'he' ? 'סינון מתקדם' : 'Advanced filters'}</span>
+          <span>{tx.advancedFilters}</span>
           {advancedActiveCount > 0 && (
             <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber/10 text-amber">
               {advancedActiveCount}
@@ -274,7 +274,7 @@ export default function Home() {
           <div className="mt-3 space-y-4">
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-wider text-cream/25 mb-1.5">
-                {lang === 'he' ? 'רמת קושי' : 'Difficulty'}
+                {tx.difficulty2}
               </p>
               <div className="flex gap-1.5 flex-wrap">
                 {DIFFICULTY_FILTERS.map(f => (
@@ -296,7 +296,7 @@ export default function Home() {
 
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-wider text-cream/25 mb-1.5">
-                {lang === 'he' ? 'תזונה' : 'Dietary'}
+                {tx.dietary}
               </p>
               <div className="flex gap-1.5 flex-wrap">
                 {DIETARY_FILTERS.map(f => (
@@ -318,7 +318,7 @@ export default function Home() {
 
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-wider text-cream/25 mb-1.5">
-                {lang === 'he' ? 'כשרות' : 'Kosher'}
+                {tx.kosher}
               </p>
               <div className="flex gap-1.5 flex-wrap">
                 {KOSHER_FILTERS.map(f => (
@@ -343,7 +343,7 @@ export default function Home() {
 
       {!loading && !search && !activeCategory && !activeDifficulty && !activeDietary && !activeKosher && !showFavoritesOnly && (
         <>
-          <RecipeStrip title={lang === 'he' ? '🔥 פופולרי השבוע' : '🔥 Trending this week'} recipes={trending} loading={trendingLoading} />
+          <RecipeStrip title={tx.trendingThisWeek} recipes={trending} loading={trendingLoading} />
         </>
       )}
 
@@ -355,17 +355,17 @@ export default function Home() {
               ? `${filtered.length} / ${recipes.length}`
               : `${recipes.length}`
             }
-            {' '}{lang === 'he' ? 'מתכונים' : 'recipes'}
+            {' '}{tx.recipes}
           </p>
           <AppSelect
             value={sortBy}
             onValueChange={value => setSortBy(value as SortOption)}
             triggerClassName="bg-tint/[0.03] border border-tint/10 rounded-lg text-xs text-cream/60 px-2.5 py-1.5 outline-none hover:bg-tint/[0.06] transition-colors"
             options={[
-              { value: 'default', label: lang === 'he' ? 'ברירת מחדל' : 'Default order' },
-              { value: 'rating', label: lang === 'he' ? 'דירוג גבוה' : 'Top rated' },
-              { value: 'quickest', label: lang === 'he' ? 'הכי מהיר' : 'Quickest' },
-              { value: 'newest', label: lang === 'he' ? 'חדש ביותר' : 'Newest' },
+              { value: 'default', label: tx.defaultOrder },
+              { value: 'rating', label: tx.topRated },
+              { value: 'quickest', label: tx.quickest },
+              { value: 'newest', label: tx.newest },
             ]}
           />
         </div>
@@ -379,7 +379,7 @@ export default function Home() {
         ) : error ? (
           <div className="text-center py-24 text-cream/30">
             <p className="text-sm tracking-widest uppercase mb-2">
-              {lang === 'he' ? 'שגיאה בטעינת המתכונים' : 'Failed to load recipes'}
+              {tx.failedToLoadRecipes}
             </p>
           </div>
         ) : filtered.length === 0 ? (
@@ -392,7 +392,7 @@ export default function Home() {
                 onClick={() => navigate('/recipes/generate', { state: { query: search.trim() } })}
                 className="btn-primary text-sm"
               >
-                {lang === 'he' ? `🔮 חפשו את "${search.trim()}" ברשת עם AI` : `🔮 Research "${search.trim()}" on the web with AI`}
+                {tx.researchOnTheWebWithAI(search.trim())}
               </button>
             )}
           </div>

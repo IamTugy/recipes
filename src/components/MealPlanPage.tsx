@@ -5,6 +5,7 @@ import { useRecipes } from '../hooks/useRecipes'
 import { useLanguage } from '../hooks/useLanguage'
 import { useToast } from '../hooks/useToast'
 import AppSelect from './ui/AppSelect'
+import { t } from "../i18n";
 
 interface MealPlanPageProps {
   onAddToShoppingList: (items: { name: string; amount: number | null; unit: string }[]) => void
@@ -25,6 +26,7 @@ function startOfWeek(offsetWeeks: number): Date {
 
 export default function MealPlanPage({ onAddToShoppingList }: MealPlanPageProps) {
   const { lang } = useLanguage()
+        const tx = t[lang]
   const { showToast } = useToast()
   const navigate = useNavigate()
   const { recipes } = useRecipes()
@@ -47,10 +49,10 @@ export default function MealPlanPage({ onAddToShoppingList }: MealPlanPageProps)
   const { entries, loading, addEntry, removeEntry } = useMealPlan(start, end)
 
   const mealTypeLabel: Record<MealType, string> = {
-    breakfast: lang === 'he' ? 'בוקר' : 'Breakfast',
-    lunch: lang === 'he' ? 'צהריים' : 'Lunch',
-    dinner: lang === 'he' ? 'ערב' : 'Dinner',
-    snack: lang === 'he' ? 'נשנוש' : 'Snack',
+    breakfast: tx.breakfast,
+    lunch: tx.lunch,
+    dinner: tx.dinner,
+    snack: tx.snack,
   }
 
   function recipeFor(slug: string) {
@@ -64,7 +66,7 @@ export default function MealPlanPage({ onAddToShoppingList }: MealPlanPageProps)
       setPickerOpenFor(null)
       setPickerSlug('')
     } catch {
-      showToast(lang === 'he' ? 'ההוספה נכשלה' : 'Failed to add', 'error')
+      showToast(tx.failedToAdd, 'error')
     }
   }
 
@@ -89,29 +91,29 @@ export default function MealPlanPage({ onAddToShoppingList }: MealPlanPageProps)
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center justify-between gap-3 mb-6 flex-wrap">
           <h1 className="font-serif text-2xl font-bold text-cream">
-            {lang === 'he' ? 'תפריט שבועי' : 'Meal Plan'}
+            {tx.mealPlan}
           </h1>
           <div className="flex items-center gap-2">
             <button type="button" onClick={() => setWeekOffset(w => w - 1)} className="btn-ghost text-xs">
-              {lang === 'he' ? 'שבוע קודם' : 'Prev week'}
+              {tx.prevWeek}
             </button>
             <button type="button" onClick={() => setWeekOffset(0)} className="btn-ghost text-xs">
-              {lang === 'he' ? 'השבוע' : 'This week'}
+              {tx.thisWeek}
             </button>
             <button type="button" onClick={() => setWeekOffset(w => w + 1)} className="btn-ghost text-xs">
-              {lang === 'he' ? 'שבוע הבא' : 'Next week'}
+              {tx.nextWeek}
             </button>
           </div>
         </div>
 
         {entries.length > 0 && (
           <button type="button" onClick={addWeekToShoppingList} className="btn-primary text-xs mb-6">
-            {lang === 'he' ? 'הוסף מרכיבי השבוע לרשימת קניות' : "Add this week's ingredients to shopping list"}
+            {tx.addThisWeekSIngredientsTo}
           </button>
         )}
 
         {loading ? (
-          <p className="text-cream/30 text-sm">{lang === 'he' ? 'טוען...' : 'Loading...'}</p>
+          <p className="text-cream/30 text-sm">{tx.loading}</p>
         ) : (
           <div className="space-y-4">
             {days.map(day => {
@@ -127,12 +129,12 @@ export default function MealPlanPage({ onAddToShoppingList }: MealPlanPageProps)
                       onClick={() => { setPickerOpenFor(iso); setPickerSlug(''); setPickerMealType('dinner') }}
                       className="text-xs font-semibold text-amber hover:text-amber/80 transition-colors"
                     >
-                      + {lang === 'he' ? 'הוסף מתכון' : 'Add recipe'}
+                      + {tx.addRecipe}
                     </button>
                   </div>
 
                   {dayEntries.length === 0 ? (
-                    <p className="text-xs text-cream/25">{lang === 'he' ? 'אין מתכונים מתוכננים' : 'Nothing planned'}</p>
+                    <p className="text-xs text-cream/25">{tx.nothingPlanned}</p>
                   ) : (
                     <ul className="space-y-1.5">
                       {dayEntries.map(entry => {
@@ -166,9 +168,9 @@ export default function MealPlanPage({ onAddToShoppingList }: MealPlanPageProps)
                         onValueChange={setPickerSlug}
                         triggerClassName="bg-tint/[0.03] border border-tint/10 rounded-lg px-2 py-1.5 text-xs text-cream/80 outline-none focus:border-amber/30"
                         popupClassName="max-h-56"
-                        aria-label={lang === 'he' ? 'בחר מתכון' : 'Select recipe'}
+                        aria-label={tx.selectRecipe2}
                         options={[
-                          { value: '', label: lang === 'he' ? 'בחר מתכון...' : 'Select recipe...' },
+                          { value: '', label: tx.selectRecipe },
                           ...recipes.map(r => ({ value: r.id, label: lang === 'he' ? (r.titleHe ?? r.title) : r.title })),
                         ]}
                       />
@@ -179,10 +181,10 @@ export default function MealPlanPage({ onAddToShoppingList }: MealPlanPageProps)
                         options={MEAL_TYPES.map(mt => ({ value: mt, label: mealTypeLabel[mt] }))}
                       />
                       <button type="button" disabled={!pickerRecipeId} onClick={() => handleAdd(iso)} className="btn-primary text-xs disabled:opacity-40">
-                        {lang === 'he' ? 'הוסף' : 'Add'}
+                        {tx.add}
                       </button>
                       <button type="button" onClick={() => setPickerOpenFor(null)} className="text-xs text-cream/40 hover:text-cream/70">
-                        {lang === 'he' ? 'ביטול' : 'Cancel'}
+                        {tx.cancel}
                       </button>
                     </div>
                   )}

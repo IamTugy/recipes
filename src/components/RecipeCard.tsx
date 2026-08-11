@@ -94,7 +94,7 @@ export default function RecipeCard({
                 <button type="button"
                   onClick={e => { e.preventDefault(); e.stopPropagation(); navigate(`/recipes/${recipe.id}/edit`) }}
                   className="h-9 w-9 sm:h-7 sm:w-7 flex items-center justify-center rounded-full backdrop-blur-sm border bg-black/30 border-white/20 text-white/80 hover:text-white transition-colors"
-                  aria-label={lang === 'he' ? 'ערוך מתכון' : 'Edit recipe'}
+                  aria-label={tx.editRecipe}
                 >
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />

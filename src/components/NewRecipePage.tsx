@@ -2,6 +2,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import RecipeForm from './RecipeForm'
 import { useLanguage } from '../hooks/useLanguage'
 import type { ImportedRecipe } from '../lib/recipeImport'
+import { t } from "../i18n";
 
 function bookmarkletHref(origin: string) {
   // The app is a HashRouter - everything after "#" is what the router
@@ -16,6 +17,7 @@ export default function NewRecipePage() {
   const location = useLocation()
   const navigate = useNavigate()
   const { lang } = useLanguage()
+        const tx = t[lang]
   const importedDraft = (location.state as { importedDraft?: ImportedRecipe } | null)?.importedDraft
 
   if (importedDraft) {
@@ -26,33 +28,31 @@ export default function NewRecipePage() {
     <div className="min-h-dvh bg-bg pt-20 px-4">
       <div className="max-w-md mx-auto space-y-4 text-center">
         <h1 className="font-serif text-2xl font-bold text-cream mb-6">
-          {lang === 'he' ? 'איך תרצו להוסיף מתכון?' : 'How would you like to add a recipe?'}
+          {tx.howWouldYouLikeToAdd}
         </h1>
         <button type="button" onClick={() => navigate('/recipes/generate')} className="btn-primary w-full">
-          {lang === 'he' ? '🔮 חיפוש מתכון עם AI' : '🔮 Research a recipe with AI'}
+          {tx.researchARecipeWithAI}
         </button>
         <button type="button" onClick={() => navigate('/recipes/import')} className="btn-ghost w-full">
-          {lang === 'he' ? '✨ ייבוא עם AI' : '✨ Import with AI'}
+          {tx.importWithAI}
         </button>
         <button type="button" onClick={() => navigate('/recipes/new/blank')} className="btn-ghost w-full">
-          {lang === 'he' ? 'התחל מדף ריק' : 'Start from scratch'}
+          {tx.startFromScratch}
         </button>
 
         <div className="card p-4 space-y-2 text-start">
           <p className="text-xs font-semibold text-cream/50">
-            {lang === 'he' ? 'ייבוא מהיר' : 'Quick import'}
+            {tx.quickImport}
           </p>
           <p className="text-sm text-cream/50">
-            {lang === 'he'
-              ? 'גררו את הכפתור הזה לסרגל המועדפים בדפדפן. בכל דף מתכון, לחיצה עליו תשלח את הדף היישר לכאן.'
-              : 'Drag this button to your browser bookmarks bar. On any recipe page, click it to send that page straight here.'}
+            {tx.dragThisButtonToYourBrowser}
           </p>
           <a
             href={bookmarkletHref(window.location.origin)}
             className="btn-ghost inline-block text-sm"
             draggable
           >
-            {lang === 'he' ? 'ייבוא למתכונים' : 'Import to Cookbook'}
+            {tx.importToCookbook}
           </a>
         </div>
       </div>

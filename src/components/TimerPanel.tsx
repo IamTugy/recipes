@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState, type RefObject } from 'react'
 import type { TimerState } from '../types'
 import { formatSeconds } from '../utils/format'
 import { useLanguage } from '../hooks/useLanguage'
+import { t } from "../i18n";
 
 interface TimerPanelProps {
   timers: TimerState[]
@@ -84,6 +85,7 @@ function playDoneSound() {
 
 export default function TimerPanel({ timers, onToggle, onRemove, onReset, panelRef }: TimerPanelProps) {
   const { lang } = useLanguage()
+        const tx = t[lang]
   const [mobileIdx, setMobileIdx] = useState(0)
   const prevDoneIds = useRef<Set<string>>(new Set(timers.filter(t => t.done).map(t => t.id)))
 
@@ -97,12 +99,12 @@ export default function TimerPanel({ timers, onToggle, onRemove, onReset, panelR
           typeof Notification !== 'undefined' &&
           Notification.permission === 'granted'
         ) {
-          new Notification(lang === 'he' ? 'הטיימר הסתיים!' : 'Timer done!', { body: t.label })
+          new Notification(tx.timerDone2, { body: t.label })
         }
       }
     })
     prevDoneIds.current = new Set(timers.filter(t => t.done).map(t => t.id))
-  }, [timers, lang])
+  }, [timers, lang, tx])
 
   // Sort: running (soonest end first), then paused (soonest first), then done
   const sorted = useMemo(() => [...timers].sort((a, b) => {

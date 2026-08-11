@@ -5,6 +5,7 @@ import { useSubmissionsFeed } from '../hooks/useRecipes'
 import { useLanguage } from '../hooks/useLanguage'
 import { useTranslatedReview } from '../hooks/useTranslatedReview'
 import type { QualityFinding, Recipe } from '../types'
+import { t } from "../i18n";
 
 const SEVERITY_CLASS: Record<QualityFinding['severity'], string> = {
   critical: 'bg-red-500/10 text-red-400',
@@ -22,6 +23,7 @@ interface SubmissionCardProps {
 // useTranslatedReview - hooks can't be called inside a .map() callback.
 function SubmissionCard({ recipe: r, expanded: isExpanded, onToggle }: SubmissionCardProps) {
   const { lang } = useLanguage()
+        const tx = t[lang]
   const navigate = useNavigate()
   const { getToken } = useAuth()
   const review = useTranslatedReview(r.qualityReview ?? null, lang, getToken)
@@ -42,8 +44,8 @@ function SubmissionCard({ recipe: r, expanded: isExpanded, onToggle }: Submissio
             passed ? 'bg-herb/10 text-herb' : 'bg-red-500/10 text-red-400'
           }`}>
             {passed
-              ? (lang === 'he' ? 'פורסם' : 'Published')
-              : (lang === 'he' ? 'נדחה' : 'Rejected')}
+              ? (tx.published)
+              : (tx.rejected)}
           </span>
         </div>
       </div>
@@ -55,7 +57,7 @@ function SubmissionCard({ recipe: r, expanded: isExpanded, onToggle }: Submissio
         <>
           <button type="button" onClick={onToggle} className="text-xs text-cream/40 hover:text-cream/70 transition-colors">
             {isExpanded
-              ? (lang === 'he' ? 'הסתר ממצאים' : 'Hide findings')
+              ? (tx.hideFindings)
               : (lang === 'he' ? `הצג ${review.findings.length} ממצאים` : `Show ${review.findings.length} finding${review.findings.length > 1 ? 's' : ''}`)}
           </button>
           {isExpanded && (
@@ -78,6 +80,7 @@ function SubmissionCard({ recipe: r, expanded: isExpanded, onToggle }: Submissio
 
 export default function SubmissionsPage() {
   const { lang } = useLanguage()
+        const tx = t[lang]
   const { recipes, loading } = useSubmissionsFeed()
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
 
@@ -94,19 +97,17 @@ export default function SubmissionsPage() {
     <div className="min-h-dvh bg-bg pt-20 pb-16 px-4">
       <div className="max-w-2xl mx-auto">
         <h1 className="font-serif text-2xl font-bold text-cream mb-2">
-          {lang === 'he' ? 'הגשות' : 'Submissions'}
+          {tx.submissions}
         </h1>
         <p className="text-sm text-cream/40 mb-6">
-          {lang === 'he'
-            ? 'כל הבדיקות האוטומטיות של AI על מתכונים שהוגשו לאחרונה - פורסמו או נדחו וממתינים לתיקון.'
-            : 'Recent AI quality-review outcomes across all recently submitted recipes - published, or rejected and awaiting a fix.'}
+          {tx.recentAIQualityReviewOutcomesAcross}
         </p>
 
         {loading ? (
-          <p className="text-cream/30 text-sm">{lang === 'he' ? 'טוען...' : 'Loading...'}</p>
+          <p className="text-cream/30 text-sm">{tx.loading}</p>
         ) : recipes.length === 0 ? (
           <p className="text-cream/30 text-sm">
-            {lang === 'he' ? 'אין הגשות עדיין' : 'No submissions yet'}
+            {tx.noSubmissionsYet}
           </p>
         ) : (
           <div className="space-y-3">

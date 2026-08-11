@@ -3,6 +3,7 @@ import { Dialog } from '@base-ui/react/dialog'
 import type { ShoppingListItem } from '../hooks/useShoppingList'
 import { useLanguage } from '../hooks/useLanguage'
 import { formatAggregatedAmount } from '../lib/shoppingListAggregation'
+import { t } from "../i18n";
 
 interface ShoppingListPanelProps {
   open: boolean
@@ -20,9 +21,10 @@ export default function ShoppingListPanel({
   open, onClose, items, onToggle, onRemove, onClearChecked, onClearAll, lastCleared, onUndoClear,
 }: ShoppingListPanelProps) {
   const { lang } = useLanguage()
+        const tx = t[lang]
   const [copied, setCopied] = useState(false)
 
-  const title = lang === 'he' ? 'רשימת קניות' : 'Shopping List'
+  const title = tx.shoppingList2
 
   function listText() {
     const lines = items.map(item => {
@@ -92,7 +94,7 @@ export default function ShoppingListPanel({
               </h2>
               <button type="button"
                 onClick={onClose}
-                aria-label={lang === 'he' ? 'סגור' : 'Close'}
+                aria-label={tx.close}
                 className="w-8 h-8 flex items-center justify-center rounded-lg text-cream/50 hover:text-cream hover:bg-tint/[0.06] transition-colors"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -109,7 +111,7 @@ export default function ShoppingListPanel({
                     : `${lastCleared.length} item${lastCleared.length === 1 ? '' : 's'} removed`}
                 </span>
                 <button type="button" onClick={onUndoClear} className="font-semibold text-amber hover:text-amber/80 transition-colors">
-                  {lang === 'he' ? 'בטל' : 'Undo'}
+                  {tx.undo}
                 </button>
               </div>
             )}
@@ -117,7 +119,7 @@ export default function ShoppingListPanel({
             <div className="flex-1 overflow-y-auto px-5 py-4">
               {items.length === 0 ? (
                 <p className="text-cream/30 text-sm text-center py-12">
-                  {lang === 'he' ? 'הרשימה ריקה' : 'Your shopping list is empty'}
+                  {tx.yourShoppingListIsEmpty}
                 </p>
               ) : (
                 <ul className="space-y-1.5">
@@ -129,8 +131,8 @@ export default function ShoppingListPanel({
                       <button type="button"
                         onClick={() => onToggle(item.id)}
                         aria-label={item.checked
-                          ? (lang === 'he' ? 'סמן כלא נאסף' : 'Mark as not collected')
-                          : (lang === 'he' ? 'סמן כנאסף' : 'Mark as collected')}
+                          ? (tx.markAsNotCollected)
+                          : (tx.markAsCollected)}
                         className={`shrink-0 h-8 w-8 sm:h-5 sm:w-5 rounded-md border flex items-center justify-center transition-colors ${
                           item.checked ? 'bg-herb border-herb text-white' : 'border-tint/20 text-transparent'
                         }`}
@@ -145,7 +147,7 @@ export default function ShoppingListPanel({
                       </p>
                       <button type="button"
                         onClick={() => onRemove(item.id)}
-                        aria-label={lang === 'he' ? 'הסר פריט' : 'Remove item'}
+                        aria-label={tx.removeItem}
                         className="shrink-0 h-8 w-8 sm:h-6 sm:w-6 flex items-center justify-center rounded text-cream/30 sm:text-cream/20 hover:text-red-400 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
                       >
                         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -162,23 +164,23 @@ export default function ShoppingListPanel({
               <div className="px-5 py-3 border-t border-tint/[0.06] space-y-2">
                 <div className="flex items-center gap-2">
                   <button type="button" onClick={shareList} className="btn-ghost text-xs flex-1">
-                    {lang === 'he' ? 'שתף' : 'Share'}
+                    {tx.share}
                   </button>
                   <button type="button" onClick={copyAsText} className="btn-ghost text-xs flex-1">
                     {copied
-                      ? (lang === 'he' ? 'הועתק!' : 'Copied!')
-                      : (lang === 'he' ? 'העתק כטקסט' : 'Copy as text')}
+                      ? (tx.copied)
+                      : (tx.copyAsText)}
                   </button>
                   <button type="button" onClick={printList} className="btn-ghost text-xs flex-1">
-                    {lang === 'he' ? 'הדפס' : 'Print'}
+                    {tx.print}
                   </button>
                 </div>
                 <div className="flex items-center gap-2">
                   <button type="button" onClick={onClearChecked} className="btn-ghost text-xs flex-1">
-                    {lang === 'he' ? 'נקה מסומנים' : 'Clear checked'}
+                    {tx.clearChecked}
                   </button>
                   <button type="button" onClick={onClearAll} className="btn-ghost text-xs flex-1 text-red-400/80">
-                    {lang === 'he' ? 'נקה הכל' : 'Clear all'}
+                    {tx.clearAll}
                   </button>
                 </div>
               </div>

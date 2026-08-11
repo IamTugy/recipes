@@ -1,5 +1,6 @@
 import { useRecipe } from '../hooks/useRecipes'
 import { useLanguage } from '../hooks/useLanguage'
+import { t } from "../i18n";
 
 interface LinkedIngredientDisplayProps {
   recipeId: string
@@ -12,6 +13,7 @@ interface LinkedIngredientDisplayProps {
 // purpose.
 export default function LinkedIngredientDisplay({ recipeId, onUnlink }: LinkedIngredientDisplayProps) {
   const { lang } = useLanguage()
+        const tx = t[lang]
   const { recipe, loading } = useRecipe(recipeId)
 
   return (
@@ -24,10 +26,10 @@ export default function LinkedIngredientDisplay({ recipeId, onUnlink }: LinkedIn
           ? '...'
           : recipe
             ? (lang === 'he' ? (recipe.titleHe || recipe.title) : recipe.title)
-            : (lang === 'he' ? 'מתכון לא נמצא' : 'Recipe not found')}
+            : (tx.recipeNotFound)}
       </span>
       <button type="button" onClick={onUnlink} className="shrink-0 text-cream/30 hover:text-red-400 text-xs">
-        {lang === 'he' ? 'בטל קישור' : 'Unlink'}
+        {tx.unlink}
       </button>
     </div>
   )

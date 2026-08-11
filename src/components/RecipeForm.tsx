@@ -107,18 +107,19 @@ function omitKey<T extends { _key: string }>(item: T): Omit<T, '_key'> {
 }
 
 function RegenerateButton({ lang, busy, onClick }: { lang: 'he' | 'en'; busy: boolean; onClick: () => void }) {
+  const tx = t[lang]
   return (
     <button
       type="button"
       onClick={onClick}
       disabled={busy}
-      title={lang === 'he' ? 'תרגם מחדש' : 'Regenerate translation'}
+      title={tx.regenerateTranslation}
       className="shrink-0 flex items-center gap-1 text-xs font-medium text-cream/40 hover:text-amber disabled:opacity-40 transition-colors"
     >
       <svg className={`w-3.5 h-3.5 ${busy ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
       </svg>
-      {lang === 'he' ? 'תרגם' : 'Translate'}
+      {tx.translate}
     </button>
   )
 }
@@ -418,7 +419,7 @@ export default function RecipeForm({ existing, importedDraft, reviewFindings, au
         .filter(g => g.items.length > 0)
     )
     if (ingredients.length === 0) {
-      showToast(lang === 'he' ? 'הוסיפו רכיבים לפני הערכת ערכים תזונתיים' : 'Add ingredients before estimating nutrition', 'error')
+      showToast(tx.addIngredientsBeforeEstimatingNutrition, 'error')
       return
     }
     setEstimatingNutrition(true)
@@ -428,7 +429,7 @@ export default function RecipeForm({ existing, importedDraft, reviewFindings, au
         commitHistory()
         setNutrition(estimate)
       } else {
-        showToast(lang === 'he' ? 'הערכת הערכים התזונתיים נכשלה' : 'Nutrition estimate failed', 'error')
+        showToast(tx.nutritionEstimateFailed, 'error')
       }
     } finally {
       setEstimatingNutrition(false)
@@ -488,14 +489,14 @@ export default function RecipeForm({ existing, importedDraft, reviewFindings, au
       if (isEditing) {
         await updateRecipe(existing!.id, input, getToken)
         navigate(`/recipes/${existing!.id}`)
-        showToast(lang === 'he' ? 'המתכון עודכן' : 'Recipe updated')
+        showToast(tx.recipeUpdated)
       } else {
         const newId = await createRecipe(input, getToken)
         navigate(`/recipes/${newId}`)
-        showToast(lang === 'he' ? 'המתכון נוצר' : 'Recipe created')
+        showToast(tx.recipeCreated)
       }
     } catch {
-      setError(lang === 'he' ? 'שמירת המתכון נכשלה. נסו שוב.' : 'Failed to save the recipe. Please try again.')
+      setError(tx.failedToSaveTheRecipePlease)
     } finally {
       setSaving(false)
     }
@@ -513,27 +514,27 @@ export default function RecipeForm({ existing, importedDraft, reviewFindings, au
         <Breadcrumbs crumbs={
           isEditing
             ? [
-                { label: lang === 'he' ? 'בית' : 'Home', href: '/' },
-                { label: displayTitle || (lang === 'he' ? 'מתכון' : 'Recipe'), href: `/recipes/${existing!.id}` },
-                { label: lang === 'he' ? 'עריכה' : 'Edit' },
+                { label: tx.home, href: '/' },
+                { label: displayTitle || (tx.recipe), href: `/recipes/${existing!.id}` },
+                { label: tx.edit2 },
               ]
             : [
-                { label: lang === 'he' ? 'בית' : 'Home', href: '/' },
-                { label: lang === 'he' ? 'מתכון חדש' : 'New Recipe' },
+                { label: tx.home, href: '/' },
+                { label: tx.newRecipe2 },
               ]
         } />
         <div className="flex items-center justify-between gap-3">
           <h1 className="font-serif text-2xl font-bold text-cream">
             {isEditing
-              ? (lang === 'he' ? 'עריכת מתכון' : 'Edit Recipe')
-              : (lang === 'he' ? 'מתכון חדש' : 'New Recipe')}
+              ? (tx.editRecipe2)
+              : (tx.newRecipe2)}
           </h1>
           <div className="flex items-center gap-1 shrink-0">
             <button
               type="button"
               onClick={undo}
               disabled={!history.canUndo}
-              title={lang === 'he' ? 'בטל' : 'Undo'}
+              title={tx.undo}
               className="p-2 rounded-lg text-cream/60 hover:text-cream hover:bg-tint/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
@@ -544,7 +545,7 @@ export default function RecipeForm({ existing, importedDraft, reviewFindings, au
               type="button"
               onClick={redo}
               disabled={!history.canRedo}
-              title={lang === 'he' ? 'בצע שוב' : 'Redo'}
+              title={tx.redo}
               className="p-2 rounded-lg text-cream/60 hover:text-cream hover:bg-tint/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
@@ -557,7 +558,7 @@ export default function RecipeForm({ existing, importedDraft, reviewFindings, au
         {reviewFindings && reviewFindings.length > 0 && (
           <div className="card p-4 border border-amber/20 space-y-2">
             <p className="text-sm font-semibold text-cream">
-              {lang === 'he' ? 'מה-AI מהבדיקה האחרונה' : 'From the last AI review'}
+              {tx.fromTheLastAIReview}
             </p>
             <ul className="space-y-1.5">
               {reviewFindings.map((f, i) => {
@@ -570,9 +571,9 @@ export default function RecipeForm({ existing, importedDraft, reviewFindings, au
                       : f.severity === 'major' ? 'bg-amber/10 text-amber'
                       : 'bg-tint/10 text-cream/50'
                     }`}>
-                      {autoFixed ? (lang === 'he' ? 'תוקן אוטומטית' : 'auto-fixed') : f.severity}
+                      {autoFixed ? (tx.autoFixed) : f.severity}
                     </span>
-                    <span>{f.message}{autoFixed ? (lang === 'he' ? ' - כדאי לוודא שהתיקון נכון' : ' - double-check the fix below') : ''}</span>
+                    <span>{f.message}{autoFixed ? (tx.doubleCheckTheFixBelow) : ''}</span>
                   </li>
                 )
               })}
@@ -582,10 +583,8 @@ export default function RecipeForm({ existing, importedDraft, reviewFindings, au
 
         {aiGenerated && (
           <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber bg-amber/10 border border-amber/20 rounded-full px-3 py-1">
-            <span>{lang === 'he' ? 'נוצר בשיתוף AI' : 'AI co-authored'}</span>
-            <FilterInfoPopover text={lang === 'he'
-              ? 'המתכון הזה נכתב בשיתוף AI שחיפש ברשת מתכונים אמיתיים והתחיל מהם - אך מי שפרסם אותו בדק, אישר, ויכול לערוך כל חלק בו. הוא לא הומצא על ידי AI.'
-              : 'This recipe was co-authored with AI - it started from real recipes AI found online, then was reviewed and approved by the person who posted it, who can edit any part of it. Not invented by AI.'}
+            <span>{tx.aICoAuthored}</span>
+            <FilterInfoPopover text={tx.thisRecipeWasCoAuthoredWith2}
             />
           </div>
         )}
@@ -598,12 +597,12 @@ export default function RecipeForm({ existing, importedDraft, reviewFindings, au
         <div className="card p-5 space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className={labelClass}>{lang === 'he' ? 'כותרת (אנגלית)' : 'Title (English)'}</label>
+              <label className={labelClass}>{tx.titleEnglish}</label>
               <input required {...fieldBindings('title', title, setTitle, 'titleHe', titleHe, setTitleHe, 'he')} className={inputClass} />
             </div>
             <div>
               <div className="flex items-center justify-between mb-1">
-                <label className={labelClass}>{lang === 'he' ? 'כותרת (עברית)' : 'Title (Hebrew)'}</label>
+                <label className={labelClass}>{tx.titleHebrew}</label>
                 <RegenerateButton lang={lang} busy={regenerating.has('title')} onClick={() => regenerateTranslation('title', titleHe, title, setTitleHe, setTitle)} />
               </div>
               <input {...fieldBindings('titleHe', titleHe, setTitleHe, 'title', title, setTitle, 'en')} className={inputClass} dir="rtl" />
@@ -612,7 +611,7 @@ export default function RecipeForm({ existing, importedDraft, reviewFindings, au
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div>
-              <label className={labelClass}>{lang === 'he' ? 'קטגוריה' : 'Category'}</label>
+              <label className={labelClass}>{tx.category}</label>
               <AppSelect
                 value={category}
                 onValueChange={value => setCategory(value as Category)}
@@ -621,7 +620,7 @@ export default function RecipeForm({ existing, importedDraft, reviewFindings, au
               />
             </div>
             <div>
-              <label className={labelClass}>{lang === 'he' ? 'רמת קושי' : 'Difficulty'}</label>
+              <label className={labelClass}>{tx.difficulty2}</label>
               <AppSelect
                 value={difficulty}
                 onValueChange={value => setDifficulty(value as Difficulty)}
@@ -630,19 +629,19 @@ export default function RecipeForm({ existing, importedDraft, reviewFindings, au
               />
             </div>
             <div>
-              <label className={labelClass}>{lang === 'he' ? 'מטבח' : 'Cuisine'}</label>
+              <label className={labelClass}>{tx.cuisine}</label>
               <input value={cuisine} onChange={e => setCuisine(e.target.value)} className={inputClass} />
             </div>
             <div>
-              <label className={labelClass} title={lang === 'he' ? 'סיווג כשרות: בשרי, חלבי, או פרווה. אופציונלי.' : 'Kosher classification: meat, dairy, or parve. Optional.'}>
-                {lang === 'he' ? 'כשרות' : 'Kosher'}
+              <label className={labelClass} title={tx.kosherClassificationMeatDairyOrParve}>
+                {tx.kosher}
               </label>
               <AppSelect
                 value={kosherType || 'unset'}
                 onValueChange={value => setKosherType(value === 'unset' ? '' : value as KosherType)}
                 triggerClassName={inputClass}
                 options={[
-                  { value: 'unset', label: lang === 'he' ? '(לא צוין)' : '(Not set)' },
+                  { value: 'unset', label: tx.notSet },
                   ...KOSHER_TYPES.map(k => ({ value: k, label: tx.kosherType[k] })),
                 ]}
               />
@@ -650,7 +649,7 @@ export default function RecipeForm({ existing, importedDraft, reviewFindings, au
           </div>
 
           <div>
-            <label className={labelClass}>{lang === 'he' ? 'תמונה' : 'Photo'}</label>
+            <label className={labelClass}>{tx.photo}</label>
             <EditableImageField
               image={image}
               onChange={url => { commitHistory(); setImage(url ?? '') }}
@@ -663,12 +662,12 @@ export default function RecipeForm({ existing, importedDraft, reviewFindings, au
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className={labelClass}>{lang === 'he' ? 'תיאור (עברית)' : 'Description (Hebrew)'}</label>
+              <label className={labelClass}>{tx.descriptionHebrew}</label>
               <textarea required {...fieldBindings('description', description, setDescription, 'descriptionEn', descriptionEn, setDescriptionEn, 'en')} rows={2} className={inputClass} dir="rtl" />
             </div>
             <div>
               <div className="flex items-center justify-between mb-1">
-                <label className={labelClass}>{lang === 'he' ? 'תיאור (אנגלית)' : 'Description (English)'}</label>
+                <label className={labelClass}>{tx.descriptionEnglish}</label>
                 <RegenerateButton lang={lang} busy={regenerating.has('description')} onClick={() => regenerateTranslation('description', description, descriptionEn, setDescription, setDescriptionEn)} />
               </div>
               <textarea {...fieldBindings('descriptionEn', descriptionEn, setDescriptionEn, 'description', description, setDescription, 'he')} rows={2} className={inputClass} />
@@ -677,22 +676,22 @@ export default function RecipeForm({ existing, importedDraft, reviewFindings, au
 
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className={labelClass}>{lang === 'he' ? 'הכנה (דק׳)' : 'Prep (min)'}</label>
+              <label className={labelClass}>{tx.prepMin}</label>
               <input type="number" min={0} value={prepTime} onChange={e => setPrepTime(Number(e.target.value))} className={inputClass} />
             </div>
             <div>
-              <label className={labelClass}>{lang === 'he' ? 'בישול (דק׳)' : 'Cook (min)'}</label>
+              <label className={labelClass}>{tx.cookMin}</label>
               <input type="number" min={0} value={cookTime} onChange={e => setCookTime(Number(e.target.value))} className={inputClass} />
             </div>
             <div>
-              <label className={labelClass}>{lang === 'he' ? 'מנות' : 'Servings'}</label>
+              <label className={labelClass}>{tx.servings}</label>
               <input type="number" min={1} value={servings} onChange={e => setServings(Number(e.target.value))} className={inputClass} />
             </div>
           </div>
 
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className={labelClass}>{lang === 'he' ? 'ערכים תזונתיים (ל-100 גרם)' : 'Nutrition (per 100g)'}</label>
+              <label className={labelClass}>{tx.nutritionPer100g}</label>
               <button
                 type="button"
                 onClick={handleEstimateNutrition}
@@ -700,31 +699,31 @@ export default function RecipeForm({ existing, importedDraft, reviewFindings, au
                 className="text-xs text-amber hover:text-amber/80 disabled:opacity-40"
               >
                 {estimatingNutrition
-                  ? (lang === 'he' ? 'מעריך...' : 'Estimating...')
+                  ? (tx.estimating)
                   : Object.values(nutrition).some(v => v !== undefined)
-                    ? (lang === 'he' ? '✨ הערך מחדש עם AI' : '✨ Re-estimate with AI')
-                    : (lang === 'he' ? '✨ הערכה עם AI' : '✨ Estimate with AI')}
+                    ? (tx.reEstimateWithAI)
+                    : (tx.estimateWithAI)}
               </button>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div>
-                <label className={labelClass}>{lang === 'he' ? 'קלוריות' : 'Calories'}</label>
+                <label className={labelClass}>{tx.calories}</label>
                 <input type="number" min={0} step="any" value={nutrition.calories ?? ''} onChange={e => setNutrition(n => ({ ...n, calories: e.target.value ? Number(e.target.value) : undefined }))} className={inputClass} />
               </div>
               <div>
-                <label className={labelClass}>{lang === 'he' ? 'חלבון (גרם)' : 'Protein (g)'}</label>
+                <label className={labelClass}>{tx.proteinG}</label>
                 <input type="number" min={0} step="any" value={nutrition.protein ?? ''} onChange={e => setNutrition(n => ({ ...n, protein: e.target.value ? Number(e.target.value) : undefined }))} className={inputClass} />
               </div>
               <div>
-                <label className={labelClass}>{lang === 'he' ? 'פחמימות (גרם)' : 'Carbs (g)'}</label>
+                <label className={labelClass}>{tx.carbsG}</label>
                 <input type="number" min={0} step="any" value={nutrition.carbs ?? ''} onChange={e => setNutrition(n => ({ ...n, carbs: e.target.value ? Number(e.target.value) : undefined }))} className={inputClass} />
               </div>
               <div>
-                <label className={labelClass}>{lang === 'he' ? 'שומן (גרם)' : 'Fat (g)'}</label>
+                <label className={labelClass}>{tx.fatG}</label>
                 <input type="number" min={0} step="any" value={nutrition.fat ?? ''} onChange={e => setNutrition(n => ({ ...n, fat: e.target.value ? Number(e.target.value) : undefined }))} className={inputClass} />
               </div>
               <div>
-                <label className={labelClass}>{lang === 'he' ? 'משקל מנה משוער (גרם)' : 'Est. serving weight (g)'}</label>
+                <label className={labelClass}>{tx.estServingWeightG}</label>
                 <input type="number" min={0} value={nutrition.servingWeight ?? ''} onChange={e => setNutrition(n => ({ ...n, servingWeight: e.target.value ? Number(e.target.value) : undefined }))} className={inputClass} />
               </div>
             </div>
@@ -732,12 +731,12 @@ export default function RecipeForm({ existing, importedDraft, reviewFindings, au
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className={labelClass}>{lang === 'he' ? 'תגיות (עברית, מופרדות בפסיק)' : 'Tags (Hebrew, comma-separated)'}</label>
+              <label className={labelClass}>{tx.tagsHebrewCommaSeparated}</label>
               <input {...fieldBindings('tags', tags, setTags, 'tagsEn', tagsEn, setTagsEn, 'en')} className={inputClass} dir="rtl" />
             </div>
             <div>
               <div className="flex items-center justify-between mb-1">
-                <label className={labelClass}>{lang === 'he' ? 'תגיות (אנגלית, מופרדות בפסיק)' : 'Tags (English, comma-separated)'}</label>
+                <label className={labelClass}>{tx.tagsEnglishCommaSeparated}</label>
                 <RegenerateButton lang={lang} busy={regenerating.has('tags')} onClick={() => regenerateTranslation('tags', tags, tagsEn, setTags, setTagsEn)} />
               </div>
               <input {...fieldBindings('tagsEn', tagsEn, setTagsEn, 'tags', tags, setTags, 'he')} className={inputClass} />
@@ -746,12 +745,12 @@ export default function RecipeForm({ existing, importedDraft, reviewFindings, au
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className={labelClass}>{lang === 'he' ? 'טיפים (עברית, שורה לכל טיפ)' : 'Tips (Hebrew, one per line)'}</label>
+              <label className={labelClass}>{tx.tipsHebrewOnePerLine}</label>
               <textarea {...fieldBindings('tips', tips, setTips, 'tipsEn', tipsEn, setTipsEn, 'en')} rows={2} className={inputClass} dir="rtl" />
             </div>
             <div>
               <div className="flex items-center justify-between mb-1">
-                <label className={labelClass}>{lang === 'he' ? 'טיפים (אנגלית, שורה לכל טיפ)' : 'Tips (English, one per line)'}</label>
+                <label className={labelClass}>{tx.tipsEnglishOnePerLine}</label>
                 <RegenerateButton lang={lang} busy={regenerating.has('tips')} onClick={() => regenerateTranslation('tips', tips, tipsEn, setTips, setTipsEn)} />
               </div>
               <textarea {...fieldBindings('tipsEn', tipsEn, setTipsEn, 'tips', tips, setTips, 'he')} rows={2} className={inputClass} />
@@ -774,13 +773,13 @@ export default function RecipeForm({ existing, importedDraft, reviewFindings, au
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             <input
                               {...fieldBindings(`ing-group-${group._key}`, group.group ?? '', v => updateIngredientGroup(gi, { group: v }), `ing-groupEn-${group._key}`, group.groupEn ?? '', v => updateIngredientGroup(gi, { groupEn: v }), 'en')}
-                              placeholder={lang === 'he' ? 'שם הקבוצה (עברית, אופציונלי)' : 'Group name (Hebrew, optional)'}
+                              placeholder={tx.groupNameHebrewOptional}
                               className={inputClass}
                               dir="rtl"
                             />
                             <input
                               {...fieldBindings(`ing-groupEn-${group._key}`, group.groupEn ?? '', v => updateIngredientGroup(gi, { groupEn: v }), `ing-group-${group._key}`, group.group ?? '', v => updateIngredientGroup(gi, { group: v }), 'he')}
-                              placeholder={lang === 'he' ? 'שם הקבוצה (אנגלית, אופציונלי)' : 'Group name (English, optional)'}
+                              placeholder={tx.groupNameEnglishOptional}
                               className={inputClass}
                             />
                           </div>
@@ -792,7 +791,7 @@ export default function RecipeForm({ existing, importedDraft, reviewFindings, au
                             />
                             {ingredientGroups.length > 1 && (
                               <button type="button" onClick={() => removeIngredientGroup(gi)} className="text-xs text-red-400/70 hover:text-red-400 shrink-0">
-                                {lang === 'he' ? 'הסר קבוצה' : 'Remove group'}
+                                {tx.removeGroup}
                               </button>
                             )}
                           </div>
@@ -807,10 +806,10 @@ export default function RecipeForm({ existing, importedDraft, reviewFindings, au
                                   <DragHandle attributes={itemAttrs} listeners={itemListeners} className="mt-2.5" />
                                   <div className="flex flex-col gap-2 flex-1 min-w-0">
                                     <div className="flex gap-2">
-                                      <input type="number" step="any" value={item.amount ?? ''} onChange={e => updateIngredientItem(gi, ii, { amount: Number(e.target.value) })} className={`${inputClass} !w-16 shrink-0`} placeholder={lang === 'he' ? 'כמות' : 'Qty'} />
-                                      <input value={item.unit ?? ''} onChange={e => updateIngredientItem(gi, ii, { unit: e.target.value })} className={`${inputClass} !w-16 shrink-0`} placeholder={lang === 'he' ? 'יחידה' : 'Unit'} />
+                                      <input type="number" step="any" value={item.amount ?? ''} onChange={e => updateIngredientItem(gi, ii, { amount: Number(e.target.value) })} className={`${inputClass} !w-16 shrink-0`} placeholder={tx.qty2} />
+                                      <input value={item.unit ?? ''} onChange={e => updateIngredientItem(gi, ii, { unit: e.target.value })} className={`${inputClass} !w-16 shrink-0`} placeholder={tx.unit} />
                                       {!item.linkedRecipeId && (
-                                        <button type="button" onClick={() => setLinkPickerFor({ gi, ii })} title={lang === 'he' ? 'קשר למתכון' : 'Link to recipe'} className="shrink-0 text-cream/30 hover:text-amber text-xs px-1">
+                                        <button type="button" onClick={() => setLinkPickerFor({ gi, ii })} title={tx.linkToRecipe} className="shrink-0 text-cream/30 hover:text-amber text-xs px-1">
                                           🔗
                                         </button>
                                       )}
@@ -823,8 +822,8 @@ export default function RecipeForm({ existing, importedDraft, reviewFindings, au
                                       />
                                     ) : (
                                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                        <input {...fieldBindings(`ing-${item._key}`, item.name, v => updateIngredientItem(gi, ii, { name: v }), `ingEn-${item._key}`, item.nameEn ?? '', v => updateIngredientItem(gi, ii, { nameEn: v }), 'en')} className={inputClass} placeholder={lang === 'he' ? 'שם (עברית)' : 'Name (Hebrew)'} dir="rtl" />
-                                        <input {...fieldBindings(`ingEn-${item._key}`, item.nameEn ?? '', v => updateIngredientItem(gi, ii, { nameEn: v }), `ing-${item._key}`, item.name, v => updateIngredientItem(gi, ii, { name: v }), 'he')} className={inputClass} placeholder={lang === 'he' ? 'שם (אנגלית)' : 'Name (English)'} />
+                                        <input {...fieldBindings(`ing-${item._key}`, item.name, v => updateIngredientItem(gi, ii, { name: v }), `ingEn-${item._key}`, item.nameEn ?? '', v => updateIngredientItem(gi, ii, { nameEn: v }), 'en')} className={inputClass} placeholder={tx.nameHebrew} dir="rtl" />
+                                        <input {...fieldBindings(`ingEn-${item._key}`, item.nameEn ?? '', v => updateIngredientItem(gi, ii, { nameEn: v }), `ing-${item._key}`, item.name, v => updateIngredientItem(gi, ii, { name: v }), 'he')} className={inputClass} placeholder={tx.nameEnglish} />
                                       </div>
                                     )}
                                   </div>
@@ -842,7 +841,7 @@ export default function RecipeForm({ existing, importedDraft, reviewFindings, au
                         </SortableContext>
                       </DndContext>
                       <button type="button" onClick={() => addIngredientItem(gi)} className="text-xs text-amber hover:text-amber/80">
-                        + {lang === 'he' ? 'הוסף רכיב' : 'Add ingredient'}
+                        + {tx.addIngredient}
                       </button>
                     </>
                   )}
@@ -851,7 +850,7 @@ export default function RecipeForm({ existing, importedDraft, reviewFindings, au
             </SortableContext>
           </DndContext>
           <button type="button" onClick={addIngredientGroup} className="btn-ghost text-xs">
-            + {lang === 'he' ? 'הוסף קבוצת רכיבים' : 'Add ingredient group'}
+            + {tx.addIngredientGroup}
           </button>
         </div>
 
@@ -881,13 +880,13 @@ export default function RecipeForm({ existing, importedDraft, reviewFindings, au
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             <input
                               {...fieldBindings(`step-group-${group._key}`, group.title ?? '', v => updateStepGroup(gi, { title: v }), `step-groupEn-${group._key}`, group.titleEn ?? '', v => updateStepGroup(gi, { titleEn: v }), 'en')}
-                              placeholder={lang === 'he' ? 'שם השלב (עברית, אופציונלי)' : 'Section title (Hebrew, optional)'}
+                              placeholder={tx.sectionTitleHebrewOptional}
                               className={inputClass}
                               dir="rtl"
                             />
                             <input
                               {...fieldBindings(`step-groupEn-${group._key}`, group.titleEn ?? '', v => updateStepGroup(gi, { titleEn: v }), `step-group-${group._key}`, group.title ?? '', v => updateStepGroup(gi, { title: v }), 'he')}
-                              placeholder={lang === 'he' ? 'שם השלב (אנגלית, אופציונלי)' : 'Section title (English, optional)'}
+                              placeholder={tx.sectionTitleEnglishOptional}
                               className={inputClass}
                             />
                           </div>
@@ -899,7 +898,7 @@ export default function RecipeForm({ existing, importedDraft, reviewFindings, au
                             />
                             {stepGroups.length > 1 && (
                               <button type="button" onClick={() => removeStepGroup(gi)} className="text-xs text-red-400/70 hover:text-red-400 shrink-0">
-                                {lang === 'he' ? 'הסר קבוצה' : 'Remove group'}
+                                {tx.removeGroup}
                               </button>
                             )}
                           </div>
@@ -941,7 +940,7 @@ export default function RecipeForm({ existing, importedDraft, reviewFindings, au
                                         busy={regenerating.has(`step-${step._key}`)}
                                         onClick={() => regenerateTranslation(`step-${step._key}`, step.instruction, step.instructionEn ?? '', v => updateStepItem(gi, si, { instruction: v }), v => updateStepItem(gi, si, { instructionEn: v }))}
                                       />
-                                      <button type="button" onClick={() => removeStepItem(gi, si)} className="text-red-400/60 hover:text-red-400 text-xs shrink-0">✕ {lang === 'he' ? 'הסר שלב' : 'Remove step'}</button>
+                                      <button type="button" onClick={() => removeStepItem(gi, si)} className="text-red-400/60 hover:text-red-400 text-xs shrink-0">✕ {tx.removeStep}</button>
                                     </div>
                                     <div className="flex gap-2">
                                       <input
@@ -949,13 +948,13 @@ export default function RecipeForm({ existing, importedDraft, reviewFindings, au
                                         min={1}
                                         value={step.timerMinutes ?? ''}
                                         onChange={e => updateStepItem(gi, si, { timerMinutes: e.target.value ? Number(e.target.value) : undefined })}
-                                        placeholder={lang === 'he' ? 'טיימר (דק׳)' : 'Timer (min)'}
+                                        placeholder={tx.timerMin}
                                         className={`${inputClass} !w-32 shrink-0`}
                                       />
                                       <input
                                         value={step.tip ?? ''}
                                         onChange={e => updateStepItem(gi, si, { tip: e.target.value })}
-                                        placeholder={lang === 'he' ? 'טיפ (אופציונלי)' : 'Tip (optional)'}
+                                        placeholder={tx.tipOptional}
                                         className={`${inputClass} flex-1`}
                                       />
                                     </div>
@@ -967,7 +966,7 @@ export default function RecipeForm({ existing, importedDraft, reviewFindings, au
                         </SortableContext>
                       </DndContext>
                       <button type="button" onClick={() => addStepItem(gi)} className="text-xs text-amber hover:text-amber/80">
-                        + {lang === 'he' ? 'הוסף שלב' : 'Add step'}
+                        + {tx.addStep}
                       </button>
                     </>
                   )}
@@ -976,13 +975,13 @@ export default function RecipeForm({ existing, importedDraft, reviewFindings, au
             </SortableContext>
           </DndContext>
           <button type="button" onClick={addStepGroup} className="btn-ghost text-xs">
-            + {lang === 'he' ? 'הוסף קבוצת שלבים' : 'Add step group'}
+            + {tx.addStepGroup}
           </button>
         </div>
 
         {/* Sources - read-only once AI-generated, otherwise a normal editable field */}
         <div className="card p-5 space-y-3">
-          <h2 className="font-serif text-lg font-bold text-cream">{lang === 'he' ? 'מקורות' : 'Sources'}</h2>
+          <h2 className="font-serif text-lg font-bold text-cream">{tx.sources}</h2>
           {aiGenerated ? (
             <ul className="space-y-1.5">
               {sources.map(s => (
@@ -1000,7 +999,7 @@ export default function RecipeForm({ existing, importedDraft, reviewFindings, au
                   <input
                     value={s.title}
                     onChange={e => setSources(prev => prev.map((x, xi) => xi === i ? { ...x, title: e.target.value } : x))}
-                    placeholder={lang === 'he' ? 'כותרת המקור' : 'Source title'}
+                    placeholder={tx.sourceTitle}
                     className={`${inputClass} flex-1`}
                   />
                   <input
@@ -1015,7 +1014,7 @@ export default function RecipeForm({ existing, importedDraft, reviewFindings, au
                 </div>
               ))}
               <button type="button" onClick={() => setSources(prev => [...prev, { title: '', url: '' }])} className="text-xs text-amber hover:text-amber/80">
-                + {lang === 'he' ? 'הוסף מקור' : 'Add source'}
+                + {tx.addSource}
               </button>
             </>
           )}
@@ -1024,23 +1023,21 @@ export default function RecipeForm({ existing, importedDraft, reviewFindings, au
         <div className="flex items-center gap-3">
           <button type="submit" disabled={saving} className="btn-primary disabled:opacity-50">
             {saving
-              ? (lang === 'he' ? 'שומר...' : 'Saving...')
-              : isEditing ? (lang === 'he' ? 'שמור שינויים' : 'Save changes') : (lang === 'he' ? 'צור מתכון' : 'Create recipe')}
+              ? (tx.saving)
+              : isEditing ? (tx.saveChanges) : (tx.createRecipe)}
           </button>
           <button type="button" onClick={() => history.canUndo ? setExitConfirmOpen(true) : navigate(-1)} className="btn-ghost">
-            {lang === 'he' ? 'ביטול' : 'Cancel'}
+            {tx.cancel}
           </button>
         </div>
       </form>
 
       <ConfirmDialog
         open={exitConfirmOpen}
-        title={lang === 'he' ? 'לצאת בלי לשמור?' : 'Discard unsaved changes?'}
-        message={lang === 'he'
-          ? 'יש לך שינויים שלא נשמרו. אם תצא עכשיו הם יאבדו.'
-          : 'You have unsaved changes. Leaving now will discard them.'}
-        confirmLabel={lang === 'he' ? 'צא בלי לשמור' : 'Discard'}
-        cancelLabel={lang === 'he' ? 'המשך עריכה' : 'Keep editing'}
+        title={tx.discardUnsavedChanges}
+        message={tx.youHaveUnsavedChangesLeavingNow}
+        confirmLabel={tx.discard}
+        cancelLabel={tx.keepEditing}
         danger
         onConfirm={() => { setExitConfirmOpen(false); navigate(-1) }}
         onCancel={() => setExitConfirmOpen(false)}

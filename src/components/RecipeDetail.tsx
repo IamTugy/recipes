@@ -218,13 +218,13 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
     setIsEditingReview(false)
     showToast(
       wasAlreadyPosted
-        ? (lang === 'he' ? 'הביקורת עודכנה' : 'Review updated')
-        : (lang === 'he' ? 'הביקורת פורסמה' : 'Review posted')
+        ? (tx.reviewUpdated)
+        : (tx.reviewPosted)
     )
   }
 
   async function deleteMyReview() {
-    const confirmMsg = lang === 'he' ? 'למחוק את הביקורת שלכם?' : 'Delete your review?'
+    const confirmMsg = tx.deleteYourReview
     if (!window.confirm(confirmMsg)) return
     const token = await getToken()
     await fetch(`/api/ratings/${id}`, {
@@ -237,7 +237,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
     setHasPostedReview(false)
     setIsEditingReview(false)
     loadReviews()
-    showToast(lang === 'he' ? 'הביקורת נמחקה' : 'Review deleted')
+    showToast(tx.reviewDeleted)
   }
 
   async function share() {
@@ -278,11 +278,11 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
     try {
       await deleteRecipe(id, getToken)
       navigate('/')
-      showToast(lang === 'he' ? 'המתכון נמחק' : 'Recipe deleted')
+      showToast(tx.recipeDeleted)
     } catch (err) {
       const message = err instanceof ApiError && err.status === 403
-        ? (lang === 'he' ? 'אין הרשאה למחוק מתכון זה' : 'You don\'t have permission to delete this recipe')
-        : (lang === 'he' ? 'מחיקת המתכון נכשלה. נסו שוב.' : 'Failed to delete the recipe. Please try again.')
+        ? (tx.youDonTHavePermissionTo)
+        : (tx.failedToDeleteTheRecipePlease)
       showToast(message, 'error')
     } finally {
       setDeleting(false)
@@ -348,8 +348,8 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
       setReviewResult(result.qualityReview ?? null)
       showToast(
         result.status === 'published'
-          ? (lang === 'he' ? 'המתכון פורסם!' : 'Recipe published!')
-          : (lang === 'he' ? 'המתכון לא עבר את הבדיקה' : "Recipe didn't pass review"),
+          ? (tx.recipePublished)
+          : (tx.recipeDidnTPassReview),
         result.status === 'published' ? 'success' : 'error'
       )
       await reloadRecipe()
@@ -358,7 +358,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
       // act on - a 3s toast disappears before they can even finish reading
       // it. Keep it pinned near the Submit button until they dismiss it or
       // try again.
-      const message = err instanceof ApiError ? err.message : (lang === 'he' ? 'השליחה נכשלה' : 'Submission failed')
+      const message = err instanceof ApiError ? err.message : (tx.submissionFailed)
       setSubmitError(message)
       showToast(message, 'error')
     } finally {
@@ -638,8 +638,8 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
     displayRecipe.ingredients.length > 0 && { id: 'ingredients-heading', label: tx.ingredients, emoji: '🥕' },
     flatSteps.length > 0 && { id: 'steps-heading', label: tx.instructions, emoji: '📋' },
     displayTipsCount > 0 && { id: 'tips-heading', label: tx.tipsTitle, emoji: '💡' },
-    { id: 'my-notes-heading', label: lang === 'he' ? 'ההערות שלי' : 'My Notes', emoji: '📝' },
-    isViewingPublishedContent && { id: 'reviews-heading', label: lang === 'he' ? 'ביקורות' : 'Reviews', emoji: '💬' },
+    { id: 'my-notes-heading', label: tx.myNotes, emoji: '📝' },
+    isViewingPublishedContent && { id: 'reviews-heading', label: tx.reviews, emoji: '💬' },
   ].filter((s): s is { id: string; label: string; emoji: string } => !!s)
 
   return (
@@ -676,26 +676,26 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
               <button type="button"
                 onClick={() => setPublishConfirmOpen(true)}
                 disabled={submitting || recipe.status === 'pending_review'}
-                title={recipe.status === 'pending_review' ? (lang === 'he' ? 'ממתין לבדיקת AI' : 'Pending AI review') : undefined}
+                title={recipe.status === 'pending_review' ? (tx.pendingAIReview) : undefined}
                 className="flex items-center gap-1.5 px-3 py-2 bg-amber text-bg hover:bg-amber/90 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50"
               >
                 {recipe.status === 'pending_review'
-                  ? (lang === 'he' ? 'ממתין לבדיקת AI...' : 'Pending AI review...')
+                  ? (tx.pendingAIReview2)
                   : submitting
-                    ? (lang === 'he' ? 'בודק עם AI...' : 'Reviewing with AI...')
-                    : (lang === 'he' ? 'פרסם' : 'Publish')}
+                    ? (tx.reviewingWithAI)
+                    : (tx.publish)}
               </button>
             )}
             <button type="button"
               onClick={() => navigate(`/recipes/${id}/edit`)}
               disabled={recipe.status === 'pending_review'}
-              title={recipe.status === 'pending_review' ? (lang === 'he' ? 'המתכון נעול בזמן בדיקת AI' : 'Locked while pending AI review') : undefined}
+              title={recipe.status === 'pending_review' ? (tx.lockedWhilePendingAIReview) : undefined}
               className="flex items-center gap-2 px-3 py-2 bg-black/40 backdrop-blur-sm text-white/80 hover:text-white rounded-xl text-sm transition-colors border border-white/10 disabled:opacity-50"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
-              {lang === 'he' ? 'עריכה' : 'Edit'}
+              {tx.edit2}
             </button>
           </div>
         )}
@@ -703,7 +703,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
 
       <div className="max-w-3xl mx-auto px-4 -mt-16 relative pb-24 print:max-w-none print:mx-0 print:mt-0 print:px-0 print:pb-0">
         <Breadcrumbs crumbs={[
-          { label: lang === 'he' ? 'בית' : 'Home', href: '/' },
+          { label: tx.home, href: '/' },
           { label: tx.categories[displayRecipe.category] },
           { label: displayTitle },
         ]} />
@@ -729,17 +729,17 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                     : 'bg-red-500/10 text-red-400'
               }`}>
                 {recipe.status === 'draft'
-                  ? (lang === 'he' ? 'טיוטה' : 'Draft')
+                  ? (tx.draft)
                   : recipe.status === 'pending_review'
-                    ? (lang === 'he' ? 'ממתין לבדיקת AI' : 'Pending AI review')
-                    : (lang === 'he' ? 'נדחה' : 'Rejected')}
+                    ? (tx.pendingAIReview)
+                    : (tx.rejected)}
               </span>
             )}
           </div>
 
           {canEdit && recipe.status === 'published' && recipe.currentRevision !== recipe.publishedRevision && (
             <p className="text-xs text-amber mb-2">
-              {lang === 'he' ? 'יש לכם שינויים שלא פורסמו' : 'You have unpublished changes'}
+              {tx.youHaveUnpublishedChanges}
             </p>
           )}
 
@@ -750,12 +750,12 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
               <div className="card p-3 mb-4 border border-red-400/20">
                 <div className="flex items-start justify-between gap-3">
                   <p className="text-sm text-red-400 font-medium">
-                    {lang === 'he' ? 'לא ניתן לשלוח - יש להשלים:' : "Can't submit yet - needs:"}
+                    {tx.canTSubmitYetNeeds}
                   </p>
                   <button
                     type="button"
                     onClick={() => setSubmitError(null)}
-                    aria-label={lang === 'he' ? 'סגור' : 'Dismiss'}
+                    aria-label={tx.dismiss}
                     className="shrink-0 text-cream/30 hover:text-cream/60 transition-colors"
                   >
                     ✕
@@ -782,7 +782,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
             <div className={`card p-4 mb-4 border ${review.score >= 95 ? 'border-herb/30' : 'border-red-400/20'}`}>
               <div className="flex items-center justify-between mb-3">
                 <span className="text-sm font-semibold text-cream">
-                  {lang === 'he' ? 'תוצאת בדיקת AI' : 'AI review result'}
+                  {tx.aIReviewResult}
                 </span>
                 <span className={`text-lg font-bold ${review.score >= 95 ? 'text-herb' : 'text-red-400'}`}>
                   {review.score}%
@@ -805,7 +805,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                 </ul>
               ) : (
                 <p className="text-xs text-cream/40 mb-3">
-                  {lang === 'he' ? 'לא נמצאו בעיות' : 'No issues found'}
+                  {tx.noIssuesFound}
                 </p>
               )}
               {recipe.status === 'rejected' && review.suggestedFields && (
@@ -814,7 +814,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                   onClick={() => navigate(`/recipes/${id}/edit?applySuggestions=1`)}
                   className="btn-ghost text-xs"
                 >
-                  {lang === 'he' ? 'החל תיקונים' : 'Apply changes'}
+                  {tx.applyChanges}
                 </button>
               )}
             </div>
@@ -822,10 +822,8 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
 
           {displayRecipe.aiGenerated && (
             <div className="print:hidden inline-flex items-center gap-1.5 text-xs font-semibold text-amber bg-amber/10 border border-amber/20 rounded-full px-3 py-1 mb-3">
-              <span>{lang === 'he' ? 'נוצר בשיתוף AI' : 'AI co-authored'}</span>
-              <FilterInfoPopover text={lang === 'he'
-                ? 'המתכון הזה נכתב בשיתוף AI שחיפש ברשת מתכונים אמיתיים והתחיל מהם - אך מי שפרסם אותו בדק, אישר, ויכול לערוך כל חלק בו. הוא לא הומצא על ידי AI. ראו קרדיטים למטה למקורות ההשראה.'
-                : 'This recipe was co-authored with AI - it started from real recipes AI found online, then was reviewed and approved by the person who posted it, who can edit any part of it. Not invented by AI. See the sources below for what it was inspired by.'}
+              <span>{tx.aICoAuthored}</span>
+              <FilterInfoPopover text={tx.thisRecipeWasCoAuthoredWith}
               />
             </div>
           )}
@@ -838,7 +836,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
           </h1>
           {recipe.status === 'published' && recipe.ownerName && (
             <p className="text-cream/30 text-xs mb-3">
-              {lang === 'he' ? 'פורסם על ידי ' : 'Published by '}
+              {tx.publishedBy}
               <Link to={`/chef/${recipe.ownerId}`} className="text-cream/50 hover:text-amber underline decoration-cream/20 hover:decoration-amber underline-offset-2 transition-colors">
                 {recipe.ownerName}
               </Link>
@@ -853,7 +851,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
 
           {recipe.source && (
             <p className="text-cream/30 text-xs mb-5">
-              {lang === 'he' ? 'מקור: ' : 'Source: '}
+              {tx.source}
               {recipe.source.startsWith('http') ? (
                 <a href={recipe.source} target="_blank" rel="noopener noreferrer" className="underline hover:text-cream/60 transition-colors">
                   {recipe.source.replace(/^https?:\/\//, '').replace(/\/.*$/, '')}
@@ -917,7 +915,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
               <button type="button"
                 onClick={() => id && toggleCooked(id)}
                 aria-pressed={!!id && cookedSlugs.has(id)}
-                title={lang === 'he' ? 'סמנו שבישלתם את המתכון הזה בפועל, כדי לעקוב אחרי מה שכבר הכנתם' : "Mark that you've actually cooked this recipe, to keep track of what you've made"}
+                title={tx.markThatYouVeActuallyCooked}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
                   id && cookedSlugs.has(id)
                     ? 'bg-herb text-white'
@@ -926,8 +924,8 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
               >
                 <span className="text-lg leading-none">{id && cookedSlugs.has(id) ? '✅' : '🍳'}</span>
                 {id && cookedSlugs.has(id)
-                  ? (lang === 'he' ? 'בישלתי את זה' : 'Made it')
-                  : (lang === 'he' ? 'סמן כבושל' : 'Mark as cooked')}
+                  ? (tx.madeIt)
+                  : (tx.markAsCooked)}
                 {!!recipe.cookCount && (
                   <span className="opacity-70 text-xs">({recipe.cookCount})</span>
                 )}
@@ -967,7 +965,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                 className="flex items-center gap-1.5 text-sm font-medium text-herb hover:text-herb/80 transition-colors"
               >
                 <span>🌐</span>
-                {lang === 'he' ? 'צפה בגרסה המפורסמת' : 'View published version'}
+                {tx.viewPublishedVersion}
               </button>
             )}
 
@@ -981,7 +979,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
               <svg className="w-4 h-4" fill={favoriteSlugs.has(recipe.id) ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 010-6.364z" />
               </svg>
-              {lang === 'he' ? 'מועדף' : 'Favorite'}
+              {tx.favorite}
             </button>
             )}
 
@@ -993,13 +991,13 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14-7H5a2 2 0 00-2 2v14l4-2 3 2 3-2 3 2 3-2V6a2 2 0 00-2-2z" />
                 </svg>
-                {lang === 'he' ? 'שמור לאוסף' : 'Save to collection'}
+                {tx.saveToCollection}
               </button>
               {collectionMenuOpen && (
                 <div className="absolute z-20 top-full mt-2 w-64 card p-3 shadow-xl" dir={lang === 'he' ? 'rtl' : 'ltr'}>
                   {collections.length === 0 ? (
                     <p className="text-xs text-cream/30 mb-2">
-                      {lang === 'he' ? 'אין עדיין אוספים' : 'No collections yet'}
+                      {tx.noCollectionsYet}
                     </p>
                   ) : (
                     <ul className="space-y-1 mb-2 max-h-40 overflow-y-auto">
@@ -1029,9 +1027,9 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                       value={newCollectionName}
                       onChange={e => setNewCollectionName(e.target.value)}
                       onKeyDown={e => { if (e.key === 'Enter') createAndAddCollection() }}
-                      placeholder={lang === 'he' ? 'אוסף חדש...' : 'New collection...'}
+                      placeholder={tx.newCollection}
                       maxLength={60}
-                      aria-label={lang === 'he' ? 'שם אוסף חדש' : 'New collection name'}
+                      aria-label={tx.newCollectionName}
                       className="flex-1 bg-tint/[0.03] border border-tint/10 rounded-md px-2 py-1 text-xs text-cream/80 placeholder-cream/25 outline-none focus:border-amber/30 transition-colors"
                     />
                     <button type="button"
@@ -1039,7 +1037,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                       disabled={!newCollectionName.trim()}
                       className="px-2 py-1 rounded-md text-[11px] font-semibold bg-amber/90 text-bg hover:bg-amber transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                     >
-                      {lang === 'he' ? 'הוסף' : 'Add'}
+                      {tx.add}
                     </button>
                   </div>
                 </div>
@@ -1049,7 +1047,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
             {!!recipe.viewCount && (
               <span
                 className="flex items-center gap-1 text-cream/30 text-xs"
-                title={lang === 'he' ? 'מספר המבקרים הייחודיים, נספר פעם אחת ליום לכל אדם' : 'Unique visitors, counted once per person per day'}
+                title={tx.uniqueVisitorsCountedOncePerPerson}
               >
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -1064,7 +1062,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                 <span>👤</span>
                 {recipe.ownerName
                   ? (lang === 'he' ? `עוד מ${recipe.ownerName}` : `More from ${recipe.ownerName}`)
-                  : (lang === 'he' ? 'עוד מהשף הזה' : "More from this chef")}
+                  : (tx.moreFromThisChef)}
               </Link>
             )}
 
@@ -1076,7 +1074,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m-10 0a2 2 0 100 4 2 2 0 000-4zm10 0a2 2 0 100 4 2 2 0 000-4z" />
                 </svg>
-                {lang === 'he' ? 'הוסף לרשימת קניות' : 'Add to list'}
+                {tx.addToList}
               </button>
             )}
 
@@ -1090,7 +1088,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342a3 3 0 100-2.684l-6.44 3.22a3 3 0 100 2.684l6.44-3.22zM8.684 13.342l6.632 3.316m0-11.317l-6.632 3.316" />
                 </svg>
-                {shareState === 'copied' ? (lang === 'he' ? 'הועתק!' : 'Copied!') : (lang === 'he' ? 'שתף' : 'Share')}
+                {shareState === 'copied' ? (tx.copied) : (tx.share)}
               </button>
             )}
 
@@ -1101,7 +1099,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6v-8z" />
               </svg>
-              {lang === 'he' ? 'הדפס' : 'Print'}
+              {tx.print}
             </button>
 
 
@@ -1113,7 +1111,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
-                {lang === 'he' ? 'מחק' : 'Delete'}
+                {tx.delete}
               </button>
             )}
           </div>
@@ -1145,8 +1143,8 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                   max="100"
                   value={customInput}
                   onChange={e => handleCustomInput(e.target.value)}
-                  placeholder={lang === 'he' ? 'מנות' : 'qty'}
-                  aria-label={lang === 'he' ? 'מספר מנות מותאם אישית' : 'Custom number of servings'}
+                  placeholder={tx.qty}
+                  aria-label={tx.customNumberOfServings}
                   className="w-14 bg-transparent text-cream text-sm text-center outline-none placeholder-cream/30"
                   dir="ltr"
                 />
@@ -1154,7 +1152,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
             </div>
             {multiplier !== 1 && (
               <span className="text-amber text-sm ms-auto">
-                {scaledServings} {lang === 'he' ? 'מנות' : 'servings'}
+                {scaledServings} {tx.servings2}
               </span>
             )}
           </div>
@@ -1250,13 +1248,13 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                   <button type="button"
                     onClick={openWizard}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-tint/10 text-cream/40 hover:text-cream/70 transition-colors"
-                    title={lang === 'he' ? 'הדריכו אותי שלב אחר שלב' : 'Guide me step by step'}
+                    title={tx.guideMeStepByStep}
                   >
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                       <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    {lang === 'he' ? 'מצב הדרכה' : 'Guided mode'}
+                    {tx.guidedMode}
                   </button>
                 )}
               </div>
@@ -1440,7 +1438,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
         {!!displayRecipe.sources?.length && (
           <div className="mt-8 card p-5 print:mt-6 print:p-0 print:border-0 print:border-t print:border-tint/15 print:pt-4 print:rounded-none print:bg-transparent print:break-inside-avoid">
             <h2 className="font-serif text-lg font-bold text-cream mb-3 flex items-center gap-2">
-              <span>🔗</span> {lang === 'he' ? 'מקורות' : 'Sources'}
+              <span>🔗</span> {tx.sources}
             </h2>
             <ul className="space-y-1.5">
               {displayRecipe.sources.map(s => (
@@ -1458,14 +1456,14 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
         <div className="print:hidden mt-8 card p-5">
           <div className="flex items-center justify-between mb-3">
             <h2 id="my-notes-heading" className="font-serif text-lg font-bold text-cream flex items-center gap-2 scroll-mt-20">
-              <span>📝</span> {lang === 'he' ? 'ההערות שלי' : 'My Notes'}
+              <span>📝</span> {tx.myNotes}
               <span className="font-sans text-[11px] font-normal text-cream/30">
-                {lang === 'he' ? '(פרטי - גלוי רק לך)' : '(Private — only visible to you)'}
+                {tx.privateOnlyVisibleToYou}
               </span>
             </h2>
             {noteStatus !== 'idle' && (
               <span className="text-xs text-cream/30">
-                {noteStatus === 'saving' ? (lang === 'he' ? 'שומר...' : 'Saving...') : (lang === 'he' ? 'נשמר' : 'Saved')}
+                {noteStatus === 'saving' ? (tx.saving) : (tx.saved)}
               </span>
             )}
           </div>
@@ -1474,7 +1472,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
             value={noteInput}
             onChange={e => setNoteInput(e.target.value)}
             onBlur={() => saveNote(noteInput)}
-            placeholder={lang === 'he' ? 'הוסף הערה פרטית למתכון הזה...' : 'Add a private note for this recipe...'}
+            placeholder={tx.addAPrivateNoteForThis}
             rows={3}
             className="w-full bg-tint/[0.03] border border-tint/10 rounded-lg p-3 text-sm text-cream/80 placeholder-cream/25 outline-none focus:border-amber/30 transition-colors resize-none"
             dir={lang === 'he' ? 'rtl' : 'ltr'}
@@ -1485,7 +1483,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
         {isViewingPublishedContent && (
         <div className="print:hidden mt-8 card p-5">
           <h2 id="reviews-heading" className="font-serif text-lg font-bold text-cream mb-3 flex items-center gap-2 scroll-mt-20">
-            <span>💬</span> {lang === 'he' ? 'ביקורות' : 'Reviews'}
+            <span>💬</span> {tx.reviews}
           </h2>
           {!!recipe.ratingCount && distribution && (
             <div className="flex flex-col gap-1 mb-4">
@@ -1508,12 +1506,12 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
             <div className="flex flex-col gap-2 mb-4 border border-tint/10 rounded-lg p-3">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-xs font-semibold text-cream/40">
-                  {lang === 'he' ? 'הביקורת שלכם' : 'Your review'}
+                  {tx.yourReview}
                 </span>
                 <div className="flex items-center gap-1">
                   <button type="button"
                     onClick={() => setIsEditingReview(true)}
-                    aria-label={lang === 'he' ? 'ערוך ביקורת' : 'Edit review'}
+                    aria-label={tx.editReview}
                     className="h-7 w-7 flex items-center justify-center rounded-lg text-cream/40 hover:text-cream/70 transition-colors"
                   >
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -1522,7 +1520,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                   </button>
                   <button type="button"
                     onClick={deleteMyReview}
-                    aria-label={lang === 'he' ? 'מחק ביקורת' : 'Delete review'}
+                    aria-label={tx.deleteReview}
                     className="h-7 w-7 flex items-center justify-center rounded-lg text-cream/40 hover:text-red-400 transition-colors"
                   >
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -1553,8 +1551,8 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
               onChange={e => setReviewComment(e.target.value)}
               placeholder={
                 userRating
-                  ? (lang === 'he' ? 'שתפו מה חשבתם על המתכון...' : 'Share your thoughts on this recipe...')
-                  : (lang === 'he' ? 'דרגו את המתכון בכוכבים כדי לכתוב ביקורת' : 'Rate the recipe with stars above to write a review')
+                  ? (tx.shareYourThoughtsOnThisRecipe)
+                  : (tx.rateTheRecipeWithStarsAbove)
               }
               rows={2}
               maxLength={500}
@@ -1572,7 +1570,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                 />
                 <button type="button"
                   onClick={() => setReviewPhotoUrl(null)}
-                  aria-label={lang === 'he' ? 'הסר תמונה' : 'Remove photo'}
+                  aria-label={tx.removePhoto}
                   className="absolute -top-1.5 -right-1.5 h-5 w-5 flex items-center justify-center rounded-full bg-black/60 text-white text-[10px] hover:bg-black/80"
                 >
                   ✕
@@ -1588,10 +1586,10 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
                 {reviewPhotoUploading
-                  ? (lang === 'he' ? 'מעלה...' : 'Uploading...')
+                  ? (tx.uploading)
                   : reviewPhotoUrl
-                    ? (lang === 'he' ? 'החלף תמונה' : 'Replace photo')
-                    : (lang === 'he' ? 'הוסף תמונה' : 'Add photo')}
+                    ? (tx.replacePhoto)
+                    : (tx.addPhoto)}
                 <input
                   type="file"
                   accept="image/jpeg,image/png,image/webp"
@@ -1606,8 +1604,8 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                 className="px-4 py-1.5 rounded-lg text-xs font-semibold bg-amber/90 text-bg hover:bg-amber transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 {hasPostedReview
-                  ? (lang === 'he' ? 'עדכן ביקורת' : 'Update review')
-                  : (lang === 'he' ? 'פרסם ביקורת' : 'Post review')}
+                  ? (tx.updateReview)
+                  : (tx.postReview)}
               </button>
             </div>
           </div>
@@ -1633,8 +1631,8 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
             ) : (
               <p className="text-xs text-cream/25">
                 {hasPostedReview
-                  ? (lang === 'he' ? 'אין עדיין ביקורות נוספות' : 'No other reviews yet')
-                  : (lang === 'he' ? 'אין עדיין ביקורות. היו הראשונים!' : 'No reviews yet. Be the first!')}
+                  ? (tx.noOtherReviewsYet)
+                  : (tx.noReviewsYetBeTheFirst)}
               </p>
             )
           })()}
@@ -1650,7 +1648,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                 onClick={() => { setRevisionsOpen(v => !v); if (!revisionsOpen && revisions === null) loadRevisions() }}
                 className="flex items-center gap-1 text-xs font-medium text-cream/35 hover:text-cream/60 transition-colors"
               >
-                <span>{lang === 'he' ? 'היסטוריית גרסאות' : 'Show revision history'}</span>
+                <span>{tx.showRevisionHistory}</span>
                 <svg className={`w-3 h-3 transition-transform ${revisionsOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                 </svg>
@@ -1660,14 +1658,14 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                   onClick={() => selectRevision(null)}
                   className="text-xs font-semibold text-amber hover:text-amber/80 transition-colors"
                 >
-                  {lang === 'he' ? 'חזרה לגרסה הנוכחית' : 'Back to current version'}
+                  {tx.backToCurrentVersion}
                 </button>
               )}
             </div>
             {revisionsOpen && revisions && (
               revisions.length === 0 ? (
                 <p className="mt-3 text-xs text-cream/25">
-                  {lang === 'he' ? 'אין עדיין גרסאות' : 'No revisions yet'}
+                  {tx.noRevisionsYet}
                 </p>
               ) : (
                 <ul className="mt-3 space-y-2">
@@ -1701,17 +1699,17 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                           <span className="flex items-center gap-1.5 shrink-0">
                             {isLive && (
                               <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-herb/10 text-herb">
-                                {lang === 'he' ? 'חי באתר' : 'Live on site'}
+                                {tx.liveOnSite}
                               </span>
                             )}
                             {isRejectedAttempt && (
                               <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-red-500/10 text-red-400">
-                                {lang === 'he' ? 'נדחה' : 'Rejected'}
+                                {tx.rejected}
                               </span>
                             )}
                             {isLatest && !isLive && !isRejectedAttempt && (
                               <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-amber/10 text-amber">
-                                {lang === 'he' ? 'הגרסה האחרונה' : 'Latest'}
+                                {tx.latest}
                               </span>
                             )}
                           </span>
@@ -1729,7 +1727,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
         {relatedRecipes.length > 0 && (
           <div className="print:hidden mt-10">
             <h2 className="font-serif text-lg font-bold text-cream mb-4">
-              {lang === 'he' ? 'מתכונים דומים' : 'You might also like'}
+              {tx.youMightAlsoLike}
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {relatedRecipes.map(r => {
@@ -1785,7 +1783,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
               </span>
               <button type="button"
                 onClick={() => setWizardOpen(false)}
-                aria-label={lang === 'he' ? 'סגור מצב הדרכה' : 'Close guided mode'}
+                aria-label={tx.closeGuidedMode}
                 className="h-9 w-9 flex items-center justify-center rounded-lg text-cream/40 hover:text-cream/70 transition-colors"
               >
                 ✕
@@ -1836,7 +1834,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                     checked ? 'border-herb/30 bg-herb/10 text-herb' : 'border-tint/10 text-cream/50 hover:text-cream/80'
                   }`}
                 >
-                  {checked ? (lang === 'he' ? '✓ הושלם' : '✓ Done') : (lang === 'he' ? 'סמן כהושלם' : 'Mark done')}
+                  {checked ? (tx.done) : (tx.markDone)}
                 </button>
               </div>
             </div>
@@ -1847,21 +1845,21 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                 disabled={wizardIndex === 0}
                 className="flex-1 py-3 rounded-xl text-sm font-medium border border-tint/10 text-cream/60 hover:text-cream/90 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               >
-                {lang === 'he' ? 'הקודם' : 'Previous'}
+                {tx.previous}
               </button>
               {wizardIndex === flatSteps.length - 1 ? (
                 <button type="button"
                   onClick={() => { markStepChecked(stepKey); setWizardOpen(false) }}
                   className="flex-1 py-3 rounded-xl text-sm font-semibold bg-amber/90 text-bg hover:bg-amber transition-colors"
                 >
-                  {lang === 'he' ? 'סיום' : 'Finish'}
+                  {tx.finish}
                 </button>
               ) : (
                 <button type="button"
                   onClick={() => { markStepChecked(stepKey); advanceWizardOrFinish() }}
                   className="flex-1 py-3 rounded-xl text-sm font-semibold bg-amber/90 text-bg hover:bg-amber transition-colors"
                 >
-                  {lang === 'he' ? 'הבא' : 'Next'}
+                  {tx.next}
                 </button>
               )}
             </div>
@@ -1880,7 +1878,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
         >
           <button type="button"
             onClick={() => setLightboxUrl(null)}
-            aria-label={lang === 'he' ? 'סגור' : 'Close'}
+            aria-label={tx.close}
             className="absolute top-4 right-4 h-10 w-10 flex items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
           >
             ✕
@@ -1896,10 +1894,10 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
 
       <ConfirmDialog
         open={deleteConfirmOpen}
-        title={lang === 'he' ? 'מחיקת מתכון' : 'Delete recipe'}
-        message={lang === 'he' ? 'למחוק את המתכון הזה לצמיתות? לא ניתן לבטל פעולה זו.' : 'Permanently delete this recipe? This cannot be undone.'}
-        confirmLabel={deleting ? (lang === 'he' ? 'מוחק...' : 'Deleting...') : (lang === 'he' ? 'מחק' : 'Delete')}
-        cancelLabel={lang === 'he' ? 'ביטול' : 'Cancel'}
+        title={tx.deleteRecipe}
+        message={tx.permanentlyDeleteThisRecipeThisCannot}
+        confirmLabel={deleting ? (tx.deleting) : (tx.delete)}
+        cancelLabel={tx.cancel}
         danger
         busy={deleting}
         onConfirm={handleDeleteRecipe}
@@ -1908,12 +1906,10 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
 
       <ConfirmDialog
         open={publishConfirmOpen}
-        title={lang === 'he' ? 'פרסום מתכון' : 'Publish recipe'}
-        message={lang === 'he'
-          ? 'לשלוח את המתכון לבדיקת AI ולפרסום? הבדיקה בודקת איכות, תמונה, תרגום ועוד.'
-          : 'Publish this recipe for AI review? The review checks quality, photo, translation, and more.'}
-        confirmLabel={lang === 'he' ? 'פרסם' : 'Publish'}
-        cancelLabel={lang === 'he' ? 'ביטול' : 'Cancel'}
+        title={tx.publishRecipe}
+        message={tx.publishThisRecipeForAIReview}
+        confirmLabel={tx.publish}
+        cancelLabel={tx.cancel}
         busy={submitting}
         onConfirm={() => { setPublishConfirmOpen(false); handleSubmitForReview() }}
         onCancel={() => setPublishConfirmOpen(false)}

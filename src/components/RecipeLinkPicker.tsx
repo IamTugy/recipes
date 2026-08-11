@@ -3,6 +3,7 @@ import { Dialog } from '@base-ui/react/dialog'
 import Modal from './Modal'
 import { useMyRecipes, useRecipes } from '../hooks/useRecipes'
 import { useLanguage } from '../hooks/useLanguage'
+import { t } from "../i18n";
 
 interface LinkTarget {
   id: string
@@ -21,6 +22,7 @@ interface RecipeLinkPickerProps {
 // own search already filters.
 export default function RecipeLinkPicker({ excludeId, onSelect, onClose }: RecipeLinkPickerProps) {
   const { lang } = useLanguage()
+        const tx = t[lang]
   const [query, setQuery] = useState('')
   const { recipes: mine } = useMyRecipes()
   const { recipes: published } = useRecipes()
@@ -40,18 +42,18 @@ export default function RecipeLinkPicker({ excludeId, onSelect, onClose }: Recip
   return (
     <Modal open onOpenChange={next => { if (!next) onClose() }} zIndexClassName="z-50" panelClassName="max-w-md p-5 space-y-3">
       <Dialog.Title className="font-serif text-lg font-bold text-cream">
-        {lang === 'he' ? 'קשר למתכון' : 'Link to a recipe'}
+        {tx.linkToARecipe}
       </Dialog.Title>
       <input
         autoFocus
         value={query}
         onChange={e => setQuery(e.target.value)}
-        placeholder={lang === 'he' ? 'חיפוש מתכון...' : 'Search recipes...'}
+        placeholder={tx.searchRecipes}
         className="w-full bg-tint/[0.03] border border-tint/10 rounded-lg px-3 py-2 text-sm text-cream/80 placeholder-cream/25 outline-none focus:border-amber/30 transition-colors"
       />
       <div className="max-h-72 overflow-y-auto space-y-1">
         {options.length === 0 && (
-          <p className="text-xs text-cream/30 text-center py-6">{lang === 'he' ? 'לא נמצאו מתכונים' : 'No recipes found'}</p>
+          <p className="text-xs text-cream/30 text-center py-6">{tx.noResultsTitle}</p>
         )}
         {options.map(r => (
           <button
@@ -66,7 +68,7 @@ export default function RecipeLinkPicker({ excludeId, onSelect, onClose }: Recip
       </div>
       <div className="flex justify-end">
         <button type="button" onClick={onClose} className="btn-ghost text-sm">
-          {lang === 'he' ? 'סגור' : 'Close'}
+          {tx.close}
         </button>
       </div>
     </Modal>

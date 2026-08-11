@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { resizedImage } from '../lib/image'
 import SkeletonImage from './SkeletonImage'
 import Avatar from './Avatar'
+import { t } from "../i18n";
 
 export interface Review {
   id: string
@@ -43,16 +44,17 @@ interface ReviewItemProps {
 }
 
 function displayName(userName: string | null, lang: 'he' | 'en'): string {
-  return userName ?? (lang === 'he' ? 'משתמש' : 'User')
+  return userName ?? t[lang].user
 }
 
 function UpvoteButton({ upvoted, count, onToggle, lang }: { upvoted: boolean; count: number; onToggle: () => void; lang: 'he' | 'en' }) {
+  const tx = t[lang]
   return (
     <button
       type="button"
       onClick={onToggle}
       aria-pressed={upvoted}
-      aria-label={lang === 'he' ? 'הצבע בעד' : 'Upvote'}
+      aria-label={tx.upvote}
       className={`flex items-center gap-1 text-xs font-medium transition-colors ${
         upvoted ? 'text-amber' : 'text-cream/35 hover:text-cream/60'
       }`}
@@ -66,6 +68,7 @@ function UpvoteButton({ upvoted, count, onToggle, lang }: { upvoted: boolean; co
 }
 
 export default function ReviewItem({ recipeId, review, lang, getToken, onOpenLightbox, translation, onToggleTranslate, liveRevision }: ReviewItemProps) {
+  const tx = t[lang]
   const showingTranslation = !!translation?.showing
   const [upvoted, setUpvoted] = useState(review.upvotedByMe)
   const [upvoteCount, setUpvoteCount] = useState(review.upvoteCount)
@@ -178,7 +181,7 @@ export default function ReviewItem({ recipeId, review, lang, getToken, onOpenLig
         )}
       </div>
       <p className="text-sm text-cream/70 leading-relaxed" dir={showingTranslation ? (lang === 'he' ? 'rtl' : 'ltr') : undefined}>
-        {showingTranslation ? (translation?.loading ? (lang === 'he' ? 'מתרגם...' : 'Translating...') : translation?.text) : review.comment}
+        {showingTranslation ? (translation?.loading ? (tx.translating) : translation?.text) : review.comment}
       </p>
       {review.comment.trim() && onToggleTranslate && (
         <button
@@ -188,8 +191,8 @@ export default function ReviewItem({ recipeId, review, lang, getToken, onOpenLig
           className="mt-1 text-[11px] text-cream/40 hover:text-cream/70 underline underline-offset-2 disabled:opacity-50"
         >
           {showingTranslation
-            ? (lang === 'he' ? 'הצג מקור' : 'Show original')
-            : (lang === 'he' ? 'תרגם' : 'Translate')}
+            ? (tx.showOriginal)
+            : (tx.translate)}
         </button>
       )}
       {review.photoUrl && (
@@ -209,7 +212,7 @@ export default function ReviewItem({ recipeId, review, lang, getToken, onOpenLig
           onClick={() => startReply()}
           className="text-xs font-medium text-cream/35 hover:text-cream/60 transition-colors"
         >
-          {lang === 'he' ? 'הגב' : 'Reply'}
+          {tx.reply}
         </button>
         {replyCount > 0 && (
           <button
@@ -218,7 +221,7 @@ export default function ReviewItem({ recipeId, review, lang, getToken, onOpenLig
             className="text-xs font-medium text-cream/35 hover:text-cream/60 transition-colors"
           >
             {repliesOpen
-              ? (lang === 'he' ? 'הסתר תגובות' : 'Hide replies')
+              ? (tx.hideReplies)
               : (lang === 'he' ? `הצג ${replyCount} תגובות` : `View ${replyCount} ${replyCount === 1 ? 'reply' : 'replies'}`)}
           </button>
         )}
@@ -251,7 +254,7 @@ export default function ReviewItem({ recipeId, review, lang, getToken, onOpenLig
                   onClick={() => startReply({ userId: reply.userId, name: displayName(reply.userName, lang) })}
                   className="text-xs font-medium text-cream/35 hover:text-cream/60 transition-colors"
                 >
-                  {lang === 'he' ? 'הגב' : 'Reply'}
+                  {tx.reply}
                 </button>
               </div>
             </li>
@@ -265,7 +268,7 @@ export default function ReviewItem({ recipeId, review, lang, getToken, onOpenLig
             autoFocus
             value={replyText}
             onChange={e => setReplyText(e.target.value)}
-            placeholder={lang === 'he' ? 'כתבו תגובה...' : 'Write a reply...'}
+            placeholder={tx.writeAReply}
             rows={2}
             maxLength={500}
             className="w-full bg-tint/[0.03] border border-tint/10 rounded-lg p-2.5 text-sm text-cream/80 placeholder-cream/25 outline-none focus:border-amber/30 transition-colors resize-none"
@@ -278,7 +281,7 @@ export default function ReviewItem({ recipeId, review, lang, getToken, onOpenLig
               disabled={!replyText.trim() || posting}
               className="px-3 py-1 rounded-lg text-xs font-semibold bg-amber/90 text-bg hover:bg-amber transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              {lang === 'he' ? 'שלח' : 'Post'}
+              {tx.post}
             </button>
             <button
               type="button"
@@ -289,7 +292,7 @@ export default function ReviewItem({ recipeId, review, lang, getToken, onOpenLig
               }}
               className="text-xs font-medium text-cream/35 hover:text-cream/60 transition-colors"
             >
-              {lang === 'he' ? 'בטל' : 'Cancel'}
+              {tx.cancel2}
             </button>
           </div>
         </div>

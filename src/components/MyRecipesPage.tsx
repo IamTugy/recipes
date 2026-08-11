@@ -82,7 +82,7 @@ export default function MyRecipesPage() {
     <div className="min-h-dvh bg-bg pt-14">
       <div className="max-w-6xl mx-auto px-6 pt-10 pb-6">
         <h1 className="font-serif text-2xl font-bold text-cream mb-4">
-          {lang === 'he' ? 'המתכונים שלי' : 'My Recipes'}
+          {tx.myRecipes}
         </h1>
         <div className="relative max-w-md">
           <svg
@@ -114,7 +114,7 @@ export default function MyRecipesPage() {
                 : 'text-cream/35 hover:text-cream/60 border-tint/10'
             }`}
           >
-            {lang === 'he' ? 'הכל' : 'All'}
+            {tx.all}
           </button>
           {STATUS_FILTERS.map(s => (
             <button type="button"
@@ -131,14 +131,14 @@ export default function MyRecipesPage() {
           ))}
           <button type="button"
             onClick={() => setLiveOnly(v => !v)}
-            title={lang === 'he' ? 'מתכונים שנראים כרגע לכולם באתר, גם אם יש בהם עריכה שלא פורסמה' : "Recipes currently visible to everyone on the site, even if they have an unpublished edit in progress"}
+            title={tx.recipesCurrentlyVisibleToEveryoneOn}
             className={`px-3 py-1.5 text-[11px] tracking-wider font-medium transition-colors rounded-lg border ${
               liveOnly
                 ? 'text-amber bg-amber/10 border-amber/20'
                 : 'text-cream/35 hover:text-cream/60 border-tint/10'
             }`}
           >
-            🌐 {lang === 'he' ? 'חי באתר' : 'Live on site'}
+            🌐 {tx.liveOnSite}
           </button>
         </div>
       </div>
@@ -200,12 +200,12 @@ export default function MyRecipesPage() {
               ? `${filtered.length} / ${recipes.length}`
               : `${recipes.length}`
             }
-            {' '}{lang === 'he' ? 'מתכונים' : 'recipes'}
+            {' '}{tx.recipes}
           </p>
           <div className="flex items-center gap-1 border border-tint/10 rounded-lg p-0.5">
             <button type="button"
               onClick={() => setViewMode('grid')}
-              aria-label={lang === 'he' ? 'תצוגת רשת' : 'Grid view'}
+              aria-label={tx.gridView}
               className={`h-7 w-7 flex items-center justify-center rounded-md transition-colors ${
                 viewMode === 'grid' ? 'bg-amber/10 text-amber' : 'text-cream/35 hover:text-cream/60'
               }`}
@@ -217,7 +217,7 @@ export default function MyRecipesPage() {
             </button>
             <button type="button"
               onClick={() => setViewMode('list')}
-              aria-label={lang === 'he' ? 'תצוגת רשימה' : 'List view'}
+              aria-label={tx.listView}
               className={`h-7 w-7 flex items-center justify-center rounded-md transition-colors ${
                 viewMode === 'list' ? 'bg-amber/10 text-amber' : 'text-cream/35 hover:text-cream/60'
               }`}
@@ -236,7 +236,7 @@ export default function MyRecipesPage() {
         ) : recipes.length === 0 ? (
           <div className="text-center py-24 text-cream/30">
             <p className="text-sm tracking-widest uppercase mb-2">
-              {lang === 'he' ? 'עדיין לא יצרתם מתכונים' : "You haven't created any recipes yet"}
+              {tx.youHavenTCreatedAnyRecipes}
             </p>
           </div>
         ) : filtered.length === 0 ? (
@@ -283,7 +283,7 @@ export default function MyRecipesPage() {
                     {status !== 'pending_review' && (
                       <button type="button"
                         onClick={e => { e.preventDefault(); e.stopPropagation(); navigate(`/recipes/${r.id}/edit`) }}
-                        aria-label={lang === 'he' ? 'ערוך מתכון' : 'Edit recipe'}
+                        aria-label={tx.editRecipe}
                         className="shrink-0 h-8 w-8 flex items-center justify-center rounded-lg text-cream/30 hover:text-cream/60 transition-colors"
                       >
                         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useAuth } from '@clerk/react'
 import Modal from './Modal'
 import { Dialog } from '@base-ui/react/dialog'
+import { t } from "../i18n";
 
 interface EnhanceImageModalProps {
   imageUrl: string
@@ -28,6 +29,7 @@ const PRESETS: Preset[] = [
 ]
 
 export default function EnhanceImageModal({ imageUrl, uploadRecipeId, lang, onCancel, onApplied }: EnhanceImageModalProps) {
+  const tx = t[lang]
   const { getToken } = useAuth()
   const [instructions, setInstructions] = useState('')
   const [enhancing, setEnhancing] = useState(false)
@@ -58,7 +60,7 @@ export default function EnhanceImageModal({ imageUrl, uploadRecipeId, lang, onCa
       const { publicUrl } = await res.json()
       setResultUrl(publicUrl)
     } catch {
-      setError(lang === 'he' ? 'שיפור התמונה נכשל' : 'Photo enhancement failed')
+      setError(tx.photoEnhancementFailed)
     } finally {
       setEnhancing(false)
     }
@@ -68,8 +70,8 @@ export default function EnhanceImageModal({ imageUrl, uploadRecipeId, lang, onCa
     <Modal open onOpenChange={next => { if (!next && !enhancing) onCancel() }} zIndexClassName="z-50" panelClassName="max-w-lg p-5 space-y-4">
       <Dialog.Title className="font-serif text-lg font-bold text-cream">
         {resultUrl
-          ? (lang === 'he' ? 'זה נראה טוב?' : 'Does this look right?')
-          : (lang === 'he' ? 'שפר תמונה עם AI' : 'Enhance photo with AI')}
+          ? (tx.doesThisLookRight)
+          : (tx.enhancePhotoWithAI)}
       </Dialog.Title>
 
       <div className="relative w-full h-56 rounded-lg overflow-hidden bg-black/40">
@@ -86,17 +88,17 @@ export default function EnhanceImageModal({ imageUrl, uploadRecipeId, lang, onCa
       {resultUrl ? (
         <>
           <p className="text-xs text-cream/40">
-            {lang === 'he' ? 'התמונה המקורית לא תוחלף עד שתאשרו.' : "The original photo isn't replaced until you confirm."}
+            {tx.theOriginalPhotoIsnTReplaced}
           </p>
           <div className="flex items-center justify-end gap-3">
             <button type="button" onClick={onCancel} className="btn-ghost">
-              {lang === 'he' ? 'ביטול' : 'Cancel'}
+              {tx.cancel}
             </button>
             <button type="button" onClick={() => setResultUrl(null)} className="btn-ghost">
-              {lang === 'he' ? 'נסה שוב' : 'Try again'}
+              {tx.tryAgain}
             </button>
             <button type="button" onClick={() => onApplied(resultUrl)} className="btn-primary">
-              {lang === 'he' ? 'השתמש בתמונה זו' : 'Use this photo'}
+              {tx.useThisPhoto}
             </button>
           </div>
         </>
@@ -120,9 +122,7 @@ export default function EnhanceImageModal({ imageUrl, uploadRecipeId, lang, onCa
             value={instructions}
             onChange={e => setInstructions(e.target.value)}
             disabled={enhancing}
-            placeholder={lang === 'he'
-              ? 'מה תרצו לשנות בתמונה? (אופציונלי)'
-              : 'What would you like to change about the photo? (optional)'}
+            placeholder={tx.whatWouldYouLikeToChange}
             rows={3}
             maxLength={300}
             dir={lang === 'he' ? 'rtl' : 'ltr'}
@@ -133,12 +133,12 @@ export default function EnhanceImageModal({ imageUrl, uploadRecipeId, lang, onCa
 
           <div className="flex items-center justify-end gap-3">
             <button type="button" onClick={onCancel} disabled={enhancing} className="btn-ghost disabled:opacity-50">
-              {lang === 'he' ? 'ביטול' : 'Cancel'}
+              {tx.cancel}
             </button>
             <button type="button" onClick={handleGenerate} disabled={enhancing} className="btn-primary disabled:opacity-50">
               {enhancing
-                ? (lang === 'he' ? 'משפר...' : 'Enhancing...')
-                : (lang === 'he' ? 'שפר תמונה' : 'Generate')}
+                ? (tx.enhancing)
+                : (tx.generate)}
             </button>
           </div>
         </>

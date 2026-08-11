@@ -2,12 +2,13 @@ import { Link, useParams } from 'react-router-dom'
 import { useCollections } from '../hooks/useCollections'
 import { useRecipes } from '../hooks/useRecipes'
 import { useLanguage } from '../hooks/useLanguage'
-import { heUnit } from '../i18n'
+import { heUnit, t } from '../i18n'
 import { formatTime, scaleAmount } from '../utils/format'
 
 export default function CollectionPrintPage() {
   const { id } = useParams<{ id: string }>()
   const { lang } = useLanguage()
+        const tx = t[lang]
   const { collections, loading } = useCollections()
   const { recipes } = useRecipes()
 
@@ -17,13 +18,13 @@ export default function CollectionPrintPage() {
     : []
 
   if (loading) {
-    return <div className="min-h-dvh bg-bg pt-24 px-4 text-center text-cream/30 text-sm">{lang === 'he' ? 'טוען...' : 'Loading...'}</div>
+    return <div className="min-h-dvh bg-bg pt-24 px-4 text-center text-cream/30 text-sm">{tx.loading}</div>
   }
 
   if (!collection) {
     return (
       <div className="min-h-dvh bg-bg pt-24 px-4 text-center text-cream/30 text-sm">
-        {lang === 'he' ? 'האוסף לא נמצא' : 'Collection not found'}
+        {tx.collectionNotFound}
       </div>
     )
   }
@@ -34,13 +35,13 @@ export default function CollectionPrintPage() {
     <div className="min-h-dvh bg-bg pt-20 pb-16 px-4 print:pt-0 print:pb-0 print:px-0">
       <div className="print:hidden max-w-3xl mx-auto mb-6 flex items-center justify-between gap-3">
         <Link to="/collections" className="text-sm text-cream/40 hover:text-cream/70 transition-colors">
-          {lang === 'he' ? '← חזרה לאוספים' : '← Back to collections'}
+          {tx.backToCollections}
         </Link>
         <button type="button"
           onClick={() => window.print()}
           className="px-4 py-2 rounded-lg text-xs font-semibold bg-amber/90 text-bg hover:bg-amber transition-colors"
         >
-          {lang === 'he' ? 'הדפס / שמור כ-PDF' : 'Print / Save as PDF'}
+          {tx.printSaveAsPDF}
         </button>
       </div>
 
@@ -48,21 +49,19 @@ export default function CollectionPrintPage() {
         {/* Cover page */}
         <div className="print-cover flex flex-col items-center justify-center text-center py-16 print:h-[100vh] print:break-after-page">
           <p className="text-amber text-xs font-semibold uppercase tracking-[0.3em] mb-4">
-            {lang === 'he' ? 'ספר מתכונים' : 'Recipe Collection'}
+            {tx.recipeCollection}
           </p>
           <h1 className="font-serif text-4xl sm:text-5xl font-bold text-cream mb-4" dir={lang === 'he' ? 'rtl' : 'ltr'}>
             {collection.name}
           </h1>
           <p className="text-cream/40 text-sm">
-            {lang === 'he'
-              ? `${collectionRecipes.length} מתכונים · ${generatedOn}`
-              : `${collectionRecipes.length} recipes · ${generatedOn}`}
+            {tx.collectionRecipesGenerated(collectionRecipes.length, generatedOn)}
           </p>
         </div>
 
         {collectionRecipes.length === 0 ? (
           <p className="text-center text-cream/30 text-sm">
-            {lang === 'he' ? 'אין מתכונים באוסף הזה' : 'This collection has no recipes yet'}
+            {tx.thisCollectionHasNoRecipesYet}
           </p>
         ) : (
           collectionRecipes.map((recipe, i) => {
@@ -86,10 +85,10 @@ export default function CollectionPrintPage() {
 
                 <div className="grid grid-cols-4 gap-2 mb-6 print:mb-4">
                   {[
-                    { label: lang === 'he' ? 'הכנה' : 'Prep', value: formatTime(recipe.prepTime) },
-                    { label: lang === 'he' ? 'בישול' : 'Cook', value: formatTime(recipe.cookTime) },
-                    { label: lang === 'he' ? 'מנות' : 'Servings', value: recipe.servings.toString() },
-                    { label: lang === 'he' ? 'רמה' : 'Level', value: recipe.difficulty },
+                    { label: tx.prep, value: formatTime(recipe.prepTime) },
+                    { label: tx.cook, value: formatTime(recipe.cookTime) },
+                    { label: tx.servings, value: recipe.servings.toString() },
+                    { label: tx.level, value: recipe.difficulty },
                   ].map(item => (
                     <div key={item.label} className="bg-tint/[0.03] print:bg-transparent print:border print:border-tint/15 rounded-lg p-2 text-center">
                       <p className="font-bold text-cream text-sm">{item.value}</p>
@@ -102,7 +101,7 @@ export default function CollectionPrintPage() {
                   {recipe.ingredients.length > 0 && (
                     <div className="sm:col-span-2 print:col-span-2">
                       <h3 className="font-serif text-lg font-bold text-cream mb-3">
-                        {lang === 'he' ? 'מרכיבים' : 'Ingredients'}
+                        {tx.ingredients2}
                       </h3>
                       <div className="space-y-3">
                         {recipe.ingredients.map((group, gi) => {
@@ -143,7 +142,7 @@ export default function CollectionPrintPage() {
 
                   <div className="sm:col-span-3 print:col-span-3">
                     <h3 className="font-serif text-lg font-bold text-cream mb-3">
-                      {lang === 'he' ? 'הוראות הכנה' : 'Instructions'}
+                      {tx.instructions2}
                     </h3>
                     <div className="space-y-4">
                       {recipe.steps.map((group, gi) => {

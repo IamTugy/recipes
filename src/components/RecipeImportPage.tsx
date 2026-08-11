@@ -5,6 +5,7 @@ import { useLanguage } from '../hooks/useLanguage'
 import { useToast } from '../hooks/useToast'
 import { importRecipe, MAX_UPLOAD_BYTES } from '../lib/recipeImport'
 import { ApiError } from '../lib/api'
+import { t } from "../i18n";
 
 const MAX_UPLOAD_MB = Math.round(MAX_UPLOAD_BYTES / (1024 * 1024))
 
@@ -46,6 +47,7 @@ export default function RecipeImportPage() {
   const location = useLocation()
   const { getToken } = useAuth()
   const { lang } = useLanguage()
+        const tx = t[lang]
   const { showToast } = useToast()
   const [source, setSource] = useState('')
   const [docFile, setDocFile] = useState<File | null>(null)
@@ -110,11 +112,11 @@ export default function RecipeImportPage() {
       }
     } catch (err) {
       if (err instanceof ApiError && err.status === 0) {
-        setError(lang === 'he' ? 'החיבור נכשל - בדקו את האינטרנט ונסו שוב (או שהקובץ גדול מדי)' : 'Connection failed - check your internet and try again (or the file may be too large)')
+        setError(tx.connectionFailedCheckYourInternetAnd)
       } else if (err instanceof ApiError && err.status === 413) {
         setError(lang === 'he' ? `הקובץ גדול מדי (מקסימום ${MAX_UPLOAD_MB}MB)` : `That file is too large (max ${MAX_UPLOAD_MB}MB)`)
       } else {
-        setError(err instanceof Error ? err.message : (lang === 'he' ? 'הייבוא נכשל' : 'Import failed'))
+        setError(err instanceof Error ? err.message : (tx.importFailed))
       }
     } finally {
       setLoading(false)
@@ -148,30 +150,28 @@ export default function RecipeImportPage() {
     <div className="min-h-dvh bg-bg pt-20 pb-16 px-4">
       <div className="max-w-2xl mx-auto space-y-6">
         <h1 className="font-serif text-2xl font-bold text-cream">
-          {lang === 'he' ? 'ייבוא מתכון עם AI' : 'Import Recipe with AI'}
+          {tx.importRecipeWithAI}
         </h1>
         <p className="text-sm text-cream/50">
-          {lang === 'he'
-            ? 'הדביקו טקסט, קישור לאתר, או שתפו פוסט מאינסטגרם/פייסבוק/טיקטוק (הכיתוב שמצורף לשיתוף עוזר ל-AI למצוא את המתכון). ניתן גם להעלות קובץ PDF/DOCX או תמונה של המתכון (קישור לא ניתן לשילוב עם קובץ או תמונה).'
-            : 'Paste recipe text, a website link, or share a post from Instagram/Facebook/TikTok (the caption that comes along helps the AI find the recipe). You can also upload a PDF/DOCX file or a photo of the recipe (a link can\'t be combined with a file or photo).'}
+          {tx.pasteRecipeTextAWebsiteLink}
         </p>
 
         {error && <div className="card p-3 text-sm text-red-400 border border-red-400/20">{error}</div>}
 
         <div className="card p-5 space-y-4">
           <div>
-            <label className={labelClass}>{lang === 'he' ? 'טקסט או קישור' : 'Text or link'}</label>
+            <label className={labelClass}>{tx.textOrLink}</label>
             <textarea
               value={source}
               onChange={e => { setSource(e.target.value); if (isUrl(e.target.value)) { setDocFile(null); setPhotoFile(null) } }}
               rows={6}
               className={inputClass}
-              placeholder={lang === 'he' ? 'הדביקו כאן טקסט מתכון, או קישור לאתר...' : 'Paste recipe text, or a website URL...'}
+              placeholder={tx.pasteRecipeTextOrAWebsite}
             />
           </div>
 
           <div>
-            <label className={labelClass}>{lang === 'he' ? 'קובץ PDF או DOCX' : 'PDF or DOCX file'}</label>
+            <label className={labelClass}>{tx.pDFOrDOCXFile}</label>
             <label
               onDragEnter={e => { e.preventDefault(); setIsDraggingDoc(true) }}
               onDragOver={e => e.preventDefault()}
@@ -198,7 +198,7 @@ export default function RecipeImportPage() {
                 <span className="text-cream/70">{docFile.name}</span>
               ) : (
                 <>
-                  <span>{lang === 'he' ? 'גררו קובץ לכאן, או לחצו לבחירה' : 'Drag a file here, or click to browse'}</span>
+                  <span>{tx.dragAFileHereOrClick}</span>
                   <span className="text-xs text-cream/25">PDF / DOCX</span>
                 </>
               )}
@@ -206,7 +206,7 @@ export default function RecipeImportPage() {
           </div>
 
           <div>
-            <label className={labelClass}>{lang === 'he' ? 'תמונה של המתכון' : 'Photo of the recipe'}</label>
+            <label className={labelClass}>{tx.photoOfTheRecipe}</label>
             <label
               onDragEnter={e => { e.preventDefault(); setIsDraggingPhoto(true) }}
               onDragOver={e => e.preventDefault()}
@@ -236,8 +236,8 @@ export default function RecipeImportPage() {
                 </div>
               ) : (
                 <>
-                  <span>{lang === 'he' ? 'גררו תמונה לכאן, או לחצו לבחירה' : 'Drag a photo here, or click to browse'}</span>
-                  <span className="text-xs text-cream/25">{lang === 'he' ? 'צילום עמוד מתכון, ספר בישול או פתק' : 'A photo of a cookbook page, printout, or handwritten card'}</span>
+                  <span>{tx.dragAPhotoHereOrClick}</span>
+                  <span className="text-xs text-cream/25">{tx.aPhotoOfACookbookPage}</span>
                 </>
               )}
             </label>
@@ -251,7 +251,7 @@ export default function RecipeImportPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
             )}
-            {loading ? (lang === 'he' ? 'ה-AI מנתח את המתכון...' : 'AI is reading the recipe...') : (lang === 'he' ? 'העלה' : 'Upload')}
+            {loading ? (tx.aIIsReadingTheRecipe) : (tx.upload)}
           </button>
         </div>
       </div>

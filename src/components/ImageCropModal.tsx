@@ -3,6 +3,7 @@ import Cropper, { type Area } from 'react-easy-crop'
 import { getCroppedImageBlob } from '../lib/cropImage'
 import Modal from './Modal'
 import { Dialog } from '@base-ui/react/dialog'
+import { t } from "../i18n";
 
 interface ImageCropModalProps {
   imageSrc: string
@@ -12,6 +13,7 @@ interface ImageCropModalProps {
 }
 
 export default function ImageCropModal({ imageSrc, lang, onCancel, onConfirm }: ImageCropModalProps) {
+  const tx = t[lang]
   const [crop, setCrop] = useState({ x: 0, y: 0 })
   const [zoom, setZoom] = useState(1)
   const [croppedArea, setCroppedArea] = useState<Area | null>(null)
@@ -31,7 +33,7 @@ export default function ImageCropModal({ imageSrc, lang, onCancel, onConfirm }: 
   return (
     <Modal open onOpenChange={next => { if (!next) onCancel() }} zIndexClassName="z-50" panelClassName="max-w-lg p-5 space-y-4">
       <Dialog.Title className="font-serif text-lg font-bold text-cream">
-        {lang === 'he' ? 'התאמת תמונה' : 'Adjust photo'}
+        {tx.adjustPhoto}
       </Dialog.Title>
       <div className="relative w-full h-80 rounded-lg overflow-hidden bg-black/40">
         <Cropper
@@ -45,7 +47,7 @@ export default function ImageCropModal({ imageSrc, lang, onCancel, onConfirm }: 
         />
       </div>
       <div className="flex items-center gap-3">
-        <span className="text-xs text-cream/50 shrink-0">{lang === 'he' ? 'זום' : 'Zoom'}</span>
+        <span className="text-xs text-cream/50 shrink-0">{tx.zoom}</span>
         <input
           type="range"
           min={1}
@@ -58,10 +60,10 @@ export default function ImageCropModal({ imageSrc, lang, onCancel, onConfirm }: 
       </div>
       <div className="flex items-center justify-end gap-3">
         <button type="button" onClick={onCancel} className="btn-ghost">
-          {lang === 'he' ? 'ביטול' : 'Cancel'}
+          {tx.cancel}
         </button>
         <button type="button" onClick={handleConfirm} disabled={!croppedArea || processing} className="btn-primary disabled:opacity-50">
-          {processing ? (lang === 'he' ? 'שומר...' : 'Saving...') : (lang === 'he' ? 'אישור' : 'Confirm')}
+          {processing ? (tx.saving) : (tx.confirm)}
         </button>
       </div>
     </Modal>

@@ -3,12 +3,14 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '@clerk/react'
 import { useLanguage } from '../hooks/useLanguage'
 import { generateRecipesWithAi } from '../lib/recipeAiGenerate'
+import { t } from "../i18n";
 
 export default function RecipeAiGeneratePage() {
   const navigate = useNavigate()
   const location = useLocation()
   const { getToken } = useAuth()
   const { lang } = useLanguage()
+        const tx = t[lang]
   const [query, setQuery] = useState((location.state as { query?: string } | null)?.query ?? '')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -22,7 +24,7 @@ export default function RecipeAiGeneratePage() {
       const created = await generateRecipesWithAi(trimmed, getToken)
       navigate(`/recipes/${created[0].id}/edit`)
     } catch (err) {
-      setError(err instanceof Error ? err.message : (lang === 'he' ? 'החיפוש נכשל' : 'Generation failed'))
+      setError(err instanceof Error ? err.message : (tx.generationFailed))
     } finally {
       setLoading(false)
     }
@@ -34,26 +36,24 @@ export default function RecipeAiGeneratePage() {
     <div className="min-h-dvh bg-bg pt-20 pb-16 px-4">
       <div className="max-w-2xl mx-auto space-y-6">
         <h1 className="font-serif text-2xl font-bold text-cream">
-          {lang === 'he' ? '🔮 חיפוש מתכון עם AI' : '🔮 Research a recipe with AI'}
+          {tx.researchARecipeWithAI}
         </h1>
         <p className="text-sm text-cream/50">
-          {lang === 'he'
-            ? 'ה-AI יחפש ברשת את המתכון הכי טוב (או שילוב של כמה מתכונים דומים) עבור מה שתבקשו, וימלא אותו בעורך. תוכלו לערוך הכל לפני השמירה - חוץ מתגית ה-AI והמקורות.'
-            : 'The AI will search the web for the best existing recipe (or combination of similar recipes) for what you ask, and fill it into the editor. You can edit everything before saving - except the AI tag and sources.'}
+          {tx.theAIWillSearchTheWeb}
         </p>
 
         {error && <div className="card p-3 text-sm text-red-400 border border-red-400/20">{error}</div>}
 
         <div className="card p-5 space-y-3">
           <label className="block text-xs font-semibold text-cream/50">
-            {lang === 'he' ? 'איזה מתכון תרצו?' : 'What recipe do you want?'}
+            {tx.whatRecipeDoYouWant}
           </label>
           <textarea
             value={query}
             onChange={e => setQuery(e.target.value)}
             rows={3}
             className={inputClass}
-            placeholder={lang === 'he' ? 'למשל: הפוקאצ׳ה האיטלקית הכי טובה, טבעונית' : 'e.g. the best authentic Italian focaccia, vegan'}
+            placeholder={tx.eGTheBestAuthenticItalian}
           />
         </div>
 
@@ -64,10 +64,10 @@ export default function RecipeAiGeneratePage() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
             )}
-            {loading ? (lang === 'he' ? 'ה-AI חוקר את הרשת...' : 'AI is researching the web...') : (lang === 'he' ? 'חפש מתכון' : 'Research recipe')}
+            {loading ? (tx.aIIsResearchingTheWeb) : (tx.researchRecipe)}
           </button>
           <button type="button" onClick={() => navigate('/recipes/new/blank')} disabled={loading} className="btn-ghost disabled:opacity-50">
-            {lang === 'he' ? 'התחל מדף ריק' : 'Start from scratch instead'}
+            {tx.startFromScratchInstead}
           </button>
         </div>
       </div>

@@ -4,6 +4,7 @@ import { Dialog } from '@base-ui/react/dialog'
 import { useLanguage } from '../hooks/useLanguage'
 import { useMyRecipes } from '../hooks/useRecipes'
 import type { useSidebar } from '../hooks/useSidebar'
+import { t } from "../i18n";
 
 interface SidebarProps {
   sidebar: ReturnType<typeof useSidebar>
@@ -22,12 +23,13 @@ export default function Sidebar({ sidebar }: SidebarProps) {
   const navigate = useNavigate()
   const location = useLocation()
   const { lang } = useLanguage()
+        const tx = t[lang]
   const { recipes: myRecipes } = useMyRecipes()
   const attentionCount = myRecipes.filter(r => r.status === 'rejected').length
 
   const recipeLinks: SidebarLinkDef[] = [
     {
-      key: 'home', label: lang === 'he' ? 'בית' : 'Home', path: '/',
+      key: 'home', label: tx.home, path: '/',
       icon: (
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7m-14 0v8a1 1 0 001 1h4a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h4a1 1 0 001-1v-8m-16 0l2-2" />
@@ -35,7 +37,7 @@ export default function Sidebar({ sidebar }: SidebarProps) {
       ),
     },
     {
-      key: 'my-recipes', label: lang === 'he' ? 'המתכונים שלי' : 'My Recipes', path: '/my-recipes',
+      key: 'my-recipes', label: tx.myRecipes, path: '/my-recipes',
       icon: (
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -43,16 +45,16 @@ export default function Sidebar({ sidebar }: SidebarProps) {
       ),
       badge: attentionCount > 0 ? attentionCount : undefined,
     },
-    { key: 'collections', label: lang === 'he' ? 'שמורים' : 'My Collections', path: '/collections', icon: <span className="w-4 h-4 flex items-center justify-center text-sm">📚</span> },
-    { key: 'meal-plan', label: lang === 'he' ? 'תפריט שבועי' : 'Meal Plan', path: '/meal-plan', icon: <span className="w-4 h-4 flex items-center justify-center text-sm">🗓️</span> },
+    { key: 'collections', label: tx.myCollections, path: '/collections', icon: <span className="w-4 h-4 flex items-center justify-center text-sm">📚</span> },
+    { key: 'meal-plan', label: tx.mealPlan, path: '/meal-plan', icon: <span className="w-4 h-4 flex items-center justify-center text-sm">🗓️</span> },
   ]
 
   const moreLinks: SidebarLinkDef[] = [
-    { key: 'leaderboard', label: lang === 'he' ? 'טבלת דירוג' : 'Leaderboard', path: '/leaderboard', icon: <span className="w-4 h-4 flex items-center justify-center text-sm">🏆</span> },
-    { key: 'feature-requests', label: lang === 'he' ? 'בקש פיצ\'ר חדש' : 'Feature Requests', path: '/feature-requests', icon: <span className="w-4 h-4 flex items-center justify-center text-sm">💡</span> },
+    { key: 'leaderboard', label: tx.leaderboard, path: '/leaderboard', icon: <span className="w-4 h-4 flex items-center justify-center text-sm">🏆</span> },
+    { key: 'feature-requests', label: tx.featureRequests, path: '/feature-requests', icon: <span className="w-4 h-4 flex items-center justify-center text-sm">💡</span> },
     {
       key: 'submissions',
-      label: lang === 'he' ? 'הגשות' : 'Submissions',
+      label: tx.submissions,
       path: '/submissions',
       icon: <span className="w-4 h-4 flex items-center justify-center text-sm">✅</span>,
     },
@@ -88,23 +90,23 @@ export default function Sidebar({ sidebar }: SidebarProps) {
           <button
             type="button"
             onClick={() => { navigate('/recipes/new'); onNavigate?.() }}
-            title={lang === 'he' ? 'מתכון חדש' : 'New Recipe'}
+            title={tx.newRecipe2}
             className={`flex items-center gap-2 w-full rounded-lg border border-tint/10 hover:bg-tint/[0.05] text-cream/80 px-3 py-2 text-sm font-medium transition-colors ${showLabel ? '' : 'justify-center'}`}
           >
             <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
             </svg>
-            {showLabel && (lang === 'he' ? 'מתכון חדש' : 'New Recipe')}
+            {showLabel && (tx.newRecipe2)}
           </button>
         </div>
 
         <nav className="flex-1 overflow-y-auto px-3 space-y-4">
           <div className="space-y-1">
-            {showLabel && <div className="px-3 text-[10px] font-semibold uppercase tracking-wider text-cream/30 mb-1">{lang === 'he' ? 'מתכונים' : 'Recipes'}</div>}
+            {showLabel && <div className="px-3 text-[10px] font-semibold uppercase tracking-wider text-cream/30 mb-1">{tx.recipes2}</div>}
             {recipeLinks.map(link => renderLink(link, showLabel, onNavigate))}
           </div>
           <div className="space-y-1">
-            {showLabel && <div className="px-3 text-[10px] font-semibold uppercase tracking-wider text-cream/30 mb-1">{lang === 'he' ? 'עוד' : 'More'}</div>}
+            {showLabel && <div className="px-3 text-[10px] font-semibold uppercase tracking-wider text-cream/30 mb-1">{tx.more}</div>}
             {moreLinks.map(link => renderLink(link, showLabel, onNavigate))}
           </div>
         </nav>
@@ -119,7 +121,7 @@ export default function Sidebar({ sidebar }: SidebarProps) {
               <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d={lang === 'he' ? 'M8.25 4.5l7.5 7.5-7.5 7.5' : 'M15.75 4.5l-7.5 7.5 7.5 7.5'} />
               </svg>
-              {lang === 'he' ? 'כווץ' : 'Collapse'}
+              {tx.collapse}
             </button>
           </div>
         )}

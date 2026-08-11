@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useLanguage } from '../hooks/useLanguage'
+import { t } from "../i18n";
 
 interface ScrollToTopButtonProps {
   raised?: boolean
@@ -8,6 +9,7 @@ interface ScrollToTopButtonProps {
 
 export default function ScrollToTopButton({ raised }: ScrollToTopButtonProps) {
   const { lang } = useLanguage()
+        const tx = t[lang]
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
@@ -27,7 +29,7 @@ export default function ScrollToTopButton({ raised }: ScrollToTopButtonProps) {
           exit={{ opacity: 0, y: 10 }}
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           className={`print:hidden fixed ${raised ? 'bottom-24' : 'bottom-6'} ${lang === 'he' ? 'left-6' : 'right-6'} z-40 w-10 h-10 rounded-full bg-card border border-tint/10 shadow-lg flex items-center justify-center text-cream/60 hover:text-amber transition-colors`}
-          aria-label={lang === 'he' ? 'חזרה למעלה' : 'Back to top'}
+          aria-label={tx.backToTop}
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
