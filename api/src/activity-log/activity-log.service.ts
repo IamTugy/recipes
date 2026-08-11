@@ -1,11 +1,22 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model } from 'mongoose'
+import { Model, PipelineStage } from 'mongoose'
 import { ActivityLog, ActivityLogDocument } from './schemas/activity-log.schema'
 
 interface TrendingAggregate {
   _id: string
   count: number
+}
+
+interface PointsAggregate {
+  _id: string
+  points: number
+}
+
+export interface PointsBonusRule {
+  action: string
+  metadataKey: string
+  bonus: number
 }
 
 @Injectable()
@@ -56,5 +67,43 @@ export class ActivityLogService {
     ])) as TrendingAggregate[]
 
     return new Map(aggregates.map(a => [a._id, a.count]))
+  }
+
+  // Generic scoring aggregation: sums per-action point values (plus optional
+  // metadata-gated bonuses, e.g. extra points for a review that has a photo)
+  // grouped by userId. The action->points mapping lives with the ranking
+  // feature, not here - this just turns that map into a $switch pipeline.
+  async pointsByUser(
+    pointsByAction: Record<string, number>,
+    bonusRules: PointsBonusRule[] = [],
+    options: { userIds?: string[]; limit?: number } = {},
+  ): Promise<Map<string, number>> {
+    const branches = Object.entries(pointsByAction).map(([action, points]) => ({
+      case: { $eq: ['$action', action] },
+      then: points,
+    }))
+    const bonusTerms = bonusRules.map(rule => ({
+      $cond: [
+        { $and: [{ $eq: ['$action', rule.action] }, { $eq: [`$metadata.${rule.metadataKey}`, true] }] },
+        rule.bonus,
+        0,
+      ],
+    }))
+
+    const pipeline: PipelineStage[] = []
+    if (options.userIds?.length) {
+      pipeline.push({ $match: { userId: { $in: options.userIds } } })
+    }
+    pipeline.push(
+      { $addFields: { points: { $add: [{ $switch: { branches, default: 0 } }, ...bonusTerms] } } },
+      { $group: { _id: '$userId', points: { $sum: '$points' } } },
+      { $sort: { points: -1 } },
+    )
+    if (options.limit) {
+      pipeline.push({ $limit: options.limit })
+    }
+
+    const aggregates = (await this.activityLogModel.aggregate(pipeline)) as PointsAggregate[]
+    return new Map(aggregates.map(a => [a._id, a.points]))
   }
 }

@@ -49,7 +49,7 @@ export class RatingsController {
     @Req() req: Request & { userId: string },
   ) {
     const result = await this.ratingsService.rate(req.userId, id, body.score, body.comment, body.photoUrl)
-    await this.activityLog.record(req.userId, id, 'rating_given', { score: body.score })
+    await this.activityLog.record(req.userId, id, 'rating_given', { score: body.score, hasPhoto: !!body.photoUrl })
     return result
   }
 

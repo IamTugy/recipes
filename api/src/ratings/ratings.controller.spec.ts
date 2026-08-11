@@ -43,7 +43,15 @@ describe('RatingsController', () => {
     ratingsService.rate.mockResolvedValue({ score: 5 })
     const controller = makeController()
     await controller.rate('a', { score: 5 }, { userId: 'user_1' } as any)
-    expect(activityLog.record).toHaveBeenCalledWith('user_1', 'a', 'rating_given', { score: 5 })
+    expect(activityLog.record).toHaveBeenCalledWith('user_1', 'a', 'rating_given', { score: 5, hasPhoto: false })
+  })
+
+  it('PUT /ratings/:slug logs hasPhoto=true when a photoUrl is included', async () => {
+    ratingsService.rate.mockResolvedValue({ score: 5 })
+    const controller = makeController()
+    const photoUrl = 'https://recipes-assets.tugy.dev/reviews/a/photo.jpg'
+    await controller.rate('a', { score: 5, photoUrl }, { userId: 'user_1' } as any)
+    expect(activityLog.record).toHaveBeenCalledWith('user_1', 'a', 'rating_given', { score: 5, hasPhoto: true })
   })
 
   it("GET /ratings/:slug/mine returns the current user's own rating", async () => {
