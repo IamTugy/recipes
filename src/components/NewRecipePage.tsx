@@ -5,7 +5,11 @@ import { useLanguage } from '../hooks/useLanguage'
 import type { ImportedRecipe } from '../lib/recipeImport'
 
 function bookmarkletHref(origin: string) {
-  const script = `(function(){location.href=${JSON.stringify(`${origin}/recipes/import?url=`)}+encodeURIComponent(location.href);})();`
+  // The app is a HashRouter - everything after "#" is what the router
+  // actually sees, so the target must be a hash URL, not a plain path
+  // (which would just load the app fresh at Home with the url= silently
+  // ignored, same bug the share_target manifest action had).
+  const script = `(function(){location.href=${JSON.stringify(`${origin}/#/recipes/import?url=`)}+encodeURIComponent(location.href);})();`
   return `javascript:${script}`
 }
 

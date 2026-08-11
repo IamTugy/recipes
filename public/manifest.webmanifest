@@ -15,7 +15,7 @@
     }
   ],
   "share_target": {
-    "action": "/recipes/import",
+    "action": "/",
     "method": "GET",
     "params": {
       "title": "title",

@@ -62,10 +62,28 @@ export default function App() {
   // going straight to the hash route, so Home ends up as a real history
   // entry underneath it - landing directly on the recipe via location.replace
   // collapsed everything into one entry with nothing to back into.
+  //
+  // The Web Share Target API (manifest's share_target, action: "/") sends
+  // the OS share sheet's payload here the same way - a real (non-hash)
+  // query string, since it's the browser's own URL/searchParams resolution
+  // doing the appending, not our router. HashRouter only ever looks at
+  // location.hash, so without this bridge the app would just boot to Home
+  // with the shared title/text/url silently ignored.
   useEffect(() => {
     if (!isLoaded || !isSignedIn) return
     const params = new URLSearchParams(window.location.search)
-    const target = params.get('share')
+    const shareTarget = params.get('share')
+    const sharedTitle = params.get('title')
+    const sharedText = params.get('text')
+    const sharedUrl = params.get('url')
+    const target = shareTarget
+      ? shareTarget
+      : (sharedTitle || sharedText || sharedUrl)
+        ? `/recipes/import?${new URLSearchParams({
+            ...(sharedUrl ? { url: sharedUrl } : {}),
+            ...((sharedText || sharedTitle) ? { text: [sharedTitle, sharedText].filter(Boolean).join(' ') } : {}),
+          })}`
+        : null
     if (!target) return
     window.history.replaceState(null, '', `${window.location.pathname}${window.location.hash}`)
     navigate(target)
