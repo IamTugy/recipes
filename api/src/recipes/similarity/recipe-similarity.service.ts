@@ -3,13 +3,15 @@ import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { Recipe, RecipeDocument } from '../schemas/recipe.schema'
 import { GeminiService } from '../../ai/gemini.service'
-import { ingredientQuantityScore, ingredientNameScore, titleSimilarityScore, isDuplicateCandidate } from './similarity-scoring'
+import {
+  ingredientQuantityScore,
+  ingredientNameScore,
+  titleSimilarityScore,
+  isDuplicateCandidate,
+  SimilarityIngredientGroup,
+} from './similarity-scoring'
 
 const MAX_CANDIDATES = 5
-
-export interface SimilarityIngredientGroup {
-  items: { name?: string; unit?: string; amount?: number }[]
-}
 
 export interface SimilaritySourceRecipe {
   title?: string
