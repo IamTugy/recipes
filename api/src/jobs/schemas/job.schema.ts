@@ -6,7 +6,9 @@ export type JobDocument = Job & Document
 export type JobType = 'import' | 'ai_generate'
 export type JobStatus = 'queued' | 'running' | 'done' | 'failed'
 
-@Schema({ timestamps: true })
+// virtuals: true so the "id" virtual (string form of _id) shows up in
+// .toObject()/.toJSON() output - see recipe.schema.ts for the full story.
+@Schema({ timestamps: true, toObject: { virtuals: true }, toJSON: { virtuals: true } })
 export class Job {
   @Prop({ required: true, index: true })
   userId!: string
