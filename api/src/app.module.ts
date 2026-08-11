@@ -16,6 +16,7 @@ import { CookLogModule } from './cook-log/cook-log.module'
 import { MealPlanModule } from './meal-plan/meal-plan.module'
 import { ShareModule } from './share/share.module'
 import { RankingModule } from './ranking/ranking.module'
+import { JobsModule } from './jobs/jobs.module'
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { RankingModule } from './ranking/ranking.module'
     MealPlanModule,
     ShareModule,
     RankingModule,
+    JobsModule,
   ],
   controllers: [HealthController],
 })
