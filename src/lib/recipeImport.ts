@@ -43,7 +43,7 @@ export interface CreatedRecipe extends ImportedRecipe {
 export async function importRecipe(
   input: { text?: string; url?: string; file?: File; image?: File },
   getToken: () => Promise<string | null>
-): Promise<ImportedRecipe | CreatedRecipe[]> {
+): Promise<{ jobId: string }> {
   const token = await getToken()
   const formData = new FormData()
   if (input.text) formData.append('text', input.text)

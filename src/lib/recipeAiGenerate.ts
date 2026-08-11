@@ -1,10 +1,9 @@
 import { ApiError } from './api'
-import type { Recipe } from '../types'
 
 export async function generateRecipesWithAi(
   query: string,
   getToken: () => Promise<string | null>
-): Promise<Recipe[]> {
+): Promise<{ jobId: string }> {
   const token = await getToken()
   const res = await fetch('/api/recipes/ai-generate', {
     method: 'POST',

@@ -97,19 +97,12 @@ export default function RecipeImportPage() {
     setLoading(true)
     try {
       const { url, text } = splitSource(src)
-      const result = await importRecipe(
+      await importRecipe(
         url ? { url, text } : { text: text || undefined, file: docFile ?? undefined, image: photoFile ?? undefined },
         getToken
       )
-      if (Array.isArray(result)) {
-        showToast(
-          lang === 'he' ? `נמצאו ${result.length} מתכונים - נשמרו כטיוטות לבדיקה` : `Found ${result.length} recipes - saved as drafts for review`,
-          'success'
-        )
-        navigate(`/recipes/${result[0].id}/edit`)
-      } else {
-        navigate('/recipes/new', { state: { importedDraft: result } })
-      }
+      showToast(tx.importStarted, 'success')
+      navigate('/')
     } catch (err) {
       if (err instanceof ApiError && err.status === 0) {
         setError(tx.connectionFailedCheckYourInternetAnd)

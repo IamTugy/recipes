@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '@clerk/react'
 import { useLanguage } from '../hooks/useLanguage'
+import { useToast } from '../hooks/useToast'
 import { generateRecipesWithAi } from '../lib/recipeAiGenerate'
 import { t } from "../i18n";
 
@@ -11,6 +12,7 @@ export default function RecipeAiGeneratePage() {
   const { getToken } = useAuth()
   const { lang } = useLanguage()
         const tx = t[lang]
+  const { showToast } = useToast()
   const [query, setQuery] = useState((location.state as { query?: string } | null)?.query ?? '')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -21,8 +23,9 @@ export default function RecipeAiGeneratePage() {
     setError(null)
     setLoading(true)
     try {
-      const created = await generateRecipesWithAi(trimmed, getToken)
-      navigate(`/recipes/${created[0].id}/edit`)
+      await generateRecipesWithAi(trimmed, getToken)
+      showToast(tx.generationStarted, 'success')
+      navigate('/')
     } catch (err) {
       setError(err instanceof Error ? err.message : (tx.generationFailed))
     } finally {
