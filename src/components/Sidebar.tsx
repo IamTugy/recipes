@@ -129,7 +129,7 @@ export default function Sidebar({ sidebar }: SidebarProps) {
   return (
     <>
       {/* Desktop pinned sidebar */}
-      <aside className={`print:hidden hidden sm:flex sm:flex-col fixed top-14 bottom-0 left-0 z-30 border-r border-tint/[0.06] bg-bg transition-[width] duration-200 ${collapsed ? 'w-16' : 'w-60'}`}>
+      <aside className={`print:hidden hidden sm:flex sm:flex-col fixed top-14 bottom-0 z-30 bg-bg transition-[width] duration-200 ${lang === 'he' ? 'right-0 border-l' : 'left-0 border-r'} border-tint/[0.06] ${collapsed ? 'w-16' : 'w-60'}`}>
         {collapsed ? (
           <div className="flex flex-col h-full">
             <div className="flex-1 overflow-hidden">{content(false)}</div>
@@ -153,7 +153,7 @@ export default function Sidebar({ sidebar }: SidebarProps) {
         <Dialog.Portal>
           <Dialog.Backdrop className="print:hidden sm:hidden fixed inset-0 bg-black/40 z-40 transition-opacity duration-150 data-[starting-style]:opacity-0 data-[ending-style]:opacity-0" />
           <Dialog.Viewport className="print:hidden sm:hidden fixed inset-0 z-50">
-            <Dialog.Popup className="fixed top-0 bottom-0 left-0 w-72 bg-bg shadow-2xl transition-transform duration-150 data-[starting-style]:-translate-x-full data-[ending-style]:-translate-x-full">
+            <Dialog.Popup className={`fixed top-0 bottom-0 w-72 bg-bg shadow-2xl transition-transform duration-150 ${lang === 'he' ? 'right-0 data-[starting-style]:translate-x-full data-[ending-style]:translate-x-full' : 'left-0 data-[starting-style]:-translate-x-full data-[ending-style]:-translate-x-full'}`}>
               {content(true, () => setMobileOpen(false))}
             </Dialog.Popup>
           </Dialog.Viewport>

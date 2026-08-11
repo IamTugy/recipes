@@ -259,7 +259,7 @@ export default function Home() {
           onClick={() => setAdvancedOpen(v => !v)}
           className="flex items-center gap-1.5 text-xs font-medium text-cream/40 hover:text-cream/70 transition-colors"
         >
-          <svg className={`w-3.5 h-3.5 transition-transform ${advancedOpen ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg className={`w-3.5 h-3.5 transition-transform ${advancedOpen ? 'rotate-90' : lang === 'he' ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
           </svg>
           <span>{lang === 'he' ? 'סינון מתקדם' : 'Advanced filters'}</span>
