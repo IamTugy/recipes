@@ -9,7 +9,7 @@ import { useLanguage } from '../hooks/useLanguage'
 import RecipeCardSkeleton from './RecipeCardSkeleton'
 import RecipeStrip from './RecipeStrip'
 import AppSelect from './ui/AppSelect'
-import VirtualRecipeGrid from './VirtualRecipeGrid'
+import VirtualRecipeGrid, { type GridItem } from './VirtualRecipeGrid'
 import FilterInfoPopover from './FilterInfoPopover'
 import { DIFFICULTY_FILTERS, DIETARY_FILTERS, KOSHER_FILTERS } from '../lib/filterDefinitions'
 import { logSearch } from '../lib/logSearch'
@@ -41,6 +41,8 @@ export default function Home() {
   const [activeKosher, setActiveKosher] = useState<string | null>(() => searchParams.get('kosher') || null)
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(() => searchParams.get('fav') === '1')
   const [sortBy, setSortBy] = useState<SortOption>(() => (searchParams.get('sort') as SortOption) || 'default')
+  const [groupByDish, setGroupByDish] = useState(() => searchParams.get('grouped') === '1')
+  const [activeGroupId, setActiveGroupId] = useState<string | null>(() => searchParams.get('group'))
   const [advancedOpen, setAdvancedOpen] = useState(false)
   const { recipes, loading, error } = useRecipes()
   const { favoriteSlugs, toggle: toggleFavorite } = useFavorites()
@@ -59,9 +61,11 @@ export default function Home() {
     if (activeKosher) next.set('kosher', activeKosher)
     if (showFavoritesOnly) next.set('fav', '1')
     if (sortBy !== 'default') next.set('sort', sortBy)
+    if (groupByDish) next.set('grouped', '1')
+    if (activeGroupId) next.set('group', activeGroupId)
     setSearchParams(next, { replace: true })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, activeCategory, activeDifficulty, activeDietary, activeKosher, showFavoritesOnly, sortBy])
+  }, [search, activeCategory, activeDifficulty, activeDietary, activeKosher, showFavoritesOnly, sortBy, groupByDish, activeGroupId])
 
   const advancedActiveCount = [activeDifficulty, activeDietary, activeKosher].filter(Boolean).length
 
@@ -99,6 +103,7 @@ export default function Home() {
       }
     }
     if (activeKosher) list = list.filter(r => r.kosherType === activeKosher)
+    if (activeGroupId) list = list.filter(r => r.dishGroupId === activeGroupId)
     if (search.trim()) {
       const q = search.toLowerCase()
       list = list.filter(r => {
@@ -134,7 +139,42 @@ export default function Home() {
       list = [...list].sort((a, b) => (b.createdAt ?? '').localeCompare(a.createdAt ?? ''))
     }
     return list
-  }, [search, activeCategory, activeDifficulty, activeDietary, activeKosher, lang, recipes, showFavoritesOnly, favoriteSlugs, sortBy])
+  }, [search, activeCategory, activeDifficulty, activeDietary, activeKosher, lang, recipes, showFavoritesOnly, favoriteSlugs, sortBy, activeGroupId])
+
+  const gridItems = useMemo<GridItem[]>(() => {
+    if (activeGroupId || !groupByDish) {
+      return filtered.map(recipe => ({ type: 'recipe', recipe }) as GridItem)
+    }
+    const byGroup = new Map<string, typeof filtered>()
+    for (const recipe of filtered) {
+      if (!recipe.dishGroupId) continue
+      const list = byGroup.get(recipe.dishGroupId) ?? []
+      list.push(recipe)
+      byGroup.set(recipe.dishGroupId, list)
+    }
+    const seenGroups = new Set<string>()
+    const items: GridItem[] = []
+    for (const recipe of filtered) {
+      const members = recipe.dishGroupId ? byGroup.get(recipe.dishGroupId) : undefined
+      if (members && members.length >= 2 && recipe.dishGroupId) {
+        if (seenGroups.has(recipe.dishGroupId)) continue
+        seenGroups.add(recipe.dishGroupId)
+        items.push({
+          type: 'group',
+          group: {
+            id: recipe.dishGroupId,
+            name: recipe.dishGroupName ?? recipe.title,
+            nameHe: recipe.dishGroupNameHe,
+            count: members.length,
+            previewRecipes: members.slice(0, 4),
+          },
+        })
+      } else {
+        items.push({ type: 'recipe', recipe })
+      }
+    }
+    return items
+  }, [filtered, groupByDish, activeGroupId])
 
   // Debounced search-event log: fires 1s after the user stops typing a
   // non-empty query, reading the *current* result count via a ref so
@@ -357,18 +397,43 @@ export default function Home() {
             }
             {' '}{tx.recipes}
           </p>
-          <AppSelect
-            value={sortBy}
-            onValueChange={value => setSortBy(value as SortOption)}
-            triggerClassName="bg-tint/[0.03] border border-tint/10 rounded-lg text-xs text-cream/60 px-2.5 py-1.5 outline-none hover:bg-tint/[0.06] transition-colors"
-            options={[
-              { value: 'default', label: tx.defaultOrder },
-              { value: 'rating', label: tx.topRated },
-              { value: 'quickest', label: tx.quickest },
-              { value: 'newest', label: tx.newest },
-            ]}
-          />
+          <div className="flex items-center gap-2">
+            <button type="button"
+              onClick={() => setGroupByDish(v => !v)}
+              className={`shrink-0 px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
+                groupByDish
+                  ? 'text-amber bg-amber/10 border-amber/20'
+                  : 'text-cream/40 hover:text-cream/70 border-tint/10'
+              }`}
+            >
+              {tx.groupSameDish}
+            </button>
+            <AppSelect
+              value={sortBy}
+              onValueChange={value => setSortBy(value as SortOption)}
+              triggerClassName="bg-tint/[0.03] border border-tint/10 rounded-lg text-xs text-cream/60 px-2.5 py-1.5 outline-none hover:bg-tint/[0.06] transition-colors"
+              options={[
+                { value: 'default', label: tx.defaultOrder },
+                { value: 'rating', label: tx.topRated },
+                { value: 'quickest', label: tx.quickest },
+                { value: 'newest', label: tx.newest },
+              ]}
+            />
+          </div>
         </div>
+
+        {activeGroupId && (() => {
+          const groupRecipe = recipes.find(r => r.dishGroupId === activeGroupId)
+          const name = (lang === 'he' ? groupRecipe?.dishGroupNameHe : groupRecipe?.dishGroupName) ?? groupRecipe?.dishGroupName ?? ''
+          return (
+            <div className="flex items-center gap-3 mb-4 text-xs text-cream/50">
+              <span>{tx.showingDishGroup(name, filtered.length)}</span>
+              <button type="button" onClick={() => setActiveGroupId(null)} className="text-amber hover:text-amber/80 transition-colors">
+                {tx.clearGroupFilter}
+              </button>
+            </div>
+          )
+        })()}
 
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -398,10 +463,11 @@ export default function Home() {
           </div>
         ) : (
           <VirtualRecipeGrid
-            recipes={filtered}
+            items={gridItems}
             searchQuery={search}
             favoriteSlugs={favoriteSlugs}
             onToggleFavorite={toggleFavorite}
+            onSelectGroup={groupId => setActiveGroupId(groupId)}
           />
         )}
       </div>
