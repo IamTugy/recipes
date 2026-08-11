@@ -444,6 +444,8 @@ export class RecipesService implements OnModuleInit {
       }
     }
 
+    recipe.duplicateReview = undefined
+    recipe.disputeStatus = 'none'
     const review = await this.qualityService.review(recipe.toObject())
     await this.activityLogService.record(userId, id, 'ai_quality_review_used')
 

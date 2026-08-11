@@ -632,6 +632,22 @@ describe('RecipesService', () => {
     expect(recipe.status).toBe('published')
   })
 
+  it('submitForReview clears a stale duplicateReview from an earlier blocked submission when this resubmission is not a duplicate', async () => {
+    const recipe: any = completeRecipe({
+      duplicateReview: { isDuplicate: true, matchedRecipeId: 'other-1', matchedRecipeTitle: 'Other Soup', reason: 'same dish, rescaled', checkedAt: 'earlier' },
+      disputeStatus: 'pending',
+    })
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe), select: jest.fn().mockReturnThis(), lean: jest.fn().mockReturnThis() })
+    const updateOne = jest.fn().mockResolvedValue({})
+    const quality = makeQualityService({ score: 100, checkedAt: 'now', findings: [] })
+    const similarity = makeSimilarityService([])
+    const service = await makeService({ findOne }, { updateOne }, undefined, undefined, undefined, undefined, undefined, quality, similarity)
+
+    await service.submitForReview('a', 'user_1', false)
+
+    expect(recipe.duplicateReview).toBeUndefined()
+  })
+
   it('submitForReview rejects and skips the quality review when the AI judges a duplicate', async () => {
     const recipe: any = completeRecipe()
     const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe), select: jest.fn().mockReturnThis(), lean: jest.fn().mockReturnThis() })
