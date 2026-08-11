@@ -56,6 +56,7 @@ export class RatingsController {
   @Delete(':id')
   async remove(@Param('id') id: string, @Req() req: Request & { userId: string }) {
     await this.ratingsService.deleteRating(req.userId, id)
+    await this.activityLog.record(req.userId, id, 'rating_removed')
     return { deleted: true }
   }
 
@@ -100,6 +101,7 @@ export class RatingsController {
       body.mentionedUserId,
       body.mentionedUserId ? names[body.mentionedUserId] ?? undefined : undefined,
     )
+    await this.activityLog.record(req.userId, id, 'review_reply_posted')
     return {
       id: String(reply._id),
       userId: reply.userId,

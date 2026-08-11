@@ -5,12 +5,14 @@ import { FeatureRequestsService } from './feature-requests.service'
 import { CreateFeatureRequestDto } from './dto/create-feature-request.dto'
 import { UpdateFeatureRequestDto } from './dto/update-feature-request.dto'
 import { DenyFeatureRequestDto } from './dto/deny-feature-request.dto'
+import { ActivityLogService } from '../activity-log/activity-log.service'
 
 @Controller('feature-requests')
 export class FeatureRequestsController {
   constructor(
     private readonly featureRequestsService: FeatureRequestsService,
     private readonly config: ConfigService,
+    private readonly activityLog: ActivityLogService,
   ) {}
 
   @Get()
@@ -23,7 +25,9 @@ export class FeatureRequestsController {
 
   @Post()
   async create(@Body() body: CreateFeatureRequestDto, @Req() req: Request & { userId: string }) {
-    return this.featureRequestsService.create(req.userId, body.title, body.description)
+    const created = await this.featureRequestsService.create(req.userId, body.title, body.description)
+    await this.activityLog.record(req.userId, undefined, 'feature_request_submitted', { title: body.title })
+    return created
   }
 
   @Post(':number/approve')
@@ -36,6 +40,7 @@ export class FeatureRequestsController {
       throw new ForbiddenException('Only the app owner can approve feature requests')
     }
     await this.featureRequestsService.approve(number)
+    await this.activityLog.record(req.userId, undefined, 'feature_request_approved', { number })
     return { approved: true }
   }
 
@@ -49,6 +54,7 @@ export class FeatureRequestsController {
       throw new ForbiddenException('Only the app owner can unapprove feature requests')
     }
     await this.featureRequestsService.unapprove(number)
+    await this.activityLog.record(req.userId, undefined, 'feature_request_unapproved', { number })
     return { unapproved: true }
   }
 
@@ -67,6 +73,7 @@ export class FeatureRequestsController {
     @Req() req: Request & { userId: string },
   ) {
     await this.featureRequestsService.withdraw(req.userId, number)
+    await this.activityLog.record(req.userId, undefined, 'feature_request_withdrawn', { number })
     return { withdrawn: true }
   }
 
@@ -81,6 +88,7 @@ export class FeatureRequestsController {
       throw new ForbiddenException('Only the app owner can deny feature requests')
     }
     await this.featureRequestsService.deny(number, body.reason)
+    await this.activityLog.record(req.userId, undefined, 'feature_request_denied', { number, reason: body.reason })
     return { denied: true }
   }
 }

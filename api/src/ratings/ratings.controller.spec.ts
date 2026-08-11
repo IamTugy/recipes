@@ -72,6 +72,7 @@ describe('RatingsController', () => {
     const controller = makeController()
     const result = await controller.remove('a', { userId: 'user_1' } as any)
     expect(ratingsService.deleteRating).toHaveBeenCalledWith('user_1', 'a')
+    expect(activityLog.record).toHaveBeenCalledWith('user_1', 'a', 'rating_removed')
     expect(result).toEqual({ deleted: true })
   })
 
@@ -114,6 +115,7 @@ describe('RatingsController', () => {
     const controller = makeController()
     const result = await controller.createReply('a', 'r1', { text: '@Avi thanks!', mentionedUserId: 'user_3' }, { userId: 'user_1' } as any)
     expect(reviewRepliesService.create).toHaveBeenCalledWith('r1', 'a', 'user_1', '@Avi thanks!', 'user_3', 'Avi')
+    expect(activityLog.record).toHaveBeenCalledWith('user_1', 'a', 'review_reply_posted')
     expect(result).toEqual({
       id: 'reply1', userId: 'user_1', text: '@Avi thanks!', mentionedUserId: 'user_3', mentionedName: 'Avi',
       upvoteCount: 0, upvotedByMe: false, createdAt: new Date('2026-01-02'),

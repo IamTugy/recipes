@@ -3,10 +3,14 @@ import { Request } from 'express'
 import { CollectionsService } from './collections.service'
 import { CreateCollectionDto } from './dto/create-collection.dto'
 import { AddRecipeDto } from './dto/add-recipe.dto'
+import { ActivityLogService } from '../activity-log/activity-log.service'
 
 @Controller('collections')
 export class CollectionsController {
-  constructor(private readonly collectionsService: CollectionsService) {}
+  constructor(
+    private readonly collectionsService: CollectionsService,
+    private readonly activityLog: ActivityLogService,
+  ) {}
 
   @Get()
   async list(@Req() req: Request & { userId: string }) {
@@ -15,7 +19,9 @@ export class CollectionsController {
 
   @Post()
   async create(@Body() body: CreateCollectionDto, @Req() req: Request & { userId: string }) {
-    return this.collectionsService.create(req.userId, body.name)
+    const collection = await this.collectionsService.create(req.userId, body.name)
+    await this.activityLog.record(req.userId, undefined, 'collection_created', { name: body.name })
+    return collection
   }
 
   @Put(':id')
@@ -30,6 +36,7 @@ export class CollectionsController {
   @Delete(':id')
   async remove(@Param('id') id: string, @Req() req: Request & { userId: string }) {
     await this.collectionsService.remove(req.userId, id)
+    await this.activityLog.record(req.userId, undefined, 'collection_deleted')
     return { deleted: true }
   }
 
@@ -39,7 +46,9 @@ export class CollectionsController {
     @Body() body: AddRecipeDto,
     @Req() req: Request & { userId: string },
   ) {
-    return this.collectionsService.addRecipe(req.userId, id, body.recipeId)
+    const collection = await this.collectionsService.addRecipe(req.userId, id, body.recipeId)
+    await this.activityLog.record(req.userId, body.recipeId, 'recipe_added_to_collection')
+    return collection
   }
 
   @Delete(':id/recipes/:recipeId')
@@ -48,6 +57,8 @@ export class CollectionsController {
     @Param('recipeId') recipeId: string,
     @Req() req: Request & { userId: string },
   ) {
-    return this.collectionsService.removeRecipe(req.userId, id, recipeId)
+    const collection = await this.collectionsService.removeRecipe(req.userId, id, recipeId)
+    await this.activityLog.record(req.userId, recipeId, 'recipe_removed_from_collection')
+    return collection
   }
 }
