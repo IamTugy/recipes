@@ -42,8 +42,10 @@ export class RecipeAiGenerateController {
       throw new BadRequestException('Provide a query describing the recipe to research')
     }
     const userId = req.userId
-    const job = await this.jobsService.create(userId, 'ai_generate', query, dedupeKeyFor(query))
-    void this.jobsService.run(job.id, () => this.runGenerate(query, userId))
+    const { job, isExisting } = await this.jobsService.create(userId, 'ai_generate', query, dedupeKeyFor(query))
+    if (!isExisting) {
+      void this.jobsService.run(job.id, () => this.runGenerate(query, userId))
+    }
     return { jobId: job.id }
   }
 

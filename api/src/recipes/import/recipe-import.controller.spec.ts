@@ -31,7 +31,7 @@ describe('RecipeImportController', () => {
 
   describe('import() - job creation', () => {
     it('creates a job and returns its id immediately without waiting for the import to finish', async () => {
-      jobsService.create.mockResolvedValue({ id: 'job-1' })
+      jobsService.create.mockResolvedValue({ job: { id: 'job-1' }, isExisting: false })
       jobsService.run.mockReturnValue(new Promise(() => {})) // never resolves during the test
 
       const result = await controller.import({ text: 'some recipe text' }, { userId: 'user_1' } as any, undefined)
@@ -39,6 +39,15 @@ describe('RecipeImportController', () => {
       expect(result).toEqual({ jobId: 'job-1' })
       expect(jobsService.create).toHaveBeenCalledWith('user_1', 'import', expect.any(String), expect.any(String))
       expect(jobsService.run).toHaveBeenCalledWith('job-1', expect.any(Function))
+    })
+
+    it('returns the existing job id without starting new work when create() reports a dedupe match', async () => {
+      jobsService.create.mockResolvedValue({ job: { id: 'job-1' }, isExisting: true })
+
+      const result = await controller.import({ text: 'some recipe text' }, { userId: 'user_1' } as any, undefined)
+
+      expect(result).toEqual({ jobId: 'job-1' })
+      expect(jobsService.run).not.toHaveBeenCalled()
     })
 
     it('throws BadRequestException when no source is provided, without creating a job', async () => {
@@ -60,7 +69,7 @@ describe('RecipeImportController', () => {
     })
 
     it('uses the same dedupeKey for two identical text submissions and a different key for a different source', async () => {
-      jobsService.create.mockResolvedValue({ id: 'job-1' })
+      jobsService.create.mockResolvedValue({ job: { id: 'job-1' }, isExisting: false })
       jobsService.run.mockReturnValue(new Promise(() => {}))
 
       await controller.import({ text: 'same text' }, { userId: 'user_1' } as any, undefined)

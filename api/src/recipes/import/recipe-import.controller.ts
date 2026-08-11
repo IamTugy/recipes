@@ -67,8 +67,15 @@ export class RecipeImportController {
     }
 
     const userId = req.userId
-    const job = await this.jobsService.create(userId, 'import', labelFor(body, file, image), dedupeKeyFor(body, file, image))
-    void this.jobsService.run(job.id, () => this.runImport(body, userId, file, image))
+    const { job, isExisting } = await this.jobsService.create(
+      userId,
+      'import',
+      labelFor(body, file, image),
+      dedupeKeyFor(body, file, image),
+    )
+    if (!isExisting) {
+      void this.jobsService.run(job.id, () => this.runImport(body, userId, file, image))
+    }
     return { jobId: job.id }
   }
 

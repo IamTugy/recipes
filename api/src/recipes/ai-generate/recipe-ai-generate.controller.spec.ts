@@ -28,7 +28,7 @@ describe('RecipeAiGenerateController', () => {
 
   describe('generate() - job creation', () => {
     it('creates a job and returns its id immediately without waiting for generation to finish', async () => {
-      jobsService.create.mockResolvedValue({ id: 'job-1' })
+      jobsService.create.mockResolvedValue({ job: { id: 'job-1' }, isExisting: false })
       jobsService.run.mockReturnValue(new Promise(() => {})) // never resolves during the test
 
       const result = await controller.generate({ query: 'chocolate cake' }, { userId: 'user_1' } as any)
@@ -36,6 +36,15 @@ describe('RecipeAiGenerateController', () => {
       expect(result).toEqual({ jobId: 'job-1' })
       expect(jobsService.create).toHaveBeenCalledWith('user_1', 'ai_generate', 'chocolate cake', expect.any(String))
       expect(jobsService.run).toHaveBeenCalledWith('job-1', expect.any(Function))
+    })
+
+    it('returns the existing job id without starting new work when create() reports a dedupe match', async () => {
+      jobsService.create.mockResolvedValue({ job: { id: 'job-1' }, isExisting: true })
+
+      const result = await controller.generate({ query: 'chocolate cake' }, { userId: 'user_1' } as any)
+
+      expect(result).toEqual({ jobId: 'job-1' })
+      expect(jobsService.run).not.toHaveBeenCalled()
     })
 
     it('throws BadRequestException when no query is provided, without creating a job', async () => {
@@ -48,7 +57,7 @@ describe('RecipeAiGenerateController', () => {
     })
 
     it('uses the same dedupeKey for the same query regardless of casing/whitespace', async () => {
-      jobsService.create.mockResolvedValue({ id: 'job-1' })
+      jobsService.create.mockResolvedValue({ job: { id: 'job-1' }, isExisting: false })
       jobsService.run.mockReturnValue(new Promise(() => {}))
 
       await controller.generate({ query: 'Chocolate Cake' }, { userId: 'user_1' } as any)
