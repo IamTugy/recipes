@@ -151,3 +151,15 @@ export interface TimerState {
   /** Epoch ms this timer reaches zero - only meaningful while `running`. Lets remaining time be recomputed from wall-clock time instead of drifting when the tab is backgrounded/suspended. */
   endsAt?: number
 }
+
+export interface Job {
+  id: string
+  type: 'import' | 'ai_generate'
+  status: 'queued' | 'running' | 'done' | 'failed'
+  label?: string
+  resultRecipeIds: string[]
+  error?: string
+  createdAt: string
+  startedAt?: string
+  finishedAt?: string
+}
