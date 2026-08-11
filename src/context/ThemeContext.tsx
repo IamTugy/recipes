@@ -32,12 +32,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     return () => media.removeEventListener('change', handleChange)
   }, [])
 
-  function cycleTheme() {
-    setMode(m => m === 'light' ? 'dark' : m === 'dark' ? 'system' : 'light')
-  }
-
   return (
-    <ThemeContext.Provider value={{ theme, mode, cycleTheme, setMode }}>
+    <ThemeContext.Provider value={{ theme, mode, setMode }}>
       {children}
     </ThemeContext.Provider>
   )

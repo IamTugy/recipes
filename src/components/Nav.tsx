@@ -13,15 +13,17 @@ interface NavProps {
 export default function Nav({ shoppingListCount, onOpenShoppingList, onToggleMobileSidebar }: NavProps) {
   const navigate = useNavigate()
   const { lang, setLang } = useLanguage()
-  const { mode, setMode } = useTheme()
+  const { theme, setMode } = useTheme()
   const { isSignedIn, getToken } = useAuth()
 
-  const themeLabel = mode === 'light'
-    ? (lang === 'he' ? 'מצב כהה' : 'Dark mode')
-    : mode === 'dark'
-      ? (lang === 'he' ? 'לפי המערכת' : 'System theme')
-      : (lang === 'he' ? 'מצב בהיר' : 'Light mode')
-  const themeIcon = mode === 'light' ? '🌙' : mode === 'dark' ? '🖥️' : '☀️'
+  // Acts on the currently *displayed* theme, not the abstract mode - a
+  // first-time visitor's mode starts as "system" (unset), and if that
+  // happens to resolve to the same theme already showing, toggling mode
+  // through a 3rd "system" step made the first click look like it did
+  // nothing (label changed, page didn't) and only the second click visibly
+  // switched. Every click now flips light<->dark immediately.
+  const themeLabel = theme === 'light' ? (lang === 'he' ? 'מצב כהה' : 'Dark mode') : (lang === 'he' ? 'מצב בהיר' : 'Light mode')
+  const themeIcon = theme === 'light' ? '🌙' : '☀️'
 
   function handleLangClick() {
     const next = lang === 'he' ? 'en' : 'he'
@@ -30,7 +32,7 @@ export default function Nav({ shoppingListCount, onOpenShoppingList, onToggleMob
   }
 
   function handleThemeClick() {
-    const next = mode === 'light' ? 'dark' : mode === 'dark' ? 'system' : 'light'
+    const next = theme === 'light' ? 'dark' : 'light'
     setMode(next)
     if (isSignedIn) void savePreferences({ theme: next }, getToken)
   }

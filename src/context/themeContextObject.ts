@@ -6,13 +6,11 @@ export type ThemeMode = Theme | 'system'
 export interface ThemeContextValue {
   theme: Theme
   mode: ThemeMode
-  cycleTheme: () => void
   setMode: (mode: ThemeMode) => void
 }
 
 export const ThemeContext = createContext<ThemeContextValue>({
   theme: 'light',
   mode: 'system',
-  cycleTheme: () => {},
   setMode: () => {},
 })
