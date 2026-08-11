@@ -246,6 +246,7 @@ export function useChefProfile(userId: string | undefined) {
 export function useTrending() {
   const { getToken, isLoaded, isSignedIn } = useAuth()
   const [trending, setTrending] = useState<Recipe[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (!isLoaded || !isSignedIn) return
@@ -256,9 +257,10 @@ export function useTrending() {
         if (!cancelled) setTrending(data)
       })
       .catch(() => { /* trending is a nice-to-have, fail silently */ })
+      .finally(() => { if (!cancelled) setLoading(false) })
 
     return () => { cancelled = true }
   }, [isLoaded, isSignedIn, getToken])
 
-  return { trending }
+  return { trending, loading }
 }

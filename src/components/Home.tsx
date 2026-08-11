@@ -44,7 +44,7 @@ export default function Home() {
   const [advancedOpen, setAdvancedOpen] = useState(false)
   const { recipes, loading, error } = useRecipes()
   const { favoriteSlugs, toggle: toggleFavorite } = useFavorites()
-  const { trending } = useTrending()
+  const { trending, loading: trendingLoading } = useTrending()
   const searchInputRef = useRef<HTMLInputElement>(null)
 
   // Keep the URL in sync with every filter/search/sort change (replace, not
@@ -343,7 +343,7 @@ export default function Home() {
 
       {!loading && !search && !activeCategory && !activeDifficulty && !activeDietary && !activeKosher && !showFavoritesOnly && (
         <>
-          <RecipeStrip title={lang === 'he' ? '🔥 פופולרי השבוע' : '🔥 Trending this week'} recipes={trending} />
+          <RecipeStrip title={lang === 'he' ? '🔥 פופולרי השבוע' : '🔥 Trending this week'} recipes={trending} loading={trendingLoading} />
         </>
       )}
 

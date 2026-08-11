@@ -8,16 +8,27 @@ import SkeletonImage from './SkeletonImage'
 interface RecipeStripProps {
   title: string
   recipes: Recipe[]
+  loading?: boolean
 }
 
-export default function RecipeStrip({ title, recipes }: RecipeStripProps) {
+export default function RecipeStrip({ title, recipes, loading }: RecipeStripProps) {
   const { lang } = useLanguage()
 
-  if (recipes.length === 0) return null
+  if (!loading && recipes.length === 0) return null
 
   return (
     <div className="max-w-6xl mx-auto px-6 mb-8">
       <p className="text-cream/25 text-xs tracking-wider mb-3">{title}</p>
+      {loading ? (
+        <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-none">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="shrink-0 w-32">
+              <div className="h-20 w-32 rounded-lg bg-tint/[0.06] animate-pulse mb-1.5" />
+              <div className="h-3 w-24 rounded bg-tint/[0.06] animate-pulse" />
+            </div>
+          ))}
+        </div>
+      ) : (
       <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-none">
         {recipes.map(r => {
           const recipeTitle = lang === 'he' ? (r.titleHe ?? r.title) : r.title
@@ -44,6 +55,7 @@ export default function RecipeStrip({ title, recipes }: RecipeStripProps) {
           )
         })}
       </div>
+      )}
     </div>
   )
 }
