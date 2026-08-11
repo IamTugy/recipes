@@ -185,6 +185,19 @@ export class Recipe {
   // panel can group/order a batch and it survives a page refresh.
   @Prop()
   batchId?: string
+
+  // Denormalized dish-group assignment, set on every successful publish by
+  // RecipeGroupingService - avoids a join/new endpoint for the browsing
+  // screen's "group same dish" toggle. dishGroupId alone isn't enough to
+  // render a group card without a second query, so the name comes along.
+  @Prop({ index: true })
+  dishGroupId?: string
+
+  @Prop()
+  dishGroupName?: string
+
+  @Prop()
+  dishGroupNameHe?: string
 }
 
 export const RecipeSchema = SchemaFactory.createForClass(Recipe)

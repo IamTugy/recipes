@@ -11,6 +11,7 @@ import { CookLogService } from '../cook-log/cook-log.service'
 import { UsersService } from '../users/users.service'
 import { RecipeQualityService } from './quality/recipe-quality.service'
 import { RecipeSimilarityService } from './similarity/recipe-similarity.service'
+import { RecipeGroupingService } from './grouping/recipe-grouping.service'
 
 describe('RecipesService', () => {
   function makeActivityLog(viewCounts: Map<string, number> = new Map()) {
@@ -41,6 +42,10 @@ describe('RecipesService', () => {
     return { findCandidates: jest.fn().mockResolvedValue(candidates), judge: jest.fn().mockResolvedValue(verdict) }
   }
 
+  function makeGroupingService(group: Record<string, unknown> = { id: 'group-1', name: 'Test Dish', nameHe: undefined }) {
+    return { assignGroup: jest.fn().mockResolvedValue(group) }
+  }
+
   async function makeService(
     recipeModel: Record<string, unknown>,
     revisionModel: Record<string, unknown> = noRevisionFound(),
@@ -51,6 +56,7 @@ describe('RecipesService', () => {
     usersService = makeUsers(),
     qualityService = makeQualityService(),
     similarityService = makeSimilarityService(),
+    groupingService = makeGroupingService(),
   ) {
     const moduleRef = await Test.createTestingModule({
       providers: [
@@ -64,6 +70,7 @@ describe('RecipesService', () => {
         { provide: ConfigService, useValue: config },
         { provide: RecipeQualityService, useValue: qualityService },
         { provide: RecipeSimilarityService, useValue: similarityService },
+        { provide: RecipeGroupingService, useValue: groupingService },
       ],
     }).compile()
     return moduleRef.get(RecipesService)
@@ -618,6 +625,35 @@ describe('RecipesService', () => {
     expect(recipe.qualityReview).toEqual({ score: 95, checkedAt: '2026-08-09T00:00:00.000Z', findings: [] })
     expect(recipe.save).toHaveBeenCalled()
     expect(result).toBe(recipe)
+  })
+
+  it('submitForReview assigns a dish group when it publishes', async () => {
+    const recipe: any = completeRecipe()
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe), select: jest.fn().mockReturnThis(), lean: jest.fn().mockReturnThis() })
+    const updateOne = jest.fn().mockResolvedValue({})
+    const quality = makeQualityService({ score: 95, checkedAt: 'now', findings: [] })
+    const grouping = makeGroupingService({ id: 'group-1', name: 'Caprese Salad', nameHe: 'סלט קפרזה' })
+    const service = await makeService({ findOne }, { updateOne }, undefined, undefined, undefined, undefined, undefined, quality, undefined, grouping)
+
+    await service.submitForReview('a', 'user_1', false)
+
+    expect(grouping.assignGroup).toHaveBeenCalledWith(recipe)
+    expect(recipe.dishGroupId).toBe('group-1')
+    expect(recipe.dishGroupName).toBe('Caprese Salad')
+    expect(recipe.dishGroupNameHe).toBe('סלט קפרזה')
+  })
+
+  it('submitForReview does not assign a dish group when the score is below the threshold', async () => {
+    const recipe: any = completeRecipe()
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe), select: jest.fn().mockReturnThis(), lean: jest.fn().mockReturnThis() })
+    const quality = makeQualityService({ score: 40, checkedAt: 'now', findings: [] })
+    const grouping = makeGroupingService()
+    const service = await makeService({ findOne }, undefined, undefined, undefined, undefined, undefined, undefined, quality, undefined, grouping)
+
+    await service.submitForReview('a', 'user_1', false)
+
+    expect(grouping.assignGroup).not.toHaveBeenCalled()
+    expect(recipe.dishGroupId).toBeUndefined()
   })
 
   it('submitForReview rejects when the AI review score is below the threshold', async () => {

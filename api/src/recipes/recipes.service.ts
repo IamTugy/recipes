@@ -11,6 +11,7 @@ import { UsersService } from '../users/users.service'
 import { SaveRecipeDraftDto } from './dto/save-recipe-draft.dto'
 import { RecipeQualityService } from './quality/recipe-quality.service'
 import { RecipeSimilarityService, SimilaritySourceRecipe } from './similarity/recipe-similarity.service'
+import { RecipeGroupingService } from './grouping/recipe-grouping.service'
 
 function slugify(text: string): string {
   return text
@@ -74,6 +75,7 @@ export class RecipesService implements OnModuleInit {
     private readonly config: ConfigService,
     private readonly qualityService: RecipeQualityService,
     private readonly similarityService: RecipeSimilarityService,
+    private readonly groupingService: RecipeGroupingService,
   ) {}
 
   // One-time backfill: recipes seeded before the ownership/publish-workflow
@@ -474,8 +476,13 @@ export class RecipesService implements OnModuleInit {
       recipe.pendingReview = false
       recipe.reviewComment = undefined
       recipe.qualityReview = review
+      const group = await this.groupingService.assignGroup(recipe)
+      recipe.dishGroupId = group.id
+      recipe.dishGroupName = group.name
+      recipe.dishGroupNameHe = group.nameHe
       await recipe.save()
       await this.activityLogService.record(userId, id, 'recipe_published')
+      await this.activityLogService.record(userId, id, 'recipe_dish_group_assigned', { dishGroupId: group.id })
     } else {
       recipe.status = 'rejected'
       recipe.reviewComment = undefined

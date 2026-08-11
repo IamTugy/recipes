@@ -17,6 +17,8 @@ import { RecipeAiGenerateController } from './ai-generate/recipe-ai-generate.con
 import { RecipeAiGenerateService } from './ai-generate/recipe-ai-generate.service'
 import { RecipeQualityService } from './quality/recipe-quality.service'
 import { RecipeSimilarityService } from './similarity/recipe-similarity.service'
+import { DishGroup, DishGroupSchema } from './schemas/dish-group.schema'
+import { RecipeGroupingService } from './grouping/recipe-grouping.service'
 
 @Module({
   imports: [
@@ -24,13 +26,14 @@ import { RecipeSimilarityService } from './similarity/recipe-similarity.service'
       { name: Recipe.name, schema: RecipeSchema },
       { name: RecipeRevision.name, schema: RecipeRevisionSchema },
       { name: Rating.name, schema: RatingSchema },
+      { name: DishGroup.name, schema: DishGroupSchema },
     ]),
     ActivityLogModule,
     CookLogModule,
     UsersModule,
     AiModule,
   ],
-  providers: [RecipesService, RecipeImportService, NutritionService, RecipeAiGenerateService, RecipeQualityService, RecipeSimilarityService],
+  providers: [RecipesService, RecipeImportService, NutritionService, RecipeAiGenerateService, RecipeQualityService, RecipeSimilarityService, RecipeGroupingService],
   controllers: [RecipesController, RecipeImportController, NutritionController, RecipeAiGenerateController],
   exports: [RecipesService],
 })
