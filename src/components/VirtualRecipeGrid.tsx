@@ -3,12 +3,26 @@ import { useWindowVirtualizer } from '@tanstack/react-virtual'
 import type { Recipe } from '../types'
 import { useGridColumns } from '../hooks/useGridColumns'
 import RecipeCard from './RecipeCard'
+import GroupCard from './GroupCard'
+
+export interface DishGroupSummary {
+  id: string
+  name: string
+  nameHe?: string
+  count: number
+  previewRecipes: Recipe[]
+}
+
+export type GridItem =
+  | { type: 'recipe'; recipe: Recipe }
+  | { type: 'group'; group: DishGroupSummary }
 
 interface VirtualRecipeGridProps {
-  recipes: Recipe[]
+  items: GridItem[]
   searchQuery: string
   favoriteSlugs: Set<string>
   onToggleFavorite: (slug: string) => void
+  onSelectGroup: (groupId: string) => void
   statusBadgeFor?: (recipe: Recipe) => { label: string; className: string } | undefined
   editableFor?: (recipe: Recipe) => boolean
 }
@@ -16,8 +30,12 @@ interface VirtualRecipeGridProps {
 const ROW_GAP = 16 // matches `gap-4`
 const ESTIMATED_ROW_HEIGHT = 360
 
+function itemKey(item: GridItem): string {
+  return item.type === 'recipe' ? item.recipe.id : `group-${item.group.id}`
+}
+
 export default function VirtualRecipeGrid({
-  recipes, searchQuery, favoriteSlugs, onToggleFavorite, statusBadgeFor, editableFor,
+  items, searchQuery, favoriteSlugs, onToggleFavorite, onSelectGroup, statusBadgeFor, editableFor,
 }: VirtualRecipeGridProps) {
   const columns = useGridColumns()
   const [parentOffset, setParentOffset] = useState(0)
@@ -28,12 +46,12 @@ export default function VirtualRecipeGrid({
   }, [])
 
   const rows = useMemo(() => {
-    const chunks: Recipe[][] = []
-    for (let i = 0; i < recipes.length; i += columns) {
-      chunks.push(recipes.slice(i, i + columns))
+    const chunks: GridItem[][] = []
+    for (let i = 0; i < items.length; i += columns) {
+      chunks.push(items.slice(i, i + columns))
     }
     return chunks
-  }, [recipes, columns])
+  }, [items, columns])
 
   const virtualizer = useWindowVirtualizer({
     count: rows.length,
@@ -41,7 +59,7 @@ export default function VirtualRecipeGrid({
     overscan: 3,
     scrollMargin: parentOffset,
     // Rows change size in Hebrew/English and with badges - remeasure real DOM height.
-    getItemKey: i => rows[i]?.[0]?.id ?? i,
+    getItemKey: i => { const first = rows[i]?.[0]; return first ? itemKey(first) : i },
   })
 
   const gridColsClass = columns === 3 ? 'grid-cols-3' : columns === 2 ? 'grid-cols-2' : 'grid-cols-1'
@@ -66,19 +84,29 @@ export default function VirtualRecipeGrid({
             }}
           >
             <div className={`grid ${gridColsClass} gap-4`}>
-              {row.map((recipe, colIndex) => (
-                <RecipeCard
-                  key={recipe.id}
-                  recipe={recipe}
-                  index={colIndex}
-                  searchQuery={searchQuery}
-                  isFavorite={favoriteSlugs.has(recipe.id)}
-                  onToggleFavorite={onToggleFavorite}
-                  statusBadge={statusBadgeFor?.(recipe)}
-                  editable={editableFor?.(recipe)}
-                  imageLoading={virtualRow.index === 0 ? 'eager' : 'lazy'}
-                  imageFetchPriority={virtualRow.index === 0 && colIndex === 0 ? 'high' : 'auto'}
-                />
+              {row.map((item, colIndex) => (
+                item.type === 'recipe' ? (
+                  <RecipeCard
+                    key={item.recipe.id}
+                    recipe={item.recipe}
+                    index={colIndex}
+                    searchQuery={searchQuery}
+                    isFavorite={favoriteSlugs.has(item.recipe.id)}
+                    onToggleFavorite={onToggleFavorite}
+                    statusBadge={statusBadgeFor?.(item.recipe)}
+                    editable={editableFor?.(item.recipe)}
+                    imageLoading={virtualRow.index === 0 ? 'eager' : 'lazy'}
+                    imageFetchPriority={virtualRow.index === 0 && colIndex === 0 ? 'high' : 'auto'}
+                  />
+                ) : (
+                  <GroupCard
+                    key={item.group.id}
+                    group={item.group}
+                    index={colIndex}
+                    onSelect={onSelectGroup}
+                    imageLoading={virtualRow.index === 0 ? 'eager' : 'lazy'}
+                  />
+                )
               ))}
             </div>
           </div>
