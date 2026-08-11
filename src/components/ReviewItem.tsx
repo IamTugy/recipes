@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { resizedImage } from '../lib/image'
 
 export interface Review {
   id: string
@@ -188,7 +189,7 @@ export default function ReviewItem({ recipeId, review, lang, getToken, onOpenLig
       )}
       {review.photoUrl && (
         <img
-          src={review.photoUrl}
+          src={resizedImage(review.photoUrl, 320)}
           alt=""
           onClick={() => onOpenLightbox(review.photoUrl!)}
           className="mt-2 w-28 h-28 object-cover rounded-lg cursor-zoom-in"

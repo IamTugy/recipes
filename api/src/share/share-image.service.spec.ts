@@ -79,6 +79,31 @@ describe('ShareImageService', () => {
       expect(set).toHaveBeenCalledWith(expect.any(String), Buffer.from('resized-jpeg-bytes'), 'EX', 60 * 60 * 24 * 30)
     })
 
+    it('resizes to the requested width when one is given', async () => {
+      jest.spyOn(global, 'fetch').mockResolvedValue({
+        ok: true,
+        arrayBuffer: async () => new Uint8Array(Buffer.from('original-bytes')).buffer,
+      } as Response)
+      const service = await makeService()
+
+      await service.getResized(sourceUrl, 160)
+
+      expect(resizeMock).toHaveBeenCalledWith({ width: 160, withoutEnlargement: true })
+    })
+
+    it('caches different widths for the same source under different keys', async () => {
+      jest.spyOn(global, 'fetch').mockResolvedValue({
+        ok: true,
+        arrayBuffer: async () => new Uint8Array(Buffer.from('original-bytes')).buffer,
+      } as Response)
+      const service = await makeService()
+
+      await service.getResized(sourceUrl, 160)
+      await service.getResized(sourceUrl, 320)
+
+      expect(set.mock.calls[0][0]).not.toBe(set.mock.calls[1][0])
+    })
+
     it('throws when the source image cannot be fetched', async () => {
       jest.spyOn(global, 'fetch').mockResolvedValue({ ok: false } as Response)
       const service = await makeService()

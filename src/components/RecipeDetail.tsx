@@ -26,6 +26,7 @@ import { useToast } from '../hooks/useToast'
 import ReviewItem, { type Review } from './ReviewItem'
 import ConfirmDialog from './ConfirmDialog'
 import type { TimerState, RecipeRevision, QualityReview } from '../types'
+import { resizedImage } from '../lib/image'
 
 interface RecipeDetailProps {
   onAddTimer: (label: string, minutes: number, recipeId: string, stepIndex: number) => void
@@ -632,7 +633,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
       <div className="print:hidden relative h-64 sm:h-96 overflow-hidden">
         {displayRecipe.image?.includes('assets.tugy.dev') ? (
           <img
-            src={displayRecipe.image}
+            src={resizedImage(displayRecipe.image, 1200)}
             alt={displayTitle}
             onClick={() => setLightboxUrl(displayRecipe.image!)}
             className="w-full h-full object-cover cursor-zoom-in"
@@ -1299,7 +1300,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
 
                                 {step.image && (
                                   <img
-                                    src={step.image}
+                                    src={resizedImage(step.image, 160)}
                                     alt=""
                                     onClick={e => { e.stopPropagation(); setLightboxUrl(step.image!) }}
                                     className="print:hidden mt-2 w-20 h-20 object-cover rounded-lg cursor-zoom-in"
@@ -1495,7 +1496,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
               </p>
               {reviewPhotoUrl && (
                 <img
-                  src={reviewPhotoUrl}
+                  src={resizedImage(reviewPhotoUrl, 160)}
                   alt=""
                   onClick={() => setLightboxUrl(reviewPhotoUrl)}
                   className="w-24 h-24 object-cover rounded-lg cursor-zoom-in"
@@ -1522,7 +1523,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
             {reviewPhotoUrl && (
               <div className="relative w-24 h-24">
                 <img
-                  src={reviewPhotoUrl}
+                  src={resizedImage(reviewPhotoUrl, 160)}
                   alt=""
                   onClick={() => setLightboxUrl(reviewPhotoUrl)}
                   className="w-full h-full object-cover rounded-lg cursor-zoom-in"
@@ -1696,7 +1697,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                     <div className="relative h-24 rounded-xl overflow-hidden mb-2">
                       {r.image?.includes('assets.tugy.dev') ? (
                         <img
-                          src={r.image}
+                          src={resizedImage(r.image, 320)}
                           alt={title}
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                           loading="lazy"
@@ -1760,7 +1761,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
               </p>
               {step.image && (
                 <img
-                  src={step.image}
+                  src={resizedImage(step.image, 320)}
                   alt=""
                   onClick={() => setLightboxUrl(step.image!)}
                   className="max-w-xs w-full max-h-52 object-cover rounded-xl cursor-zoom-in"

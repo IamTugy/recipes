@@ -2,7 +2,7 @@ import { Controller, Get, Logger, Param, Query, Res } from '@nestjs/common'
 import type { Response } from 'express'
 import { RecipesService } from '../recipes/recipes.service'
 import { Public } from '../auth/public.decorator'
-import { ShareImageService } from './share-image.service'
+import { ShareImageService, ALLOWED_WIDTHS } from './share-image.service'
 
 const APP_URL = 'https://recipes.tugy.dev'
 const FALLBACK_IMAGE = 'https://assets.tugy.dev/a-quick-date-and-honey-cake.jpg'
@@ -94,15 +94,24 @@ export class ShareController {
 </html>`)
   }
 
+  // `w` is whitelisted rather than accepting any number - an unbounded set of
+  // widths would mean an unbounded set of cache entries (and sharp resize
+  // calls) for the same source image, one per pixel value a caller feels
+  // like sending.
   @Public()
   @Get('image')
-  async shareImage(@Query('src') src: string | undefined, @Res() res: Response) {
+  async shareImage(
+    @Query('src') src: string | undefined,
+    @Query('w') w: string | undefined,
+    @Res() res: Response,
+  ) {
     if (!src || !this.shareImageService.isAllowedSource(src)) {
       res.redirect(302, FALLBACK_IMAGE)
       return
     }
+    const width = ALLOWED_WIDTHS.find(allowed => allowed === Number(w)) ?? 1200
     try {
-      const buffer = await this.shareImageService.getResized(src)
+      const buffer = await this.shareImageService.getResized(src, width)
       res.set('Cache-Control', 'public, max-age=2592000, immutable')
       res.type('image/jpeg').send(buffer)
     } catch (err) {

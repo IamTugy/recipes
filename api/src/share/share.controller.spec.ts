@@ -194,19 +194,41 @@ describe('ShareController', () => {
       const controller = makeController()
       const res = makeRes()
 
-      await controller.shareImage('https://recipes-assets.tugy.dev/recipes/x/photo.jpg', res as any)
+      await controller.shareImage('https://recipes-assets.tugy.dev/recipes/x/photo.jpg', undefined, res as any)
 
-      expect(shareImageService.getResized).toHaveBeenCalledWith('https://recipes-assets.tugy.dev/recipes/x/photo.jpg')
+      expect(shareImageService.getResized).toHaveBeenCalledWith('https://recipes-assets.tugy.dev/recipes/x/photo.jpg', 1200)
       expect(res.set).toHaveBeenCalledWith('Cache-Control', 'public, max-age=2592000, immutable')
       expect(res.type).toHaveBeenCalledWith('image/jpeg')
       expect(res.send).toHaveBeenCalledWith(buffer)
+    })
+
+    it('resizes to the requested width when w is one of the allowed sizes', async () => {
+      const buffer = Buffer.from('fake-jpeg-bytes')
+      shareImageService.getResized.mockResolvedValue(buffer)
+      const controller = makeController()
+      const res = makeRes()
+
+      await controller.shareImage('https://recipes-assets.tugy.dev/recipes/x/photo.jpg', '320', res as any)
+
+      expect(shareImageService.getResized).toHaveBeenCalledWith('https://recipes-assets.tugy.dev/recipes/x/photo.jpg', 320)
+    })
+
+    it('falls back to the default width when w is not one of the allowed sizes', async () => {
+      const buffer = Buffer.from('fake-jpeg-bytes')
+      shareImageService.getResized.mockResolvedValue(buffer)
+      const controller = makeController()
+      const res = makeRes()
+
+      await controller.shareImage('https://recipes-assets.tugy.dev/recipes/x/photo.jpg', '999', res as any)
+
+      expect(shareImageService.getResized).toHaveBeenCalledWith('https://recipes-assets.tugy.dev/recipes/x/photo.jpg', 1200)
     })
 
     it('redirects to the fallback image when src is missing', async () => {
       const controller = makeController()
       const res = makeRes()
 
-      await controller.shareImage(undefined, res as any)
+      await controller.shareImage(undefined, undefined, res as any)
 
       expect(res.redirect).toHaveBeenCalledWith(302, FALLBACK_IMAGE)
       expect(shareImageService.getResized).not.toHaveBeenCalled()
@@ -216,7 +238,7 @@ describe('ShareController', () => {
       const controller = makeController()
       const res = makeRes()
 
-      await controller.shareImage('https://evil.example.com/steal.jpg', res as any)
+      await controller.shareImage('https://evil.example.com/steal.jpg', undefined, res as any)
 
       expect(res.redirect).toHaveBeenCalledWith(302, FALLBACK_IMAGE)
       expect(shareImageService.getResized).not.toHaveBeenCalled()
@@ -227,7 +249,7 @@ describe('ShareController', () => {
       const controller = makeController()
       const res = makeRes()
 
-      await controller.shareImage('https://recipes-assets.tugy.dev/recipes/x/photo.jpg', res as any)
+      await controller.shareImage('https://recipes-assets.tugy.dev/recipes/x/photo.jpg', undefined, res as any)
 
       expect(res.redirect).toHaveBeenCalledWith(302, FALLBACK_IMAGE)
     })

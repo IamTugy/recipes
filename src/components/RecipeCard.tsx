@@ -6,6 +6,7 @@ import { t, categoryEmoji, difficultyColor } from '../i18n'
 import { useLanguage } from '../hooks/useLanguage'
 import Highlight from './Highlight'
 import RecipePlaceholder from './RecipePlaceholder'
+import { resizedImage } from '../lib/image'
 
 interface RecipeCardProps {
   recipe: Recipe
@@ -49,7 +50,7 @@ export default function RecipeCard({
           <div className="relative h-52 sm:h-60 overflow-hidden">
             {recipe.image?.includes('assets.tugy.dev') ? (
               <img
-                src={recipe.image}
+                src={resizedImage(recipe.image, 640)}
                 alt={displayTitle}
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 loading={imageLoading ?? (index < 4 ? 'eager' : 'lazy')}
