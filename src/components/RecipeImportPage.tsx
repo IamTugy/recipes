@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '@clerk/react'
 import { useLanguage } from '../hooks/useLanguage'
+import { useToast } from '../hooks/useToast'
 import { importRecipe, MAX_UPLOAD_BYTES } from '../lib/recipeImport'
 import { ApiError } from '../lib/api'
 
@@ -45,6 +46,7 @@ export default function RecipeImportPage() {
   const location = useLocation()
   const { getToken } = useAuth()
   const { lang } = useLanguage()
+  const { showToast } = useToast()
   const [source, setSource] = useState('')
   const [docFile, setDocFile] = useState<File | null>(null)
   const [photoFile, setPhotoFile] = useState<File | null>(null)
@@ -93,11 +95,19 @@ export default function RecipeImportPage() {
     setLoading(true)
     try {
       const { url, text } = splitSource(src)
-      const draft = await importRecipe(
+      const result = await importRecipe(
         url ? { url, text } : { text: text || undefined, file: docFile ?? undefined, image: photoFile ?? undefined },
         getToken
       )
-      navigate('/recipes/new', { state: { importedDraft: draft } })
+      if (Array.isArray(result)) {
+        showToast(
+          lang === 'he' ? `נמצאו ${result.length} מתכונים - נשמרו כטיוטות לבדיקה` : `Found ${result.length} recipes - saved as drafts for review`,
+          'success'
+        )
+        navigate(`/recipes/${result[0].id}/edit`)
+      } else {
+        navigate('/recipes/new', { state: { importedDraft: result } })
+      }
     } catch (err) {
       if (err instanceof ApiError && err.status === 0) {
         setError(lang === 'he' ? 'החיבור נכשל - בדקו את האינטרנט ונסו שוב (או שהקובץ גדול מדי)' : 'Connection failed - check your internet and try again (or the file may be too large)')

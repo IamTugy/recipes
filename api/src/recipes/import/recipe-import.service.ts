@@ -2,9 +2,7 @@ import { Injectable, BadRequestException } from '@nestjs/common'
 import { GeminiService } from '../../ai/gemini.service'
 import { extractFromUrl, extractFromPdf, extractFromDocx, isSocialMediaUrl, extractTikTokOembed, type ImportedRecipe } from './source-extractor'
 
-const EXTRACTION_PROMPT = `You are extracting a cooking recipe from raw text into a strict JSON object. Read the following source text and produce a single JSON object with exactly these fields (omit any field you cannot determine, but always include "title"):
-
-{
+const RECIPE_SHAPE = `{
   "title": "string, English title (required)",
   "titleHe": "string, Hebrew title",
   "category": "one of: breakfast, lunch, dinner, dessert, salad, soup, snack, bread, sauce",
@@ -22,82 +20,64 @@ const EXTRACTION_PROMPT = `You are extracting a cooking recipe from raw text int
   "steps": [{ "title": "Hebrew section title or empty string", "titleEn": "English section title or empty string", "items": [{ "instruction": "Hebrew step text", "instructionEn": "English step text", "timerMinutes": "number if this step mentions a specific duration" }] }],
   "tips": ["Hebrew tips"],
   "tipsEn": ["English tips"]
-}
+}`
+
+const MULTI_RECIPE_INSTRUCTION = `The source may describe one recipe or several (e.g. a cooking-class handout, a cookbook excerpt, or a page listing multiple numbered dishes). Also treat a sauce/dressing/component that's written as its own distinct, separately-titled entry as its own recipe, even if a dish above references it - don't fold it into the dish it's used in. Produce one object per distinct recipe you find, and return them all as a "recipes" array: {"recipes": [{...}, {...}]}. A single-recipe source still returns an array with one item.`
+
+const EXTRACTION_PROMPT = `You are extracting cooking recipes from raw text. Read the following source text and produce a strict JSON object of the shape below, where each recipe object has exactly these fields (omit any field you cannot determine, but always include "title"):
+
+${RECIPE_SHAPE}
+
+${MULTI_RECIPE_INSTRUCTION}
 
 Always fill in both the Hebrew and English version of every text field, translating as needed if the source is only in one language. The "unit" field is displayed translated by the app itself, so it must always be one of the exact tokens listed above (in English), never a translated or free-form word. Respond with ONLY the JSON object, no other text.
 
 Source text:
 `
 
-const JSON_LD_TO_RECIPE_PROMPT = `You are converting a schema.org Recipe JSON-LD object into a strict JSON object matching this exact shape (omit fields you cannot determine, but always include "title"):
+const JSON_LD_TO_RECIPE_PROMPT = `You are converting a schema.org Recipe JSON-LD object into a strict JSON object. Page markup like this always describes exactly one recipe - produce a "recipes" array with exactly one item of this shape (omit fields you cannot determine, but always include "title"):
 
-{
-  "title": "string, English title (required)",
-  "titleHe": "string, Hebrew title",
-  "category": "one of: breakfast, lunch, dinner, dessert, salad, soup, snack, bread, sauce",
-  "tags": ["Hebrew tags"],
-  "tagsEn": ["English tags"],
-  "cuisine": "string",
-  "description": "string, Hebrew short description",
-  "descriptionEn": "string, English short description",
-  "prepTime": "number, minutes",
-  "cookTime": "number, minutes",
-  "servings": "number",
-  "difficulty": "one of: easy, medium, hard",
-  "kosherType": "one of: meat, dairy, parve - meat if it contains any meat, poultry, or fish; dairy if it contains dairy and no meat/poultry/fish of any kind; parve if it contains neither. Omit only if you genuinely cannot tell.",
-  "ingredients": [{ "group": "Hebrew group name or empty string", "groupEn": "English group name or empty string", "items": [{ "amount": "number", "unit": "one of: g, kg, ml, l, cup, tbsp, tsp, cm, mm, pcs, cloves, bunch, sprigs, or empty string - but ONLY leave it empty for a naturally countable whole item (e.g. \"1 onion\", \"10 grapes\", \"1 garlic clove\"). Never leave it empty for something measured by mass or volume (e.g. milk, butter, flour, oil) - \"1 milk\" or \"1 butter\" with no unit is wrong, use g/ml/etc for those.", "name": "Hebrew ingredient name", "nameEn": "English ingredient name" }] }],
-  "steps": [{ "title": "Hebrew section title or empty string", "titleEn": "English section title or empty string", "items": [{ "instruction": "Hebrew step text", "instructionEn": "English step text", "timerMinutes": "number if mentioned" }] }],
-  "tips": ["Hebrew tips"],
-  "tipsEn": ["English tips"]
-}
+${RECIPE_SHAPE}
 
-The source is normally in English - translate every field into Hebrew as well as keeping the English version. The "unit" field is displayed translated by the app itself, so it must always be one of the exact tokens listed above (in English), never a translated or free-form word. Respond with ONLY the JSON object, no other text.
+Return {"recipes": [{...}]}. The source is normally in English - translate every field into Hebrew as well as keeping the English version. The "unit" field is displayed translated by the app itself, so it must always be one of the exact tokens listed above (in English), never a translated or free-form word. Respond with ONLY the JSON object, no other text.
 
 Source JSON-LD:
 `
 
-const IMAGE_EXTRACTION_PROMPT = `You are reading a photo of a recipe (a cookbook page, a handwritten card, a screenshot, etc.) and extracting it into a strict JSON object. Produce a single JSON object with exactly these fields (omit any field you cannot determine, but always include "title"):
+const IMAGE_EXTRACTION_PROMPT = `You are reading a photo of a recipe (a cookbook page, a handwritten card, a screenshot, etc.) and extracting it into a strict JSON object, where each recipe object has exactly these fields (omit any field you cannot determine, but always include "title"):
 
-{
-  "title": "string, English title (required)",
-  "titleHe": "string, Hebrew title",
-  "category": "one of: breakfast, lunch, dinner, dessert, salad, soup, snack, bread, sauce",
-  "tags": ["Hebrew tags"],
-  "tagsEn": ["English tags"],
-  "cuisine": "string, e.g. Italian, Brazilian",
-  "description": "string, Hebrew short description",
-  "descriptionEn": "string, English short description",
-  "prepTime": "number, minutes",
-  "cookTime": "number, minutes",
-  "servings": "number",
-  "difficulty": "one of: easy, medium, hard",
-  "kosherType": "one of: meat, dairy, parve - meat if it contains any meat, poultry, or fish; dairy if it contains dairy and no meat/poultry/fish of any kind; parve if it contains neither. Omit only if you genuinely cannot tell.",
-  "ingredients": [{ "group": "Hebrew group name or empty string", "groupEn": "English group name or empty string", "items": [{ "amount": "number", "unit": "one of: g, kg, ml, l, cup, tbsp, tsp, cm, mm, pcs, cloves, bunch, sprigs, or empty string - but ONLY leave it empty for a naturally countable whole item (e.g. \"1 onion\", \"10 grapes\", \"1 garlic clove\"). Never leave it empty for something measured by mass or volume (e.g. milk, butter, flour, oil) - \"1 milk\" or \"1 butter\" with no unit is wrong, use g/ml/etc for those.", "name": "Hebrew ingredient name", "nameEn": "English ingredient name" }] }],
-  "steps": [{ "title": "Hebrew section title or empty string", "titleEn": "English section title or empty string", "items": [{ "instruction": "Hebrew step text", "instructionEn": "English step text", "timerMinutes": "number if this step mentions a specific duration" }] }],
-  "tips": ["Hebrew tips"],
-  "tipsEn": ["English tips"]
-}
+${RECIPE_SHAPE}
+
+${MULTI_RECIPE_INSTRUCTION}
 
 Always fill in both the Hebrew and English version of every text field, translating as needed if the source is only in one language. The "unit" field is displayed translated by the app itself, so it must always be one of the exact tokens listed above (in English), never a translated or free-form word. Do not set "image" - it is not part of this object. Respond with ONLY the JSON object, no other text.`
+
+interface MultiRecipeResponse {
+  recipes: ImportedRecipe[]
+}
 
 @Injectable()
 export class RecipeImportService {
   constructor(private readonly gemini: GeminiService) {}
 
-  async importFromText(text: string): Promise<ImportedRecipe> {
-    return this.gemini.generateStructured<ImportedRecipe>(`${EXTRACTION_PROMPT}${text}`)
+  async importFromText(text: string): Promise<ImportedRecipe[]> {
+    const { recipes } = await this.gemini.generateStructured<MultiRecipeResponse>(`${EXTRACTION_PROMPT}${text}`)
+    if (!recipes?.length) throw new BadRequestException('Could not find a recipe in that text')
+    return recipes
   }
 
   // captionText is the text the OS share sheet hands along with the link
   // (e.g. an Instagram/TikTok caption) - it's the richest signal available
   // for social posts, since those pages can't be fetched directly.
-  async importFromUrl(url: string, captionText?: string): Promise<ImportedRecipe> {
+  async importFromUrl(url: string, captionText?: string): Promise<ImportedRecipe[]> {
     if (isSocialMediaUrl(url)) {
       return this.importFromSocialUrl(url, captionText)
     }
     const { text, structured } = await extractFromUrl(url)
     if (structured) {
-      return this.gemini.generateStructured<ImportedRecipe>(`${JSON_LD_TO_RECIPE_PROMPT}${JSON.stringify(structured)}`)
+      const { recipes } = await this.gemini.generateStructured<MultiRecipeResponse>(`${JSON_LD_TO_RECIPE_PROMPT}${JSON.stringify(structured)}`)
+      if (!recipes?.length) throw new BadRequestException('Could not find a recipe at that URL')
+      return recipes
     }
     return this.importFromText(captionText ? `${captionText}\n\n${text}` : text)
   }
@@ -108,7 +88,7 @@ export class RecipeImportService {
   // (Instagram/Facebook oEmbed both require a Meta access token, so those are
   // skipped), and a Gemini web-search pass grounded on the post URL - then
   // feeds the combined text through the normal text-extraction prompt.
-  async importFromSocialUrl(url: string, captionText?: string): Promise<ImportedRecipe> {
+  async importFromSocialUrl(url: string, captionText?: string): Promise<ImportedRecipe[]> {
     const [oembedText, search] = await Promise.all([
       extractTikTokOembed(url),
       this.gemini.generateWithSearch(
@@ -125,7 +105,7 @@ export class RecipeImportService {
     return this.importFromText(combined)
   }
 
-  async importFromFile(buffer: Buffer, mimeType: string, promptText?: string): Promise<ImportedRecipe> {
+  async importFromFile(buffer: Buffer, mimeType: string, promptText?: string): Promise<ImportedRecipe[]> {
     let text: string
     if (mimeType === 'application/pdf') {
       text = await extractFromPdf(buffer)
@@ -141,10 +121,12 @@ export class RecipeImportService {
     return this.importFromText(combined)
   }
 
-  async importFromImage(buffer: Buffer, mimeType: string, promptText?: string): Promise<ImportedRecipe> {
+  async importFromImage(buffer: Buffer, mimeType: string, promptText?: string): Promise<ImportedRecipe[]> {
     const prompt = promptText
       ? `${IMAGE_EXTRACTION_PROMPT}\n\nAdditional instructions from the user: ${promptText}`
       : IMAGE_EXTRACTION_PROMPT
-    return this.gemini.generateStructuredWithImage<ImportedRecipe>(prompt, buffer.toString('base64'), mimeType)
+    const { recipes } = await this.gemini.generateStructuredWithImage<MultiRecipeResponse>(prompt, buffer.toString('base64'), mimeType)
+    if (!recipes?.length) throw new BadRequestException('Could not find a recipe in that photo')
+    return recipes
   }
 }

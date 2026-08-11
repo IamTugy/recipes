@@ -30,10 +30,20 @@ export interface ImportedRecipe {
 // and then failing with a raw network error once nginx cuts it off.
 export const MAX_UPLOAD_BYTES = 25 * 1024 * 1024
 
+// A source with more than one recipe in it (a cooking-class PDF, a
+// multi-recipe photo, ...) is saved server-side as a batch of pending-review
+// drafts instead of being handed back for the single-recipe prefill flow -
+// the response comes back as an array of the already-created recipes (each
+// with an id) rather than the single unsaved ImportedRecipe object. See the
+// AI-drafts sidebar for reviewing/publishing them.
+export interface CreatedRecipe extends ImportedRecipe {
+  id: string
+}
+
 export async function importRecipe(
   input: { text?: string; url?: string; file?: File; image?: File },
   getToken: () => Promise<string | null>
-): Promise<ImportedRecipe> {
+): Promise<ImportedRecipe | CreatedRecipe[]> {
   const token = await getToken()
   const formData = new FormData()
   if (input.text) formData.append('text', input.text)
