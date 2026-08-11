@@ -8,7 +8,7 @@ import FilterInfoPopover from './FilterInfoPopover'
 import { useTranslatedReview } from '../hooks/useTranslatedReview'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { useRecipe, useRecipes, deleteRecipe, submitForReview } from '../hooks/useRecipes'
+import { useRecipe, useRecipes, deleteRecipe, submitForReview, disputeDuplicate } from '../hooks/useRecipes'
 import { OWNER_USER_ID } from '../lib/admin'
 import { ApiError, apiFetch } from '../lib/api'
 import { useWakeLock } from '../hooks/useWakeLock'
@@ -291,6 +291,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
   }
 
   const [submitting, setSubmitting] = useState(false)
+  const [disputing, setDisputing] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [reviewResult, setReviewResult] = useState<QualityReview | null>(null)
   const [revisionsOpen, setRevisionsOpen] = useState(false)
@@ -363,6 +364,20 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
       showToast(message, 'error')
     } finally {
       setSubmitting(false)
+    }
+  }
+
+  async function handleDisputeDuplicate() {
+    if (!id) return
+    setDisputing(true)
+    try {
+      await disputeDuplicate(id, undefined, getToken)
+      showToast(tx.disputeSubmitted, 'success')
+      await reloadRecipe()
+    } catch {
+      showToast(tx.submissionFailed, 'error')
+    } finally {
+      setDisputing(false)
     }
   }
 
@@ -773,6 +788,29 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
               </div>
             )
           })()}
+
+          {canEdit && recipe.status === 'rejected' && recipe.duplicateReview?.isDuplicate && (
+            <div className="card p-4 mb-4 border border-red-400/20">
+              <p className="text-sm font-semibold text-cream mb-1">{tx.duplicateBlockedTitle}</p>
+              <p className="text-xs text-cream/60 mb-3">{tx.duplicateBlockedIntro(recipe.duplicateReview.matchedRecipeTitle)}</p>
+              <div className="flex items-center gap-3">
+                <Link to={`/recipes/${recipe.duplicateReview.matchedRecipeId}`} className="text-xs text-amber hover:text-amber/80 transition-colors">
+                  {tx.viewSimilarRecipe}
+                </Link>
+                {recipe.disputeStatus === 'none' && (
+                  <button type="button" onClick={handleDisputeDuplicate} disabled={disputing} className="btn-ghost text-xs">
+                    {tx.disputeThisDecision}
+                  </button>
+                )}
+                {recipe.disputeStatus === 'pending' && (
+                  <span className="text-xs text-cream/40">{tx.disputeUnderReview}</span>
+                )}
+                {recipe.disputeStatus === 'denied' && (
+                  <span className="text-xs text-cream/40">{tx.disputeWasDenied}</span>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* AI review results - either the outcome of the submission just
               made, or the recipe's last stored review (so a rejected recipe

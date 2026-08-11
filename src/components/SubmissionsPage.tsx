@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@clerk/react'
-import { useSubmissionsFeed } from '../hooks/useRecipes'
+import { useSubmissionsFeed, useDuplicateDisputes, resolveDuplicateDispute } from '../hooks/useRecipes'
 import { useLanguage } from '../hooks/useLanguage'
 import { useTranslatedReview } from '../hooks/useTranslatedReview'
 import type { QualityFinding, Recipe } from '../types'
 import { t } from "../i18n";
+import { OWNER_USER_ID } from '../lib/admin'
 
 const SEVERITY_CLASS: Record<QualityFinding['severity'], string> = {
   critical: 'bg-red-500/10 text-red-400',
@@ -78,9 +79,64 @@ function SubmissionCard({ recipe: r, expanded: isExpanded, onToggle }: Submissio
   )
 }
 
+interface DisputeCardProps {
+  recipe: Recipe
+  onResolved: () => void
+}
+
+function DisputeCard({ recipe: r, onResolved }: DisputeCardProps) {
+  const { lang } = useLanguage()
+        const tx = t[lang]
+  const navigate = useNavigate()
+  const { getToken } = useAuth()
+  const [resolving, setResolving] = useState(false)
+
+  async function resolve(approve: boolean) {
+    setResolving(true)
+    try {
+      await resolveDuplicateDispute(r.id, approve, getToken)
+      onResolved()
+    } finally {
+      setResolving(false)
+    }
+  }
+
+  return (
+    <div className="card p-4">
+      <button type="button" onClick={() => navigate(`/recipes/${r.id}`)} className="font-serif text-base font-medium text-cream hover:text-amber transition-colors text-start block mb-1">
+        {r.title}
+      </button>
+      {r.duplicateReview && (
+        <>
+          <p className="text-xs text-cream/50 mb-1">
+            {tx.duplicateBlockedIntro(r.duplicateReview.matchedRecipeTitle)}
+          </p>
+          <p className="text-xs text-cream/30 mb-3">{r.duplicateReview.reason}</p>
+        </>
+      )}
+      {r.duplicateReview && (
+        <Link to={`/recipes/${r.duplicateReview.matchedRecipeId}`} className="text-xs text-amber hover:text-amber/80 transition-colors">
+          {tx.viewSimilarRecipe}
+        </Link>
+      )}
+      <div className="flex items-center gap-2 mt-3">
+        <button type="button" disabled={resolving} onClick={() => resolve(true)} className="btn-ghost text-xs">
+          {tx.approveDispute}
+        </button>
+        <button type="button" disabled={resolving} onClick={() => resolve(false)} className="btn-ghost text-xs">
+          {tx.denyDispute}
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export default function SubmissionsPage() {
   const { lang } = useLanguage()
         const tx = t[lang]
+  const { userId } = useAuth()
+  const isOwner = userId === OWNER_USER_ID
+  const { recipes: disputes, loading: disputesLoading, reload: reloadDisputes } = useDuplicateDisputes(isOwner)
   const { recipes, loading } = useSubmissionsFeed()
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
 
@@ -102,6 +158,17 @@ export default function SubmissionsPage() {
         <p className="text-sm text-cream/40 mb-6">
           {tx.recentAIQualityReviewOutcomesAcross}
         </p>
+
+        {isOwner && !disputesLoading && disputes.length > 0 && (
+          <div className="mb-8">
+            <h2 className="font-serif text-lg font-bold text-cream mb-3">{tx.duplicateDisputes}</h2>
+            <div className="space-y-3">
+              {disputes.map(r => (
+                <DisputeCard key={r.id} recipe={r} onResolved={reloadDisputes} />
+              ))}
+            </div>
+          </div>
+        )}
 
         {loading ? (
           <p className="text-cream/30 text-sm">{tx.loading}</p>
