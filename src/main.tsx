@@ -5,6 +5,7 @@ import { LanguageProvider } from './context/LanguageContext'
 import { ThemeProvider } from './context/ThemeContext'
 import { LocalizedClerkProvider } from './context/LocalizedClerkProvider'
 import { ToastProvider } from './context/ToastContext'
+import JobsWatcher from './components/JobsWatcher'
 import './index.css'
 import App from './App.tsx'
 
@@ -19,6 +20,7 @@ createRoot(document.getElementById('root')!).render(
         <LanguageProvider>
           <LocalizedClerkProvider>
             <ToastProvider>
+              <JobsWatcher />
               <App />
             </ToastProvider>
           </LocalizedClerkProvider>
