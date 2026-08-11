@@ -18,6 +18,7 @@ import MyRecipesPage from './components/MyRecipesPage'
 import SubmissionsPage from './components/SubmissionsPage'
 import MealPlanPage from './components/MealPlanPage'
 import ChefProfilePage from './components/ChefProfilePage'
+import LeaderboardPage from './components/LeaderboardPage'
 import TimerPanel from './components/TimerPanel'
 import ShoppingListPanel from './components/ShoppingListPanel'
 import ScrollToTopButton from './components/ScrollToTopButton'
@@ -157,6 +158,7 @@ export default function App() {
           <Route path="/submissions" element={<SubmissionsPage />} />
           <Route path="/meal-plan" element={<MealPlanPage onAddToShoppingList={shoppingList.addItems} />} />
           <Route path="/chef/:userId" element={<ChefProfilePage />} />
+          <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route
             path="/recipes/:id"
             element={

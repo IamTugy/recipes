@@ -48,6 +48,7 @@ export default function Sidebar({ sidebar }: SidebarProps) {
   ]
 
   const moreLinks: SidebarLinkDef[] = [
+    { key: 'leaderboard', label: lang === 'he' ? 'טבלת דירוג' : 'Leaderboard', path: '/leaderboard', icon: <span className="w-4 h-4 flex items-center justify-center text-sm">🏆</span> },
     { key: 'feature-requests', label: lang === 'he' ? 'בקש פיצ\'ר חדש' : 'Feature Requests', path: '/feature-requests', icon: <span className="w-4 h-4 flex items-center justify-center text-sm">💡</span> },
     {
       key: 'submissions',

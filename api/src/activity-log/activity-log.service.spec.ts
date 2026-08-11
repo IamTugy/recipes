@@ -81,4 +81,67 @@ describe('ActivityLogService', () => {
       { $group: { _id: '$_id.recipeId', count: { $sum: 1 } } },
     ])
   })
+
+  it('pointsByUser sums per-action points, applies bonus rules, and sorts descending', async () => {
+    const aggregate = jest.fn().mockResolvedValue([
+      { _id: 'user_1', points: 55 },
+      { _id: 'user_2', points: 8 },
+    ])
+    const moduleRef = await Test.createTestingModule({
+      providers: [ActivityLogService, { provide: getModelToken(ActivityLog.name), useValue: { aggregate } }],
+    }).compile()
+
+    const service = moduleRef.get(ActivityLogService)
+    const result = await service.pointsByUser(
+      { recipe_published: 50, rating_given: 8 },
+      [{ action: 'rating_given', metadataKey: 'hasPhoto', bonus: 5 }],
+      { limit: 20 },
+    )
+
+    expect(result.get('user_1')).toBe(55)
+    expect(result.get('user_2')).toBe(8)
+    const pipeline = aggregate.mock.calls[0][0]
+    expect(pipeline).toEqual([
+      {
+        $addFields: {
+          points: {
+            $add: [
+              {
+                $switch: {
+                  branches: [
+                    { case: { $eq: ['$action', 'recipe_published'] }, then: 50 },
+                    { case: { $eq: ['$action', 'rating_given'] }, then: 8 },
+                  ],
+                  default: 0,
+                },
+              },
+              {
+                $cond: [
+                  { $and: [{ $eq: ['$action', 'rating_given'] }, { $eq: ['$metadata.hasPhoto', true] }] },
+                  5,
+                  0,
+                ],
+              },
+            ],
+          },
+        },
+      },
+      { $group: { _id: '$userId', points: { $sum: '$points' } } },
+      { $sort: { points: -1 } },
+      { $limit: 20 },
+    ])
+  })
+
+  it('pointsByUser scopes to specific userIds when provided', async () => {
+    const aggregate = jest.fn().mockResolvedValue([{ _id: 'user_1', points: 10 }])
+    const moduleRef = await Test.createTestingModule({
+      providers: [ActivityLogService, { provide: getModelToken(ActivityLog.name), useValue: { aggregate } }],
+    }).compile()
+
+    const service = moduleRef.get(ActivityLogService)
+    await service.pointsByUser({ recipe_created: 5 }, [], { userIds: ['user_1'] })
+
+    const pipeline = aggregate.mock.calls[0][0]
+    expect(pipeline[0]).toEqual({ $match: { userId: { $in: ['user_1'] } } })
+  })
 })
