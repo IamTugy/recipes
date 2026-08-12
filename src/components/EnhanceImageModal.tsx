@@ -14,18 +14,51 @@ interface EnhanceImageModalProps {
 
 interface Preset {
   label: { he: string; en: string }
-  instructions: string
+  instructions: { he: string; en: string }
 }
 
 // Quick-suggestion chips, same idea as Photoroom/Canva Magic Edit/Google
 // Photos Magic Editor's preset styles - they fill the text box rather than
-// firing immediately, so the request stays visible and editable.
+// firing immediately, so the request stays visible and editable. Each
+// preset's text is written in the user's own language (Gemini understands
+// either fine) rather than always English, matching what the chip itself
+// says.
 const PRESETS: Preset[] = [
-  { label: { he: 'מקצועי', en: 'Professional' }, instructions: 'Give it a professional studio food-photography look: clean styling, soft even lighting, and a polished composition.' },
-  { label: { he: 'בטבע', en: 'In nature' }, instructions: 'Show the dish outdoors in a natural setting, like on a rustic wooden table with soft natural sunlight.' },
-  { label: { he: 'רקע נקי', en: 'Clean background' }, instructions: 'Simplify and blur the background so the dish is the clear focus.' },
-  { label: { he: 'תאורה חמה', en: 'Warm & cozy' }, instructions: 'Give it warm, cozy evening lighting like a home kitchen.' },
-  { label: { he: 'מקרוב', en: 'Close-up' }, instructions: 'Reframe as a close-up shot emphasizing the food\'s texture and detail.' },
+  {
+    label: { he: 'מקצועי', en: 'Professional' },
+    instructions: {
+      he: 'תנו לזה מראה מקצועי של צילום אוכל בסטודיו: עיצוב נקי, תאורה רכה ואחידה, וקומפוזיציה מלוטשת.',
+      en: 'Give it a professional studio food-photography look: clean styling, soft even lighting, and a polished composition.',
+    },
+  },
+  {
+    label: { he: 'בטבע', en: 'In nature' },
+    instructions: {
+      he: 'הציגו את המנה בחוץ בסביבה טבעית, כמו על שולחן עץ כפרי עם אור שמש טבעי ורך.',
+      en: 'Show the dish outdoors in a natural setting, like on a rustic wooden table with soft natural sunlight.',
+    },
+  },
+  {
+    label: { he: 'רקע נקי', en: 'Clean background' },
+    instructions: {
+      he: 'פשטו וטשטשו את הרקע כך שהמנה תהיה במוקד הברור.',
+      en: 'Simplify and blur the background so the dish is the clear focus.',
+    },
+  },
+  {
+    label: { he: 'תאורה חמה', en: 'Warm & cozy' },
+    instructions: {
+      he: 'תנו לזה תאורת ערב חמה ונעימה כמו במטבח ביתי.',
+      en: 'Give it warm, cozy evening lighting like a home kitchen.',
+    },
+  },
+  {
+    label: { he: 'מקרוב', en: 'Close-up' },
+    instructions: {
+      he: 'מסגרו מחדש כתמונת קלוז-אפ שמדגישה את המרקם והפרטים של המאכל.',
+      en: 'Reframe as a close-up shot emphasizing the food\'s texture and detail.',
+    },
+  },
 ]
 
 export default function EnhanceImageModal({ imageUrl, uploadRecipeId, lang, onCancel, onApplied }: EnhanceImageModalProps) {
@@ -39,8 +72,26 @@ export default function EnhanceImageModal({ imageUrl, uploadRecipeId, lang, onCa
   // like never even reaches "undo" territory.
   const [resultUrl, setResultUrl] = useState<string | null>(null)
 
-  function applyPreset(preset: Preset) {
-    setInstructions(prev => (prev.trim() ? `${prev.trim()}. ${preset.instructions}` : preset.instructions))
+  // Each preset lives on its own line, so combining several stays readable
+  // instead of running together into one dense sentence. Clicking an
+  // already-picked preset removes just its line (toggle), same as the chip
+  // un-highlighting - clicking again re-adds it.
+  function togglePreset(preset: Preset) {
+    const text = preset.instructions[lang]
+    setInstructions(prev => {
+      const lines = prev.split('\n').filter(line => line.trim() !== '')
+      const index = lines.indexOf(text)
+      if (index !== -1) {
+        lines.splice(index, 1)
+      } else {
+        lines.push(text)
+      }
+      return lines.length ? `${lines.join('\n')}\n` : ''
+    })
+  }
+
+  function isPresetPicked(preset: Preset): boolean {
+    return instructions.split('\n').includes(preset.instructions[lang])
   }
 
   async function handleGenerate() {
@@ -105,17 +156,25 @@ export default function EnhanceImageModal({ imageUrl, uploadRecipeId, lang, onCa
       ) : (
         <>
           <div className="flex flex-wrap gap-1.5">
-            {PRESETS.map(preset => (
-              <button
-                key={preset.label.en}
-                type="button"
-                onClick={() => applyPreset(preset)}
-                disabled={enhancing}
-                className="px-2.5 py-1 rounded-full text-xs font-medium border border-tint/10 text-cream/60 hover:text-cream/90 hover:border-amber/30 transition-colors disabled:opacity-40"
-              >
-                {lang === 'he' ? preset.label.he : preset.label.en}
-              </button>
-            ))}
+            {PRESETS.map(preset => {
+              const picked = isPresetPicked(preset)
+              return (
+                <button
+                  key={preset.label.en}
+                  type="button"
+                  onClick={() => togglePreset(preset)}
+                  disabled={enhancing}
+                  aria-pressed={picked}
+                  className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-colors disabled:opacity-40 ${
+                    picked
+                      ? 'bg-amber/15 border-amber/40 text-amber'
+                      : 'border-tint/10 text-cream/60 hover:text-cream/90 hover:border-amber/30'
+                  }`}
+                >
+                  {lang === 'he' ? preset.label.he : preset.label.en}
+                </button>
+              )
+            })}
           </div>
 
           <textarea
@@ -124,7 +183,7 @@ export default function EnhanceImageModal({ imageUrl, uploadRecipeId, lang, onCa
             disabled={enhancing}
             placeholder={tx.whatWouldYouLikeToChange}
             rows={3}
-            maxLength={300}
+            maxLength={600}
             dir={lang === 'he' ? 'rtl' : 'ltr'}
             className="w-full bg-tint/[0.03] border border-tint/10 rounded-lg px-3 py-2 text-sm text-cream/80 placeholder-cream/25 outline-none focus:border-amber/30 transition-colors resize-none disabled:opacity-50"
           />
