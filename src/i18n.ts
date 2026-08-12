@@ -460,6 +460,9 @@ export const t = {
       viewResult: 'צפייה בתוצאה',
       manageDisputeOnRecipePage: 'לצפייה או ערעור, עברו לעמוד המתכון',
       newSubmission: 'ההגשה החדשה',
+      downloadRecipePdf: 'הורדת PDF',
+      generatingPdf: 'מכינים PDF...',
+      pdfGenerationFailed: 'יצירת ה-PDF נכשלה, נסו שוב',
 },
   en: {
     siteTitle: "Tugy's Cookbook",
@@ -887,6 +890,9 @@ export const t = {
     viewResult: 'View result',
     manageDisputeOnRecipePage: 'Go to the recipe page to view or dispute this',
     newSubmission: 'New submission',
+    downloadRecipePdf: 'Download PDF',
+    generatingPdf: 'Generating PDF...',
+    pdfGenerationFailed: 'Could not generate the PDF - try again',
 },
 }
 

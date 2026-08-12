@@ -28,6 +28,7 @@ import ReviewItem, { type Review } from './ReviewItem'
 import ConfirmDialog from './ConfirmDialog'
 import type { TimerState, RecipeRevision, QualityReview } from '../types'
 import { resizedImage } from '../lib/image'
+import { downloadRecipePdf } from '../lib/recipePdf'
 import SkeletonImage from './SkeletonImage'
 import { useTranslatedText } from '../hooks/useTranslatedText'
 import TranslatedText from './TranslatedText'
@@ -84,6 +85,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
   const [userRating, setUserRating] = useState<number | null>(null)
   const [hoverRating, setHoverRating] = useState<number | null>(null)
   const [shareState, setShareState] = useState<'idle' | 'copied'>('idle')
+  const [pdfGenerating, setPdfGenerating] = useState(false)
   const [noteInput, setNoteInput] = useState('')
   const [reviews, setReviews] = useState<Review[]>([])
   const [reviewComment, setReviewComment] = useState('')
@@ -267,6 +269,18 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
       setShareState('copied')
       setTimeout(() => setShareState('idle'), 2000)
     } catch { /* clipboard unavailable */ }
+  }
+
+  async function handleDownloadPdf() {
+    if (!displayRecipe) return
+    setPdfGenerating(true)
+    try {
+      await downloadRecipePdf(displayRecipe, lang, multiplier)
+    } catch {
+      showToast(tx.pdfGenerationFailed, 'error')
+    } finally {
+      setPdfGenerating(false)
+    }
   }
 
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
@@ -1173,13 +1187,14 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
             )}
 
             <button type="button"
-              onClick={() => window.print()}
-              className="flex items-center gap-1.5 text-sm font-medium text-cream/40 hover:text-cream/70 transition-colors"
+              onClick={() => void handleDownloadPdf()}
+              disabled={pdfGenerating}
+              className="flex items-center gap-1.5 text-sm font-medium text-cream/40 hover:text-cream/70 transition-colors disabled:opacity-50"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6v-8z" />
               </svg>
-              {tx.print}
+              {pdfGenerating ? tx.generatingPdf : tx.downloadRecipePdf}
             </button>
 
 

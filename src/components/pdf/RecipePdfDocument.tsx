@@ -8,7 +8,14 @@ interface RecipePdfDocumentProps {
 }
 
 export default function RecipePdfDocument({ data }: RecipePdfDocumentProps) {
-  const dirStyle = data.isRtl ? { textAlign: 'right' as const } : {}
+  // Cormorant Garamond and Inter (the two Latin-only families pdfStyles.ts
+  // otherwise uses everywhere) have no Hebrew glyphs - only Frank Ruhl
+  // Libre does. Every piece of text that can carry Hebrew content (titles,
+  // headings, ingredient/step/tip text, meta labels, the brand wordmark)
+  // needs this override or it renders as tofu/mismapped glyphs instead of
+  // real Hebrew letters.
+  const dirStyle = data.isRtl ? { textAlign: 'right' as const, fontFamily: 'Frank Ruhl Libre' } : {}
+  const rtlFont = data.isRtl ? { fontFamily: 'Frank Ruhl Libre' } : {}
   const rowDir = data.isRtl ? { flexDirection: 'row-reverse' as const } : {}
   const ingredientsColStyle = data.isRtl
     ? { ...pdfStyles.ingredientsCol, paddingRight: 0, paddingLeft: 16 }
@@ -18,29 +25,29 @@ export default function RecipePdfDocument({ data }: RecipePdfDocumentProps) {
     <Document>
       <Page size="A4" style={pdfStyles.page}>
         <View style={pdfStyles.header}>
-          <Text style={pdfStyles.wordmark}>{data.brandName}</Text>
+          <Text style={[pdfStyles.wordmark, rtlFont]}>{data.brandName}</Text>
         </View>
         <View style={pdfStyles.headerRule} />
 
         <Text style={[pdfStyles.title, dirStyle]}>{data.title}</Text>
-        {data.tag ? <Text style={pdfStyles.tag}>{data.tag}</Text> : null}
+        {data.tag ? <Text style={[pdfStyles.tag, rtlFont]}>{data.tag}</Text> : null}
 
         <View style={pdfStyles.metaRow}>
           <View style={pdfStyles.metaItem}>
             <ClockPdfIcon color={PDF_COLORS.amber} />
-            <Text style={pdfStyles.metaText}>{data.prepTimeText}</Text>
+            <Text style={[pdfStyles.metaText, rtlFont]}>{data.prepTimeText}</Text>
           </View>
           <View style={pdfStyles.metaItem}>
             <ClockPdfIcon color={PDF_COLORS.amber} />
-            <Text style={pdfStyles.metaText}>{data.cookTimeText}</Text>
+            <Text style={[pdfStyles.metaText, rtlFont]}>{data.cookTimeText}</Text>
           </View>
           <View style={pdfStyles.metaItem}>
             <ServingsPdfIcon color={PDF_COLORS.amber} />
-            <Text style={pdfStyles.metaText}>{data.servingsText}</Text>
+            <Text style={[pdfStyles.metaText, rtlFont]}>{data.servingsText}</Text>
           </View>
           <View style={pdfStyles.metaItem}>
             <DifficultyPdfIcon color={PDF_COLORS.amber} />
-            <Text style={pdfStyles.metaText}>{data.difficultyText}</Text>
+            <Text style={[pdfStyles.metaText, rtlFont]}>{data.difficultyText}</Text>
           </View>
         </View>
 
@@ -97,7 +104,7 @@ export default function RecipePdfDocument({ data }: RecipePdfDocumentProps) {
         )}
 
         <View style={pdfStyles.footer} fixed>
-          <Text style={pdfStyles.footerWordmark}>{data.brandName}</Text>
+          <Text style={[pdfStyles.footerWordmark, rtlFont]}>{data.brandName}</Text>
           <Image src={data.qrDataUrl} style={pdfStyles.footerQr} />
         </View>
       </Page>
