@@ -297,6 +297,13 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
   }
 
   async function shareNative() {
+    // Not every browser implements the Web Share API (most desktop browsers
+    // don't) - falling back to a plain clipboard copy means the "Share"
+    // item always does something useful instead of silently not rendering.
+    if (!navigator.share) {
+      await copyShareLink()
+      return
+    }
     try {
       await navigator.share({ title: displayTitle, text: displayDescription, url: getShareUrl() })
     } catch { /* user cancelled */ }
@@ -908,7 +915,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                         className="flex items-center gap-3 w-full text-start px-3 py-2.5 rounded-lg text-sm font-medium text-cream/80 hover:bg-tint/[0.06] transition-colors"
                       >
                         <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14-7H5a2 2 0 00-2 2v14l4-2 3 2 3-2 3 2 3-2V6a2 2 0 00-2-2z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                         </svg>
                         {tx.saveToCollection}
                       </button>
@@ -941,17 +948,15 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                           offered at all. */}
                       {recipe.publishedRevision != null && (
                         <>
-                          {typeof navigator !== 'undefined' && !!navigator.share && (
-                            <button type="button"
-                              onClick={() => { closeActionsMenu(); void shareNative() }}
-                              className="flex items-center gap-3 w-full text-start px-3 py-2.5 rounded-lg text-sm font-medium text-cream/80 hover:bg-tint/[0.06] transition-colors"
-                            >
-                              <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342a3 3 0 100-2.684l-6.44 3.22a3 3 0 100 2.684l6.44-3.22zM8.684 13.342l6.632 3.316m0-11.317l-6.632 3.316" />
-                              </svg>
-                              {tx.share}
-                            </button>
-                          )}
+                          <button type="button"
+                            onClick={() => { closeActionsMenu(); void shareNative() }}
+                            className="flex items-center gap-3 w-full text-start px-3 py-2.5 rounded-lg text-sm font-medium text-cream/80 hover:bg-tint/[0.06] transition-colors"
+                          >
+                            <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342a3 3 0 100-2.684l-6.44 3.22a3 3 0 100 2.684l6.44-3.22zM8.684 13.342l6.632 3.316m0-11.317l-6.632 3.316" />
+                            </svg>
+                            {tx.share}
+                          </button>
                           <button type="button"
                             onClick={() => { closeActionsMenu(); void copyShareLink() }}
                             className="flex items-center gap-3 w-full text-start px-3 py-2.5 rounded-lg text-sm font-medium text-cream/80 hover:bg-tint/[0.06] transition-colors"

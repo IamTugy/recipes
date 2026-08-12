@@ -702,7 +702,7 @@ export const t = {
       share: "Share",
       copyLink: "Copy link",
       copied: "Copied!",
-      addToList: "Add to list",
+      addToList: "Add to shopping list",
       moreActions: "More actions",
       uniqueVisitorsCountedOncePerPerson: "Unique visitors, counted once per person per day",
       newCollection: "New collection...",
