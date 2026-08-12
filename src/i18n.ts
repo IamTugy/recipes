@@ -458,6 +458,8 @@ export const t = {
       jobStatusDone: 'הושלם',
       jobStatusFailed: 'נכשל',
       viewResult: 'צפייה בתוצאה',
+      manageDisputeOnRecipePage: 'לצפייה או ערעור, עברו לעמוד המתכון',
+      newSubmission: 'ההגשה החדשה',
 },
   en: {
     siteTitle: "Tugy's Cookbook",
@@ -883,6 +885,8 @@ export const t = {
     jobStatusDone: 'Done',
     jobStatusFailed: 'Failed',
     viewResult: 'View result',
+    manageDisputeOnRecipePage: 'Go to the recipe page to view or dispute this',
+    newSubmission: 'New submission',
 },
 }
 

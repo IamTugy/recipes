@@ -1,4 +1,4 @@
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useRecipe } from '../hooks/useRecipes'
 import RecipeForm from './RecipeForm'
 import { useLanguage } from '../hooks/useLanguage'
@@ -37,11 +37,47 @@ export default function EditRecipePage() {
   const applySuggestions = searchParams.get('applySuggestions') === '1' && recipe.qualityReview?.suggestedFields
   const existing = applySuggestions ? { ...recipe, ...recipe.qualityReview!.suggestedFields } : recipe
 
-  // Only show the findings checklist right after "Apply changes" - once the
-  // owner has edited and resubmitted, the stored qualityReview no longer
-  // reflects what's on screen.
-  const reviewFindings = applySuggestions ? recipe.qualityReview?.findings : undefined
+  // Shown regardless of how the editor was reached (not just right after
+  // "Apply changes") so the owner can see what the last AI review flagged
+  // while they're actually fixing it, not only on the read-only recipe
+  // page. autoFixedFieldKeys (which findings the AI already patched for
+  // them) only makes sense right after the apply action, since those are
+  // exactly the values pre-filled into the form below.
+  const reviewFindings = recipe.qualityReview?.findings
   const autoFixedFieldKeys = applySuggestions ? Object.keys(recipe.qualityReview?.suggestedFields ?? {}) : undefined
 
-  return <RecipeForm existing={existing} reviewFindings={reviewFindings} autoFixedFieldKeys={autoFixedFieldKeys} />
+  // Mutually exclusive - approving a dispute resets status away from
+  // 'rejected', so only one of these ever shows at once. Rendered above
+  // RecipeForm's own pt-20 section rather than inside it, since RecipeForm
+  // is shared with the blank-draft flow that has nothing to show here.
+  const duplicateBanner = recipe.status === 'rejected' && recipe.duplicateReview?.isDuplicate ? (
+    <div className="card p-4 mb-4 border border-red-400/20">
+      <p className="text-sm font-semibold text-cream mb-1">{tx.duplicateBlockedTitle}</p>
+      <p className="text-xs text-cream/60 mb-3">{tx.duplicateBlockedIntro(recipe.duplicateReview.matchedRecipeTitle)}</p>
+      <div className="flex items-center gap-3">
+        <Link to={`/recipes/${recipe.duplicateReview.matchedRecipeId}`} className="text-xs text-amber hover:text-amber/80 transition-colors">
+          {tx.viewSimilarRecipe}
+        </Link>
+        <Link to={`/recipes/${recipe.id}`} className="text-xs text-cream/40 hover:text-cream/70 transition-colors">
+          {tx.manageDisputeOnRecipePage}
+        </Link>
+      </div>
+    </div>
+  ) : recipe.duplicateReview?.isDuplicate && recipe.disputeStatus === 'approved' ? (
+    <div className="card p-4 mb-4 border border-herb/30">
+      <p className="text-sm font-semibold text-herb mb-1">{tx.disputeApprovedTitle}</p>
+      <p className="text-xs text-cream/60">{tx.disputeApprovedIntro}</p>
+    </div>
+  ) : null
+
+  return (
+    <>
+      {duplicateBanner && (
+        <div className="max-w-2xl mx-auto px-4 pt-20">
+          {duplicateBanner}
+        </div>
+      )}
+      <RecipeForm existing={existing} reviewFindings={reviewFindings} autoFixedFieldKeys={autoFixedFieldKeys} />
+    </>
+  )
 }

@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@clerk/react'
-import { useSubmissionsFeed, useDuplicateDisputes, resolveDuplicateDispute } from '../hooks/useRecipes'
+import { useSubmissionsFeed, useDuplicateDisputes, useRecipe, resolveDuplicateDispute } from '../hooks/useRecipes'
 import { useLanguage } from '../hooks/useLanguage'
 import { useTranslatedReview } from '../hooks/useTranslatedReview'
 import { useToast } from '../hooks/useToast'
+import { resizedImage } from '../lib/image'
+import SkeletonImage from './SkeletonImage'
 import type { QualityFinding, Recipe } from '../types'
 import { t } from "../i18n";
 import { OWNER_USER_ID } from '../lib/admin'
@@ -92,6 +94,7 @@ function DisputeCard({ recipe: r, onResolved }: DisputeCardProps) {
   const { getToken } = useAuth()
   const { showToast } = useToast()
   const [resolving, setResolving] = useState(false)
+  const { recipe: matchedRecipe } = useRecipe(r.duplicateReview?.matchedRecipeId)
 
   async function resolve(approve: boolean) {
     setResolving(true)
@@ -107,6 +110,26 @@ function DisputeCard({ recipe: r, onResolved }: DisputeCardProps) {
 
   return (
     <div className="card p-4">
+      {r.duplicateReview && (
+        <div className="grid grid-cols-2 gap-3 mb-3">
+          <Link to={`/recipes/${r.id}`} className="block">
+            <div className="relative h-24 rounded-lg overflow-hidden bg-tint/[0.04] mb-1">
+              {r.image?.includes('assets.tugy.dev') && (
+                <SkeletonImage src={resizedImage(r.image, 320)} alt={r.title} className="w-full h-full object-cover" loading="lazy" />
+              )}
+            </div>
+            <p className="text-[10px] text-cream/40 truncate">{tx.newSubmission}: {r.title}</p>
+          </Link>
+          <Link to={`/recipes/${r.duplicateReview.matchedRecipeId}`} className="block">
+            <div className="relative h-24 rounded-lg overflow-hidden bg-tint/[0.04] mb-1">
+              {matchedRecipe?.image?.includes('assets.tugy.dev') && (
+                <SkeletonImage src={resizedImage(matchedRecipe.image, 320)} alt={r.duplicateReview.matchedRecipeTitle} className="w-full h-full object-cover" loading="lazy" />
+              )}
+            </div>
+            <p className="text-[10px] text-cream/40 truncate">{r.duplicateReview.matchedRecipeTitle}</p>
+          </Link>
+        </div>
+      )}
       <button type="button" onClick={() => navigate(`/recipes/${r.id}`)} className="font-serif text-base font-medium text-cream hover:text-amber transition-colors text-start block mb-1">
         {r.title}
       </button>
