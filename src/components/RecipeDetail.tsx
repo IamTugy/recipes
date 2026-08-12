@@ -736,6 +736,20 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
               </svg>
               {tx.edit2}
             </button>
+            {/* Never offered for published recipes - deleting those is
+                destructive to something other people rely on/rated. */}
+            {recipe.status !== 'published' && (isAdmin || (isOwner && recipe.publishedRevision == null)) && (
+              <button type="button"
+                onClick={() => setDeleteConfirmOpen(true)}
+                title={tx.delete}
+                aria-label={tx.delete}
+                className="flex items-center justify-center p-2 bg-black/40 backdrop-blur-sm text-white/80 hover:text-red-400 rounded-xl transition-colors border border-white/10"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -956,56 +970,24 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
             </p>
           )}
 
-          {/* Meta grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 print:grid-cols-5 gap-3 print:gap-2">
-            {[
-              { label: tx.prep, value: formatTime(displayRecipe.prepTime), icon: '🔪' },
-              { label: tx.cook, value: formatTime(displayRecipe.cookTime), icon: '🔥' },
-              { label: tx.total, value: formatTime(totalTime), icon: '⏱' },
-              { label: tx.servings, value: scaledServings.toString(), icon: '🍽' },
-            ].map(item => (
-              <div key={item.label} className="bg-tint/[0.03] print:bg-transparent print:border print:border-tint/15 rounded-xl print:rounded-lg p-3 print:p-2 text-center border border-tint/5">
-                <p className="text-xl mb-1">{item.icon}</p>
-                <p className="font-bold text-cream text-lg">{item.value}</p>
-                <p className="text-cream/40 text-xs">{item.label}</p>
-              </div>
-            ))}
-          </div>
+          {/* Actions: cooked / favorite / save / views / share / download PDF */}
+          <div className="print:hidden flex flex-wrap items-center gap-x-4 gap-y-3 mb-5">
+            {canEdit && recipe.publishedRevision != null && !isViewingPublishedContent && (
+              <button type="button"
+                onClick={async () => {
+                  setRevisionsOpen(true)
+                  const revs = revisions ?? await loadRevisions()
+                  const live = revs.find(r => r.revisionNumber === recipe.publishedRevision)
+                  if (live) selectRevision(live)
+                }}
+                className="flex items-center gap-1.5 text-sm font-medium text-herb hover:text-herb/80 transition-colors"
+              >
+                <span>🌐</span>
+                {tx.viewPublishedVersion}
+              </button>
+            )}
 
-          {hasNutrition && (
-            <div className="mt-5">
-              <h2 className="font-serif text-lg font-bold text-cream mb-2">{tx.nutritionTitle}</h2>
-              <table className="w-full text-sm border-collapse">
-                <thead>
-                  <tr className="border-b border-tint/10">
-                    <th className="text-start py-1.5 font-medium text-cream/50"></th>
-                    <th className="text-end py-1.5 font-medium text-cream/50">{tx.per100g}</th>
-                    {displayRecipe.nutrition?.servingWeight && (
-                      <th className="text-end py-1.5 font-medium text-cream/50">
-                        {tx.perServing} ({Math.round(displayRecipe.nutrition.servingWeight)}g)
-                      </th>
-                    )}
-                  </tr>
-                </thead>
-                <tbody>
-                  {nutritionRows.map(row => (
-                    <tr key={row.label} className="border-b border-tint/5">
-                      <td className="py-1.5 text-cream/70">{row.label}</td>
-                      <td className="py-1.5 text-end text-cream font-medium">{row.per100g}</td>
-                      {displayRecipe.nutrition?.servingWeight && (
-                        <td className="py-1.5 text-end text-cream font-medium">{row.perServing}</td>
-                      )}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <p className="text-cream/30 text-xs mt-2">{tx.nutritionDisclaimer}</p>
-            </div>
-          )}
-
-          {/* Primary actions: mark as cooked + rating get the strongest visual weight */}
-          {isViewingPublishedContent && (
-            <div className="print:hidden flex flex-wrap items-center gap-4 mt-5 pt-5 border-t border-tint/[0.06]">
+            {isViewingPublishedContent && (
               <button type="button"
                 onClick={() => id && toggleCooked(id)}
                 aria-pressed={!!id && cookedSlugs.has(id)}
@@ -1024,57 +1006,20 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                   <span className="opacity-70 text-xs">({recipe.cookCount})</span>
                 )}
               </button>
-
-              <div className="flex items-center" onMouseLeave={() => setHoverRating(null)}>
-                {[1, 2, 3, 4, 5].map(n => (
-                  <button
-                    type="button"
-                    key={n}
-                    onClick={() => rate(n)}
-                    onMouseEnter={() => setHoverRating(n)}
-                    className="text-2xl leading-none p-1"
-                  >
-                    <span className={n <= (hoverRating ?? userRating ?? 0) ? 'text-amber' : 'text-cream/20'}>★</span>
-                  </button>
-                ))}
-                {!!recipe.averageRating && (
-                  <span className="text-cream/40 text-xs ms-1.5">
-                    {recipe.averageRating} ({recipe.ratingCount})
-                  </span>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Favorite / share / print / other actions */}
-          <div className={`print:hidden flex flex-wrap items-center gap-x-4 gap-y-3 ${isViewingPublishedContent ? 'mt-4' : 'mt-5 pt-5 border-t border-tint/[0.06]'}`}>
-            {canEdit && recipe.publishedRevision != null && !isViewingPublishedContent && (
-              <button type="button"
-                onClick={async () => {
-                  setRevisionsOpen(true)
-                  const revs = revisions ?? await loadRevisions()
-                  const live = revs.find(r => r.revisionNumber === recipe.publishedRevision)
-                  if (live) selectRevision(live)
-                }}
-                className="flex items-center gap-1.5 text-sm font-medium text-herb hover:text-herb/80 transition-colors"
-              >
-                <span>🌐</span>
-                {tx.viewPublishedVersion}
-              </button>
             )}
 
             {isViewingPublishedContent && (
               <button type="button"
-              onClick={() => toggleFavorite(recipe.id)}
-              className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${
-                favoriteSlugs.has(recipe.id) ? 'text-amber' : 'text-cream/40 hover:text-cream/70'
-              }`}
-            >
-              <svg className="w-4 h-4" fill={favoriteSlugs.has(recipe.id) ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 010-6.364z" />
-              </svg>
-              {tx.favorite}
-            </button>
+                onClick={() => toggleFavorite(recipe.id)}
+                className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${
+                  favoriteSlugs.has(recipe.id) ? 'text-amber' : 'text-cream/40 hover:text-cream/70'
+                }`}
+              >
+                <svg className="w-4 h-4" fill={favoriteSlugs.has(recipe.id) ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 010-6.364z" />
+                </svg>
+                {tx.favorite}
+              </button>
             )}
 
             <div className="relative" ref={collectionMenuRef}>
@@ -1151,27 +1096,6 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
               </span>
             )}
 
-            {recipe.status === 'published' && recipe.ownerId && (
-              <Link to={`/chef/${recipe.ownerId}`} className="flex items-center gap-1 text-cream/30 hover:text-cream/60 text-xs transition-colors">
-                <span>👤</span>
-                {recipe.ownerName
-                  ? (lang === 'he' ? `עוד מ${recipe.ownerName}` : `More from ${recipe.ownerName}`)
-                  : (tx.moreFromThisChef)}
-              </Link>
-            )}
-
-            {displayRecipe.ingredients.length > 0 && (
-              <button type="button"
-                onClick={addAllToShoppingList}
-                className="flex items-center gap-1.5 text-sm font-medium text-cream/40 hover:text-cream/70 transition-colors"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m-10 0a2 2 0 100 4 2 2 0 000-4zm10 0a2 2 0 100 4 2 2 0 000-4z" />
-                </svg>
-                {tx.addToList}
-              </button>
-            )}
-
             {/* Personal recipes (never published) have nothing public to
                 preview or link to, so sharing isn't offered at all. */}
             {recipe.publishedRevision != null && (
@@ -1180,7 +1104,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                 className="flex items-center gap-1.5 text-sm font-medium text-cream/40 hover:text-cream/70 transition-colors"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342a3 3 0 100-2.684l-6.44 3.22a3 3 0 100 2.684l6.44-3.22zM8.684 13.342l6.632 3.316m0-11.317l-6.632 3.316" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v9m0-9l-3.5 3.5M12 4l3.5 3.5M5 15v3a2 2 0 002 2h10a2 2 0 002-2v-3" />
                 </svg>
                 {shareState === 'copied' ? (tx.copied) : (tx.share)}
               </button>
@@ -1194,22 +1118,57 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6v-8z" />
               </svg>
-              {pdfGenerating ? tx.generatingPdf : tx.print}
+              {pdfGenerating ? tx.generatingPdf : tx.downloadRecipePdf}
             </button>
-
-
-            {(isAdmin || (isOwner && recipe.publishedRevision == null)) && (
-              <button type="button"
-                onClick={() => setDeleteConfirmOpen(true)}
-                className="flex items-center gap-1.5 text-sm font-medium text-cream/40 hover:text-red-400 transition-colors"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-                {tx.delete}
-              </button>
-            )}
           </div>
+
+          {/* Meta grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 print:grid-cols-5 gap-3 print:gap-2">
+            {[
+              { label: tx.prep, value: formatTime(displayRecipe.prepTime), icon: '🔪' },
+              { label: tx.cook, value: formatTime(displayRecipe.cookTime), icon: '🔥' },
+              { label: tx.total, value: formatTime(totalTime), icon: '⏱' },
+              { label: tx.servings, value: scaledServings.toString(), icon: '🍽' },
+            ].map(item => (
+              <div key={item.label} className="bg-tint/[0.03] print:bg-transparent print:border print:border-tint/15 rounded-xl print:rounded-lg p-3 print:p-2 text-center border border-tint/5">
+                <p className="text-xl mb-1">{item.icon}</p>
+                <p className="font-bold text-cream text-lg">{item.value}</p>
+                <p className="text-cream/40 text-xs">{item.label}</p>
+              </div>
+            ))}
+          </div>
+
+          {hasNutrition && (
+            <div className="mt-5">
+              <h2 className="font-serif text-lg font-bold text-cream mb-2">{tx.nutritionTitle}</h2>
+              <table className="w-full text-sm border-collapse">
+                <thead>
+                  <tr className="border-b border-tint/10">
+                    <th className="text-start py-1.5 font-medium text-cream/50"></th>
+                    <th className="text-end py-1.5 font-medium text-cream/50">{tx.per100g}</th>
+                    {displayRecipe.nutrition?.servingWeight && (
+                      <th className="text-end py-1.5 font-medium text-cream/50">
+                        {tx.perServing} ({Math.round(displayRecipe.nutrition.servingWeight)}g)
+                      </th>
+                    )}
+                  </tr>
+                </thead>
+                <tbody>
+                  {nutritionRows.map(row => (
+                    <tr key={row.label} className="border-b border-tint/5">
+                      <td className="py-1.5 text-cream/70">{row.label}</td>
+                      <td className="py-1.5 text-end text-cream font-medium">{row.per100g}</td>
+                      {displayRecipe.nutrition?.servingWeight && (
+                        <td className="py-1.5 text-end text-cream font-medium">{row.perServing}</td>
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <p className="text-cream/30 text-xs mt-2">{tx.nutritionDisclaimer}</p>
+            </div>
+          )}
+
         </div>
 
         {/* Portion control */}
@@ -1256,7 +1215,19 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
         <div className="grid grid-cols-1 sm:grid-cols-5 print:grid-cols-5 gap-6 print:gap-0">
           {/* Ingredients */}
           {displayRecipe.ingredients.length > 0 && <div className="sm:col-span-2 print:col-span-2 card p-5 bg-amber/[0.04] border-amber/10 h-fit print:p-0 print:pe-5 print:border-0 print:border-e print:border-tint/20 print:bg-transparent print:rounded-none">
-            <h2 id="ingredients-heading" className="font-serif text-xl font-bold text-cream mb-4 scroll-mt-20">{tx.ingredients}</h2>
+            <div className="flex items-center justify-between gap-2 mb-4">
+              <h2 id="ingredients-heading" className="font-serif text-xl font-bold text-cream scroll-mt-20">{tx.ingredients}</h2>
+              <button type="button"
+                onClick={addAllToShoppingList}
+                title={tx.addToList}
+                className="print:hidden flex items-center gap-1.5 text-xs font-medium text-cream/40 hover:text-cream/70 transition-colors"
+              >
+                <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m-10 0a2 2 0 100 4 2 2 0 000-4zm10 0a2 2 0 100 4 2 2 0 000-4z" />
+                </svg>
+                {tx.addToList}
+              </button>
+            </div>
             <div className="space-y-4">
               {displayRecipe.ingredients.map((group, gi) => {
                 const hasGroupLabel = !!(group.group || group.groupEn)
@@ -1584,6 +1555,27 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
           <h2 id="reviews-heading" className="font-serif text-lg font-bold text-cream mb-3 flex items-center gap-2 scroll-mt-20">
             <span>💬</span> {tx.reviews}
           </h2>
+          <div className="flex items-center gap-1.5 mb-4" onMouseLeave={() => setHoverRating(null)}>
+            <div className="flex items-center">
+              {[1, 2, 3, 4, 5].map(n => (
+                <button
+                  type="button"
+                  key={n}
+                  onClick={() => rate(n)}
+                  onMouseEnter={() => setHoverRating(n)}
+                  aria-label={`${n} ★`}
+                  className="text-2xl leading-none p-1"
+                >
+                  <span className={n <= (hoverRating ?? userRating ?? 0) ? 'text-amber' : 'text-cream/20'}>★</span>
+                </button>
+              ))}
+            </div>
+            {!!recipe.averageRating && (
+              <span className="text-cream/40 text-xs">
+                {recipe.averageRating} ({recipe.ratingCount})
+              </span>
+            )}
+          </div>
           {!!recipe.ratingCount && distribution && (
             <div className="flex flex-col gap-1 mb-4">
               {([5, 4, 3, 2, 1] as const).map(star => {
