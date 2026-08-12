@@ -7,6 +7,17 @@ interface RecipePdfDocumentProps {
   data: PdfRecipeData
 }
 
+// Per-field text can fall back to the other language's value when a
+// translation is missing (see buildPdfRecipeData) - e.g. an English-mode PDF
+// whose step group only has a Hebrew title. `dirStyle`/`rtlFont` key off the
+// document's overall isRtl flag, so they miss this case and Inter renders
+// the Hebrew characters as tofu. This catches it per-string regardless of
+// the document's language.
+const hebrewCharPattern = /[֐-׿]/
+function scriptFont(text?: string) {
+  return text && hebrewCharPattern.test(text) ? { fontFamily: 'Frank Ruhl Libre' } : {}
+}
+
 export default function RecipePdfDocument({ data }: RecipePdfDocumentProps) {
   // Cormorant Garamond and Inter (the two Latin-only families pdfStyles.ts
   // otherwise uses everywhere) have no Hebrew glyphs - only Frank Ruhl
@@ -50,8 +61,8 @@ export default function RecipePdfDocument({ data }: RecipePdfDocumentProps) {
         <Image src={data.qrDataUrl} style={pdfStyles.headerQr} />
         <View style={pdfStyles.headerRule} />
 
-        <Text style={[pdfStyles.title, rtlFont]}>{data.title}</Text>
-        {data.tag ? <Text style={[pdfStyles.tag, rtlFont]}>{data.tag}</Text> : null}
+        <Text style={[pdfStyles.title, rtlFont, scriptFont(data.title)]}>{data.title}</Text>
+        {data.tag ? <Text style={[pdfStyles.tag, rtlFont, scriptFont(data.tag)]}>{data.tag}</Text> : null}
 
         <View style={pdfStyles.metaRow}>
           <View style={[pdfStyles.metaItem, rowDir]}>
@@ -87,13 +98,14 @@ export default function RecipePdfDocument({ data }: RecipePdfDocumentProps) {
               // page - matches @react-pdf/renderer's own recommended pattern
               // for list-like content.
               <View key={gi} wrap={false}>
-                {group.label && <Text style={[pdfStyles.groupLabel, dirStyle]}>{group.label}</Text>}
+                {group.label && <Text style={[pdfStyles.groupLabel, dirStyle, scriptFont(group.label)]}>{group.label}</Text>}
                 {group.items.map((item, ii) => {
                   const amountUnitText = [item.amountText, item.unitText].filter(Boolean).join(' ')
+                  const ingredientLine = `${amountUnitText} ${item.nameText} ${item.noteText ?? ''}`
                   return (
                     <View key={ii} style={[pdfStyles.ingredientRow, rowDir]} wrap={false}>
                       <View style={[pdfStyles.ingredientBullet, bulletMargin]} />
-                      <Text style={[pdfStyles.ingredientText, dirStyle]}>
+                      <Text style={[pdfStyles.ingredientText, dirStyle, scriptFont(ingredientLine)]}>
                         {amountUnitText ? `${amountUnitText} ` : ''}{item.nameText}
                         {item.noteText ? ` (${item.noteText})` : ''}
                       </Text>
@@ -108,13 +120,13 @@ export default function RecipePdfDocument({ data }: RecipePdfDocumentProps) {
             <Text style={[pdfStyles.columnHeading, dirStyle]}>{data.methodHeading}</Text>
             {data.steps.map((group, gi) => (
               <View key={gi} wrap={false}>
-                {group.title && <Text style={[pdfStyles.stepGroupTitle, dirStyle]}>{group.title}</Text>}
+                {group.title && <Text style={[pdfStyles.stepGroupTitle, dirStyle, scriptFont(group.title)]}>{group.title}</Text>}
                 {group.items.map((step, si) => (
                   <View key={si} style={[pdfStyles.stepRow, rowDir]} wrap={false}>
                     <View style={[pdfStyles.stepNumber, stepNumberMargin]}>
                       <Text style={pdfStyles.stepNumberText}>{stepNumsByGroup[gi][si]}</Text>
                     </View>
-                    <Text style={[pdfStyles.stepText, dirStyle]}>{step.text}</Text>
+                    <Text style={[pdfStyles.stepText, dirStyle, scriptFont(step.text)]}>{step.text}</Text>
                   </View>
                 ))}
               </View>
@@ -124,9 +136,9 @@ export default function RecipePdfDocument({ data }: RecipePdfDocumentProps) {
 
         {data.tips && data.tips.length > 0 && (
           <View style={pdfStyles.tipsSection} wrap={false}>
-            <Text style={[pdfStyles.tipsHeading, dirStyle]}>{data.tipsHeading}</Text>
+            <Text style={[pdfStyles.tipsHeading, dirStyle, scriptFont(data.tipsHeading)]}>{data.tipsHeading}</Text>
             {data.tips.map((tip, i) => (
-              <Text key={i} style={[pdfStyles.tipRow, dirStyle]}>• {tip}</Text>
+              <Text key={i} style={[pdfStyles.tipRow, dirStyle, scriptFont(tip)]}>• {tip}</Text>
             ))}
           </View>
         )}
