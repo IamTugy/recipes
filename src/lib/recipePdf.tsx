@@ -1,7 +1,6 @@
-import { pdf } from '@react-pdf/renderer'
 import QRCode from 'qrcode'
-import RecipePdfDocument from '../components/pdf/RecipePdfDocument'
 import { formatTime, scaleAmount } from '../utils/format'
+import { resizedImage } from './image'
 import { t, heUnit } from '../i18n'
 import type { Recipe, Lang } from '../types'
 
@@ -32,6 +31,7 @@ export interface PdfRecipeData {
   imageUrl?: string
   prepTimeText: string
   cookTimeText: string
+  totalTimeText: string
   servingsText: string
   difficultyText: string
   ingredientsHeading: string
@@ -77,9 +77,10 @@ function buildPdfRecipeData(recipe: Recipe, lang: Lang, multiplier: number, qrDa
   return {
     title,
     tag: tagParts.join(' · '),
-    imageUrl: recipe.image,
+    imageUrl: resizedImage(recipe.image, 1200),
     prepTimeText: `${tx.prep} ${formatTime(recipe.prepTime)}`,
     cookTimeText: `${tx.cook} ${formatTime(recipe.cookTime)}`,
+    totalTimeText: `${tx.total} ${formatTime(recipe.prepTime + recipe.cookTime)}`,
     servingsText: `${Math.round(recipe.servings * multiplier)} ${tx.servings}`,
     difficultyText: tx.difficulty[recipe.difficulty],
     ingredientsHeading: tx.ingredients2,
@@ -95,6 +96,15 @@ function buildPdfRecipeData(recipe: Recipe, lang: Lang, multiplier: number, qrDa
 }
 
 export async function downloadRecipePdf(recipe: Recipe, lang: Lang, multiplier: number): Promise<void> {
+  // Dynamically imported so @react-pdf/renderer (and RecipePdfDocument's font
+  // registrations) only load when a user actually requests a PDF, instead of
+  // bloating the main entry bundle on every route. The caller already wraps
+  // this call in a `pdfGenerating` loading state, so the extra async delay
+  // from fetching these chunks is already covered.
+  const [{ pdf }, { default: RecipePdfDocument }] = await Promise.all([
+    import('@react-pdf/renderer'),
+    import('../components/pdf/RecipePdfDocument'),
+  ])
   const shareUrl = `${window.location.origin}/share/recipes/${recipe.id}`
   const qrDataUrl = await QRCode.toDataURL(shareUrl, { margin: 1, width: 128 })
   const data = buildPdfRecipeData(recipe, lang, multiplier, qrDataUrl)

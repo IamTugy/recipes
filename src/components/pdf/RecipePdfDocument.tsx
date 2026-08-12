@@ -17,9 +17,21 @@ export default function RecipePdfDocument({ data }: RecipePdfDocumentProps) {
   const dirStyle = data.isRtl ? { textAlign: 'right' as const, fontFamily: 'Frank Ruhl Libre' } : {}
   const rtlFont = data.isRtl ? { fontFamily: 'Frank Ruhl Libre' } : {}
   const rowDir = data.isRtl ? { flexDirection: 'row-reverse' as const } : {}
+  // ingredientBullet/stepNumber carry their own marginRight to space them from
+  // the text that follows in LTR - when rowDir flips the row to row-reverse
+  // for Hebrew, that margin needs to flip sides too or the gap lands on the
+  // wrong side of the badge.
+  const bulletMargin = data.isRtl ? { marginRight: 0, marginLeft: 6 } : {}
+  const stepNumberMargin = data.isRtl ? { marginRight: 0, marginLeft: 8 } : {}
   const ingredientsColStyle = data.isRtl
     ? { ...pdfStyles.ingredientsCol, paddingRight: 0, paddingLeft: 16 }
     : pdfStyles.ingredientsCol
+  // Numbered continuously across all step groups, matching the screen
+  // (RecipeDetail.tsx), where group 2 continues from group 1's last number
+  // instead of restarting at 1. Computed up front (rather than mutating a
+  // counter inside the JSX map below) per the react-hooks/immutability rule.
+  let stepCounter = 0
+  const stepNumsByGroup = data.steps.map(group => group.items.map(() => ++stepCounter))
 
   return (
     <Document>
@@ -29,23 +41,27 @@ export default function RecipePdfDocument({ data }: RecipePdfDocumentProps) {
         </View>
         <View style={pdfStyles.headerRule} />
 
-        <Text style={[pdfStyles.title, dirStyle]}>{data.title}</Text>
+        <Text style={[pdfStyles.title, rtlFont]}>{data.title}</Text>
         {data.tag ? <Text style={[pdfStyles.tag, rtlFont]}>{data.tag}</Text> : null}
 
         <View style={pdfStyles.metaRow}>
-          <View style={pdfStyles.metaItem}>
+          <View style={[pdfStyles.metaItem, rowDir]}>
             <ClockPdfIcon color={PDF_COLORS.amber} />
             <Text style={[pdfStyles.metaText, rtlFont]}>{data.prepTimeText}</Text>
           </View>
-          <View style={pdfStyles.metaItem}>
+          <View style={[pdfStyles.metaItem, rowDir]}>
             <ClockPdfIcon color={PDF_COLORS.amber} />
             <Text style={[pdfStyles.metaText, rtlFont]}>{data.cookTimeText}</Text>
           </View>
-          <View style={pdfStyles.metaItem}>
+          <View style={[pdfStyles.metaItem, rowDir]}>
+            <ClockPdfIcon color={PDF_COLORS.amber} />
+            <Text style={[pdfStyles.metaText, rtlFont]}>{data.totalTimeText}</Text>
+          </View>
+          <View style={[pdfStyles.metaItem, rowDir]}>
             <ServingsPdfIcon color={PDF_COLORS.amber} />
             <Text style={[pdfStyles.metaText, rtlFont]}>{data.servingsText}</Text>
           </View>
-          <View style={pdfStyles.metaItem}>
+          <View style={[pdfStyles.metaItem, rowDir]}>
             <DifficultyPdfIcon color={PDF_COLORS.amber} />
             <Text style={[pdfStyles.metaText, rtlFont]}>{data.difficultyText}</Text>
           </View>
@@ -59,38 +75,35 @@ export default function RecipePdfDocument({ data }: RecipePdfDocumentProps) {
             {data.ingredients.map((group, gi) => (
               <View key={gi}>
                 {group.label && <Text style={[pdfStyles.groupLabel, dirStyle]}>{group.label}</Text>}
-                {group.items.map((item, ii) => (
-                  <View key={ii} style={[pdfStyles.ingredientRow, rowDir]}>
-                    <View style={pdfStyles.ingredientBullet} />
-                    <Text style={[pdfStyles.ingredientText, dirStyle]}>
-                      {[item.amountText, item.unitText].filter(Boolean).join(' ')} {item.nameText}
-                      {item.noteText ? ` (${item.noteText})` : ''}
-                    </Text>
-                  </View>
-                ))}
+                {group.items.map((item, ii) => {
+                  const amountUnitText = [item.amountText, item.unitText].filter(Boolean).join(' ')
+                  return (
+                    <View key={ii} style={[pdfStyles.ingredientRow, rowDir]}>
+                      <View style={[pdfStyles.ingredientBullet, bulletMargin]} />
+                      <Text style={[pdfStyles.ingredientText, dirStyle]}>
+                        {amountUnitText ? `${amountUnitText} ` : ''}{item.nameText}
+                        {item.noteText ? ` (${item.noteText})` : ''}
+                      </Text>
+                    </View>
+                  )
+                })}
               </View>
             ))}
           </View>
 
           <View style={pdfStyles.methodCol}>
             <Text style={[pdfStyles.columnHeading, dirStyle]}>{data.methodHeading}</Text>
-            {data.steps.map((group, gi) => {
-              let stepNum = 0
-              return (
-                <View key={gi}>
-                  {group.title && <Text style={[pdfStyles.stepGroupTitle, dirStyle]}>{group.title}</Text>}
-                  {group.items.map((step, si) => {
-                    stepNum += 1
-                    return (
-                      <View key={si} style={[pdfStyles.stepRow, rowDir]}>
-                        <Text style={pdfStyles.stepNumber}>{stepNum}</Text>
-                        <Text style={[pdfStyles.stepText, dirStyle]}>{step.text}</Text>
-                      </View>
-                    )
-                  })}
-                </View>
-              )
-            })}
+            {data.steps.map((group, gi) => (
+              <View key={gi}>
+                {group.title && <Text style={[pdfStyles.stepGroupTitle, dirStyle]}>{group.title}</Text>}
+                {group.items.map((step, si) => (
+                  <View key={si} style={[pdfStyles.stepRow, rowDir]}>
+                    <Text style={[pdfStyles.stepNumber, stepNumberMargin]}>{stepNumsByGroup[gi][si]}</Text>
+                    <Text style={[pdfStyles.stepText, dirStyle]}>{step.text}</Text>
+                  </View>
+                ))}
+              </View>
+            ))}
           </View>
         </View>
 
