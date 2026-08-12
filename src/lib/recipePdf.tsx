@@ -1,7 +1,7 @@
 import QRCode from 'qrcode'
 import { formatTime, scaleAmount } from '../utils/format'
 import { resizedImage } from './image'
-import { t, heUnit } from '../i18n'
+import { t, heUnit, canonicalUnit } from '../i18n'
 import type { Recipe, Lang } from '../types'
 
 export interface PdfIngredientItem {
@@ -55,7 +55,8 @@ function buildPdfRecipeData(recipe: Recipe, lang: Lang, multiplier: number, qrDa
     label: (isRtl ? (group.group || group.groupEn) : (group.groupEn || group.group)) || undefined,
     items: group.items.map(item => {
       const scaledAmount = item.amount ? item.amount * multiplier : 0
-      const unit = isRtl ? heUnit(item.unit, scaledAmount) : item.unit
+      const unitCode = canonicalUnit(item.unit)
+      const unit = isRtl ? heUnit(unitCode, scaledAmount) : unitCode
       return {
         amountText: item.amount ? scaleAmount(item.amount, multiplier) : null,
         unitText: unit || null,

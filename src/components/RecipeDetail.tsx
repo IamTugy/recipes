@@ -21,7 +21,7 @@ import { useNote } from '../hooks/useNote'
 import { useTranslatedRecipe } from '../hooks/useTranslatedRecipe'
 import { useAuth } from '@clerk/react'
 import { formatTime, formatSeconds, scaleAmount } from '../utils/format'
-import { t, categoryEmoji, heUnit, difficultyColor } from '../i18n'
+import { t, categoryEmoji, heUnit, canonicalUnit, difficultyColor } from '../i18n'
 import { useLanguage } from '../hooks/useLanguage'
 import { useToast } from '../hooks/useToast'
 import ReviewItem, { type Review } from './ReviewItem'
@@ -605,8 +605,12 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
         .filter(item => !item.linkedRecipeId)
         .map(item => {
           const itemName = lang === 'he' ? item.name : (item.nameEn ?? item.name)
-          if (!item.amount) return { name: itemName, amount: null, unit: item.unit }
-          return { name: itemName, amount: item.amount * multiplier, unit: item.unit }
+          // Normalize to the canonical unit code (not whatever the recipe
+          // happened to store) so aggregation groups matching units
+          // together and the shopping list can localize it correctly.
+          const unit = canonicalUnit(item.unit)
+          if (!item.amount) return { name: itemName, amount: null, unit }
+          return { name: itemName, amount: item.amount * multiplier, unit }
         })
     )
     onAddToShoppingList(items)
@@ -1414,7 +1418,8 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                                 if (!item.amount) return null
                                 const scaled = item.amount * multiplier
                                 const amt = scaleAmount(item.amount, multiplier)
-                                const unit = lang === 'he' ? heUnit(item.unit, scaled) : item.unit
+                                const unitCode = canonicalUnit(item.unit)
+                                const unit = lang === 'he' ? heUnit(unitCode, scaled) : unitCode
                                 if (!unit) return amt
                                 return `${amt} ${unit}`
                               })()}

@@ -2,7 +2,7 @@ import { Link, useParams } from 'react-router-dom'
 import { useCollections } from '../hooks/useCollections'
 import { useRecipes } from '../hooks/useRecipes'
 import { useLanguage } from '../hooks/useLanguage'
-import { heUnit, t } from '../i18n'
+import { heUnit, canonicalUnit, t } from '../i18n'
 import { formatTime, scaleAmount } from '../utils/format'
 
 export default function CollectionPrintPage() {
@@ -118,7 +118,8 @@ export default function CollectionPrintPage() {
                                     ? (lang === 'he' ? (linkedRecipe.titleHe || linkedRecipe.title) : linkedRecipe.title)
                                     : (lang === 'he' ? item.name : (item.nameEn ?? item.name))
                                   const itemNote = lang === 'he' ? item.note : (item.noteEn ?? item.note)
-                                  const unit = lang === 'he' ? heUnit(item.unit, item.amount) : item.unit
+                                  const unitCode = canonicalUnit(item.unit)
+                                  const unit = lang === 'he' ? heUnit(unitCode, item.amount) : unitCode
                                   const amt = item.amount ? scaleAmount(item.amount, 1) : null
                                   return (
                                     <li key={ii} className="flex gap-2 text-sm" dir={lang === 'he' ? 'rtl' : 'ltr'}>

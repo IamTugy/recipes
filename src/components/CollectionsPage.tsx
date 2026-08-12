@@ -8,7 +8,7 @@ import { resizedImage } from '../lib/image'
 import TranslatedText from './TranslatedText'
 import SkeletonImage from './SkeletonImage'
 import ActionsMenu from './ActionsMenu'
-import { t } from "../i18n";
+import { t, canonicalUnit } from "../i18n";
 
 interface CollectionsPageProps {
   onAddToShoppingList: (items: { name: string; amount: number | null; unit: string }[]) => void
@@ -62,7 +62,7 @@ export default function CollectionsPage({ onAddToShoppingList }: CollectionsPage
           .filter(item => !item.linkedRecipeId)
           .map(item => {
             const itemName = lang === 'he' ? item.name : (item.nameEn ?? item.name)
-            return { name: itemName, amount: item.amount || null, unit: item.unit }
+            return { name: itemName, amount: item.amount || null, unit: canonicalUnit(item.unit) }
           })
       )
       onAddToShoppingList(items)

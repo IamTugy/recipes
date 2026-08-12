@@ -28,6 +28,19 @@ export function heUnit(unit: string, amount: number): string {
   return amount === 1 ? forms[0] : forms[1]
 }
 
+// Some recipes have their unit stored as a raw Hebrew word (typed free-text
+// rather than picked from the canonical g/kg/tsp/... list) - heUnit only
+// translates canonical -> Hebrew, so those recipes showed literal Hebrew
+// units even in English mode. This reverses the lookup, so any known
+// Hebrew form (singular or plural) normalizes back to its canonical code
+// before display/aggregation - unrecognized units pass through unchanged.
+const heFormToUnit: Record<string, string> = Object.fromEntries(
+  Object.entries(heUnitForms).flatMap(([unit, [singular, plural]]) => [[singular, unit], [plural, unit]])
+)
+export function canonicalUnit(unit: string): string {
+  return heFormToUnit[unit] ?? unit
+}
+
 // Keep for backward compat
 export const heUnits: Record<string, string> = Object.fromEntries(
   Object.entries(heUnitForms).map(([k, [, plural]]) => [k, plural])

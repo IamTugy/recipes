@@ -5,7 +5,7 @@ import { useRecipes } from '../hooks/useRecipes'
 import { useLanguage } from '../hooks/useLanguage'
 import { useToast } from '../hooks/useToast'
 import AppSelect from './ui/AppSelect'
-import { t } from "../i18n";
+import { t, canonicalUnit } from "../i18n";
 
 interface MealPlanPageProps {
   onAddToShoppingList: (items: { name: string; amount: number | null; unit: string }[]) => void
@@ -81,7 +81,7 @@ export default function MealPlanPage({ onAddToShoppingList }: MealPlanPageProps)
           // component," not a literal item to buy.
           if (item.linkedRecipeId) continue
           const itemName = lang === 'he' ? item.name : (item.nameEn ?? item.name)
-          items.push({ name: itemName, amount: item.amount || null, unit: item.unit })
+          items.push({ name: itemName, amount: item.amount || null, unit: canonicalUnit(item.unit) })
         }
       }
     }
