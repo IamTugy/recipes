@@ -8,7 +8,7 @@ import RecipeSectionNav from './RecipeSectionNav'
 import FilterInfoPopover from './FilterInfoPopover'
 import { useTranslatedReview } from '../hooks/useTranslatedReview'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence, useDragControls } from 'framer-motion'
 import { useRecipe, useRecipes, deleteRecipe, submitForReview, disputeDuplicate } from '../hooks/useRecipes'
 import { OWNER_USER_ID } from '../lib/admin'
 import { ApiError, apiFetch } from '../lib/api'
@@ -64,6 +64,18 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
   const [actionsMenuView, setActionsMenuView] = useState<'root' | 'collections'>('root')
   const [newCollectionName, setNewCollectionName] = useState('')
   const actionsMenuRef = useRef<HTMLDivElement>(null)
+  const actionsMenuDragControls = useDragControls()
+  // Below sm (640px) the menu renders as a bottom sheet (slide up/down,
+  // drag-to-dismiss via the handle); at sm and above it's an anchored
+  // dropdown (fade/rise, no drag) - same markup, different motion values.
+  const [isMobileMenu, setIsMobileMenu] = useState(() => typeof window !== 'undefined' && window.matchMedia('(max-width: 639px)').matches)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 639px)')
+    const handler = () => setIsMobileMenu(mq.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
 
   function closeActionsMenu() {
     setActionsMenuOpen(false)
@@ -259,26 +271,35 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
     showToast(tx.reviewDeleted)
   }
 
-  async function copyShareLink() {
-    // Route through /share/recipes/:id instead of the page's own hash URL -
-    // link-preview crawlers (WhatsApp, iMessage, Slack) don't run JS, so they
-    // need a server-rendered page with this recipe's own og:image/og:title.
-    // Carry the currently-viewed revision along too, so sharing an older
-    // version previews and links to that version, not whatever's live now.
-    // When sharing the live version, tack on the published revision number -
-    // crawlers cache previews per exact URL, so without this, editing a
-    // recipe's photo/title after it's been shared once would leave every
-    // future share stuck showing the old preview forever.
+  // Route through /share/recipes/:id instead of the page's own hash URL -
+  // link-preview crawlers (WhatsApp, iMessage, Slack) don't run JS, so they
+  // need a server-rendered page with this recipe's own og:image/og:title.
+  // Carry the currently-viewed revision along too, so sharing an older
+  // version previews and links to that version, not whatever's live now.
+  // When sharing the live version, tack on the published revision number -
+  // crawlers cache previews per exact URL, so without this, editing a
+  // recipe's photo/title after it's been shared once would leave every
+  // future share stuck showing the old preview forever.
+  function getShareUrl() {
     const shareQuery = viewingRevision
       ? `?rev=${viewingRevision.id}`
       : recipe?.publishedRevision != null ? `?v=${recipe.publishedRevision}` : ''
-    const shareUrl = id
+    return id
       ? `${window.location.origin}/share/recipes/${id}${shareQuery}`
       : window.location.href
+  }
+
+  async function copyShareLink() {
     try {
-      await navigator.clipboard.writeText(shareUrl)
+      await navigator.clipboard.writeText(getShareUrl())
       showToast(tx.copied)
     } catch { /* clipboard unavailable */ }
+  }
+
+  async function shareNative() {
+    try {
+      await navigator.share({ title: displayTitle, text: displayDescription, url: getShareUrl() })
+    } catch { /* user cancelled */ }
   }
 
   async function handleDownloadPdf() {
@@ -752,19 +773,46 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
               </svg>
             </button>
 
-            {actionsMenuOpen && (
-              <>
-                {/* Mobile: dims the page behind the bottom sheet. Desktop's
-                    dropdown closes via the outside-click listener instead,
-                    so no backdrop is needed there. */}
-                <div className="sm:hidden fixed inset-0 z-40 bg-black/50" onClick={closeActionsMenu} />
-                <div
+            <AnimatePresence>
+              {actionsMenuOpen && [
+                // Mobile: dims the page behind the bottom sheet. Desktop's
+                // dropdown closes via the outside-click listener instead, so
+                // no backdrop is needed there.
+                <motion.div key="backdrop"
+                  className="sm:hidden fixed inset-0 z-40 bg-black/50"
+                  onClick={closeActionsMenu}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                />,
+                <motion.div key="panel"
                   role="menu"
                   dir={lang === 'he' ? 'rtl' : 'ltr'}
+                  drag={isMobileMenu ? 'y' : false}
+                  dragControls={actionsMenuDragControls}
+                  dragListener={false}
+                  dragConstraints={{ top: 0, bottom: 0 }}
+                  dragElastic={{ top: 0, bottom: 0.5 }}
+                  onDragEnd={(_e, info) => {
+                    if (info.offset.y > 100 || info.velocity.y > 500) closeActionsMenu()
+                  }}
+                  initial={isMobileMenu ? { y: '100%' } : { opacity: 0, y: -8 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={isMobileMenu ? { y: '100%' } : { opacity: 0, y: -8 }}
+                  transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
                   className={`fixed inset-x-0 bottom-0 z-50 rounded-t-2xl border-t border-tint/10 sm:rounded-xl sm:border sm:absolute sm:inset-x-auto sm:bottom-auto sm:top-full sm:z-30 sm:mt-2 sm:w-72 ${lang === 'he' ? 'sm:left-0' : 'sm:right-0'} bg-bg shadow-2xl p-2 max-h-[75vh] overflow-y-auto`}
                   style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}
                 >
-                  <div className="sm:hidden w-10 h-1 rounded-full bg-tint/20 mx-auto mb-2 mt-1" />
+                  {/* Drag handle - dragging is scoped to this bar (dragListener={false}
+                      + imperative start on pointerdown) so it doesn't fight with
+                      taps/scrolls on the menu items below it. */}
+                  <div
+                    className="sm:hidden -mx-2 px-2 pt-1 pb-3 cursor-grab active:cursor-grabbing touch-none"
+                    onPointerDown={e => actionsMenuDragControls.start(e)}
+                  >
+                    <div className="w-10 h-1 rounded-full bg-tint/20 mx-auto" />
+                  </div>
 
                   {actionsMenuView === 'collections' ? (
                     <div>
@@ -865,6 +913,18 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                         {tx.saveToCollection}
                       </button>
 
+                      {displayRecipe.ingredients.length > 0 && (
+                        <button type="button"
+                          onClick={() => { closeActionsMenu(); addAllToShoppingList() }}
+                          className="flex items-center gap-3 w-full text-start px-3 py-2.5 rounded-lg text-sm font-medium text-cream/80 hover:bg-tint/[0.06] transition-colors"
+                        >
+                          <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m-10 0a2 2 0 100 4 2 2 0 000-4zm10 0a2 2 0 100 4 2 2 0 000-4z" />
+                          </svg>
+                          {tx.addToList}
+                        </button>
+                      )}
+
                       <button type="button"
                         onClick={() => void handleDownloadPdf()}
                         disabled={pdfGenerating}
@@ -880,21 +940,34 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                           public to preview or link to, so sharing isn't
                           offered at all. */}
                       {recipe.publishedRevision != null && (
-                        <button type="button"
-                          onClick={() => { closeActionsMenu(); void copyShareLink() }}
-                          className="flex items-center gap-3 w-full text-start px-3 py-2.5 rounded-lg text-sm font-medium text-cream/80 hover:bg-tint/[0.06] transition-colors"
-                        >
-                          <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 010 5.656l-3 3a4 4 0 01-5.656-5.656l1.5-1.5M10.172 13.828a4 4 0 010-5.656l3-3a4 4 0 015.656 5.656l-1.5 1.5" />
-                          </svg>
-                          {tx.copyLink}
-                        </button>
+                        <>
+                          {typeof navigator !== 'undefined' && !!navigator.share && (
+                            <button type="button"
+                              onClick={() => { closeActionsMenu(); void shareNative() }}
+                              className="flex items-center gap-3 w-full text-start px-3 py-2.5 rounded-lg text-sm font-medium text-cream/80 hover:bg-tint/[0.06] transition-colors"
+                            >
+                              <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342a3 3 0 100-2.684l-6.44 3.22a3 3 0 100 2.684l6.44-3.22zM8.684 13.342l6.632 3.316m0-11.317l-6.632 3.316" />
+                              </svg>
+                              {tx.share}
+                            </button>
+                          )}
+                          <button type="button"
+                            onClick={() => { closeActionsMenu(); void copyShareLink() }}
+                            className="flex items-center gap-3 w-full text-start px-3 py-2.5 rounded-lg text-sm font-medium text-cream/80 hover:bg-tint/[0.06] transition-colors"
+                          >
+                            <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 010 5.656l-3 3a4 4 0 01-5.656-5.656l1.5-1.5M10.172 13.828a4 4 0 010-5.656l3-3a4 4 0 015.656 5.656l-1.5 1.5" />
+                            </svg>
+                            {tx.copyLink}
+                          </button>
+                        </>
                       )}
                     </>
                   )}
-                </div>
-              </>
-            )}
+                </motion.div>,
+              ]}
+            </AnimatePresence>
           </div>
         </div>
       </div>
