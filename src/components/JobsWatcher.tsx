@@ -18,8 +18,24 @@ export default function JobsWatcher() {
   const { lang } = useLanguage()
   const tx = t[lang]
   const toastIdByJobId = useRef(new Map<string, string>())
+  const pollInFlight = useRef(false)
 
   async function poll() {
+    // A slow fetchActiveJobs response can still be pending when the next
+    // interval tick fires - without this guard, an overlapping poll cycle
+    // can read a stale active list after a faster cycle already flipped a
+    // job's toast to its final state, transiently re-adding it as "in
+    // progress" until the next cycle corrects it.
+    if (pollInFlight.current) return
+    pollInFlight.current = true
+    try {
+      await pollOnce()
+    } finally {
+      pollInFlight.current = false
+    }
+  }
+
+  async function pollOnce() {
     let active
     try {
       active = await fetchActiveJobs(getToken)

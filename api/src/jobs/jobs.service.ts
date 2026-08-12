@@ -59,22 +59,45 @@ export class JobsService implements OnModuleInit {
     dedupeKey?: string,
   ): Promise<{ job: JobDocument; isExisting: boolean }> {
     if (dedupeKey) {
-      const cutoff = new Date(Date.now() - DEDUPE_WINDOW_MS)
-      const existing = await this.jobModel
-        .findOne({
-          userId,
-          dedupeKey,
-          $or: [
-            { status: { $in: ['queued', 'running'] } },
-            { status: 'done', finishedAt: { $gte: cutoff } },
-          ],
-        })
-        .sort({ createdAt: -1 })
-        .exec()
+      const existing = await this.findDedupeMatch(userId, dedupeKey)
       if (existing) return { job: existing, isExisting: true }
     }
-    const job = await this.jobModel.create({ userId, type, label, dedupeKey, status: 'queued' })
-    return { job, isExisting: false }
+    try {
+      const job = await this.jobModel.create({ userId, type, label, dedupeKey, status: 'queued' })
+      return { job, isExisting: false }
+    } catch (err) {
+      // A concurrent request for the same userId+dedupeKey won the race and
+      // inserted first, in the gap between this call's findDedupeMatch above
+      // and this create() - the unique partial index (see job.schema.ts)
+      // rejects this insert with a duplicate-key error instead of letting a
+      // second in-flight job through. Treat it the same as finding the match
+      // above: return the other request's job rather than starting a
+      // duplicate run.
+      if (dedupeKey && this.isDuplicateKeyError(err)) {
+        const existing = await this.findDedupeMatch(userId, dedupeKey)
+        if (existing) return { job: existing, isExisting: true }
+      }
+      throw err
+    }
+  }
+
+  private async findDedupeMatch(userId: string, dedupeKey: string): Promise<JobDocument | null> {
+    const cutoff = new Date(Date.now() - DEDUPE_WINDOW_MS)
+    return this.jobModel
+      .findOne({
+        userId,
+        dedupeKey,
+        $or: [
+          { status: { $in: ['queued', 'running'] } },
+          { status: 'done', finishedAt: { $gte: cutoff } },
+        ],
+      })
+      .sort({ createdAt: -1 })
+      .exec()
+  }
+
+  private isDuplicateKeyError(err: unknown): boolean {
+    return typeof err === 'object' && err !== null && (err as { code?: unknown }).code === 11000
   }
 
   // Never throws - callers invoke this without awaiting it (fire-and-forget)

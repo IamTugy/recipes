@@ -161,7 +161,7 @@ describe('RecipeImportController', () => {
 
       await runImport({ text: 'some recipe text' })
 
-      expect(activityLog.record).toHaveBeenCalledWith('user_1', undefined, 'ai_recipe_import_used')
+      expect(activityLog.record).toHaveBeenCalledWith('user_1', undefined, 'ai_recipe_import_used', { count: 1 })
     })
 
     it('always persists a single found recipe as a pending-review draft, returning its id (no more unsaved pass-through)', async () => {

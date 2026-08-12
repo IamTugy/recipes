@@ -69,6 +69,39 @@ describe('JobsService', () => {
     expect(result).toEqual({ job: { id: 'job-2' }, isExisting: false })
   })
 
+  it('create with a dedupeKey falls back to the concurrently-inserted job when create() hits the unique-index race', async () => {
+    // First findOne (before the insert attempt) finds nothing; the insert
+    // itself then loses a race to a concurrent request and rejects with the
+    // partial unique index's duplicate-key error; a second findOne (the
+    // recovery path) picks up the job the other request just created.
+    const raceWinnerJob = { id: 'job-1', status: 'queued' }
+    const findOne = jest.fn()
+      .mockReturnValueOnce({ sort: jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(null) }) })
+      .mockReturnValueOnce({ sort: jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(raceWinnerJob) }) })
+    const create = jest.fn().mockRejectedValue({ code: 11000 })
+    const service = await makeService({ findOne, create })
+
+    const result = await service.create('user_1', 'import', 'my-recipe.pdf', 'dedupe-abc')
+
+    expect(findOne).toHaveBeenCalledTimes(2)
+    expect(result).toEqual({ job: raceWinnerJob, isExisting: true })
+  })
+
+  it('create rethrows a create() failure that is not a duplicate-key error', async () => {
+    const findOne = jest.fn().mockReturnValue({ sort: jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(null) }) })
+    const create = jest.fn().mockRejectedValue(new Error('Mongo is down'))
+    const service = await makeService({ findOne, create })
+
+    await expect(service.create('user_1', 'import', 'my-recipe.pdf', 'dedupe-abc')).rejects.toThrow('Mongo is down')
+  })
+
+  it('create without a dedupeKey rethrows any create() failure (no recovery path without a dedupeKey)', async () => {
+    const create = jest.fn().mockRejectedValue({ code: 11000 })
+    const service = await makeService({ create })
+
+    await expect(service.create('user_1', 'import', 'my-recipe.pdf')).rejects.toEqual({ code: 11000 })
+  })
+
   it('create with a dedupeKey does NOT match a failed job within the window - a new job is created instead', async () => {
     const sort = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(null) })
     const findOne = jest.fn().mockReturnValue({ sort })

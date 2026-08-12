@@ -20,7 +20,7 @@ const STATUS_CLASS: Record<Job['status'], string> = {
 
 export default function JobsPage() {
   const { lang } = useLanguage()
-        const tx = t[lang]
+  const tx = t[lang]
   const { jobs, loading } = useJobs()
 
   return (
@@ -44,6 +44,9 @@ export default function JobsPage() {
                     {tx[STATUS_LABEL_KEY[job.status]]}
                   </span>
                 </div>
+                <p className="text-[11px] text-cream/30 mb-2">
+                  {new Date(job.createdAt).toLocaleString(lang === 'he' ? 'he-IL' : 'en-US')}
+                </p>
                 {job.status === 'done' && job.resultRecipeIds.length > 0 && (
                   <Link
                     to={job.resultRecipeIds.length === 1 ? `/recipes/${job.resultRecipeIds[0]}/edit` : '/my-recipes'}

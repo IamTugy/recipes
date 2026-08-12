@@ -103,8 +103,6 @@ export class RecipeImportController {
           ? await this.importService.importFromImage(image.buffer, image.mimetype, body.text)
           : await this.importService.importFromText(body.text!)
 
-    await this.activityLog.record(userId, undefined, 'ai_recipe_import_used')
-
     const candidates = await this.recipesService.findLinkCandidates(userId)
     const links = await this.importService.resolveLinks(recipes, candidates)
     for (const link of links) {
@@ -156,6 +154,7 @@ export class RecipeImportController {
       }
     }
 
+    await this.activityLog.record(userId, undefined, 'ai_recipe_import_used', { count: createdIds.length })
     return createdIds
   }
 }

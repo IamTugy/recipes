@@ -48,3 +48,17 @@ export class Job {
 }
 
 export const JobSchema = SchemaFactory.createForClass(Job)
+
+// Closes the TOCTOU race in JobsService.create()'s dedupe check: two
+// concurrent requests with the same userId+dedupeKey could both pass the
+// findOne() before either create() lands, producing two "queued" jobs for
+// the same submission - exactly the duplicate-work bug dedupeKey exists to
+// prevent. This unique index makes the second concurrent insert fail at the
+// database level instead; create() catches that failure and re-fetches the
+// job the other request just created. Partial (queued/running only) because
+// a `done`/`failed` job is allowed to coexist with a later resubmission -
+// only truly concurrent in-flight submissions need to collide.
+JobSchema.index(
+  { userId: 1, dedupeKey: 1 },
+  { unique: true, partialFilterExpression: { dedupeKey: { $exists: true }, status: { $in: ['queued', 'running'] } } },
+)
