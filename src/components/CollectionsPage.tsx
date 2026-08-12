@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useCollections } from '../hooks/useCollections'
 import { useRecipes } from '../hooks/useRecipes'
 import { useLanguage } from '../hooks/useLanguage'
@@ -7,6 +7,7 @@ import { useToast } from '../hooks/useToast'
 import { resizedImage } from '../lib/image'
 import TranslatedText from './TranslatedText'
 import SkeletonImage from './SkeletonImage'
+import ActionsMenu from './ActionsMenu'
 import { t } from "../i18n";
 
 interface CollectionsPageProps {
@@ -16,6 +17,7 @@ interface CollectionsPageProps {
 export default function CollectionsPage({ onAddToShoppingList }: CollectionsPageProps) {
   const { lang } = useLanguage()
         const tx = t[lang]
+  const navigate = useNavigate()
   const { showToast } = useToast()
   const { collections, loading, create, rename, remove, removeRecipe } = useCollections()
   const { recipes } = useRecipes()
@@ -130,29 +132,54 @@ export default function CollectionsPage({ onAddToShoppingList }: CollectionsPage
                       {col.name} <span className="text-cream/30 text-sm font-sans">({col.recipeIds.length})</span>
                     </h2>
                   )}
-                  <div className="flex items-center gap-3 shrink-0">
-                    {col.recipeIds.length > 0 && (
-                      <Link
-                        to={`/collections/${col._id}/print`}
-                        className="text-xs text-cream/40 hover:text-amber transition-colors"
-                      >
-                        {tx.exportAsPDF}
-                      </Link>
-                    )}
-                    {col.recipeIds.length > 0 && (
-                      <button type="button"
-                        onClick={() => handleAddCollectionToShoppingList(col.recipeIds)}
-                        className="text-xs text-cream/40 hover:text-amber transition-colors"
-                      >
-                        {tx.addAllToShoppingList}
-                      </button>
-                    )}
-                    <button type="button"
-                      onClick={() => handleRemove(col._id, col.name)}
-                      className="text-xs text-cream/30 hover:text-red-400 transition-colors"
-                    >
-                      {tx.delete}
-                    </button>
+                  <div className="shrink-0">
+                    <ActionsMenu
+                      lang={lang}
+                      triggerLabel={tx.moreActions}
+                      items={[
+                        {
+                          key: 'rename',
+                          label: tx.rename,
+                          onClick: () => startEditing(col._id, col.name),
+                          icon: (
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                          ),
+                        },
+                        ...(col.recipeIds.length > 0 ? [{
+                          key: 'export-pdf',
+                          label: tx.exportAsPDF,
+                          onClick: () => navigate(`/collections/${col._id}/print`),
+                          icon: (
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6v-8z" />
+                            </svg>
+                          ),
+                        }] : []),
+                        ...(col.recipeIds.length > 0 ? [{
+                          key: 'add-to-list',
+                          label: tx.addAllToShoppingList,
+                          onClick: () => handleAddCollectionToShoppingList(col.recipeIds),
+                          icon: (
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m-10 0a2 2 0 100 4 2 2 0 000-4zm10 0a2 2 0 100 4 2 2 0 000-4z" />
+                            </svg>
+                          ),
+                        }] : []),
+                        {
+                          key: 'delete',
+                          label: tx.delete,
+                          danger: true,
+                          onClick: () => handleRemove(col._id, col.name),
+                          icon: (
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          ),
+                        },
+                      ]}
+                    />
                   </div>
                 </div>
                 {col.recipeIds.length === 0 ? (
