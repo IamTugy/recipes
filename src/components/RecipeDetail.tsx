@@ -56,20 +56,37 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
   const { collections, create: createCollection, addRecipe: addRecipeToCollection, removeRecipe: removeRecipeFromCollection } = useCollections()
   const [wizardOpen, setWizardOpen] = useState(false)
   const [wizardIndex, setWizardIndex] = useState(0)
-  const [collectionMenuOpen, setCollectionMenuOpen] = useState(false)
+  // The overflow menu (Edit/Delete/Save to collection/Download PDF/Copy
+  // link) consolidates what used to be scattered separate buttons. It's a
+  // single sheet with two "views" - the root list, and a collections
+  // sub-view - rather than a separate popover per action.
+  const [actionsMenuOpen, setActionsMenuOpen] = useState(false)
+  const [actionsMenuView, setActionsMenuView] = useState<'root' | 'collections'>('root')
   const [newCollectionName, setNewCollectionName] = useState('')
-  const collectionMenuRef = useRef<HTMLDivElement>(null)
+  const actionsMenuRef = useRef<HTMLDivElement>(null)
+
+  function closeActionsMenu() {
+    setActionsMenuOpen(false)
+    setActionsMenuView('root')
+  }
 
   useEffect(() => {
-    if (!collectionMenuOpen) return
+    if (!actionsMenuOpen) return
     function handleClickOutside(e: MouseEvent) {
-      if (collectionMenuRef.current && !collectionMenuRef.current.contains(e.target as Node)) {
-        setCollectionMenuOpen(false)
+      if (actionsMenuRef.current && !actionsMenuRef.current.contains(e.target as Node)) {
+        closeActionsMenu()
       }
     }
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') closeActionsMenu()
+    }
     document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [collectionMenuOpen])
+    document.addEventListener('keydown', handleKey)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('keydown', handleKey)
+    }
+  }, [actionsMenuOpen])
   const { addRecent } = useRecentlyViewed()
   const { text: savedNote, save: saveNote, status: noteStatus } = useNote(id)
   const { getToken, userId: currentUserId } = useAuth()
@@ -84,7 +101,6 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
   const [checkedIngredients, setCheckedIngredients] = useState<Set<string>>(new Set())
   const [userRating, setUserRating] = useState<number | null>(null)
   const [hoverRating, setHoverRating] = useState<number | null>(null)
-  const [shareState, setShareState] = useState<'idle' | 'copied'>('idle')
   const [pdfGenerating, setPdfGenerating] = useState(false)
   const [noteInput, setNoteInput] = useState('')
   const [reviews, setReviews] = useState<Review[]>([])
@@ -243,7 +259,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
     showToast(tx.reviewDeleted)
   }
 
-  async function share() {
+  async function copyShareLink() {
     // Route through /share/recipes/:id instead of the page's own hash URL -
     // link-preview crawlers (WhatsApp, iMessage, Slack) don't run JS, so they
     // need a server-rendered page with this recipe's own og:image/og:title.
@@ -259,15 +275,9 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
     const shareUrl = id
       ? `${window.location.origin}/share/recipes/${id}${shareQuery}`
       : window.location.href
-    const shareData = { title: displayTitle, text: displayDescription, url: shareUrl }
-    if (navigator.share) {
-      try { await navigator.share(shareData) } catch { /* user cancelled */ }
-      return
-    }
     try {
       await navigator.clipboard.writeText(shareUrl)
-      setShareState('copied')
-      setTimeout(() => setShareState('idle'), 2000)
+      showToast(tx.copied)
     } catch { /* clipboard unavailable */ }
   }
 
@@ -426,6 +436,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
   useFocusTrap(wizardRef, wizardOpen)
   const lightboxRef = useRef<HTMLDivElement>(null)
   useFocusTrap(lightboxRef, !!lightboxUrl)
+  useFocusTrap(actionsMenuRef, actionsMenuOpen)
 
   useEffect(() => {
     if (!wizardOpen) return
@@ -709,49 +720,183 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
           </svg>
           {tx.back}
         </button>
-        {canEdit && (
-          <div className={`print:hidden absolute top-4 ${lang === 'he' ? 'left-4' : 'right-4'} flex items-center gap-2`}>
-            {/* Never offered for published recipes - deleting those is
-                destructive to something other people rely on/rated. */}
-            {recipe.status !== 'published' && (isAdmin || (isOwner && recipe.publishedRevision == null)) && (
-              <button type="button"
-                onClick={() => setDeleteConfirmOpen(true)}
-                title={tx.delete}
-                aria-label={tx.delete}
-                className="flex items-center justify-center p-2 bg-black/40 backdrop-blur-sm text-white/80 hover:text-red-400 rounded-xl transition-colors border border-white/10"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-              </button>
-            )}
-            {(recipe.currentRevision !== recipe.publishedRevision || recipe.status === 'pending_review') && (
-              <button type="button"
-                onClick={() => setPublishConfirmOpen(true)}
-                disabled={submitting || recipe.status === 'pending_review'}
-                title={recipe.status === 'pending_review' ? (tx.pendingAIReview) : undefined}
-                className="flex items-center gap-1.5 px-3 py-2 bg-amber text-bg hover:bg-amber/90 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50"
-              >
-                {recipe.status === 'pending_review'
-                  ? (tx.pendingAIReview2)
-                  : submitting
-                    ? (tx.reviewingWithAI)
-                    : (tx.publish)}
-              </button>
-            )}
+        <div className={`print:hidden absolute top-4 ${lang === 'he' ? 'left-4' : 'right-4'} flex items-center gap-2`}>
+          {canEdit && (recipe.currentRevision !== recipe.publishedRevision || recipe.status === 'pending_review') && (
             <button type="button"
-              onClick={() => navigate(`/recipes/${id}/edit`)}
-              disabled={recipe.status === 'pending_review'}
-              title={recipe.status === 'pending_review' ? (tx.lockedWhilePendingAIReview) : undefined}
-              className="flex items-center gap-2 px-3 py-2 bg-black/40 backdrop-blur-sm text-white/80 hover:text-white rounded-xl text-sm transition-colors border border-white/10 disabled:opacity-50"
+              onClick={() => setPublishConfirmOpen(true)}
+              disabled={submitting || recipe.status === 'pending_review'}
+              title={recipe.status === 'pending_review' ? (tx.pendingAIReview) : undefined}
+              className="flex items-center gap-1.5 px-3 py-2 bg-amber text-bg hover:bg-amber/90 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50"
             >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
-              {tx.edit2}
+              {recipe.status === 'pending_review'
+                ? (tx.pendingAIReview2)
+                : submitting
+                  ? (tx.reviewingWithAI)
+                  : (tx.publish)}
             </button>
+          )}
+
+          <div className="relative" ref={actionsMenuRef}>
+            <button type="button"
+              onClick={() => setActionsMenuOpen(v => !v)}
+              title={tx.moreActions}
+              aria-label={tx.moreActions}
+              aria-haspopup="menu"
+              aria-expanded={actionsMenuOpen}
+              className="flex items-center justify-center p-2 bg-black/40 backdrop-blur-sm text-white/80 hover:text-white rounded-xl transition-colors border border-white/10"
+            >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <circle cx="12" cy="5" r="1.75" />
+                <circle cx="12" cy="12" r="1.75" />
+                <circle cx="12" cy="19" r="1.75" />
+              </svg>
+            </button>
+
+            {actionsMenuOpen && (
+              <>
+                {/* Mobile: dims the page behind the bottom sheet. Desktop's
+                    dropdown closes via the outside-click listener instead,
+                    so no backdrop is needed there. */}
+                <div className="sm:hidden fixed inset-0 z-40 bg-black/50" onClick={closeActionsMenu} />
+                <div
+                  role="menu"
+                  dir={lang === 'he' ? 'rtl' : 'ltr'}
+                  className={`fixed inset-x-0 bottom-0 z-50 rounded-t-2xl border-t border-tint/10 sm:rounded-xl sm:border sm:absolute sm:inset-x-auto sm:bottom-auto sm:top-full sm:z-30 sm:mt-2 sm:w-72 ${lang === 'he' ? 'sm:left-0' : 'sm:right-0'} bg-bg shadow-2xl p-2 max-h-[75vh] overflow-y-auto`}
+                  style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}
+                >
+                  <div className="sm:hidden w-10 h-1 rounded-full bg-tint/20 mx-auto mb-2 mt-1" />
+
+                  {actionsMenuView === 'collections' ? (
+                    <div>
+                      <button type="button"
+                        onClick={() => setActionsMenuView('root')}
+                        className="flex items-center gap-1.5 text-sm font-medium text-cream/50 hover:text-cream/80 transition-colors px-2 py-2 mb-1"
+                      >
+                        <svg className={`w-4 h-4 ${lang === 'he' ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                        </svg>
+                        {tx.saveToCollection}
+                      </button>
+                      {collections.length === 0 ? (
+                        <p className="text-xs text-cream/30 px-2 py-2">
+                          {tx.noCollectionsYet}
+                        </p>
+                      ) : (
+                        <ul className="space-y-0.5 max-h-52 overflow-y-auto px-1 mb-1">
+                          {collections.map(col => {
+                            const inCollection = id ? col.recipeIds.includes(id) : false
+                            return (
+                              <li key={col._id}>
+                                <label className="flex items-center gap-2.5 text-sm text-cream/80 cursor-pointer px-2 py-2.5 rounded-lg hover:bg-tint/[0.06] transition-colors">
+                                  <input
+                                    type="checkbox"
+                                    checked={inCollection}
+                                    onChange={() => {
+                                      if (!id) return
+                                      if (inCollection) removeRecipeFromCollection(col._id, id)
+                                      else addRecipeToCollection(col._id, id)
+                                    }}
+                                  />
+                                  {col.name}
+                                </label>
+                              </li>
+                            )
+                          })}
+                        </ul>
+                      )}
+                      <div className="flex gap-1.5 px-2 pb-1">
+                        <input
+                          value={newCollectionName}
+                          onChange={e => setNewCollectionName(e.target.value)}
+                          onKeyDown={e => { if (e.key === 'Enter') createAndAddCollection() }}
+                          placeholder={tx.newCollection}
+                          maxLength={60}
+                          aria-label={tx.newCollectionName}
+                          className="flex-1 bg-tint/[0.03] border border-tint/10 rounded-md px-2 py-1.5 text-xs text-cream/80 placeholder-cream/25 outline-none focus:border-amber/30 transition-colors"
+                        />
+                        <button type="button"
+                          onClick={createAndAddCollection}
+                          disabled={!newCollectionName.trim()}
+                          className="px-2.5 py-1.5 rounded-md text-[11px] font-semibold bg-amber/90 text-bg hover:bg-amber transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                        >
+                          {tx.add}
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      {canEdit && (
+                        <div className="pb-1 mb-1 border-b border-tint/10">
+                          <button type="button"
+                            onClick={() => { closeActionsMenu(); navigate(`/recipes/${id}/edit`) }}
+                            disabled={recipe.status === 'pending_review'}
+                            title={recipe.status === 'pending_review' ? (tx.lockedWhilePendingAIReview) : undefined}
+                            className="flex items-center gap-3 w-full text-start px-3 py-2.5 rounded-lg text-sm font-medium text-cream/80 hover:bg-tint/[0.06] transition-colors disabled:opacity-40"
+                          >
+                            <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                            {tx.edit2}
+                          </button>
+                          {/* Never offered for published recipes - deleting
+                              those is destructive to something other people
+                              rely on/rated. */}
+                          {recipe.status !== 'published' && (isAdmin || (isOwner && recipe.publishedRevision == null)) && (
+                            <button type="button"
+                              onClick={() => { closeActionsMenu(); setDeleteConfirmOpen(true) }}
+                              className="flex items-center gap-3 w-full text-start px-3 py-2.5 rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10 transition-colors"
+                            >
+                              <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                              {tx.delete}
+                            </button>
+                          )}
+                        </div>
+                      )}
+
+                      <button type="button"
+                        onClick={() => setActionsMenuView('collections')}
+                        className="flex items-center gap-3 w-full text-start px-3 py-2.5 rounded-lg text-sm font-medium text-cream/80 hover:bg-tint/[0.06] transition-colors"
+                      >
+                        <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14-7H5a2 2 0 00-2 2v14l4-2 3 2 3-2 3 2 3-2V6a2 2 0 00-2-2z" />
+                        </svg>
+                        {tx.saveToCollection}
+                      </button>
+
+                      <button type="button"
+                        onClick={() => void handleDownloadPdf()}
+                        disabled={pdfGenerating}
+                        className="flex items-center gap-3 w-full text-start px-3 py-2.5 rounded-lg text-sm font-medium text-cream/80 hover:bg-tint/[0.06] transition-colors disabled:opacity-50"
+                      >
+                        <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6v-8z" />
+                        </svg>
+                        {pdfGenerating ? tx.generatingPdf : tx.downloadRecipePdf}
+                      </button>
+
+                      {/* Personal recipes (never published) have nothing
+                          public to preview or link to, so sharing isn't
+                          offered at all. */}
+                      {recipe.publishedRevision != null && (
+                        <button type="button"
+                          onClick={() => { closeActionsMenu(); void copyShareLink() }}
+                          className="flex items-center gap-3 w-full text-start px-3 py-2.5 rounded-lg text-sm font-medium text-cream/80 hover:bg-tint/[0.06] transition-colors"
+                        >
+                          <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 010 5.656l-3 3a4 4 0 01-5.656-5.656l1.5-1.5M10.172 13.828a4 4 0 010-5.656l3-3a4 4 0 015.656 5.656l-1.5 1.5" />
+                          </svg>
+                          {tx.copyLink}
+                        </button>
+                      )}
+                    </>
+                  )}
+                </div>
+              </>
+            )}
           </div>
-        )}
+        </div>
       </div>
 
       <div className="max-w-3xl mx-auto px-4 -mt-16 relative pb-24 print:max-w-none print:mx-0 print:mt-0 print:px-0 print:pb-0">
@@ -984,7 +1129,9 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
             </p>
           )}
 
-          {/* Actions: cooked / favorite / save / views / share / download PDF */}
+          {/* Actions: view-published-version (owner-only) / cooked / favorite -
+              everything else (edit, delete, save to collection, download
+              PDF, copy link) lives in the "..." menu on the hero image. */}
           <div className="print:hidden flex flex-wrap items-center gap-x-4 gap-y-3 mb-5">
             {canEdit && recipe.publishedRevision != null && !isViewingPublishedContent && (
               <button type="button"
@@ -1035,92 +1182,6 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                 {tx.favorite}
               </button>
             )}
-
-            <div className="relative" ref={collectionMenuRef}>
-              <button type="button"
-                onClick={() => setCollectionMenuOpen(v => !v)}
-                className="flex items-center gap-1.5 text-sm font-medium text-cream/40 hover:text-cream/70 transition-colors"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14-7H5a2 2 0 00-2 2v14l4-2 3 2 3-2 3 2 3-2V6a2 2 0 00-2-2z" />
-                </svg>
-                {tx.saveToCollection}
-              </button>
-              {collectionMenuOpen && (
-                <div className="absolute z-20 top-full mt-2 w-64 card p-3 shadow-xl" dir={lang === 'he' ? 'rtl' : 'ltr'}>
-                  {collections.length === 0 ? (
-                    <p className="text-xs text-cream/30 mb-2">
-                      {tx.noCollectionsYet}
-                    </p>
-                  ) : (
-                    <ul className="space-y-1 mb-2 max-h-40 overflow-y-auto">
-                      {collections.map(col => {
-                        const inCollection = id ? col.recipeIds.includes(id) : false
-                        return (
-                          <li key={col._id}>
-                            <label className="flex items-center gap-2 text-sm text-cream/70 cursor-pointer">
-                              <input
-                                type="checkbox"
-                                checked={inCollection}
-                                onChange={() => {
-                                  if (!id) return
-                                  if (inCollection) removeRecipeFromCollection(col._id, id)
-                                  else addRecipeToCollection(col._id, id)
-                                }}
-                              />
-                              {col.name}
-                            </label>
-                          </li>
-                        )
-                      })}
-                    </ul>
-                  )}
-                  <div className="flex gap-1.5">
-                    <input
-                      value={newCollectionName}
-                      onChange={e => setNewCollectionName(e.target.value)}
-                      onKeyDown={e => { if (e.key === 'Enter') createAndAddCollection() }}
-                      placeholder={tx.newCollection}
-                      maxLength={60}
-                      aria-label={tx.newCollectionName}
-                      className="flex-1 bg-tint/[0.03] border border-tint/10 rounded-md px-2 py-1 text-xs text-cream/80 placeholder-cream/25 outline-none focus:border-amber/30 transition-colors"
-                    />
-                    <button type="button"
-                      onClick={createAndAddCollection}
-                      disabled={!newCollectionName.trim()}
-                      className="px-2 py-1 rounded-md text-[11px] font-semibold bg-amber/90 text-bg hover:bg-amber transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                    >
-                      {tx.add}
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Personal recipes (never published) have nothing public to
-                preview or link to, so sharing isn't offered at all. */}
-            {recipe.publishedRevision != null && (
-              <button type="button"
-                onClick={share}
-                className="flex items-center gap-1.5 text-sm font-medium text-cream/40 hover:text-cream/70 transition-colors"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v9m0-9l-3.5 3.5M12 4l3.5 3.5M5 15v3a2 2 0 002 2h10a2 2 0 002-2v-3" />
-                </svg>
-                {shareState === 'copied' ? (tx.copied) : (tx.share)}
-              </button>
-            )}
-
-            <button type="button"
-              onClick={() => void handleDownloadPdf()}
-              disabled={pdfGenerating}
-              className="flex items-center gap-1.5 text-sm font-medium text-cream/40 hover:text-cream/70 transition-colors disabled:opacity-50"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6v-8z" />
-              </svg>
-              {pdfGenerating ? tx.generatingPdf : tx.downloadRecipePdf}
-            </button>
           </div>
 
           {/* Meta grid */}
