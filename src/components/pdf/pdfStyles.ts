@@ -73,6 +73,13 @@ export const pdfStyles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 4,
   },
+  headerQr: {
+    position: 'absolute',
+    top: 36,
+    right: 40,
+    width: 40,
+    height: 40,
+  },
   wordmark: {
     fontFamily: 'Cormorant Garamond',
     fontWeight: 600,
@@ -186,12 +193,16 @@ export const pdfStyles = StyleSheet.create({
     height: 18,
     borderRadius: 9,
     backgroundColor: PDF_COLORS.amber,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
+  },
+  stepNumberText: {
     color: '#FFFFFF',
     fontSize: 9,
     fontWeight: 600,
     textAlign: 'center',
-    lineHeight: 1.3,
-    marginRight: 8,
+    lineHeight: 1,
   },
   stepText: {
     fontSize: 9.5,
@@ -221,9 +232,7 @@ export const pdfStyles = StyleSheet.create({
     bottom: 20,
     left: 40,
     right: 40,
-    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     borderTopWidth: 1,
     borderTopColor: PDF_COLORS.border,
     paddingTop: 8,
@@ -233,9 +242,5 @@ export const pdfStyles = StyleSheet.create({
     fontWeight: 600,
     fontSize: 9,
     color: PDF_COLORS.inkMuted,
-  },
-  footerQr: {
-    width: 32,
-    height: 32,
   },
 })

@@ -91,7 +91,10 @@ function buildPdfRecipeData(recipe: Recipe, lang: Lang, multiplier: number, qrDa
     tips: tips && tips.length > 0 ? tips : undefined,
     isRtl,
     qrDataUrl,
-    brandName: tx.siteTitle,
+    // Always the English wordmark, same as the app's own header (Nav.tsx) -
+    // it's a brand name, not translated content, regardless of tx.siteTitle
+    // (which is localized for the page <title>/meta).
+    brandName: "Tugy's Cookbook",
   }
 }
 

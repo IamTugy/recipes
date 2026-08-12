@@ -41,8 +41,14 @@ export default function RecipePdfDocument({ data }: RecipePdfDocumentProps) {
     <Document>
       <Page size="A4" style={pdfStyles.page}>
         <View style={pdfStyles.header}>
-          <Text style={[pdfStyles.wordmark, rtlFont]}>{data.brandName}</Text>
+          {/* brandName is always the English wordmark, so no rtlFont here -
+              Frank Ruhl Libre is only needed for actual Hebrew glyphs. */}
+          <Text style={pdfStyles.wordmark}>{data.brandName}</Text>
         </View>
+        {/* Unlike the footer wordmark (fixed, repeats every page), this QR
+            is part of the normal document flow, so it only ever renders once
+            - on page 1, where a reader would look for it. */}
+        <Image src={data.qrDataUrl} style={pdfStyles.headerQr} />
         <View style={pdfStyles.headerRule} />
 
         <Text style={[pdfStyles.title, rtlFont]}>{data.title}</Text>
@@ -77,12 +83,16 @@ export default function RecipePdfDocument({ data }: RecipePdfDocumentProps) {
           <View style={ingredientsColStyle}>
             <Text style={[pdfStyles.columnHeading, dirStyle]}>{data.ingredientsHeading}</Text>
             {data.ingredients.map((group, gi) => (
-              <View key={gi}>
+              // wrap={false}: keep this whole group together across a page
+              // break rather than splitting a few of its rows onto the next
+              // page - matches @react-pdf/renderer's own recommended pattern
+              // for list-like content.
+              <View key={gi} wrap={false}>
                 {group.label && <Text style={[pdfStyles.groupLabel, dirStyle]}>{group.label}</Text>}
                 {group.items.map((item, ii) => {
                   const amountUnitText = [item.amountText, item.unitText].filter(Boolean).join(' ')
                   return (
-                    <View key={ii} style={[pdfStyles.ingredientRow, rowDir]}>
+                    <View key={ii} style={[pdfStyles.ingredientRow, rowDir]} wrap={false}>
                       <View style={[pdfStyles.ingredientBullet, bulletMargin]} />
                       <Text style={[pdfStyles.ingredientText, dirStyle]}>
                         {amountUnitText ? `${amountUnitText} ` : ''}{item.nameText}
@@ -98,11 +108,13 @@ export default function RecipePdfDocument({ data }: RecipePdfDocumentProps) {
           <View style={pdfStyles.methodCol}>
             <Text style={[pdfStyles.columnHeading, dirStyle]}>{data.methodHeading}</Text>
             {data.steps.map((group, gi) => (
-              <View key={gi}>
+              <View key={gi} wrap={false}>
                 {group.title && <Text style={[pdfStyles.stepGroupTitle, dirStyle]}>{group.title}</Text>}
                 {group.items.map((step, si) => (
-                  <View key={si} style={[pdfStyles.stepRow, rowDir]}>
-                    <Text style={[pdfStyles.stepNumber, stepNumberMargin]}>{stepNumsByGroup[gi][si]}</Text>
+                  <View key={si} style={[pdfStyles.stepRow, rowDir]} wrap={false}>
+                    <View style={[pdfStyles.stepNumber, stepNumberMargin]}>
+                      <Text style={pdfStyles.stepNumberText}>{stepNumsByGroup[gi][si]}</Text>
+                    </View>
                     <Text style={[pdfStyles.stepText, dirStyle]}>{step.text}</Text>
                   </View>
                 ))}
@@ -112,7 +124,7 @@ export default function RecipePdfDocument({ data }: RecipePdfDocumentProps) {
         </View>
 
         {data.tips && data.tips.length > 0 && (
-          <View style={pdfStyles.tipsSection}>
+          <View style={pdfStyles.tipsSection} wrap={false}>
             <Text style={[pdfStyles.tipsHeading, dirStyle]}>{data.tipsHeading}</Text>
             {data.tips.map((tip, i) => (
               <Text key={i} style={[pdfStyles.tipRow, dirStyle]}>• {tip}</Text>
@@ -121,8 +133,7 @@ export default function RecipePdfDocument({ data }: RecipePdfDocumentProps) {
         )}
 
         <View style={pdfStyles.footer} fixed>
-          <Text style={[pdfStyles.footerWordmark, rtlFont]}>{data.brandName}</Text>
-          <Image src={data.qrDataUrl} style={pdfStyles.footerQr} />
+          <Text style={pdfStyles.footerWordmark}>{data.brandName}</Text>
         </View>
       </Page>
     </Document>
