@@ -13,21 +13,27 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # Cluster nodes are arm64-only, so amd64 images were never deployed -
+    # only ever built to satisfy the matrix. Building natively on an arm64
+    # runner instead of amd64+QEMU emulation removes the emulation tax
+    # entirely (QEMU-emulated `npm ci`/`vite build` was the slow part,
+    # already known to hang on recipes-mcp's small image).
+    runs-on: ${{ matrix.runs-on }}
     strategy:
       matrix:
         include:
           - app: recipes
             dockerfile: Dockerfile
-            platforms: linux/amd64,linux/arm64
+            platforms: linux/arm64
+            runs-on: ubuntu-24.04-arm
           - app: recipes-api
             dockerfile: api/Dockerfile
-            platforms: linux/amd64,linux/arm64
+            platforms: linux/arm64
+            runs-on: ubuntu-24.04-arm
           - app: recipes-mcp
             dockerfile: mcp/Dockerfile
-            # Cluster nodes are arm64-only; skip the emulated amd64 leg,
-            # which hung indefinitely on this small image's first build.
             platforms: linux/arm64
+            runs-on: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v4
 
@@ -77,9 +83,6 @@ jobs:
             }
             console.log('No react-hooks violations found.');
           "
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
