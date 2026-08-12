@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useFocusTrap } from '../hooks/useFocusTrap'
 import RecipePlaceholder from './RecipePlaceholder'
+import LinkedIngredientName from './LinkedIngredientName'
 import RecipeDetailSkeleton from './RecipeDetailSkeleton'
 import Breadcrumbs from './Breadcrumbs'
 import RecipeSectionNav from './RecipeSectionNav'
@@ -544,11 +545,16 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
 
   function addAllToShoppingList() {
     const items = displayRecipe!.ingredients.flatMap(group =>
-      group.items.map(item => {
-        const itemName = lang === 'he' ? item.name : (item.nameEn ?? item.name)
-        if (!item.amount) return { name: itemName, amount: null, unit: item.unit }
-        return { name: itemName, amount: item.amount * multiplier, unit: item.unit }
-      })
+      group.items
+        // A linked ingredient represents "make this other recipe as a
+        // component," not a literal item to buy - it has no name to shop
+        // for, and its own ingredients aren't pulled in transitively here.
+        .filter(item => !item.linkedRecipeId)
+        .map(item => {
+          const itemName = lang === 'he' ? item.name : (item.nameEn ?? item.name)
+          if (!item.amount) return { name: itemName, amount: null, unit: item.unit }
+          return { name: itemName, amount: item.amount * multiplier, unit: item.unit }
+        })
     )
     onAddToShoppingList(items)
     showToast(lang === 'he' ? `${items.length} פריטים נוספו לרשימת הקניות` : `Added ${items.length} items to your shopping list`)
@@ -1288,10 +1294,14 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                               })()}
                             </span>
                             <span className={`transition-colors ${checked ? 'text-cream/30 line-through' : 'text-cream/70'}`}>
-                              <TranslatedText
-                                primary={lang === 'he' ? item.name : item.nameEn}
-                                secondary={lang === 'he' ? item.nameEn : item.name}
-                              />
+                              {item.linkedRecipeId ? (
+                                <LinkedIngredientName recipeId={item.linkedRecipeId} lang={lang} />
+                              ) : (
+                                <TranslatedText
+                                  primary={lang === 'he' ? item.name : item.nameEn}
+                                  secondary={lang === 'he' ? item.nameEn : item.name}
+                                />
+                              )}
                               {(item.note || item.noteEn) && (
                                 <span className="text-cream/40 italic">
                                   {' ('}

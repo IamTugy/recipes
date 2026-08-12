@@ -113,7 +113,10 @@ export default function CollectionPrintPage() {
                               )}
                               <ul className="space-y-1.5">
                                 {group.items.map((item, ii) => {
-                                  const itemName = lang === 'he' ? item.name : (item.nameEn ?? item.name)
+                                  const linkedRecipe = item.linkedRecipeId ? recipes.find(r => r.id === item.linkedRecipeId) : undefined
+                                  const itemName = linkedRecipe
+                                    ? (lang === 'he' ? (linkedRecipe.titleHe || linkedRecipe.title) : linkedRecipe.title)
+                                    : (lang === 'he' ? item.name : (item.nameEn ?? item.name))
                                   const itemNote = lang === 'he' ? item.note : (item.noteEn ?? item.note)
                                   const unit = lang === 'he' ? heUnit(item.unit, item.amount) : item.unit
                                   const amt = item.amount ? scaleAmount(item.amount, 1) : null

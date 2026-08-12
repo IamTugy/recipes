@@ -54,10 +54,14 @@ export default function CollectionsPage({ onAddToShoppingList }: CollectionsPage
       if (!r) continue
       recipeCount++
       const items = r.ingredients.flatMap(group =>
-        group.items.map(item => {
-          const itemName = lang === 'he' ? item.name : (item.nameEn ?? item.name)
-          return { name: itemName, amount: item.amount || null, unit: item.unit }
-        })
+        group.items
+          // A linked ingredient represents "make this other recipe as a
+          // component," not a literal item to buy.
+          .filter(item => !item.linkedRecipeId)
+          .map(item => {
+            const itemName = lang === 'he' ? item.name : (item.nameEn ?? item.name)
+            return { name: itemName, amount: item.amount || null, unit: item.unit }
+          })
       )
       onAddToShoppingList(items)
     }

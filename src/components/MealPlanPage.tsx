@@ -77,6 +77,9 @@ export default function MealPlanPage({ onAddToShoppingList }: MealPlanPageProps)
       if (!recipe) continue
       for (const group of recipe.ingredients) {
         for (const item of group.items) {
+          // A linked ingredient represents "make this other recipe as a
+          // component," not a literal item to buy.
+          if (item.linkedRecipeId) continue
           const itemName = lang === 'he' ? item.name : (item.nameEn ?? item.name)
           items.push({ name: itemName, amount: item.amount || null, unit: item.unit })
         }
