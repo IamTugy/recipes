@@ -23,6 +23,10 @@ export default function RecipePdfDocument({ data }: RecipePdfDocumentProps) {
   // wrong side of the badge.
   const bulletMargin = data.isRtl ? { marginRight: 0, marginLeft: 6 } : {}
   const stepNumberMargin = data.isRtl ? { marginRight: 0, marginLeft: 8 } : {}
+  // metaText carries marginLeft to space it from its icon in LTR - when
+  // rowDir flips metaItem to row-reverse for Hebrew, that margin needs to
+  // flip sides too or the icon and label end up touching with no gap.
+  const metaTextMargin = data.isRtl ? { marginLeft: 0, marginRight: 4 } : {}
   const ingredientsColStyle = data.isRtl
     ? { ...pdfStyles.ingredientsCol, paddingRight: 0, paddingLeft: 16 }
     : pdfStyles.ingredientsCol
@@ -47,23 +51,23 @@ export default function RecipePdfDocument({ data }: RecipePdfDocumentProps) {
         <View style={pdfStyles.metaRow}>
           <View style={[pdfStyles.metaItem, rowDir]}>
             <ClockPdfIcon color={PDF_COLORS.amber} />
-            <Text style={[pdfStyles.metaText, rtlFont]}>{data.prepTimeText}</Text>
+            <Text style={[pdfStyles.metaText, rtlFont, metaTextMargin]}>{data.prepTimeText}</Text>
           </View>
           <View style={[pdfStyles.metaItem, rowDir]}>
             <ClockPdfIcon color={PDF_COLORS.amber} />
-            <Text style={[pdfStyles.metaText, rtlFont]}>{data.cookTimeText}</Text>
+            <Text style={[pdfStyles.metaText, rtlFont, metaTextMargin]}>{data.cookTimeText}</Text>
           </View>
           <View style={[pdfStyles.metaItem, rowDir]}>
             <ClockPdfIcon color={PDF_COLORS.amber} />
-            <Text style={[pdfStyles.metaText, rtlFont]}>{data.totalTimeText}</Text>
+            <Text style={[pdfStyles.metaText, rtlFont, metaTextMargin]}>{data.totalTimeText}</Text>
           </View>
           <View style={[pdfStyles.metaItem, rowDir]}>
             <ServingsPdfIcon color={PDF_COLORS.amber} />
-            <Text style={[pdfStyles.metaText, rtlFont]}>{data.servingsText}</Text>
+            <Text style={[pdfStyles.metaText, rtlFont, metaTextMargin]}>{data.servingsText}</Text>
           </View>
           <View style={[pdfStyles.metaItem, rowDir]}>
             <DifficultyPdfIcon color={PDF_COLORS.amber} />
-            <Text style={[pdfStyles.metaText, rtlFont]}>{data.difficultyText}</Text>
+            <Text style={[pdfStyles.metaText, rtlFont, metaTextMargin]}>{data.difficultyText}</Text>
           </View>
         </View>
 
