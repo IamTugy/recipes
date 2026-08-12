@@ -45,9 +45,8 @@ export default function RecipePdfDocument({ data }: RecipePdfDocumentProps) {
               Frank Ruhl Libre is only needed for actual Hebrew glyphs. */}
           <Text style={pdfStyles.wordmark}>{data.brandName}</Text>
         </View>
-        {/* Unlike the footer wordmark (fixed, repeats every page), this QR
-            is part of the normal document flow, so it only ever renders once
-            - on page 1, where a reader would look for it. */}
+        {/* Part of the normal document flow (not `fixed`), so it only ever
+            renders once - on page 1, where a reader would look for it. */}
         <Image src={data.qrDataUrl} style={pdfStyles.headerQr} />
         <View style={pdfStyles.headerRule} />
 
@@ -131,10 +130,6 @@ export default function RecipePdfDocument({ data }: RecipePdfDocumentProps) {
             ))}
           </View>
         )}
-
-        <View style={pdfStyles.footer} fixed>
-          <Text style={pdfStyles.footerWordmark}>{data.brandName}</Text>
-        </View>
       </Page>
     </Document>
   )

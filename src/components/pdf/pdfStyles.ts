@@ -64,7 +64,7 @@ export const pdfStyles = StyleSheet.create({
     fontFamily: 'Inter',
     fontSize: 10,
     paddingTop: 36,
-    paddingBottom: 48,
+    paddingBottom: 28,
     paddingHorizontal: 40,
   },
   header: {
@@ -89,6 +89,8 @@ export const pdfStyles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   headerRule: {
+    width: '70%',
+    alignSelf: 'center',
     borderBottomWidth: 1,
     borderBottomColor: PDF_COLORS.border,
     marginTop: 6,
@@ -186,6 +188,7 @@ export const pdfStyles = StyleSheet.create({
   },
   stepRow: {
     flexDirection: 'row',
+    alignItems: 'flex-start',
     marginBottom: 8,
   },
   stepNumber: {
@@ -195,6 +198,11 @@ export const pdfStyles = StyleSheet.create({
     backgroundColor: PDF_COLORS.amber,
     justifyContent: 'center',
     alignItems: 'center',
+    // stepText's first line is shorter than this circle's height, so top-
+    // aligning both (the row's default) leaves the circle sitting visibly
+    // lower than the line of text beside it - this pulls it back up to
+    // center on that first line instead.
+    marginTop: -2,
     marginRight: 8,
   },
   stepNumberText: {
@@ -210,7 +218,7 @@ export const pdfStyles = StyleSheet.create({
     flex: 1,
   },
   tipsSection: {
-    marginTop: 20,
+    marginTop: 14,
     paddingTop: 12,
     borderTopWidth: 1,
     borderTopColor: PDF_COLORS.border,
@@ -226,21 +234,5 @@ export const pdfStyles = StyleSheet.create({
     fontSize: 9.5,
     lineHeight: 1.4,
     marginBottom: 3,
-  },
-  footer: {
-    position: 'absolute',
-    bottom: 20,
-    left: 40,
-    right: 40,
-    alignItems: 'center',
-    borderTopWidth: 1,
-    borderTopColor: PDF_COLORS.border,
-    paddingTop: 8,
-  },
-  footerWordmark: {
-    fontFamily: 'Cormorant Garamond',
-    fontWeight: 600,
-    fontSize: 9,
-    color: PDF_COLORS.inkMuted,
   },
 })
