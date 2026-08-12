@@ -1312,7 +1312,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
 
           {/* Steps */}
           <div className="sm:col-span-3 print:col-span-3 print:ps-5">
-            <div className="flex items-center justify-between mb-4">
+            <div className={`flex items-center justify-between ${flatSteps.length > 0 ? 'mb-1' : 'mb-4'}`}>
               <h2 id="steps-heading" className="font-serif text-xl font-bold text-cream scroll-mt-20">{tx.instructions}</h2>
               <div className="print:hidden flex items-center gap-2">
                 {flatSteps.length > 0 && (
@@ -1330,6 +1330,9 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                 )}
               </div>
             </div>
+            {flatSteps.length > 0 && (
+              <p className="print:hidden text-xs text-cream/40 mb-4">{tx.instructionsInteractiveHint}</p>
+            )}
             <div className="space-y-6">
               {displayRecipe.steps.map((group, gi) => {
                 const hasGroupTitle = !!(group.title || group.titleEn)
