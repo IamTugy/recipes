@@ -1,44 +1,9 @@
 import { ApiError } from './api'
-import type { Category, Difficulty, KosherType, Nutrition } from '../types'
-
-export interface ImportedRecipe {
-  title: string
-  titleHe?: string
-  category?: Category
-  tags?: string[]
-  tagsEn?: string[]
-  cuisine?: string
-  image?: string
-  description?: string
-  descriptionEn?: string
-  prepTime?: number
-  cookTime?: number
-  servings?: number
-  difficulty?: Difficulty
-  kosherType?: KosherType
-  nutrition?: Nutrition
-  aiGenerated?: boolean
-  sources?: { title: string; url: string }[]
-  ingredients?: { group?: string; groupEn?: string; items: { amount: number; unit: string; name: string; nameEn?: string }[] }[]
-  steps?: { title?: string; titleEn?: string; items: { instruction: string; instructionEn?: string; timerMinutes?: number }[] }[]
-  tips?: string[]
-  tipsEn?: string[]
-}
 
 // Keep in sync with client_max_body_size in nginx.conf - checking client-side
 // gives an instant, specific error instead of the upload running for a while
 // and then failing with a raw network error once nginx cuts it off.
 export const MAX_UPLOAD_BYTES = 25 * 1024 * 1024
-
-// A source with more than one recipe in it (a cooking-class PDF, a
-// multi-recipe photo, ...) is saved server-side as a batch of pending-review
-// drafts instead of being handed back for the single-recipe prefill flow -
-// the response comes back as an array of the already-created recipes (each
-// with an id) rather than the single unsaved ImportedRecipe object. See the
-// AI-drafts sidebar for reviewing/publishing them.
-export interface CreatedRecipe extends ImportedRecipe {
-  id: string
-}
 
 export async function importRecipe(
   input: { text?: string; url?: string; file?: File; image?: File },

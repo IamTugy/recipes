@@ -1,7 +1,5 @@
-import { useLocation, useNavigate } from 'react-router-dom'
-import RecipeForm from './RecipeForm'
+import { useNavigate } from 'react-router-dom'
 import { useLanguage } from '../hooks/useLanguage'
-import type { ImportedRecipe } from '../lib/recipeImport'
 import { t } from "../i18n";
 
 function bookmarkletHref(origin: string) {
@@ -14,15 +12,9 @@ function bookmarkletHref(origin: string) {
 }
 
 export default function NewRecipePage() {
-  const location = useLocation()
   const navigate = useNavigate()
   const { lang } = useLanguage()
-        const tx = t[lang]
-  const importedDraft = (location.state as { importedDraft?: ImportedRecipe } | null)?.importedDraft
-
-  if (importedDraft) {
-    return <RecipeForm importedDraft={importedDraft} />
-  }
+  const tx = t[lang]
 
   return (
     <div className="min-h-dvh bg-bg pt-20 px-4">

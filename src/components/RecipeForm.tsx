@@ -4,7 +4,6 @@ import { useAuth } from '@clerk/react'
 import { DndContext, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
 import { SortableContext, arrayMove, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import type { Category, Difficulty, IngredientGroup, IngredientItem, KosherType, Nutrition, QualityFinding, Recipe, StepGroup, StepItem } from '../types'
-import type { ImportedRecipe } from '../lib/recipeImport'
 import { createRecipe, updateRecipe, type RecipeInput } from '../hooks/useRecipes'
 import { t, categoryEmoji } from '../i18n'
 import { useLanguage } from '../hooks/useLanguage'
@@ -25,7 +24,6 @@ import LinkedIngredientDisplay from './LinkedIngredientDisplay'
 
 interface RecipeFormProps {
   existing?: Recipe
-  importedDraft?: ImportedRecipe
   // The last AI review's findings, shown as a checklist while editing so
   // issues without an auto-applied suggestedFields fix (e.g. "photo is
   // blurry") don't silently linger past the fields that did get prefilled -
@@ -124,14 +122,14 @@ function RegenerateButton({ lang, busy, onClick }: { lang: 'he' | 'en'; busy: bo
   )
 }
 
-export default function RecipeForm({ existing, importedDraft, reviewFindings, autoFixedFieldKeys }: RecipeFormProps) {
+export default function RecipeForm({ existing, reviewFindings, autoFixedFieldKeys }: RecipeFormProps) {
   const navigate = useNavigate()
   const { getToken } = useAuth()
   const { lang } = useLanguage()
   const { showToast } = useToast()
   const tx = t[lang]
   const isEditing = !!existing
-  const prefill = existing ?? importedDraft
+  const prefill = existing
 
   const [title, setTitle] = useState(prefill?.title ?? '')
   const [titleHe, setTitleHe] = useState(prefill?.titleHe ?? '')
@@ -436,18 +434,6 @@ export default function RecipeForm({ existing, importedDraft, reviewFindings, au
     }
   }
 
-  // AI-generated/imported drafts fill in everything except nutrition (Gemini
-  // can't reliably estimate it in the same pass as the rest of the recipe) -
-  // auto-run the same estimate once on arrival so it isn't just silently
-  // blank. Re-estimating later is still the same manual button.
-  const autoEstimatedRef = useRef(false)
-  useEffect(() => {
-    if (autoEstimatedRef.current) return
-    if (!importedDraft || importedDraft.nutrition) return
-    autoEstimatedRef.current = true
-    void handleEstimateNutrition()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
