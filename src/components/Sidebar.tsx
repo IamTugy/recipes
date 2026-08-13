@@ -283,33 +283,31 @@ export default function Sidebar({ sidebar }: SidebarProps) {
 
       {accountModalOpen && (
         <Modal open onOpenChange={setAccountModalOpen} zIndexClassName="z-[80]" panelClassName="max-w-3xl w-full p-0 max-h-[85vh] overflow-y-auto">
-          <UserProfile routing="hash">
-            <UserProfile.Page
-              label={tx.preferences}
-              url="preferences"
-              labelIcon={<span>🎨</span>}
+          {/* Plain UserProfile (no custom UserProfile.Page) - a second page
+              gave Clerk's own component a nav sidebar with its own internal
+              scroll, stacked on top of our modal's scroll (two scrollbars
+              at once). Appending the preferences as ordinary content below
+              it, inside the same single scroll container, avoids that. */}
+          <UserProfile routing="hash" />
+          <div className="p-4 space-y-2 border-t border-tint/10">
+            <h2 className="font-serif text-sm font-bold text-cream/70 mb-1">{tx.preferences}</h2>
+            <button
+              type="button"
+              onClick={handleLangClick}
+              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm w-full text-cream/70 hover:text-cream/95 hover:bg-tint/[0.05] transition-colors border border-tint/10"
             >
-              <div className="p-1 space-y-2">
-                <h1 className="font-serif text-lg font-bold text-cream mb-3">{tx.preferences}</h1>
-                <button
-                  type="button"
-                  onClick={handleLangClick}
-                  className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm w-full text-cream/70 hover:text-cream/95 hover:bg-tint/[0.05] transition-colors border border-tint/10"
-                >
-                  <span className="w-4 h-4 shrink-0 flex items-center justify-center text-sm">🌐</span>
-                  {lang === 'he' ? 'English' : 'עברית'}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleThemeClick}
-                  className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm w-full text-cream/70 hover:text-cream/95 hover:bg-tint/[0.05] transition-colors border border-tint/10"
-                >
-                  <span className="w-4 h-4 shrink-0 flex items-center justify-center text-sm">{themeIcon}</span>
-                  {themeLabel}
-                </button>
-              </div>
-            </UserProfile.Page>
-          </UserProfile>
+              <span className="w-4 h-4 shrink-0 flex items-center justify-center text-sm">🌐</span>
+              {lang === 'he' ? 'English' : 'עברית'}
+            </button>
+            <button
+              type="button"
+              onClick={handleThemeClick}
+              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm w-full text-cream/70 hover:text-cream/95 hover:bg-tint/[0.05] transition-colors border border-tint/10"
+            >
+              <span className="w-4 h-4 shrink-0 flex items-center justify-center text-sm">{themeIcon}</span>
+              {themeLabel}
+            </button>
+          </div>
         </Modal>
       )}
     </>
