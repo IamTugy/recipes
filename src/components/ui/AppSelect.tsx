@@ -40,7 +40,10 @@ export default function AppSelect<T extends string>({
   return (
     <Select.Root value={value} onValueChange={next => onValueChange(next as T)}>
       <Select.Trigger aria-label={ariaLabel} className={`${triggerClassName} flex items-center justify-between gap-2`}>
-        <Select.Value />
+        {/* Base UI's Select.Value shows the raw `value` (not its label) unless
+            given a children render function - without this every AppSelect
+            displayed e.g. "rating" instead of "Top rated". */}
+        <Select.Value>{(value: T) => options.find(opt => opt.value === value)?.label ?? value}</Select.Value>
         <Select.Icon>
           <ChevronDownIcon />
         </Select.Icon>

@@ -204,11 +204,11 @@ export default function RecipeFilterBar({
           )}
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <div className="flex items-center gap-1 border border-tint/10 rounded-lg p-0.5">
+          <div className="flex items-center gap-1 h-8 border border-tint/10 rounded-lg p-0.5">
             <button type="button"
               onClick={() => onViewModeChange('grid')}
               aria-label={tx.gridView}
-              className={`h-7 w-7 flex items-center justify-center rounded-md transition-colors ${
+              className={`h-full w-7 flex items-center justify-center rounded-md transition-colors ${
                 viewMode === 'grid' ? 'bg-amber/10 text-amber' : 'text-cream/35 hover:text-cream/60'
               }`}
             >
@@ -220,7 +220,7 @@ export default function RecipeFilterBar({
             <button type="button"
               onClick={() => onViewModeChange('list')}
               aria-label={tx.listView}
-              className={`h-7 w-7 flex items-center justify-center rounded-md transition-colors ${
+              className={`h-full w-7 flex items-center justify-center rounded-md transition-colors ${
                 viewMode === 'list' ? 'bg-amber/10 text-amber' : 'text-cream/35 hover:text-cream/60'
               }`}
             >
@@ -232,7 +232,7 @@ export default function RecipeFilterBar({
           <AppSelect
             value={sortBy}
             onValueChange={value => onSortChange(value as SortOption)}
-            triggerClassName="bg-tint/[0.03] border border-tint/10 rounded-lg text-xs text-cream/60 px-2.5 py-1.5 outline-none hover:bg-tint/[0.06] transition-colors"
+            triggerClassName="h-8 min-w-[108px] bg-tint/[0.03] border border-tint/10 rounded-lg text-xs text-cream/60 px-2.5 outline-none hover:bg-tint/[0.06] transition-colors"
             options={[
               { value: 'rating', label: tx.topRated },
               { value: 'quickest', label: tx.quickest },
