@@ -27,6 +27,7 @@ import KeyboardShortcutsHelp from './components/KeyboardShortcutsHelp'
 import { useTimers } from './hooks/useTimers'
 import { useShoppingList } from './hooks/useShoppingList'
 import { useSidebar } from './hooks/useSidebar'
+import { useEdgeSwipeToOpenSidebar } from './hooks/useEdgeSwipeToOpenSidebar'
 import { useLanguage } from './hooks/useLanguage'
 import { useTheme } from './hooks/useTheme'
 import { fetchPreferences } from './lib/preferences'
@@ -43,6 +44,8 @@ export default function App() {
   const navigate = useNavigate()
   const { lang, setLang } = useLanguage()
   const { setMode } = useTheme()
+
+  useEdgeSwipeToOpenSidebar(lang, sidebar.mobileOpen, sidebar.setMobileOpen)
 
   // A signed-in user's explicit lang/theme choice (if they've ever set one)
   // follows them across devices - overrides whatever this device fell back
