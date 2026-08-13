@@ -4,76 +4,117 @@ import { useAuth } from '@clerk/react'
 import type { Category, Difficulty } from '../types'
 import { useRecipes, useTrending } from '../hooks/useRecipes'
 import { useFavorites } from '../hooks/useFavorites'
-import { t, categoryEmoji } from '../i18n'
+import { t } from '../i18n'
 import { useLanguage } from '../hooks/useLanguage'
 import RecipeCardSkeleton from './RecipeCardSkeleton'
 import RecipeStrip from './RecipeStrip'
-import AppSelect from './ui/AppSelect'
+import RecipePlaceholder from './RecipePlaceholder'
+import SkeletonImage from './SkeletonImage'
+import TranslatedText from './TranslatedText'
 import VirtualRecipeGrid, { type GridItem } from './VirtualRecipeGrid'
-import FilterInfoPopover from './FilterInfoPopover'
-import { DIFFICULTY_FILTERS, DIETARY_FILTERS, KOSHER_FILTERS } from '../lib/filterDefinitions'
+import RecipeFilterBar, { type SortOption } from './RecipeFilterBar'
+import { DIETARY_KEYWORDS } from '../lib/filterDefinitions'
+import { resizedImage } from '../lib/image'
+import {
+  getSharedCategories, setSharedCategories,
+  getSharedDifficulties, setSharedDifficulties,
+  getSharedDietary, setSharedDietary,
+  getSharedKosher, setSharedKosher,
+  getSharedSort, setSharedSort,
+} from '../lib/sharedRecipeFilters'
 import { logSearch } from '../lib/logSearch'
-import { getSharedCategory, setSharedCategory, getSharedDifficulty, setSharedDifficulty } from '../lib/sharedRecipeFilters'
 
-const categories: Category[] = ['breakfast', 'lunch', 'dinner', 'dessert', 'salad', 'soup', 'snack', 'bread', 'sauce']
+const categories: Category[] = ['dessert', 'salad', 'soup', 'bread', 'sauce']
 
-const dietaryKeywords: Record<string, string[]> = {
-  vegetarian: ['vegetarian', 'צמחוני'],
-  vegan: ['vegan', 'טבעוני'],
-  'gluten-free': ['gluten-free', 'gluten free', 'ללא גלוטן'],
-  'dairy-free': ['dairy-free', 'dairy free', 'ללא חלב', 'ללא מוצרי חלב'],
+function parseSet<T extends string>(param: string | null): Set<T> {
+  return new Set((param ? param.split(',') : []).filter(Boolean) as T[])
 }
-
-type SortOption = 'default' | 'rating' | 'quickest' | 'newest'
 
 export default function Home() {
   const navigate = useNavigate()
-  const { getToken } = useAuth()
-  // Initial state is read from the URL once on mount (lazy initializers) so
-  // a shared link reproduces the exact filtered view. "tag" is kept as a
-  // legacy alias for "q" - old share links used it before this sync existed.
+  const { getToken, userId } = useAuth()
+  // Initial state is read from the URL once on mount (lazy initializers),
+  // falling back to whatever the shared filter storage last held (synced
+  // with My Cookbook), so a shared link reproduces the exact filtered view
+  // and an unlinked visit picks up wherever the user left off on either
+  // page. "tag" is kept as a legacy alias for "q" - old share links used
+  // it before this sync existed.
   const [searchParams, setSearchParams] = useSearchParams()
   const { lang } = useLanguage()
   const tx = t[lang]
   const [search, setSearch] = useState(() => searchParams.get('q') ?? searchParams.get('tag') ?? '')
-  const [activeCategory, setActiveCategory] = useState<Category | null>(() => (searchParams.get('category') as Category) || (getSharedCategory() as Category) || null)
-  const [activeDifficulty, setActiveDifficulty] = useState<Difficulty | null>(() => (searchParams.get('diff') as Difficulty) || (getSharedDifficulty() as Difficulty) || null)
-  const [activeDietary, setActiveDietary] = useState<string | null>(() => searchParams.get('diet') || null)
-  const [activeKosher, setActiveKosher] = useState<string | null>(() => searchParams.get('kosher') || null)
+  const [activeCategories, setActiveCategories] = useState<Set<Category>>(() =>
+    searchParams.has('category') ? parseSet(searchParams.get('category')) : (getSharedCategories() as Set<Category>))
+  const [activeDifficulties, setActiveDifficulties] = useState<Set<Difficulty>>(() =>
+    searchParams.has('diff') ? parseSet(searchParams.get('diff')) : (getSharedDifficulties() as Set<Difficulty>))
+  const [activeDietary, setActiveDietary] = useState<Set<string>>(() =>
+    searchParams.has('diet') ? parseSet(searchParams.get('diet')) : getSharedDietary())
+  const [activeKosher, setActiveKosher] = useState<Set<string>>(() =>
+    searchParams.has('kosher') ? parseSet(searchParams.get('kosher')) : getSharedKosher())
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(() => searchParams.get('fav') === '1')
-  const [sortBy, setSortBy] = useState<SortOption>(() => (searchParams.get('sort') as SortOption) || 'default')
+  const [showMineOnly, setShowMineOnly] = useState(() => searchParams.get('mine') === '1')
+  const [sortBy, setSortBy] = useState<SortOption>(() => (searchParams.get('sort') as SortOption) || (getSharedSort() as SortOption) || 'rating')
   const [groupByDish, setGroupByDish] = useState(() => searchParams.get('grouped') === '1')
   const [activeGroupId, setActiveGroupId] = useState<string | null>(() => searchParams.get('group'))
-  const [advancedOpen, setAdvancedOpen] = useState(false)
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const { recipes, loading, error } = useRecipes()
   const { favoriteSlugs, toggle: toggleFavorite } = useFavorites()
   const { trending, loading: trendingLoading } = useTrending()
   const searchInputRef = useRef<HTMLInputElement>(null)
 
+  const hasOwnRecipes = !!userId && recipes.some(r => r.ownerId === userId)
+
   // Keep the URL in sync with every filter/search/sort change (replace, not
   // push, so typing in the search box doesn't spam browser history) - a
   // shared link always reproduces the exact filtered view.
   useEffect(() => {
-    setSharedCategory(activeCategory)
-    setSharedDifficulty(activeDifficulty)
-  }, [activeCategory, activeDifficulty])
-
-  useEffect(() => {
     const next = new URLSearchParams()
     if (search.trim()) next.set('q', search.trim())
-    if (activeCategory) next.set('category', activeCategory)
-    if (activeDifficulty) next.set('diff', activeDifficulty)
-    if (activeDietary) next.set('diet', activeDietary)
-    if (activeKosher) next.set('kosher', activeKosher)
+    if (activeCategories.size) next.set('category', [...activeCategories].join(','))
+    if (activeDifficulties.size) next.set('diff', [...activeDifficulties].join(','))
+    if (activeDietary.size) next.set('diet', [...activeDietary].join(','))
+    if (activeKosher.size) next.set('kosher', [...activeKosher].join(','))
     if (showFavoritesOnly) next.set('fav', '1')
-    if (sortBy !== 'default') next.set('sort', sortBy)
+    if (showMineOnly) next.set('mine', '1')
+    if (sortBy !== 'rating') next.set('sort', sortBy)
     if (groupByDish) next.set('grouped', '1')
     if (activeGroupId) next.set('group', activeGroupId)
     setSearchParams(next, { replace: true })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, activeCategory, activeDifficulty, activeDietary, activeKosher, showFavoritesOnly, sortBy, groupByDish, activeGroupId])
+  }, [search, activeCategories, activeDifficulties, activeDietary, activeKosher, showFavoritesOnly, showMineOnly, sortBy, groupByDish, activeGroupId])
 
-  const advancedActiveCount = [activeDifficulty, activeDietary, activeKosher].filter(Boolean).length
+  // Mirror category/difficulty/dietary/kosher/sort into shared storage so
+  // My Cookbook picks up the same selection.
+  useEffect(() => {
+    setSharedCategories(activeCategories)
+    setSharedDifficulties(activeDifficulties)
+    setSharedDietary(activeDietary)
+    setSharedKosher(activeKosher)
+    setSharedSort(sortBy)
+  }, [activeCategories, activeDifficulties, activeDietary, activeKosher, sortBy])
+
+  const hasActiveFilters = activeCategories.size > 0 || activeDifficulties.size > 0 || activeDietary.size > 0
+    || activeKosher.size > 0 || showFavoritesOnly || showMineOnly || !!search.trim()
+
+  function clearAllFilters() {
+    setActiveCategories(new Set())
+    setActiveDifficulties(new Set())
+    setActiveDietary(new Set())
+    setActiveKosher(new Set())
+    setShowFavoritesOnly(false)
+    setShowMineOnly(false)
+    setGroupByDish(false)
+    setActiveGroupId(null)
+  }
+
+  function toggleInSet<T>(setter: React.Dispatch<React.SetStateAction<Set<T>>>, value: T) {
+    setter(prev => {
+      const next = new Set(prev)
+      if (next.has(value)) next.delete(value)
+      else next.add(value)
+      return next
+    })
+  }
 
   // "/" focuses search (from anywhere on the page), Escape clears + blurs it
   useEffect(() => {
@@ -97,18 +138,19 @@ export default function Home() {
   const filtered = useMemo(() => {
     let list = recipes.filter(r => !r.hidden)
     if (showFavoritesOnly) list = list.filter(r => favoriteSlugs.has(r.id))
-    if (activeCategory) list = list.filter(r => r.category === activeCategory)
-    if (activeDifficulty) list = list.filter(r => r.difficulty === activeDifficulty)
-    if (activeDietary) {
-      const keywords = dietaryKeywords[activeDietary]
-      if (keywords) {
-        list = list.filter(r => {
-          const allTags = [...r.tags, ...(r.tagsEn ?? [])].map(t => t.toLowerCase())
-          return keywords.some(k => allTags.some(tag => tag.includes(k.toLowerCase())))
+    if (showMineOnly) list = list.filter(r => r.ownerId === userId)
+    if (activeCategories.size) list = list.filter(r => activeCategories.has(r.category))
+    if (activeDifficulties.size) list = list.filter(r => activeDifficulties.has(r.difficulty))
+    if (activeDietary.size) {
+      list = list.filter(r => {
+        const allTags = [...r.tags, ...(r.tagsEn ?? [])].map(t => t.toLowerCase())
+        return [...activeDietary].some(diet => {
+          const keywords = DIETARY_KEYWORDS[diet]
+          return keywords && keywords.some(k => allTags.some(tag => tag.includes(k.toLowerCase())))
         })
-      }
+      })
     }
-    if (activeKosher) list = list.filter(r => r.kosherType === activeKosher)
+    if (activeKosher.size) list = list.filter(r => r.kosherType && activeKosher.has(r.kosherType))
     if (activeGroupId) list = list.filter(r => r.dishGroupId === activeGroupId)
     if (search.trim()) {
       const q = search.toLowerCase()
@@ -145,7 +187,19 @@ export default function Home() {
       list = [...list].sort((a, b) => (b.createdAt ?? '').localeCompare(a.createdAt ?? ''))
     }
     return list
-  }, [search, activeCategory, activeDifficulty, activeDietary, activeKosher, lang, recipes, showFavoritesOnly, favoriteSlugs, sortBy, activeGroupId])
+  }, [search, activeCategories, activeDifficulties, activeDietary, activeKosher, lang, recipes, showFavoritesOnly, showMineOnly, userId, favoriteSlugs, sortBy, activeGroupId])
+
+  // Whether grouping would actually collapse anything in the current
+  // filtered set - the toggle to enable it only shows up when it would.
+  const canGroup = useMemo(() => {
+    if (activeGroupId) return false
+    const counts = new Map<string, number>()
+    for (const r of filtered) {
+      if (!r.dishGroupId) continue
+      counts.set(r.dishGroupId, (counts.get(r.dishGroupId) ?? 0) + 1)
+    }
+    return [...counts.values()].some(n => n >= 2)
+  }, [filtered, activeGroupId])
 
   const gridItems = useMemo<GridItem[]>(() => {
     if (activeGroupId || !groupByDish) {
@@ -239,11 +293,6 @@ export default function Home() {
               className={`input-field ${lang === 'he' ? 'pr-11 text-right' : 'pl-11'} w-full`}
               dir={lang === 'he' ? 'rtl' : 'ltr'}
             />
-            {!search && (
-              <kbd className={`hidden sm:flex absolute ${lang === 'he' ? 'left-3' : 'right-3'} top-1/2 -translate-y-1/2 items-center justify-center w-5 h-5 rounded text-[10px] font-mono text-cream/25 border border-tint/10 bg-tint/[0.03]`}>
-                /
-              </kbd>
-            )}
           </div>
           <button type="button"
             onClick={surpriseMe}
@@ -257,177 +306,53 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Category filter */}
-      <div className="max-w-6xl mx-auto px-6 mb-6">
-        <div className="flex gap-1 overflow-x-auto pb-1 scrollbar-none">
-          <button type="button"
-            onClick={() => setActiveCategory(null)}
-            className={`shrink-0 px-4 py-2 text-xs tracking-wider font-medium transition-colors rounded-lg ${
-              activeCategory === null
-                ? 'text-amber bg-amber/10 border border-amber/20'
-                : 'text-cream/40 hover:text-cream/70 border border-transparent'
-            }`}
-          >
-            {tx.categories.all}
-          </button>
-          <button type="button"
-            onClick={() => setShowFavoritesOnly(v => !v)}
-            className={`shrink-0 flex items-center gap-1.5 px-4 py-2 text-xs tracking-wider font-medium transition-colors rounded-lg ${
-              showFavoritesOnly
-                ? 'text-amber bg-amber/10 border border-amber/20'
-                : 'text-cream/40 hover:text-cream/70 border border-transparent'
-            }`}
-          >
-            <span>♥</span>
-            <span>{tx.favorites}</span>
-          </button>
-          {categories.map(cat => (
-            <button type="button"
-              key={cat}
-              onClick={() => setActiveCategory(cat === activeCategory ? null : cat)}
-              className={`shrink-0 flex items-center gap-1.5 px-4 py-2 text-xs tracking-wider font-medium transition-colors rounded-lg ${
-                activeCategory === cat
-                  ? 'text-amber bg-amber/10 border border-amber/20'
-                  : 'text-cream/40 hover:text-cream/70 border border-transparent'
-              }`}
-            >
-              <span className="text-sm">{categoryEmoji[cat]}</span>
-              <span>{tx.categories[cat]}</span>
-            </button>
-          ))}
-        </div>
+      <div className="max-w-6xl mx-auto px-6">
+        <RecipeFilterBar
+          lang={lang}
+          categories={categories}
+          activeCategories={activeCategories}
+          onToggleCategory={cat => toggleInSet(setActiveCategories, cat)}
+          onClearCategories={() => setActiveCategories(new Set())}
+          extraChips={[
+            {
+              key: 'favorites',
+              label: <><span>♥</span> {tx.favorites}</>,
+              active: showFavoritesOnly,
+              onClick: () => setShowFavoritesOnly(v => !v),
+            },
+            ...(hasOwnRecipes ? [{
+              key: 'mine',
+              label: tx.mine,
+              active: showMineOnly,
+              onClick: () => setShowMineOnly(v => !v),
+            }] : []),
+          ]}
+          activeDifficulties={activeDifficulties}
+          onToggleDifficulty={d => toggleInSet(setActiveDifficulties, d)}
+          activeDietary={activeDietary}
+          onToggleDietary={d => toggleInSet(setActiveDietary, d)}
+          activeKosher={activeKosher}
+          onToggleKosher={k => toggleInSet(setActiveKosher, k)}
+          canGroup={canGroup}
+          groupByDish={groupByDish}
+          onToggleGroup={() => setGroupByDish(v => !v)}
+          sortBy={sortBy}
+          onSortChange={setSortBy}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          resultCount={filtered.length}
+          totalCount={recipes.length}
+          hasActiveFilters={hasActiveFilters}
+          onClearAll={clearAllFilters}
+        />
       </div>
 
-      {/* Advanced filters */}
-      <div className="max-w-6xl mx-auto px-6 mb-6">
-        <button
-          type="button"
-          onClick={() => setAdvancedOpen(v => !v)}
-          className="flex items-center gap-1.5 text-xs font-medium text-cream/40 hover:text-cream/70 transition-colors"
-        >
-          <svg className={`w-3.5 h-3.5 transition-transform ${advancedOpen ? 'rotate-90' : lang === 'he' ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-          </svg>
-          <span>{tx.advancedFilters}</span>
-          {advancedActiveCount > 0 && (
-            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber/10 text-amber">
-              {advancedActiveCount}
-            </span>
-          )}
-        </button>
-
-        {advancedOpen && (
-          <div className="mt-3 space-y-4">
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-cream/25 mb-1.5">
-                {tx.difficulty2}
-              </p>
-              <div className="flex gap-1.5 flex-wrap">
-                {DIFFICULTY_FILTERS.map(f => (
-                  <button type="button"
-                    key={f.key}
-                    onClick={() => setActiveDifficulty(f.key === activeDifficulty ? null : f.key as Difficulty)}
-                    className={`flex items-center gap-1 px-3 py-1.5 text-[11px] tracking-wider font-medium transition-colors rounded-lg border ${
-                      activeDifficulty === f.key
-                        ? 'text-amber bg-amber/10 border-amber/20'
-                        : 'text-cream/35 hover:text-cream/60 border-tint/10'
-                    }`}
-                  >
-                    {f.label[lang]}
-                    <FilterInfoPopover text={f.tooltip[lang]} />
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-cream/25 mb-1.5">
-                {tx.dietary}
-              </p>
-              <div className="flex gap-1.5 flex-wrap">
-                {DIETARY_FILTERS.map(f => (
-                  <button type="button"
-                    key={f.key}
-                    onClick={() => setActiveDietary(f.key === activeDietary ? null : f.key)}
-                    className={`flex items-center gap-1 px-3 py-1.5 text-[11px] tracking-wider font-medium transition-colors rounded-lg border ${
-                      activeDietary === f.key
-                        ? 'text-amber bg-amber/10 border-amber/20'
-                        : 'text-cream/35 hover:text-cream/60 border-tint/10'
-                    }`}
-                  >
-                    {f.label[lang]}
-                    <FilterInfoPopover text={f.tooltip[lang]} />
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-cream/25 mb-1.5">
-                {tx.kosher}
-              </p>
-              <div className="flex gap-1.5 flex-wrap">
-                {KOSHER_FILTERS.map(f => (
-                  <button type="button"
-                    key={f.key}
-                    onClick={() => setActiveKosher(f.key === activeKosher ? null : f.key)}
-                    className={`flex items-center gap-1 px-3 py-1.5 text-[11px] tracking-wider font-medium transition-colors rounded-lg border ${
-                      activeKosher === f.key
-                        ? 'text-amber bg-amber/10 border-amber/20'
-                        : 'text-cream/35 hover:text-cream/60 border-tint/10'
-                    }`}
-                  >
-                    {f.label[lang]}
-                    <FilterInfoPopover text={f.tooltip[lang]} />
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {!loading && !search && !activeCategory && !activeDifficulty && !activeDietary && !activeKosher && !showFavoritesOnly && (
-        <>
-          <RecipeStrip title={tx.trendingThisWeek} recipes={trending} loading={trendingLoading} />
-        </>
+      {!loading && !hasActiveFilters && (
+        <RecipeStrip title={tx.trendingThisWeek} recipes={trending} loading={trendingLoading} />
       )}
 
       {/* Recipe grid */}
       <div className="max-w-6xl mx-auto px-6 pb-24">
-        <div className="flex items-center justify-between mb-5">
-          <p className="text-cream/25 text-xs tracking-wider">
-            {(search || activeCategory || activeDifficulty || activeDietary || activeKosher || showFavoritesOnly)
-              ? `${filtered.length} / ${recipes.length}`
-              : `${recipes.length}`
-            }
-            {' '}{tx.recipes}
-          </p>
-          <div className="flex items-center gap-2">
-            <button type="button"
-              onClick={() => setGroupByDish(v => !v)}
-              className={`shrink-0 px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
-                groupByDish
-                  ? 'text-amber bg-amber/10 border-amber/20'
-                  : 'text-cream/40 hover:text-cream/70 border-tint/10'
-              }`}
-            >
-              {tx.groupSameDish}
-            </button>
-            <AppSelect
-              value={sortBy}
-              onValueChange={value => setSortBy(value as SortOption)}
-              triggerClassName="bg-tint/[0.03] border border-tint/10 rounded-lg text-xs text-cream/60 px-2.5 py-1.5 outline-none hover:bg-tint/[0.06] transition-colors"
-              options={[
-                { value: 'default', label: tx.defaultOrder },
-                { value: 'rating', label: tx.topRated },
-                { value: 'quickest', label: tx.quickest },
-                { value: 'newest', label: tx.newest },
-              ]}
-            />
-          </div>
-        </div>
-
         {activeGroupId && (() => {
           const groupRecipe = recipes.find(r => r.dishGroupId === activeGroupId)
           const name = (lang === 'he' ? groupRecipe?.dishGroupNameHe : groupRecipe?.dishGroupName) ?? groupRecipe?.dishGroupName ?? ''
@@ -467,6 +392,36 @@ export default function Home() {
               </button>
             )}
           </div>
+        ) : viewMode === 'list' ? (
+          <ul className="space-y-1.5">
+            {filtered.map(r => (
+              <li key={r.id}>
+                <button type="button"
+                  onClick={() => navigate(`/recipes/${r.id}`)}
+                  className="card w-full flex items-center gap-3 p-2 text-start"
+                >
+                  <div className="relative w-12 h-12 rounded-lg overflow-hidden shrink-0">
+                    {r.image?.includes('assets.tugy.dev') ? (
+                      <SkeletonImage src={resizedImage(r.image, 160)} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <RecipePlaceholder recipe={r} />
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-cream truncate" dir={lang === 'he' ? 'rtl' : 'ltr'}>
+                      <TranslatedText
+                        primary={lang === 'he' ? r.titleHe : r.title}
+                        secondary={lang === 'he' ? r.title : r.titleHe}
+                      />
+                    </p>
+                    <p className="text-[11px] text-cream/30">
+                      {tx.categories[r.category]} · {tx.difficulty[r.difficulty]}
+                    </p>
+                  </div>
+                </button>
+              </li>
+            ))}
+          </ul>
         ) : (
           <VirtualRecipeGrid
             items={gridItems}

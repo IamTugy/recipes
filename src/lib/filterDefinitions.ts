@@ -74,3 +74,13 @@ export const KOSHER_FILTERS: FilterDef[] = [
 ]
 
 export const ALL_FILTERS: FilterDef[] = [...DIFFICULTY_FILTERS, ...DIETARY_FILTERS, ...KOSHER_FILTERS]
+
+// Recipes don't have a dedicated "dietary" field - matched against their
+// free-text tags instead. Shared between Home and MyRecipesPage so both
+// pages' dietary filter behaves identically.
+export const DIETARY_KEYWORDS: Record<string, string[]> = {
+  vegetarian: ['vegetarian', 'צמחוני'],
+  vegan: ['vegan', 'טבעוני'],
+  'gluten-free': ['gluten-free', 'gluten free', 'ללא גלוטן'],
+  'dairy-free': ['dairy-free', 'dairy free', 'ללא חלב', 'ללא מוצרי חלב'],
+}

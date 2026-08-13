@@ -1,29 +1,44 @@
-// Category/difficulty are the two filters that exist identically on both
-// the published-recipes feed (Home.tsx) and My Cookbook (MyRecipesPage.tsx).
-// Persisting them here keeps the two in sync - picking "Dessert" on one
-// page and then switching to the other shows it already selected, instead
-// of each page resetting independently.
+// Filters that exist identically on both the published-recipes feed
+// (Home.tsx) and My Cookbook (MyRecipesPage.tsx). Persisting them here
+// keeps the two in sync - picking a filter on one page and then switching
+// to the other shows it already selected, instead of each page resetting
+// independently. Category/difficulty/dietary/kosher are all multiselect,
+// so each is stored as a comma-joined list rather than a single value.
 const CATEGORY_KEY = 'shared-filter-category'
 const DIFFICULTY_KEY = 'shared-filter-difficulty'
+const DIETARY_KEY = 'shared-filter-dietary'
+const KOSHER_KEY = 'shared-filter-kosher'
+const SORT_KEY = 'shared-filter-sort'
 
-export function getSharedCategory(): string | null {
-  try { return localStorage.getItem(CATEGORY_KEY) } catch { return null }
+function getSet(key: string): Set<string> {
+  try {
+    const raw = localStorage.getItem(key)
+    return raw ? new Set(raw.split(',').filter(Boolean)) : new Set()
+  } catch {
+    return new Set()
+  }
 }
 
-export function setSharedCategory(value: string | null): void {
+function setSet(key: string, values: Set<string>): void {
   try {
-    if (value) localStorage.setItem(CATEGORY_KEY, value)
-    else localStorage.removeItem(CATEGORY_KEY)
+    if (values.size === 0) localStorage.removeItem(key)
+    else localStorage.setItem(key, [...values].join(','))
   } catch { /* storage unavailable */ }
 }
 
-export function getSharedDifficulty(): string | null {
-  try { return localStorage.getItem(DIFFICULTY_KEY) } catch { return null }
+export const getSharedCategories = () => getSet(CATEGORY_KEY)
+export const setSharedCategories = (values: Set<string>) => setSet(CATEGORY_KEY, values)
+export const getSharedDifficulties = () => getSet(DIFFICULTY_KEY)
+export const setSharedDifficulties = (values: Set<string>) => setSet(DIFFICULTY_KEY, values)
+export const getSharedDietary = () => getSet(DIETARY_KEY)
+export const setSharedDietary = (values: Set<string>) => setSet(DIETARY_KEY, values)
+export const getSharedKosher = () => getSet(KOSHER_KEY)
+export const setSharedKosher = (values: Set<string>) => setSet(KOSHER_KEY, values)
+
+export function getSharedSort(): string | null {
+  try { return localStorage.getItem(SORT_KEY) } catch { return null }
 }
 
-export function setSharedDifficulty(value: string | null): void {
-  try {
-    if (value) localStorage.setItem(DIFFICULTY_KEY, value)
-    else localStorage.removeItem(DIFFICULTY_KEY)
-  } catch { /* storage unavailable */ }
+export function setSharedSort(value: string): void {
+  try { localStorage.setItem(SORT_KEY, value) } catch { /* storage unavailable */ }
 }

@@ -13,7 +13,15 @@ import RecipeCardSkeleton from './RecipeCardSkeleton'
 import RecipePlaceholder from './RecipePlaceholder'
 import SubmissionsPage from './SubmissionsPage'
 import JobsPage from './JobsPage'
-import { getSharedCategory, setSharedCategory, getSharedDifficulty, setSharedDifficulty } from '../lib/sharedRecipeFilters'
+import RecipeFilterBar, { type SortOption } from './RecipeFilterBar'
+import { DIETARY_KEYWORDS } from '../lib/filterDefinitions'
+import {
+  getSharedCategories, setSharedCategories,
+  getSharedDifficulties, setSharedDifficulties,
+  getSharedDietary, setSharedDietary,
+  getSharedKosher, setSharedKosher,
+  getSharedSort, setSharedSort,
+} from '../lib/sharedRecipeFilters'
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll'
 import { resizedImage } from '../lib/image'
 import TranslatedText from './TranslatedText'
@@ -21,8 +29,9 @@ import SkeletonImage from './SkeletonImage'
 
 type PageTab = 'recipes' | 'submissions' | 'jobs'
 
-const categories: Category[] = ['breakfast', 'lunch', 'dinner', 'dessert', 'salad', 'soup', 'snack', 'bread', 'sauce']
-const difficulties: Difficulty[] = ['easy', 'medium', 'hard']
+// Kept in sync with Home.tsx's category list (see #5/#1 of the filter-sync
+// request) - breakfast/lunch/dinner/snack were dropped as not useful chips.
+const categories: Category[] = ['dessert', 'salad', 'soup', 'bread', 'sauce']
 
 type StatusFilter = 'draft' | 'pending_review' | 'published' | 'rejected'
 const STATUS_FILTERS: StatusFilter[] = ['draft', 'pending_review', 'published', 'rejected']
@@ -67,13 +76,15 @@ export default function MyRecipesPage() {
   const { jobs } = useJobs()
   const jobsNeedingAttention = jobs.filter(j => j.status === 'running' || j.status === 'queued' || j.status === 'failed').length
   const [search, setSearch] = useState('')
-  const [activeCategory, setActiveCategory] = useState<Category | null>(() => (getSharedCategory() as Category) || null)
-  const [activeDifficulty, setActiveDifficulty] = useState<Difficulty | null>(() => (getSharedDifficulty() as Difficulty) || null)
+  const [activeCategories, setActiveCategories] = useState<Set<Category>>(() => getSharedCategories() as Set<Category>)
+  const [activeDifficulties, setActiveDifficulties] = useState<Set<Difficulty>>(() => getSharedDifficulties() as Set<Difficulty>)
+  const [activeDietary, setActiveDietary] = useState<Set<string>>(() => getSharedDietary())
+  const [activeKosher, setActiveKosher] = useState<Set<string>>(() => getSharedKosher())
   const [activeStatus, setActiveStatus] = useState<StatusFilter | null>(null)
-  const [liveOnly, setLiveOnly] = useState(false)
+  const [sortBy, setSortBy] = useState<SortOption>(() => (getSharedSort() as SortOption) || 'rating')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
-  const filtersKey = JSON.stringify([search, activeCategory, activeDifficulty, activeStatus, liveOnly])
+  const filtersKey = JSON.stringify([search, [...activeCategories], [...activeDifficulties], [...activeDietary], [...activeKosher], activeStatus, sortBy])
   const [prevFiltersKey, setPrevFiltersKey] = useState(filtersKey)
   if (filtersKey !== prevFiltersKey) {
     setPrevFiltersKey(filtersKey)
@@ -81,16 +92,48 @@ export default function MyRecipesPage() {
   }
 
   useEffect(() => {
-    setSharedCategory(activeCategory)
-    setSharedDifficulty(activeDifficulty)
-  }, [activeCategory, activeDifficulty])
+    setSharedCategories(activeCategories)
+    setSharedDifficulties(activeDifficulties)
+    setSharedDietary(activeDietary)
+    setSharedKosher(activeKosher)
+    setSharedSort(sortBy)
+  }, [activeCategories, activeDifficulties, activeDietary, activeKosher, sortBy])
+
+  function toggleInSet<T>(setter: React.Dispatch<React.SetStateAction<Set<T>>>, value: T) {
+    setter(prev => {
+      const next = new Set(prev)
+      if (next.has(value)) next.delete(value)
+      else next.add(value)
+      return next
+    })
+  }
+
+  const hasActiveFilters = !!search || activeCategories.size > 0 || activeDifficulties.size > 0
+    || activeDietary.size > 0 || activeKosher.size > 0 || !!activeStatus
+
+  function clearAllFilters() {
+    setActiveCategories(new Set())
+    setActiveDifficulties(new Set())
+    setActiveDietary(new Set())
+    setActiveKosher(new Set())
+    setActiveStatus(null)
+  }
 
   const filtered = useMemo(() => {
     let list = recipes
-    if (liveOnly) list = list.filter(r => r.publishedRevision != null)
     if (activeStatus) list = list.filter(r => (r.status ?? 'published') === activeStatus)
-    if (activeCategory) list = list.filter(r => r.category === activeCategory)
-    if (activeDifficulty) list = list.filter(r => r.difficulty === activeDifficulty)
+    if (activeCategories.size) list = list.filter(r => activeCategories.has(r.category))
+    if (activeDifficulties.size) list = list.filter(r => activeDifficulties.has(r.difficulty))
+    if (activeDietary.size) {
+      list = list.filter(r => {
+        const allTags = [...r.tags, ...(r.tagsEn ?? [])].map(t => t.toLowerCase())
+        return [...activeDietary].some(diet => {
+          const keywords = DIETARY_KEYWORDS[diet]
+          return keywords && keywords.some(k => allTags.some(tag => tag.includes(k.toLowerCase())))
+        })
+      })
+    }
+    if (activeKosher.size) list = list.filter(r => r.kosherType && activeKosher.has(r.kosherType))
     if (search.trim()) {
       const q = search.toLowerCase()
       list = list.filter(r =>
@@ -99,8 +142,15 @@ export default function MyRecipesPage() {
         (r.description ?? '').toLowerCase().includes(q)
       )
     }
+    if (sortBy === 'rating') {
+      list = [...list].sort((a, b) => (b.averageRating ?? -1) - (a.averageRating ?? -1))
+    } else if (sortBy === 'quickest') {
+      list = [...list].sort((a, b) => (a.prepTime + a.cookTime) - (b.prepTime + b.cookTime))
+    } else if (sortBy === 'newest') {
+      list = [...list].sort((a, b) => (b.createdAt ?? '').localeCompare(a.createdAt ?? ''))
+    }
     return list
-  }, [recipes, search, activeCategory, activeDifficulty, activeStatus, liveOnly])
+  }, [recipes, search, activeCategories, activeDifficulties, activeDietary, activeKosher, activeStatus, sortBy])
 
   const paged = useMemo(() => filtered.slice(0, visibleCount), [filtered, visibleCount])
   const hasMore = visibleCount < filtered.length
@@ -117,12 +167,12 @@ export default function MyRecipesPage() {
 
   return (
     <div className="min-h-dvh bg-bg pt-14">
-      <div className="max-w-6xl mx-auto px-6 pt-10 pb-6">
+      <div className="max-w-6xl mx-auto px-6 pt-10 pb-3">
         <h1 className="font-serif text-2xl font-bold text-cream mb-4">
           {tx.myRecipes}
         </h1>
 
-        <div className="flex gap-1.5 mb-6">
+        <div className="flex gap-1.5 mb-3">
           {tabs.map(tabDef => (
             <button type="button"
               key={tabDef.key}
@@ -144,14 +194,34 @@ export default function MyRecipesPage() {
         </div>
 
         {activeTab === 'submissions' && (
-          <p className="text-sm text-cream/40 -mt-3 mb-6 max-w-2xl mx-auto">
+          <p className="text-sm text-cream/40 mb-3 max-w-2xl mx-auto">
             {tx.recentAIQualityReviewOutcomesAcross}
           </p>
         )}
         {activeTab === 'jobs' && (
-          <p className="text-sm text-cream/40 -mt-3 mb-6 max-w-2xl mx-auto">
+          <p className="text-sm text-cream/40 mb-3 max-w-2xl mx-auto">
             {tx.jobsDescription}
           </p>
+        )}
+
+        {activeTab === 'recipes' && (
+          <div className="relative max-w-md">
+            <svg
+              className={`absolute ${lang === 'he' ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 w-4 h-4 text-cream/25`}
+              fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              type="text"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder={tx.searchPlaceholder}
+              aria-label={tx.searchPlaceholder}
+              className={`input-field ${lang === 'he' ? 'pr-11 text-right' : 'pl-11'} w-full`}
+              dir={lang === 'he' ? 'rtl' : 'ltr'}
+            />
+          </div>
         )}
       </div>
 
@@ -165,26 +235,6 @@ export default function MyRecipesPage() {
         </div>
       ) : (
       <>
-      <div className="max-w-6xl mx-auto px-6 pb-6">
-        <div className="relative max-w-md">
-          <svg
-            className={`absolute ${lang === 'he' ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 w-4 h-4 text-cream/25`}
-            fill="none" viewBox="0 0 24 24" stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <input
-            type="text"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder={tx.searchPlaceholder}
-            aria-label={tx.searchPlaceholder}
-            className={`input-field ${lang === 'he' ? 'pr-11 text-right' : 'pl-11'} w-full`}
-            dir={lang === 'he' ? 'rtl' : 'ltr'}
-          />
-        </div>
-      </div>
-
       {/* Status filter */}
       <div className="max-w-6xl mx-auto px-6 mb-4">
         <div className="flex gap-1.5 flex-wrap">
@@ -211,106 +261,38 @@ export default function MyRecipesPage() {
               {statusLabel[s][lang]}
             </button>
           ))}
-          <button type="button"
-            onClick={() => setLiveOnly(v => !v)}
-            title={tx.recipesCurrentlyVisibleToEveryoneOn}
-            className={`px-3 py-1.5 text-[11px] tracking-wider font-medium transition-colors rounded-lg border ${
-              liveOnly
-                ? 'text-amber bg-amber/10 border-amber/20'
-                : 'text-cream/35 hover:text-cream/60 border-tint/10'
-            }`}
-          >
-            🌐 {tx.liveOnSite}
-          </button>
         </div>
       </div>
 
-      {/* Category filter */}
-      <div className="max-w-6xl mx-auto px-6 mb-6">
-        <div className="flex gap-1 overflow-x-auto pb-1 scrollbar-none">
-          <button type="button"
-            onClick={() => setActiveCategory(null)}
-            className={`shrink-0 px-4 py-2 text-xs tracking-wider font-medium transition-colors rounded-lg ${
-              activeCategory === null
-                ? 'text-amber bg-amber/10 border border-amber/20'
-                : 'text-cream/40 hover:text-cream/70 border border-transparent'
-            }`}
-          >
-            {tx.categories.all}
-          </button>
-          {categories.map(cat => (
-            <button type="button"
-              key={cat}
-              onClick={() => setActiveCategory(cat === activeCategory ? null : cat)}
-              className={`shrink-0 flex items-center gap-1.5 px-4 py-2 text-xs tracking-wider font-medium transition-colors rounded-lg ${
-                activeCategory === cat
-                  ? 'text-amber bg-amber/10 border border-amber/20'
-                  : 'text-cream/40 hover:text-cream/70 border border-transparent'
-              }`}
-            >
-              <span className="text-sm">{categoryEmoji[cat]}</span>
-              <span>{tx.categories[cat]}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Difficulty filter */}
-      <div className="max-w-6xl mx-auto px-6 mb-6">
-        <div className="flex gap-1.5">
-          {difficulties.map(diff => (
-            <button type="button"
-              key={diff}
-              onClick={() => setActiveDifficulty(diff === activeDifficulty ? null : diff)}
-              className={`px-3 py-1.5 text-[11px] tracking-wider font-medium transition-colors rounded-lg border ${
-                activeDifficulty === diff
-                  ? 'text-amber bg-amber/10 border-amber/20'
-                  : 'text-cream/35 hover:text-cream/60 border-tint/10'
-              }`}
-            >
-              {tx.difficulty[diff]}
-            </button>
-          ))}
-        </div>
+      <div className="max-w-6xl mx-auto px-6">
+        <RecipeFilterBar
+          lang={lang}
+          categories={categories}
+          activeCategories={activeCategories}
+          onToggleCategory={cat => toggleInSet(setActiveCategories, cat)}
+          onClearCategories={() => setActiveCategories(new Set())}
+          activeDifficulties={activeDifficulties}
+          onToggleDifficulty={d => toggleInSet(setActiveDifficulties, d)}
+          activeDietary={activeDietary}
+          onToggleDietary={d => toggleInSet(setActiveDietary, d)}
+          activeKosher={activeKosher}
+          onToggleKosher={k => toggleInSet(setActiveKosher, k)}
+          canGroup={false}
+          groupByDish={false}
+          onToggleGroup={() => {}}
+          sortBy={sortBy}
+          onSortChange={setSortBy}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          resultCount={filtered.length}
+          totalCount={recipes.length}
+          hasActiveFilters={hasActiveFilters}
+          onClearAll={clearAllFilters}
+        />
       </div>
 
       {/* Recipe grid */}
       <div className="max-w-6xl mx-auto px-6 pb-24">
-        <div className="flex items-center justify-between mb-5">
-          <p className="text-cream/25 text-xs tracking-wider">
-            {(search || activeCategory || activeDifficulty || activeStatus || liveOnly)
-              ? `${filtered.length} / ${recipes.length}`
-              : `${recipes.length}`
-            }
-            {' '}{tx.recipes}
-          </p>
-          <div className="flex items-center gap-1 border border-tint/10 rounded-lg p-0.5">
-            <button type="button"
-              onClick={() => setViewMode('grid')}
-              aria-label={tx.gridView}
-              className={`h-7 w-7 flex items-center justify-center rounded-md transition-colors ${
-                viewMode === 'grid' ? 'bg-amber/10 text-amber' : 'text-cream/35 hover:text-cream/60'
-              }`}
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" />
-                <rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
-              </svg>
-            </button>
-            <button type="button"
-              onClick={() => setViewMode('list')}
-              aria-label={tx.listView}
-              className={`h-7 w-7 flex items-center justify-center rounded-md transition-colors ${
-                viewMode === 'list' ? 'bg-amber/10 text-amber' : 'text-cream/35 hover:text-cream/60'
-              }`}
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-          </div>
-        </div>
-
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {Array.from({ length: 6 }).map((_, i) => <RecipeCardSkeleton key={i} />)}
