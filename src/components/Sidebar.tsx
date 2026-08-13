@@ -1,8 +1,12 @@
 import { type ReactNode } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Dialog } from '@base-ui/react/dialog'
+import { useAuth, useUser, useClerk } from '@clerk/react'
 import { useLanguage } from '../hooks/useLanguage'
+import { useTheme } from '../hooks/useTheme'
 import { useMyRecipes } from '../hooks/useRecipes'
+import { savePreferences } from '../lib/preferences'
+import Avatar from './Avatar'
 import type { useSidebar } from '../hooks/useSidebar'
 import { t } from "../i18n";
 
@@ -22,10 +26,40 @@ export default function Sidebar({ sidebar }: SidebarProps) {
   const { collapsed, setCollapsed, mobileOpen, setMobileOpen } = sidebar
   const navigate = useNavigate()
   const location = useLocation()
-  const { lang } = useLanguage()
+  const { lang, setLang } = useLanguage()
         const tx = t[lang]
   const { recipes: myRecipes } = useMyRecipes()
   const attentionCount = myRecipes.filter(r => r.status === 'rejected').length
+
+  // Account section (avatar/name/manage-account up top, language/theme/sign
+  // out down at the bottom) - merged in from what used to be Clerk's
+  // UserButton dropdown in Nav.tsx, now living directly in the sidebar.
+  const { theme, setMode } = useTheme()
+  const { getToken } = useAuth()
+  const { user, isSignedIn } = useUser()
+  const { signOut, openUserProfile } = useClerk()
+  const displayName = user?.fullName || user?.username || user?.primaryEmailAddress?.emailAddress || tx.aCook
+
+  // Acts on the currently *displayed* theme, not the abstract mode - a
+  // first-time visitor's mode starts as "system" (unset), and if that
+  // happens to resolve to the same theme already showing, toggling mode
+  // through a 3rd "system" step made the first click look like it did
+  // nothing (label changed, page didn't) and only the second click visibly
+  // switched. Every click now flips light<->dark immediately.
+  const themeLabel = theme === 'light' ? (tx.darkMode) : (tx.lightMode)
+  const themeIcon = theme === 'light' ? '🌙' : '☀️'
+
+  function handleLangClick() {
+    const next = lang === 'he' ? 'en' : 'he'
+    setLang(next)
+    if (isSignedIn) void savePreferences({ lang: next }, getToken)
+  }
+
+  function handleThemeClick() {
+    const next = theme === 'light' ? 'dark' : 'light'
+    setMode(next)
+    if (isSignedIn) void savePreferences({ theme: next }, getToken)
+  }
 
   const recipeLinks: SidebarLinkDef[] = [
     {
@@ -87,6 +121,27 @@ export default function Sidebar({ sidebar }: SidebarProps) {
   function content(showLabel: boolean, onNavigate?: () => void) {
     return (
       <div className="flex flex-col h-full">
+        {isSignedIn && showLabel && (
+          <div className="p-3 border-b border-tint/[0.06] flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <Avatar name={displayName} imageUrl={user?.imageUrl ?? null} />
+              <span className="truncate text-sm text-cream/80">{displayName}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => openUserProfile()}
+              title={tx.manageAccount}
+              aria-label={tx.manageAccount}
+              className="shrink-0 h-8 w-8 flex items-center justify-center rounded-lg text-cream/40 hover:text-cream/70 hover:bg-tint/[0.05] transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </button>
+          </div>
+        )}
+
         <div className="p-3">
           <button
             type="button"
@@ -113,7 +168,35 @@ export default function Sidebar({ sidebar }: SidebarProps) {
         </nav>
 
         {showLabel && (
-          <div className="p-3 border-t border-tint/[0.06]">
+          <div className="p-3 border-t border-tint/[0.06] space-y-1">
+            <button
+              type="button"
+              onClick={handleLangClick}
+              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm w-full text-cream/60 hover:text-cream/90 hover:bg-tint/[0.05] transition-colors"
+            >
+              <span className="w-4 h-4 shrink-0 flex items-center justify-center text-sm">🌐</span>
+              {lang === 'he' ? 'English' : 'עברית'}
+            </button>
+            <button
+              type="button"
+              onClick={handleThemeClick}
+              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm w-full text-cream/60 hover:text-cream/90 hover:bg-tint/[0.05] transition-colors"
+            >
+              <span className="w-4 h-4 shrink-0 flex items-center justify-center text-sm">{themeIcon}</span>
+              {themeLabel}
+            </button>
+            {isSignedIn && (
+              <button
+                type="button"
+                onClick={() => signOut()}
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm w-full text-red-400/70 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+              >
+                <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l3 3m0 0l-3 3m3-3H2.25" />
+                </svg>
+                {tx.signOut}
+              </button>
+            )}
             <button
               type="button"
               onClick={() => setCollapsed(true)}

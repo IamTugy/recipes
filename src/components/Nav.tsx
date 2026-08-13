@@ -1,8 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { UserButton, useAuth } from '@clerk/react'
 import { useLanguage } from '../hooks/useLanguage'
-import { useTheme } from '../hooks/useTheme'
-import { savePreferences } from '../lib/preferences'
 import { t } from "../i18n";
 
 interface NavProps {
@@ -13,31 +10,8 @@ interface NavProps {
 
 export default function Nav({ shoppingListCount, onOpenShoppingList, onToggleMobileSidebar }: NavProps) {
   const navigate = useNavigate()
-  const { lang, setLang } = useLanguage()
+  const { lang } = useLanguage()
         const tx = t[lang]
-  const { theme, setMode } = useTheme()
-  const { isSignedIn, getToken } = useAuth()
-
-  // Acts on the currently *displayed* theme, not the abstract mode - a
-  // first-time visitor's mode starts as "system" (unset), and if that
-  // happens to resolve to the same theme already showing, toggling mode
-  // through a 3rd "system" step made the first click look like it did
-  // nothing (label changed, page didn't) and only the second click visibly
-  // switched. Every click now flips light<->dark immediately.
-  const themeLabel = theme === 'light' ? (tx.darkMode) : (tx.lightMode)
-  const themeIcon = theme === 'light' ? '🌙' : '☀️'
-
-  function handleLangClick() {
-    const next = lang === 'he' ? 'en' : 'he'
-    setLang(next)
-    if (isSignedIn) void savePreferences({ lang: next }, getToken)
-  }
-
-  function handleThemeClick() {
-    const next = theme === 'light' ? 'dark' : 'light'
-    setMode(next)
-    if (isSignedIn) void savePreferences({ theme: next }, getToken)
-  }
 
   return (
     <nav className="print:hidden fixed top-0 inset-x-0 z-50 bg-bg/90 backdrop-blur-md border-b border-tint/[0.06]">
@@ -77,21 +51,6 @@ export default function Nav({ shoppingListCount, onOpenShoppingList, onToggleMob
               </span>
             )}
           </button>
-
-          <UserButton>
-            <UserButton.MenuItems>
-              <UserButton.Action
-                label={lang === 'he' ? 'English' : 'עברית'}
-                labelIcon={<span>🌐</span>}
-                onClick={handleLangClick}
-              />
-              <UserButton.Action
-                label={themeLabel}
-                labelIcon={<span>{themeIcon}</span>}
-                onClick={handleThemeClick}
-              />
-            </UserButton.MenuItems>
-          </UserButton>
         </div>
       </div>
     </nav>
