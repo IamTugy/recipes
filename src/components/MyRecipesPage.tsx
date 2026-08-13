@@ -1,17 +1,25 @@
-import { useCallback, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useAuth } from '@clerk/react'
 import type { Category, Difficulty } from '../types'
-import { useMyRecipes } from '../hooks/useRecipes'
+import { useMyRecipes, useDuplicateDisputes } from '../hooks/useRecipes'
 import { useFavorites } from '../hooks/useFavorites'
+import { useJobs } from '../hooks/useJobs'
+import { OWNER_USER_ID } from '../lib/admin'
 import { t, categoryEmoji } from '../i18n'
 import { useLanguage } from '../hooks/useLanguage'
 import RecipeCard from './RecipeCard'
 import RecipeCardSkeleton from './RecipeCardSkeleton'
 import RecipePlaceholder from './RecipePlaceholder'
+import SubmissionsPage from './SubmissionsPage'
+import JobsPage from './JobsPage'
+import { getSharedCategory, setSharedCategory, getSharedDifficulty, setSharedDifficulty } from '../lib/sharedRecipeFilters'
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll'
 import { resizedImage } from '../lib/image'
 import TranslatedText from './TranslatedText'
 import SkeletonImage from './SkeletonImage'
+
+type PageTab = 'recipes' | 'submissions' | 'jobs'
 
 const categories: Category[] = ['breakfast', 'lunch', 'dinner', 'dessert', 'salad', 'soup', 'snack', 'bread', 'sauce']
 const difficulties: Difficulty[] = ['easy', 'medium', 'hard']
@@ -39,11 +47,28 @@ export default function MyRecipesPage() {
   const { lang } = useLanguage()
   const tx = t[lang]
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const { userId } = useAuth()
+  const isOwner = userId === OWNER_USER_ID
+  const activeTab = (searchParams.get('tab') as PageTab) || 'recipes'
+  function setActiveTab(next: PageTab) {
+    setSearchParams(prev => {
+      const params = new URLSearchParams(prev)
+      if (next === 'recipes') params.delete('tab')
+      else params.set('tab', next)
+      return params
+    }, { replace: true })
+  }
   const { recipes, loading } = useMyRecipes()
   const { favoriteSlugs, toggle: toggleFavorite } = useFavorites()
+  // Only fetched for their badge counts here - each tab's own component
+  // fetches (and polls) the same data again to actually render itself.
+  const { recipes: disputes } = useDuplicateDisputes(isOwner)
+  const { jobs } = useJobs()
+  const jobsNeedingAttention = jobs.filter(j => j.status === 'running' || j.status === 'queued' || j.status === 'failed').length
   const [search, setSearch] = useState('')
-  const [activeCategory, setActiveCategory] = useState<Category | null>(null)
-  const [activeDifficulty, setActiveDifficulty] = useState<Difficulty | null>(null)
+  const [activeCategory, setActiveCategory] = useState<Category | null>(() => (getSharedCategory() as Category) || null)
+  const [activeDifficulty, setActiveDifficulty] = useState<Difficulty | null>(() => (getSharedDifficulty() as Difficulty) || null)
   const [activeStatus, setActiveStatus] = useState<StatusFilter | null>(null)
   const [liveOnly, setLiveOnly] = useState(false)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
@@ -54,6 +79,11 @@ export default function MyRecipesPage() {
     setPrevFiltersKey(filtersKey)
     setVisibleCount(PAGE_SIZE)
   }
+
+  useEffect(() => {
+    setSharedCategory(activeCategory)
+    setSharedDifficulty(activeDifficulty)
+  }, [activeCategory, activeDifficulty])
 
   const filtered = useMemo(() => {
     let list = recipes
@@ -78,12 +108,64 @@ export default function MyRecipesPage() {
     setVisibleCount(v => Math.min(v + PAGE_SIZE, filtered.length))
   }, [filtered.length]))
 
+  const submissionsBadge = isOwner && disputes.length > 0 ? disputes.length : undefined
+  const tabs: { key: PageTab; label: string; badge?: number }[] = [
+    { key: 'recipes', label: tx.recipes2 },
+    { key: 'submissions', label: tx.submissions, badge: submissionsBadge },
+    { key: 'jobs', label: tx.jobs, badge: jobsNeedingAttention || undefined },
+  ]
+
   return (
     <div className="min-h-dvh bg-bg pt-14">
       <div className="max-w-6xl mx-auto px-6 pt-10 pb-6">
         <h1 className="font-serif text-2xl font-bold text-cream mb-4">
           {tx.myRecipes}
         </h1>
+
+        <div className="flex gap-1.5 mb-6">
+          {tabs.map(tabDef => (
+            <button type="button"
+              key={tabDef.key}
+              onClick={() => setActiveTab(tabDef.key)}
+              className={`flex items-center gap-1.5 px-4 py-2 text-xs font-semibold tracking-wide rounded-full border transition-colors ${
+                activeTab === tabDef.key
+                  ? 'text-amber bg-amber/10 border-amber/20'
+                  : 'text-cream/50 hover:text-cream/80 border-tint/10'
+              }`}
+            >
+              {tabDef.label}
+              {!!tabDef.badge && (
+                <span className="min-w-[16px] h-4 px-1 rounded-full bg-amber text-bg text-[9px] font-bold flex items-center justify-center">
+                  {tabDef.badge}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+
+        {activeTab === 'submissions' && (
+          <p className="text-sm text-cream/40 -mt-3 mb-6 max-w-2xl mx-auto">
+            {tx.recentAIQualityReviewOutcomesAcross}
+          </p>
+        )}
+        {activeTab === 'jobs' && (
+          <p className="text-sm text-cream/40 -mt-3 mb-6 max-w-2xl mx-auto">
+            {tx.jobsDescription}
+          </p>
+        )}
+      </div>
+
+      {activeTab === 'submissions' ? (
+        <div className="px-4 pb-16">
+          <SubmissionsPage />
+        </div>
+      ) : activeTab === 'jobs' ? (
+        <div className="px-4 pb-16">
+          <JobsPage />
+        </div>
+      ) : (
+      <>
+      <div className="max-w-6xl mx-auto px-6 pb-6">
         <div className="relative max-w-md">
           <svg
             className={`absolute ${lang === 'he' ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 w-4 h-4 text-cream/25`}
@@ -340,6 +422,8 @@ export default function MyRecipesPage() {
           </div>
         )}
       </div>
+      </>
+      )}
     </div>
   )
 }

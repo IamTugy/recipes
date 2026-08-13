@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Routes, Route, useNavigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import { useAuth, SignIn } from '@clerk/react'
 import Nav from './components/Nav'
@@ -15,8 +15,6 @@ import RecipeForm from './components/RecipeForm'
 import EditRecipePage from './components/EditRecipePage'
 import FeatureRequestsPage from './components/FeatureRequestsPage'
 import MyRecipesPage from './components/MyRecipesPage'
-import SubmissionsPage from './components/SubmissionsPage'
-import JobsPage from './components/JobsPage'
 import MealPlanPage from './components/MealPlanPage'
 import ChefProfilePage from './components/ChefProfilePage'
 import LeaderboardPage from './components/LeaderboardPage'
@@ -159,8 +157,10 @@ export default function App() {
           <Route path="/recipes/:id/edit" element={<EditRecipePage />} />
           <Route path="/feature-requests" element={<FeatureRequestsPage />} />
           <Route path="/my-recipes" element={<MyRecipesPage />} />
-          <Route path="/submissions" element={<SubmissionsPage />} />
-          <Route path="/jobs" element={<JobsPage />} />
+          {/* Submissions and Jobs are now tabs on My Recipes, not standalone pages -
+              old links/bookmarks still land somewhere useful. */}
+          <Route path="/submissions" element={<Navigate to="/my-recipes?tab=submissions" replace />} />
+          <Route path="/jobs" element={<Navigate to="/my-recipes?tab=jobs" replace />} />
           <Route path="/meal-plan" element={<MealPlanPage onAddToShoppingList={shoppingList.addItems} />} />
           <Route path="/chef/:userId" element={<ChefProfilePage />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />

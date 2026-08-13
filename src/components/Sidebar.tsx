@@ -1,12 +1,13 @@
-import { type ReactNode } from 'react'
+import { type ReactNode, useRef, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Dialog } from '@base-ui/react/dialog'
-import { useAuth, useUser, useClerk } from '@clerk/react'
+import { useAuth, useUser, useClerk, UserProfile } from '@clerk/react'
 import { useLanguage } from '../hooks/useLanguage'
 import { useTheme } from '../hooks/useTheme'
 import { useMyRecipes } from '../hooks/useRecipes'
 import { savePreferences } from '../lib/preferences'
 import Avatar from './Avatar'
+import Modal from './Modal'
 import type { useSidebar } from '../hooks/useSidebar'
 import { t } from "../i18n";
 
@@ -31,13 +32,62 @@ export default function Sidebar({ sidebar }: SidebarProps) {
   const { recipes: myRecipes } = useMyRecipes()
   const attentionCount = myRecipes.filter(r => r.status === 'rejected').length
 
+  // Swipe-to-close for the mobile drawer: drags the panel live with the
+  // finger, then either finishes the close (past a distance/velocity
+  // threshold) or snaps back. Mirrors useEdgeSwipeToOpenSidebar's plain
+  // touch-event approach rather than a drag library, so it doesn't fight
+  // with base-ui's own CSS-driven open/close transition on the same
+  // element - only the live drag frame sets an inline transform; the
+  // moment the gesture ends we either hand off to setMobileOpen(false)
+  // (base-ui's own closed-state transition takes it from there) or clear
+  // the inline style entirely so the drawer's normal transition snaps it
+  // back to open.
+  const drawerPopupRef = useRef<HTMLDivElement>(null)
+  const dragState = useRef<{ startX: number; lastDelta: number; dragging: boolean }>({ startX: 0, lastDelta: 0, dragging: false })
+  const CLOSE_THRESHOLD_PX = 80
+
+  function handleDrawerTouchStart(e: React.TouchEvent) {
+    const touch = e.touches[0]
+    if (!touch) return
+    dragState.current = { startX: touch.clientX, lastDelta: 0, dragging: true }
+    const el = drawerPopupRef.current
+    if (el) el.style.transition = 'none'
+  }
+
+  function handleDrawerTouchMove(e: React.TouchEvent) {
+    if (!dragState.current.dragging) return
+    const touch = e.touches[0]
+    if (!touch) return
+    const rawDelta = touch.clientX - dragState.current.startX
+    // Only the closing direction moves the panel - drawer sits on the left
+    // in LTR (closes toward negative X) and the right in RTL (closes
+    // toward positive X); dragging the other way is just inert overscroll.
+    const closingDelta = lang === 'he' ? Math.max(rawDelta, 0) : Math.min(rawDelta, 0)
+    dragState.current.lastDelta = closingDelta
+    const el = drawerPopupRef.current
+    if (el) el.style.transform = `translateX(${closingDelta}px)`
+  }
+
+  function handleDrawerTouchEnd() {
+    if (!dragState.current.dragging) return
+    dragState.current.dragging = false
+    const { lastDelta } = dragState.current
+    const el = drawerPopupRef.current
+    if (el) {
+      el.style.transition = ''
+      el.style.transform = ''
+    }
+    if (Math.abs(lastDelta) >= CLOSE_THRESHOLD_PX) setMobileOpen(false)
+  }
+
   // Account section (avatar/name/manage-account up top, language/theme/sign
   // out down at the bottom) - merged in from what used to be Clerk's
   // UserButton dropdown in Nav.tsx, now living directly in the sidebar.
   const { theme, setMode } = useTheme()
   const { getToken } = useAuth()
   const { user, isSignedIn } = useUser()
-  const { signOut, openUserProfile } = useClerk()
+  const { signOut } = useClerk()
+  const [accountModalOpen, setAccountModalOpen] = useState(false)
   const displayName = user?.fullName || user?.username || user?.primaryEmailAddress?.emailAddress || tx.aCook
 
   // Acts on the currently *displayed* theme, not the abstract mode - a
@@ -86,13 +136,6 @@ export default function Sidebar({ sidebar }: SidebarProps) {
   const moreLinks: SidebarLinkDef[] = [
     { key: 'leaderboard', label: tx.leaderboard, path: '/leaderboard', icon: <span className="w-4 h-4 flex items-center justify-center text-sm">🏆</span> },
     { key: 'feature-requests', label: tx.featureRequests, path: '/feature-requests', icon: <span className="w-4 h-4 flex items-center justify-center text-sm">💡</span> },
-    {
-      key: 'submissions',
-      label: tx.submissions,
-      path: '/submissions',
-      icon: <span className="w-4 h-4 flex items-center justify-center text-sm">✅</span>,
-    },
-    { key: 'jobs', label: tx.jobs, path: '/jobs', icon: <span className="w-4 h-4 flex items-center justify-center text-sm">⏳</span> },
   ]
 
   function renderLink(link: SidebarLinkDef, showLabel: boolean, onNavigate?: () => void) {
@@ -129,12 +172,12 @@ export default function Sidebar({ sidebar }: SidebarProps) {
             </div>
             <button
               type="button"
-              onClick={() => openUserProfile()}
+              onClick={() => setAccountModalOpen(true)}
               title={tx.manageAccount}
               aria-label={tx.manageAccount}
-              className="shrink-0 h-8 w-8 flex items-center justify-center rounded-lg text-cream/40 hover:text-cream/70 hover:bg-tint/[0.05] transition-colors"
+              className="shrink-0 h-9 w-9 flex items-center justify-center rounded-lg text-cream/40 hover:text-cream/70 hover:bg-tint/[0.05] transition-colors"
             >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
@@ -169,22 +212,6 @@ export default function Sidebar({ sidebar }: SidebarProps) {
 
         {showLabel && (
           <div className="p-3 border-t border-tint/[0.06] space-y-1">
-            <button
-              type="button"
-              onClick={handleLangClick}
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm w-full text-cream/60 hover:text-cream/90 hover:bg-tint/[0.05] transition-colors"
-            >
-              <span className="w-4 h-4 shrink-0 flex items-center justify-center text-sm">🌐</span>
-              {lang === 'he' ? 'English' : 'עברית'}
-            </button>
-            <button
-              type="button"
-              onClick={handleThemeClick}
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm w-full text-cream/60 hover:text-cream/90 hover:bg-tint/[0.05] transition-colors"
-            >
-              <span className="w-4 h-4 shrink-0 flex items-center justify-center text-sm">{themeIcon}</span>
-              {themeLabel}
-            </button>
             {isSignedIn && (
               <button
                 type="button"
@@ -235,17 +262,56 @@ export default function Sidebar({ sidebar }: SidebarProps) {
         ) : content(true)}
       </aside>
 
-      {/* Mobile drawer */}
+      {/* Mobile drawer - above the timer panel (z-[65]) so opening the menu
+          doesn't leave the timer bar floating on top of it. */}
       <Dialog.Root open={mobileOpen} onOpenChange={setMobileOpen}>
         <Dialog.Portal>
-          <Dialog.Backdrop className="print:hidden sm:hidden fixed inset-0 bg-black/40 z-40 transition-opacity duration-150 data-[starting-style]:opacity-0 data-[ending-style]:opacity-0" />
-          <Dialog.Viewport className="print:hidden sm:hidden fixed inset-0 z-50">
-            <Dialog.Popup className={`fixed top-0 bottom-0 w-72 bg-bg shadow-2xl transition-transform duration-150 ${lang === 'he' ? 'right-0 data-[starting-style]:translate-x-full data-[ending-style]:translate-x-full' : 'left-0 data-[starting-style]:-translate-x-full data-[ending-style]:-translate-x-full'}`}>
+          <Dialog.Backdrop className="print:hidden sm:hidden fixed inset-0 bg-black/60 backdrop-blur-[2px] z-[70] transition-opacity duration-150 data-[starting-style]:opacity-0 data-[ending-style]:opacity-0" />
+          <Dialog.Viewport className="print:hidden sm:hidden fixed inset-0 z-[71]">
+            <Dialog.Popup
+              ref={drawerPopupRef}
+              onTouchStart={handleDrawerTouchStart}
+              onTouchMove={handleDrawerTouchMove}
+              onTouchEnd={handleDrawerTouchEnd}
+              className={`fixed top-0 bottom-0 w-72 bg-bg shadow-2xl transition-transform duration-150 ${lang === 'he' ? 'right-0 data-[starting-style]:translate-x-full data-[ending-style]:translate-x-full' : 'left-0 data-[starting-style]:-translate-x-full data-[ending-style]:-translate-x-full'}`}
+            >
               {content(true, () => setMobileOpen(false))}
             </Dialog.Popup>
           </Dialog.Viewport>
         </Dialog.Portal>
       </Dialog.Root>
+
+      {accountModalOpen && (
+        <Modal open onOpenChange={setAccountModalOpen} zIndexClassName="z-[80]" panelClassName="max-w-3xl w-full p-0 max-h-[85vh] overflow-y-auto">
+          <UserProfile routing="hash">
+            <UserProfile.Page
+              label={tx.preferences}
+              url="preferences"
+              labelIcon={<span>🎨</span>}
+            >
+              <div className="p-1 space-y-2">
+                <h1 className="font-serif text-lg font-bold text-cream mb-3">{tx.preferences}</h1>
+                <button
+                  type="button"
+                  onClick={handleLangClick}
+                  className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm w-full text-cream/70 hover:text-cream/95 hover:bg-tint/[0.05] transition-colors border border-tint/10"
+                >
+                  <span className="w-4 h-4 shrink-0 flex items-center justify-center text-sm">🌐</span>
+                  {lang === 'he' ? 'English' : 'עברית'}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleThemeClick}
+                  className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm w-full text-cream/70 hover:text-cream/95 hover:bg-tint/[0.05] transition-colors border border-tint/10"
+                >
+                  <span className="w-4 h-4 shrink-0 flex items-center justify-center text-sm">{themeIcon}</span>
+                  {themeLabel}
+                </button>
+              </div>
+            </UserProfile.Page>
+          </UserProfile>
+        </Modal>
+      )}
     </>
   )
 }

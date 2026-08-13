@@ -24,45 +24,39 @@ export default function JobsPage() {
   const { jobs, loading } = useJobs()
 
   return (
-    <div className="min-h-dvh bg-bg pt-20 pb-16 px-4">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="font-serif text-2xl font-bold text-cream mb-6">
-          {tx.jobsPageTitle}
-        </h1>
-
-        {loading ? (
-          <p className="text-cream/30 text-sm">{tx.loading}</p>
-        ) : jobs.length === 0 ? (
-          <p className="text-cream/30 text-sm">{tx.noJobsYet}</p>
-        ) : (
-          <div className="space-y-3">
-            {jobs.map(job => (
-              <div key={job.id} className="card p-4">
-                <div className="flex items-center justify-between gap-3 mb-1">
-                  <p className="text-sm text-cream/80 truncate">{job.label ?? job.type}</p>
-                  <span className={`shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full ${STATUS_CLASS[job.status]}`}>
-                    {tx[STATUS_LABEL_KEY[job.status]]}
-                  </span>
-                </div>
-                <p className="text-[11px] text-cream/30 mb-2">
-                  {new Date(job.createdAt).toLocaleString(lang === 'he' ? 'he-IL' : 'en-US')}
-                </p>
-                {job.status === 'done' && job.resultRecipeIds.length > 0 && (
-                  <Link
-                    to={job.resultRecipeIds.length === 1 ? `/recipes/${job.resultRecipeIds[0]}/edit` : '/my-recipes'}
-                    className="text-xs text-amber hover:text-amber/80 transition-colors"
-                  >
-                    {job.resultRecipeIds.length === 1 ? tx.viewResult : tx.jobDoneBatch(job.resultRecipeIds.length)}
-                  </Link>
-                )}
-                {job.status === 'failed' && job.error && (
-                  <p className="text-xs text-red-400/80">{job.error}</p>
-                )}
+    <div className="max-w-2xl mx-auto">
+      {loading ? (
+        <p className="text-cream/30 text-sm">{tx.loading}</p>
+      ) : jobs.length === 0 ? (
+        <p className="text-cream/30 text-sm">{tx.noJobsYet}</p>
+      ) : (
+        <div className="space-y-3">
+          {jobs.map(job => (
+            <div key={job.id} className="card p-4">
+              <div className="flex items-center justify-between gap-3 mb-1">
+                <p className="text-sm text-cream/80 truncate">{job.label ?? job.type}</p>
+                <span className={`shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full ${STATUS_CLASS[job.status]}`}>
+                  {tx[STATUS_LABEL_KEY[job.status]]}
+                </span>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
+              <p className="text-[11px] text-cream/30 mb-2">
+                {new Date(job.createdAt).toLocaleString(lang === 'he' ? 'he-IL' : 'en-US')}
+              </p>
+              {job.status === 'done' && job.resultRecipeIds.length > 0 && (
+                <Link
+                  to={job.resultRecipeIds.length === 1 ? `/recipes/${job.resultRecipeIds[0]}/edit` : '/my-recipes'}
+                  className="text-xs text-amber hover:text-amber/80 transition-colors"
+                >
+                  {job.resultRecipeIds.length === 1 ? tx.viewResult : tx.jobDoneBatch(job.resultRecipeIds.length)}
+                </Link>
+              )}
+              {job.status === 'failed' && job.error && (
+                <p className="text-xs text-red-400/80">{job.error}</p>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

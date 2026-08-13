@@ -182,40 +182,31 @@ export default function SubmissionsPage() {
   }
 
   return (
-    <div className="min-h-dvh bg-bg pt-20 pb-16 px-4">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="font-serif text-2xl font-bold text-cream mb-2">
-          {tx.submissions}
-        </h1>
-        <p className="text-sm text-cream/40 mb-6">
-          {tx.recentAIQualityReviewOutcomesAcross}
-        </p>
-
-        {isOwner && !disputesLoading && disputes.length > 0 && (
-          <div className="mb-8">
-            <h2 className="font-serif text-lg font-bold text-cream mb-3">{tx.duplicateDisputes}</h2>
-            <div className="space-y-3">
-              {disputes.map(r => (
-                <DisputeCard key={r.id} recipe={r} onResolved={reloadDisputes} />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {loading ? (
-          <p className="text-cream/30 text-sm">{tx.loading}</p>
-        ) : recipes.length === 0 ? (
-          <p className="text-cream/30 text-sm">
-            {tx.noSubmissionsYet}
-          </p>
-        ) : (
+    <div className="max-w-2xl mx-auto">
+      {isOwner && !disputesLoading && disputes.length > 0 && (
+        <div className="mb-8">
+          <h2 className="font-serif text-lg font-bold text-cream mb-3">{tx.duplicateDisputes}</h2>
           <div className="space-y-3">
-            {recipes.map(r => (
-              <SubmissionCard key={r.id} recipe={r} expanded={expanded.has(r.id)} onToggle={() => toggle(r.id)} />
+            {disputes.map(r => (
+              <DisputeCard key={r.id} recipe={r} onResolved={reloadDisputes} />
             ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {loading ? (
+        <p className="text-cream/30 text-sm">{tx.loading}</p>
+      ) : recipes.length === 0 ? (
+        <p className="text-cream/30 text-sm">
+          {tx.noSubmissionsYet}
+        </p>
+      ) : (
+        <div className="space-y-3">
+          {recipes.map(r => (
+            <SubmissionCard key={r.id} recipe={r} expanded={expanded.has(r.id)} onToggle={() => toggle(r.id)} />
+          ))}
+        </div>
+      )}
     </div>
   )
 }

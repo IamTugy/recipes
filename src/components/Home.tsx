@@ -13,6 +13,7 @@ import VirtualRecipeGrid, { type GridItem } from './VirtualRecipeGrid'
 import FilterInfoPopover from './FilterInfoPopover'
 import { DIFFICULTY_FILTERS, DIETARY_FILTERS, KOSHER_FILTERS } from '../lib/filterDefinitions'
 import { logSearch } from '../lib/logSearch'
+import { getSharedCategory, setSharedCategory, getSharedDifficulty, setSharedDifficulty } from '../lib/sharedRecipeFilters'
 
 const categories: Category[] = ['breakfast', 'lunch', 'dinner', 'dessert', 'salad', 'soup', 'snack', 'bread', 'sauce']
 
@@ -35,8 +36,8 @@ export default function Home() {
   const { lang } = useLanguage()
   const tx = t[lang]
   const [search, setSearch] = useState(() => searchParams.get('q') ?? searchParams.get('tag') ?? '')
-  const [activeCategory, setActiveCategory] = useState<Category | null>(() => (searchParams.get('category') as Category) || null)
-  const [activeDifficulty, setActiveDifficulty] = useState<Difficulty | null>(() => (searchParams.get('diff') as Difficulty) || null)
+  const [activeCategory, setActiveCategory] = useState<Category | null>(() => (searchParams.get('category') as Category) || (getSharedCategory() as Category) || null)
+  const [activeDifficulty, setActiveDifficulty] = useState<Difficulty | null>(() => (searchParams.get('diff') as Difficulty) || (getSharedDifficulty() as Difficulty) || null)
   const [activeDietary, setActiveDietary] = useState<string | null>(() => searchParams.get('diet') || null)
   const [activeKosher, setActiveKosher] = useState<string | null>(() => searchParams.get('kosher') || null)
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(() => searchParams.get('fav') === '1')
@@ -52,6 +53,11 @@ export default function Home() {
   // Keep the URL in sync with every filter/search/sort change (replace, not
   // push, so typing in the search box doesn't spam browser history) - a
   // shared link always reproduces the exact filtered view.
+  useEffect(() => {
+    setSharedCategory(activeCategory)
+    setSharedDifficulty(activeDifficulty)
+  }, [activeCategory, activeDifficulty])
+
   useEffect(() => {
     const next = new URLSearchParams()
     if (search.trim()) next.set('q', search.trim())
