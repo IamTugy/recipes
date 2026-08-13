@@ -32,6 +32,7 @@ import { downloadRecipePdf } from '../lib/recipePdf'
 import SkeletonImage from './SkeletonImage'
 import { useTranslatedText } from '../hooks/useTranslatedText'
 import TranslatedText from './TranslatedText'
+import BackgroundCookStatus, { type BackgroundCookStatusHandle } from './BackgroundCookStatus'
 
 interface RecipeDetailProps {
   onAddTimer: (label: string, minutes: number, recipeId: string, stepIndex: number) => void
@@ -462,6 +463,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
   const stepsCount = recipe?.steps.reduce((n, g) => n + g.items.length, 0) ?? 0
   const wizardRef = useRef<HTMLDivElement>(null)
   useFocusTrap(wizardRef, wizardOpen)
+  const backgroundCookStatusRef = useRef<BackgroundCookStatusHandle>(null)
   const lightboxRef = useRef<HTMLDivElement>(null)
   useFocusTrap(lightboxRef, !!lightboxUrl)
   useFocusTrap(actionsMenuRef, actionsMenuOpen)
@@ -709,6 +711,17 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
       image: step.image,
     }))
   )
+
+  // Most urgent timer for this recipe - what a backgrounded notification/PiP widget should show.
+  const recipeTimers = timers.filter(t => t.recipeId === recipe?.id && !t.done)
+  const runningRecipeTimers = recipeTimers.filter(t => t.running)
+  const nearestTimer = (runningRecipeTimers.length > 0 ? runningRecipeTimers : recipeTimers)
+    .slice().sort((a, b) => a.remainingSeconds - b.remainingSeconds)[0] ?? null
+
+  const currentWizardStep = wizardOpen ? flatSteps[wizardIndex] : undefined
+  const wizardStepLabel = lang === 'he'
+    ? `שלב ${wizardIndex + 1} מתוך ${flatSteps.length}`
+    : `Step ${wizardIndex + 1} of ${flatSteps.length}`
 
   function openWizard() {
     const firstUnchecked = flatSteps.findIndex(s => !checkedSteps.has(`${s.groupIdx}-${s.stepIdx}`))
@@ -2018,15 +2031,28 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
           >
             <div className="flex items-center justify-between px-4 h-14 border-b border-tint/[0.06]">
               <span className="text-cream/40 text-sm">
-                {lang === 'he' ? `שלב ${wizardIndex + 1} מתוך ${flatSteps.length}` : `Step ${wizardIndex + 1} of ${flatSteps.length}`}
+                {wizardStepLabel}
               </span>
-              <button type="button"
-                onClick={() => setWizardOpen(false)}
-                aria-label={tx.closeGuidedMode}
-                className="h-9 w-9 flex items-center justify-center rounded-lg text-cream/40 hover:text-cream/70 transition-colors"
-              >
-                ✕
-              </button>
+              <div className="flex items-center gap-1">
+                <button type="button"
+                  onClick={() => backgroundCookStatusRef.current?.enterFloatingView()}
+                  aria-label={tx.floatingCookView}
+                  title={tx.floatingCookView}
+                  className="h-9 w-9 flex items-center justify-center rounded-lg text-cream/40 hover:text-cream/70 transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16v10H4V6z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} fill="currentColor" d="M13 12h6v5h-6z" />
+                  </svg>
+                </button>
+                <button type="button"
+                  onClick={() => setWizardOpen(false)}
+                  aria-label={tx.closeGuidedMode}
+                  className="h-9 w-9 flex items-center justify-center rounded-lg text-cream/40 hover:text-cream/70 transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
             <div className="h-1 bg-tint/[0.06]">
               <div className="h-full bg-amber transition-all" style={{ width: `${((wizardIndex + 1) / flatSteps.length) * 100}%` }} />
@@ -2105,6 +2131,18 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
           </div>
         )
       })()}
+
+      {/* Ongoing-cook status: mirrors the current guided step + nearest timer into an OS
+          notification and a floating Picture-in-Picture widget while the app is minimized. */}
+      <BackgroundCookStatus
+        ref={backgroundCookStatusRef}
+        active={wizardOpen && !!currentWizardStep}
+        recipeTitle={displayTitle ?? ''}
+        stepLabel={wizardStepLabel}
+        stepText={currentWizardStep?.instruction ?? ''}
+        nearestTimer={nearestTimer}
+        lang={lang}
+      />
 
       {/* Photo lightbox */}
       {lightboxUrl && (
