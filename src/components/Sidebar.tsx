@@ -1,13 +1,12 @@
-import { type ReactNode, useRef, useState } from 'react'
+import { type ReactNode, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Dialog } from '@base-ui/react/dialog'
-import { useAuth, useUser, useClerk, UserProfile } from '@clerk/react'
+import { useAuth, useUser, useClerk } from '@clerk/react'
 import { useLanguage } from '../hooks/useLanguage'
 import { useTheme } from '../hooks/useTheme'
 import { useMyRecipes } from '../hooks/useRecipes'
 import { savePreferences } from '../lib/preferences'
 import Avatar from './Avatar'
-import Modal from './Modal'
 import type { useSidebar } from '../hooks/useSidebar'
 import { t } from "../i18n";
 
@@ -86,8 +85,7 @@ export default function Sidebar({ sidebar }: SidebarProps) {
   const { theme, setMode } = useTheme()
   const { getToken } = useAuth()
   const { user, isSignedIn } = useUser()
-  const { signOut } = useClerk()
-  const [accountModalOpen, setAccountModalOpen] = useState(false)
+  const { signOut, openUserProfile } = useClerk()
   const displayName = user?.fullName || user?.username || user?.primaryEmailAddress?.emailAddress || tx.aCook
 
   // Acts on the currently *displayed* theme, not the abstract mode - a
@@ -172,7 +170,7 @@ export default function Sidebar({ sidebar }: SidebarProps) {
             </div>
             <button
               type="button"
-              onClick={() => setAccountModalOpen(true)}
+              onClick={() => openUserProfile()}
               title={tx.manageAccount}
               aria-label={tx.manageAccount}
               className="shrink-0 h-9 w-9 flex items-center justify-center rounded-lg text-cream/40 hover:text-cream/70 hover:bg-tint/[0.05] transition-colors"
@@ -212,6 +210,22 @@ export default function Sidebar({ sidebar }: SidebarProps) {
 
         {showLabel && (
           <div className="p-3 border-t border-tint/[0.06] space-y-1">
+            <button
+              type="button"
+              onClick={handleLangClick}
+              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm w-full text-cream/60 hover:text-cream/90 hover:bg-tint/[0.05] transition-colors"
+            >
+              <span className="w-4 h-4 shrink-0 flex items-center justify-center text-sm">🌐</span>
+              {lang === 'he' ? 'English' : 'עברית'}
+            </button>
+            <button
+              type="button"
+              onClick={handleThemeClick}
+              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm w-full text-cream/60 hover:text-cream/90 hover:bg-tint/[0.05] transition-colors"
+            >
+              <span className="w-4 h-4 shrink-0 flex items-center justify-center text-sm">{themeIcon}</span>
+              {themeLabel}
+            </button>
             {isSignedIn && (
               <button
                 type="button"
@@ -280,36 +294,6 @@ export default function Sidebar({ sidebar }: SidebarProps) {
           </Dialog.Viewport>
         </Dialog.Portal>
       </Dialog.Root>
-
-      {accountModalOpen && (
-        <Modal open onOpenChange={setAccountModalOpen} zIndexClassName="z-[80]" panelClassName="max-w-3xl w-full p-0 max-h-[85vh] overflow-y-auto">
-          {/* Plain UserProfile (no custom UserProfile.Page) - a second page
-              gave Clerk's own component a nav sidebar with its own internal
-              scroll, stacked on top of our modal's scroll (two scrollbars
-              at once). Appending the preferences as ordinary content below
-              it, inside the same single scroll container, avoids that. */}
-          <UserProfile routing="hash" />
-          <div className="p-4 space-y-2 border-t border-tint/10">
-            <h2 className="font-serif text-sm font-bold text-cream/70 mb-1">{tx.preferences}</h2>
-            <button
-              type="button"
-              onClick={handleLangClick}
-              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm w-full text-cream/70 hover:text-cream/95 hover:bg-tint/[0.05] transition-colors border border-tint/10"
-            >
-              <span className="w-4 h-4 shrink-0 flex items-center justify-center text-sm">🌐</span>
-              {lang === 'he' ? 'English' : 'עברית'}
-            </button>
-            <button
-              type="button"
-              onClick={handleThemeClick}
-              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm w-full text-cream/70 hover:text-cream/95 hover:bg-tint/[0.05] transition-colors border border-tint/10"
-            >
-              <span className="w-4 h-4 shrink-0 flex items-center justify-center text-sm">{themeIcon}</span>
-              {themeLabel}
-            </button>
-          </div>
-        </Modal>
-      )}
     </>
   )
 }
