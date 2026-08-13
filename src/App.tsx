@@ -166,6 +166,7 @@ export default function App() {
             element={
               <RecipeDetail
                 onAddTimer={addTimer}
+                onToggleTimer={toggleTimer}
                 timers={timers}
                 timerBarHeight={timerBarHeight}
                 onAddToShoppingList={shoppingList.addItems}

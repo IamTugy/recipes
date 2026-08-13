@@ -36,6 +36,7 @@ import BackgroundCookStatus, { type BackgroundCookStatusHandle } from './Backgro
 
 interface RecipeDetailProps {
   onAddTimer: (label: string, minutes: number, recipeId: string, stepIndex: number) => void
+  onToggleTimer: (id: string) => void
   timers: TimerState[]
   timerBarHeight: number
   onAddToShoppingList: (items: { name: string; amount: number | null; unit: string }[]) => void
@@ -44,7 +45,7 @@ interface RecipeDetailProps {
 const presetMultipliers = [0.5, 1, 1.5, 2, 3, 4]
 const presetLabels: Record<number, string> = { 0.5: '½x', 1: '1x', 1.5: '1.5x', 2: '2x', 3: '3x', 4: '4x' }
 
-export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAddToShoppingList }: RecipeDetailProps) {
+export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerBarHeight, onAddToShoppingList }: RecipeDetailProps) {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -56,6 +57,12 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
   const { cookedSlugs, toggle: toggleCooked } = useCookedRecipes()
   const { collections, create: createCollection, addRecipe: addRecipeToCollection, removeRecipe: removeRecipeFromCollection } = useCollections()
   const [wizardOpen, setWizardOpen] = useState(false)
+  // Stays true while cooking is "in progress" even after the fullscreen
+  // wizard is minimized into Picture-in-Picture - wizardOpen alone can't
+  // drive this since it goes false the moment the modal is minimized, and
+  // the PiP stream/step tracking need to keep running independent of
+  // whether the modal itself is currently mounted.
+  const [cookSessionActive, setCookSessionActive] = useState(false)
   const [wizardIndex, setWizardIndex] = useState(0)
   // The overflow menu (Edit/Delete/Save to collection/Download PDF/Copy
   // link) consolidates what used to be scattered separate buttons. It's a
@@ -492,6 +499,36 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
     // eslint-disable-next-line react-hooks/exhaustive-deps -- cookMode is a new object every render; request/release are individually stable
   }, [wizardOpen, cookMode.request, cookMode.release])
 
+  // The fullscreen wizard and the PiP floating view are mutually exclusive -
+  // whichever one the user is looking at should be the only one live.
+  // Reopening the fullscreen view (manually, or automatically below when
+  // the app comes back to the foreground) always wins over PiP.
+  useEffect(() => {
+    if (wizardOpen) backgroundCookStatusRef.current?.exitFloatingView()
+  }, [wizardOpen])
+
+  // Auto-enter/exit the floating cook view as the app is backgrounded and
+  // foregrounded, for whenever a session is ongoing but the fullscreen
+  // modal isn't the thing currently on screen (either because it was
+  // minimized, or because the OS switched away from the tab/app).
+  useEffect(() => {
+    if (!cookSessionActive) return
+    function handleVisibility() {
+      if (document.hidden) {
+        backgroundCookStatusRef.current?.enterFloatingView()
+      } else {
+        // Coming back to the app mid-cook: restore the real wizard view and
+        // close PiP directly - wizardOpen may already have been true this
+        // whole time (tab hidden without ever minimizing), so the separate
+        // "wizardOpen just became true" effect wouldn't fire again to do it.
+        setWizardOpen(true)
+        backgroundCookStatusRef.current?.exitFloatingView()
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibility)
+    return () => document.removeEventListener('visibilitychange', handleVisibility)
+  }, [cookSessionActive])
+
   useEffect(() => {
     if (!lightboxUrl) return
     function handleKey(e: KeyboardEvent) {
@@ -644,6 +681,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
   function advanceWizardOrFinish() {
     if (wizardIndex === flatSteps.length - 1) {
       setWizardOpen(false)
+      setCookSessionActive(false)
     } else {
       setWizardIndex(i => Math.min(i + 1, flatSteps.length - 1))
     }
@@ -718,7 +756,10 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
   const nearestTimer = (runningRecipeTimers.length > 0 ? runningRecipeTimers : recipeTimers)
     .slice().sort((a, b) => a.remainingSeconds - b.remainingSeconds)[0] ?? null
 
-  const currentWizardStep = wizardOpen ? flatSteps[wizardIndex] : undefined
+  // Depends on cookSessionActive, not wizardOpen - this (and the PiP feed
+  // it drives) must keep reflecting the current step even while the
+  // fullscreen modal is minimized.
+  const currentWizardStep = cookSessionActive ? flatSteps[wizardIndex] : undefined
   const wizardStepLabel = lang === 'he'
     ? `שלב ${wizardIndex + 1} מתוך ${flatSteps.length}`
     : `Step ${wizardIndex + 1} of ${flatSteps.length}`
@@ -727,6 +768,21 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
     const firstUnchecked = flatSteps.findIndex(s => !checkedSteps.has(`${s.groupIdx}-${s.stepIdx}`))
     setWizardIndex(firstUnchecked === -1 ? 0 : firstUnchecked)
     setWizardOpen(true)
+    setCookSessionActive(true)
+  }
+
+  function pipToggleNearestTimer() {
+    if (nearestTimer) onToggleTimer(nearestTimer.id)
+  }
+
+  function pipPreviousStep() {
+    setWizardIndex(i => Math.max(i - 1, 0))
+  }
+
+  function pipNextStep() {
+    if (!currentWizardStep) return
+    markStepChecked(`${currentWizardStep.groupIdx}-${currentWizardStep.stepIdx}`)
+    advanceWizardOrFinish()
   }
 
   const sectionNavItems = [
@@ -2035,7 +2091,12 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
               </span>
               <div className="flex items-center gap-1">
                 <button type="button"
-                  onClick={() => backgroundCookStatusRef.current?.enterFloatingView()}
+                  onClick={() => {
+                    // Minimize: hand off to the PiP widget and dismiss the
+                    // fullscreen modal - cooking keeps going, just not here.
+                    backgroundCookStatusRef.current?.enterFloatingView()
+                    setWizardOpen(false)
+                  }}
                   aria-label={tx.floatingCookView}
                   title={tx.floatingCookView}
                   className="h-9 w-9 flex items-center justify-center rounded-lg text-cream/40 hover:text-cream/70 transition-colors"
@@ -2046,7 +2107,13 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                   </svg>
                 </button>
                 <button type="button"
-                  onClick={() => setWizardOpen(false)}
+                  onClick={() => {
+                    // Close (not minimize): end the cook session entirely,
+                    // no PiP hand-off.
+                    setWizardOpen(false)
+                    setCookSessionActive(false)
+                    backgroundCookStatusRef.current?.exitFloatingView()
+                  }}
                   aria-label={tx.closeGuidedMode}
                   className="h-9 w-9 flex items-center justify-center rounded-lg text-cream/40 hover:text-cream/70 transition-colors"
                 >
@@ -2136,12 +2203,17 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
           notification and a floating Picture-in-Picture widget while the app is minimized. */}
       <BackgroundCookStatus
         ref={backgroundCookStatusRef}
-        active={wizardOpen && !!currentWizardStep}
+        active={cookSessionActive && !!currentWizardStep}
         recipeTitle={displayTitle ?? ''}
         stepLabel={wizardStepLabel}
         stepText={currentWizardStep?.instruction ?? ''}
         nearestTimer={nearestTimer}
         lang={lang}
+        canGoPrev={wizardIndex > 0}
+        canGoNext={wizardIndex < flatSteps.length - 1}
+        onToggleNearestTimer={pipToggleNearestTimer}
+        onPrevStep={pipPreviousStep}
+        onNextStep={pipNextStep}
       />
 
       {/* Photo lightbox */}
