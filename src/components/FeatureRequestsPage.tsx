@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useAuth } from '@clerk/react'
 import { useFeatureRequests } from '../hooks/useFeatureRequests'
 import { useLanguage } from '../hooks/useLanguage'
@@ -7,9 +7,11 @@ import { OWNER_USER_ID } from '../lib/admin'
 import { embedFeatureRequestImage, extractFeatureRequestImage } from '../lib/featureRequestImage'
 import { resizedImage } from '../lib/image'
 import SkeletonImage from './SkeletonImage'
+import AppSelect from './ui/AppSelect'
 import { t } from "../i18n";
 
 type RequestStatus = 'pending' | 'approved' | 'denied' | 'in-progress' | 'needs-input' | 'pr-open' | 'closed'
+type SortMode = 'status' | 'recent'
 
 function getStatus(labels: string[], state: string): RequestStatus {
   if (labels.includes('denied')) return 'denied'
@@ -19,6 +21,20 @@ function getStatus(labels: string[], state: string): RequestStatus {
   if (labels.includes('claude-in-progress')) return 'in-progress'
   if (labels.includes('approved-for-claude')) return 'approved'
   return 'pending'
+}
+
+// In review -> ongoing -> approved -> pending -> done -> denied. needs-input
+// isn't one of those six names, but it's part of the same "Claude is
+// actively working this" cluster as in-review/ongoing, so it sits right
+// alongside them rather than off on its own.
+const STATUS_ORDER: Record<RequestStatus, number> = {
+  'pr-open': 0,
+  'needs-input': 1,
+  'in-progress': 2,
+  approved: 3,
+  pending: 4,
+  closed: 5,
+  denied: 6,
 }
 
 export default function FeatureRequestsPage() {
@@ -41,7 +57,21 @@ export default function FeatureRequestsPage() {
   const [editPhotoUrl, setEditPhotoUrl] = useState<string | null>(null)
   const [editPhotoUploading, setEditPhotoUploading] = useState(false)
   const [savingEdit, setSavingEdit] = useState(false)
+  const [sortMode, setSortMode] = useState<SortMode>('status')
   const uploadIdRef = useRef(`new-${Date.now()}`)
+
+  // Secondary sort is always most-recent-first (higher issue number = newer,
+  // same ordering as createdAt) - "status" only decides the primary bucket,
+  // "recent" ignores status and sorts across all requests by recency alone.
+  const sortedRequests = useMemo(() => {
+    return [...requests].sort((a, b) => {
+      if (sortMode === 'status') {
+        const statusDiff = STATUS_ORDER[getStatus(a.labels, a.state)] - STATUS_ORDER[getStatus(b.labels, b.state)]
+        if (statusDiff !== 0) return statusDiff
+      }
+      return b.number - a.number
+    })
+  }, [requests, sortMode])
 
   async function uploadPhoto(uploadId: string, file: File): Promise<string | null> {
     const token = await getToken()
@@ -235,8 +265,22 @@ export default function FeatureRequestsPage() {
             {tx.noRequestsYet}
           </p>
         ) : (
-          <div className="space-y-3">
-            {requests.map(r => {
+          <>
+            <div className="flex items-center justify-end gap-2 mb-3">
+              <span className="text-xs text-cream/40">{tx.sortBy}</span>
+              <AppSelect
+                value={sortMode}
+                onValueChange={setSortMode}
+                triggerClassName="bg-tint/[0.03] border border-tint/10 rounded-lg px-2 py-1.5 text-xs text-cream/80 outline-none focus:border-amber/30"
+                aria-label={tx.sortBy}
+                options={[
+                  { value: 'status', label: tx.sortByStatus },
+                  { value: 'recent', label: tx.sortByMostRecent },
+                ]}
+              />
+            </div>
+            <div className="space-y-3">
+            {sortedRequests.map(r => {
               const status = getStatus(r.labels, r.state)
               const statusLabel: Record<RequestStatus, string> = {
                 pending: tx.pending,
@@ -429,7 +473,8 @@ export default function FeatureRequestsPage() {
                 </div>
               )
             })}
-          </div>
+            </div>
+          </>
         )}
       </div>
     </div>
