@@ -115,7 +115,7 @@ export default function ActionsMenu({ items, triggerLabel, lang, triggerClassNam
                 key={item.key}
                 onClick={() => { close(); item.onClick() }}
                 disabled={item.disabled}
-                className={`flex items-center gap-3 w-full text-start px-3 py-2.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-40 ${
+                className={`flex items-center gap-3 w-full text-start px-3 py-[13.5px] rounded-lg text-sm font-medium transition-colors disabled:opacity-40 ${
                   item.danger ? 'text-red-400 hover:bg-red-500/10' : 'text-cream/80 hover:bg-tint/[0.06]'
                 }`}
               >

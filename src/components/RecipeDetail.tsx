@@ -846,7 +846,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                             const inCollection = id ? col.recipeIds.includes(id) : false
                             return (
                               <li key={col._id}>
-                                <label className="flex items-center gap-2.5 text-sm text-cream/80 cursor-pointer px-2 py-2.5 rounded-lg hover:bg-tint/[0.06] transition-colors">
+                                <label className="flex items-center gap-2.5 text-sm text-cream/80 cursor-pointer px-2 py-[13.5px] rounded-lg hover:bg-tint/[0.06] transition-colors">
                                   <input
                                     type="checkbox"
                                     checked={inCollection}
@@ -890,7 +890,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                             onClick={() => { closeActionsMenu(); navigate(`/recipes/${id}/edit`) }}
                             disabled={recipe.status === 'pending_review'}
                             title={recipe.status === 'pending_review' ? (tx.lockedWhilePendingAIReview) : undefined}
-                            className="flex items-center gap-3 w-full text-start px-3 py-2.5 rounded-lg text-sm font-medium text-cream/80 hover:bg-tint/[0.06] transition-colors disabled:opacity-40"
+                            className="flex items-center gap-3 w-full text-start px-3 py-[13.5px] rounded-lg text-sm font-medium text-cream/80 hover:bg-tint/[0.06] transition-colors disabled:opacity-40"
                           >
                             <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -903,7 +903,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                           {recipe.status !== 'published' && (isAdmin || (isOwner && recipe.publishedRevision == null)) && (
                             <button type="button"
                               onClick={() => { closeActionsMenu(); setDeleteConfirmOpen(true) }}
-                              className="flex items-center gap-3 w-full text-start px-3 py-2.5 rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10 transition-colors"
+                              className="flex items-center gap-3 w-full text-start px-3 py-[13.5px] rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10 transition-colors"
                             >
                               <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -916,7 +916,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
 
                       <button type="button"
                         onClick={() => setActionsMenuView('collections')}
-                        className="flex items-center gap-3 w-full text-start px-3 py-2.5 rounded-lg text-sm font-medium text-cream/80 hover:bg-tint/[0.06] transition-colors"
+                        className="flex items-center gap-3 w-full text-start px-3 py-[13.5px] rounded-lg text-sm font-medium text-cream/80 hover:bg-tint/[0.06] transition-colors"
                       >
                         <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
@@ -927,7 +927,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                       {displayRecipe.ingredients.length > 0 && (
                         <button type="button"
                           onClick={() => { closeActionsMenu(); addAllToShoppingList() }}
-                          className="flex items-center gap-3 w-full text-start px-3 py-2.5 rounded-lg text-sm font-medium text-cream/80 hover:bg-tint/[0.06] transition-colors"
+                          className="flex items-center gap-3 w-full text-start px-3 py-[13.5px] rounded-lg text-sm font-medium text-cream/80 hover:bg-tint/[0.06] transition-colors"
                         >
                           <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m-10 0a2 2 0 100 4 2 2 0 000-4zm10 0a2 2 0 100 4 2 2 0 000-4z" />
@@ -939,7 +939,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                       <button type="button"
                         onClick={() => void handleDownloadPdf()}
                         disabled={pdfGenerating}
-                        className="flex items-center gap-3 w-full text-start px-3 py-2.5 rounded-lg text-sm font-medium text-cream/80 hover:bg-tint/[0.06] transition-colors disabled:opacity-50"
+                        className="flex items-center gap-3 w-full text-start px-3 py-[13.5px] rounded-lg text-sm font-medium text-cream/80 hover:bg-tint/[0.06] transition-colors disabled:opacity-50"
                       >
                         <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6v-8z" />
@@ -954,7 +954,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                         <>
                           <button type="button"
                             onClick={() => { closeActionsMenu(); void shareNative() }}
-                            className="flex items-center gap-3 w-full text-start px-3 py-2.5 rounded-lg text-sm font-medium text-cream/80 hover:bg-tint/[0.06] transition-colors"
+                            className="flex items-center gap-3 w-full text-start px-3 py-[13.5px] rounded-lg text-sm font-medium text-cream/80 hover:bg-tint/[0.06] transition-colors"
                           >
                             <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342a3 3 0 100-2.684l-6.44 3.22a3 3 0 100 2.684l6.44-3.22zM8.684 13.342l6.632 3.316m0-11.317l-6.632 3.316" />
@@ -963,7 +963,7 @@ export default function RecipeDetail({ onAddTimer, timers, timerBarHeight, onAdd
                           </button>
                           <button type="button"
                             onClick={() => { closeActionsMenu(); void copyShareLink() }}
-                            className="flex items-center gap-3 w-full text-start px-3 py-2.5 rounded-lg text-sm font-medium text-cream/80 hover:bg-tint/[0.06] transition-colors"
+                            className="flex items-center gap-3 w-full text-start px-3 py-[13.5px] rounded-lg text-sm font-medium text-cream/80 hover:bg-tint/[0.06] transition-colors"
                           >
                             <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 010 5.656l-3 3a4 4 0 01-5.656-5.656l1.5-1.5M10.172 13.828a4 4 0 010-5.656l3-3a4 4 0 015.656 5.656l-1.5 1.5" />
