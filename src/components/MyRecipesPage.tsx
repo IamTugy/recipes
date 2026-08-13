@@ -14,6 +14,7 @@ import RecipePlaceholder from './RecipePlaceholder'
 import SubmissionsPage from './SubmissionsPage'
 import JobsPage from './JobsPage'
 import RecipeFilterBar, { type SortOption } from './RecipeFilterBar'
+import AppSelect from './ui/AppSelect'
 import { DIETARY_KEYWORDS } from '../lib/filterDefinitions'
 import {
   getSharedCategories, setSharedCategories,
@@ -235,35 +236,6 @@ export default function MyRecipesPage() {
         </div>
       ) : (
       <>
-      {/* Status filter */}
-      <div className="max-w-6xl mx-auto px-6 mb-4">
-        <div className="flex gap-1.5 flex-wrap">
-          <button type="button"
-            onClick={() => setActiveStatus(null)}
-            className={`px-3 py-1.5 text-[11px] tracking-wider font-medium transition-colors rounded-lg border ${
-              activeStatus === null
-                ? 'text-amber bg-amber/10 border-amber/20'
-                : 'text-cream/35 hover:text-cream/60 border-tint/10'
-            }`}
-          >
-            {tx.all}
-          </button>
-          {STATUS_FILTERS.map(s => (
-            <button type="button"
-              key={s}
-              onClick={() => setActiveStatus(s === activeStatus ? null : s)}
-              className={`px-3 py-1.5 text-[11px] tracking-wider font-medium transition-colors rounded-lg border ${
-                activeStatus === s
-                  ? 'text-amber bg-amber/10 border-amber/20'
-                  : 'text-cream/35 hover:text-cream/60 border-tint/10'
-              }`}
-            >
-              {statusLabel[s][lang]}
-            </button>
-          ))}
-        </div>
-      </div>
-
       <div className="max-w-6xl mx-auto px-6">
         <RecipeFilterBar
           lang={lang}
@@ -280,6 +252,22 @@ export default function MyRecipesPage() {
           canGroup={false}
           groupByDish={false}
           onToggleGroup={() => {}}
+          advancedExtra={(
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-cream/25 mb-1.5">
+                {tx.status}
+              </p>
+              <AppSelect
+                value={activeStatus ?? 'all'}
+                onValueChange={value => setActiveStatus(value === 'all' ? null : value as StatusFilter)}
+                triggerClassName="bg-tint/[0.03] border border-tint/10 rounded-lg text-xs text-cream/70 px-2.5 py-1.5 outline-none hover:bg-tint/[0.06] transition-colors"
+                options={[
+                  { value: 'all', label: tx.all },
+                  ...STATUS_FILTERS.map(s => ({ value: s, label: statusLabel[s][lang] })),
+                ]}
+              />
+            </div>
+          )}
           sortBy={sortBy}
           onSortChange={setSortBy}
           viewMode={viewMode}

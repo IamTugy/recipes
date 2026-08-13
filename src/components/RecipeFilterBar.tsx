@@ -30,6 +30,8 @@ interface RecipeFilterBarProps {
   canGroup: boolean
   groupByDish: boolean
   onToggleGroup: () => void
+  /** Extra page-specific filter (e.g. MyRecipesPage's status dropdown), rendered at the top of the advanced-options panel. */
+  advancedExtra?: ReactNode
   sortBy: SortOption
   onSortChange: (s: SortOption) => void
   viewMode: 'grid' | 'list'
@@ -55,7 +57,7 @@ function smallChipClass(active: boolean) {
 export default function RecipeFilterBar({
   lang, categories, activeCategories, onToggleCategory, onClearCategories, extraChips,
   activeDifficulties, onToggleDifficulty, activeDietary, onToggleDietary, activeKosher, onToggleKosher,
-  canGroup, groupByDish, onToggleGroup,
+  canGroup, groupByDish, onToggleGroup, advancedExtra,
   sortBy, onSortChange, viewMode, onViewModeChange,
   resultCount, totalCount, hasActiveFilters, onClearAll,
 }: RecipeFilterBarProps) {
@@ -98,24 +100,37 @@ export default function RecipeFilterBar({
 
       {/* Advanced options */}
       <div className="mb-6">
-        <button
-          type="button"
-          onClick={() => setAdvancedOpen(v => !v)}
-          className="flex items-center gap-1.5 text-xs font-medium text-cream/40 hover:text-cream/70 transition-colors"
-        >
-          <svg className={`w-3.5 h-3.5 transition-transform ${advancedOpen ? 'rotate-90' : lang === 'he' ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-          </svg>
-          <span>{tx.advancedFilters}</span>
-          {advancedActiveCount > 0 && (
-            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber/10 text-amber">
-              {advancedActiveCount}
-            </span>
-          )}
-        </button>
+        <div className="flex items-center justify-between gap-2">
+          <button
+            type="button"
+            onClick={() => setAdvancedOpen(v => !v)}
+            className="flex items-center gap-1.5 text-xs font-medium text-cream/40 hover:text-cream/70 transition-colors"
+          >
+            <svg className={`w-3.5 h-3.5 transition-transform ${advancedOpen ? 'rotate-90' : lang === 'he' ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+            <span>{tx.advancedFilters}</span>
+            {advancedActiveCount > 0 && (
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber/10 text-amber">
+                {advancedActiveCount}
+              </span>
+            )}
+          </button>
+          <AppSelect
+            value={sortBy}
+            onValueChange={value => onSortChange(value as SortOption)}
+            triggerClassName="h-8 min-w-[108px] bg-tint/[0.03] border border-tint/10 rounded-lg text-xs text-cream/60 px-2.5 outline-none hover:bg-tint/[0.06] transition-colors"
+            options={[
+              { value: 'rating', label: tx.topRated },
+              { value: 'quickest', label: tx.quickest },
+              { value: 'newest', label: tx.newest },
+            ]}
+          />
+        </div>
 
         {advancedOpen && (
           <div className="mt-3 space-y-4">
+            {advancedExtra}
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-wider text-cream/25 mb-1.5">
                 {tx.difficulty2}
@@ -203,42 +218,30 @@ export default function RecipeFilterBar({
             </button>
           )}
         </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <div className="flex items-center gap-1 h-8 border border-tint/10 rounded-lg p-0.5">
-            <button type="button"
-              onClick={() => onViewModeChange('grid')}
-              aria-label={tx.gridView}
-              className={`h-full w-7 flex items-center justify-center rounded-md transition-colors ${
-                viewMode === 'grid' ? 'bg-amber/10 text-amber' : 'text-cream/35 hover:text-cream/60'
-              }`}
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" />
-                <rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
-              </svg>
-            </button>
-            <button type="button"
-              onClick={() => onViewModeChange('list')}
-              aria-label={tx.listView}
-              className={`h-full w-7 flex items-center justify-center rounded-md transition-colors ${
-                viewMode === 'list' ? 'bg-amber/10 text-amber' : 'text-cream/35 hover:text-cream/60'
-              }`}
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-          </div>
-          <AppSelect
-            value={sortBy}
-            onValueChange={value => onSortChange(value as SortOption)}
-            triggerClassName="h-8 min-w-[108px] bg-tint/[0.03] border border-tint/10 rounded-lg text-xs text-cream/60 px-2.5 outline-none hover:bg-tint/[0.06] transition-colors"
-            options={[
-              { value: 'rating', label: tx.topRated },
-              { value: 'quickest', label: tx.quickest },
-              { value: 'newest', label: tx.newest },
-            ]}
-          />
+        <div className="flex items-center gap-1 h-8 border border-tint/10 rounded-lg p-0.5 shrink-0">
+          <button type="button"
+            onClick={() => onViewModeChange('grid')}
+            aria-label={tx.gridView}
+            className={`h-full w-7 flex items-center justify-center rounded-md transition-colors ${
+              viewMode === 'grid' ? 'bg-amber/10 text-amber' : 'text-cream/35 hover:text-cream/60'
+            }`}
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
+            </svg>
+          </button>
+          <button type="button"
+            onClick={() => onViewModeChange('list')}
+            aria-label={tx.listView}
+            className={`h-full w-7 flex items-center justify-center rounded-md transition-colors ${
+              viewMode === 'list' ? 'bg-amber/10 text-amber' : 'text-cream/35 hover:text-cream/60'
+            }`}
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
         </div>
       </div>
     </>
