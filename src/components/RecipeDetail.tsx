@@ -66,6 +66,7 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
   // treats a null id as "skip the network call", so anonymous cooking is
   // unaffected.
   const [cookSessionId, setCookSessionId] = useState<string | null>(null)
+  const pendingCookStepRef = useRef<{ stepKey: string; stepNum: number } | null>(null)
   const [wizardIndex, setWizardIndex] = useState(0)
   // The overflow menu (Edit/Delete/Save to collection/Download PDF/Copy
   // link) consolidates what used to be scattered separate buttons. It's a
@@ -738,8 +739,16 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
     setWizardIndex(firstUnchecked === -1 ? 0 : firstUnchecked)
     setCookSessionActive(true)
     setCookSessionId(null)
+    pendingCookStepRef.current = null
     if (currentUserId && recipe) {
-      startCookSession(recipe.id, getToken).then(setCookSessionId)
+      startCookSession(recipe.id, getToken).then(id => {
+        setCookSessionId(id)
+        if (id && pendingCookStepRef.current) {
+          const { stepKey, stepNum } = pendingCookStepRef.current
+          pendingCookStepRef.current = null
+          logCookSessionStep(id, stepKey, stepNum, getToken)
+        }
+      })
     }
   }
 
@@ -767,7 +776,10 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
   }
 
   function handleStepEntered(stepKey: string, stepNum: number) {
-    if (!cookSessionId) return
+    if (!cookSessionId) {
+      pendingCookStepRef.current = { stepKey, stepNum }
+      return
+    }
     logCookSessionStep(cookSessionId, stepKey, stepNum, getToken)
   }
 
