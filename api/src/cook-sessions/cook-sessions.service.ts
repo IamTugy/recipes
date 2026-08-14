@@ -165,7 +165,12 @@ export class CookSessionsService {
       steps,
     })
 
-    await this.cookLogService.recordCook(session.userId, session.recipeId)
+    try {
+      await this.cookLogService.recordCook(session.userId, session.recipeId)
+    } catch (err) {
+      // recordCook never throws itself, but guard defensively - a failure
+      // here must never prevent Redis cleanup
+    }
 
     const client = this.redis.getClient()
     await client.del(redisKey(sessionId))

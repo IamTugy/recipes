@@ -10,7 +10,8 @@ describe('CookLogService', () => {
   const create = jest.fn()
   const find = jest.fn()
   const aggregate = jest.fn()
-  const cookLogModel = { findOne, create, find, aggregate }
+  const syncIndexes = jest.fn()
+  const cookLogModel = { findOne, create, find, aggregate, syncIndexes }
 
   const recipeFindOne = jest.fn()
   const recipeModel = { findOne: recipeFindOne }
@@ -31,6 +32,28 @@ describe('CookLogService', () => {
     }).compile()
     return moduleRef.get(CookLogService)
   }
+
+  it('onModuleInit syncs indexes on startup', async () => {
+    syncIndexes.mockResolvedValue(undefined)
+    const service = await makeService()
+    await service.onModuleInit()
+    expect(syncIndexes).toHaveBeenCalled()
+  })
+
+  it('onModuleInit does not throw when syncIndexes fails', async () => {
+    syncIndexes.mockRejectedValue(new Error('permission denied'))
+    const service = await makeService()
+    await expect(service.onModuleInit()).resolves.toBeUndefined()
+  })
+
+  it('recordCook treats a pre-migration row with no cookedAt as no effective cooldown, inserting normally', async () => {
+    findOne.mockReturnValue({ sort: () => ({ exec: jest.fn().mockResolvedValue({ userId: 'user_1', recipeId: 'recipe_a' }) }) })
+    recipeFindOne.mockReturnValue({ exec: jest.fn().mockResolvedValue({ prepTime: 10, cookTime: 20 }) })
+    create.mockResolvedValue({})
+    const service = await makeService()
+    await expect(service.recordCook('user_1', 'recipe_a')).resolves.toBeUndefined()
+    expect(create).toHaveBeenCalledWith(expect.objectContaining({ userId: 'user_1', recipeId: 'recipe_a' }))
+  })
 
   it('recordCook inserts a new row on the very first cook of a recipe', async () => {
     findOne.mockReturnValue({ sort: () => ({ exec: jest.fn().mockResolvedValue(null) }) })

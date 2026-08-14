@@ -226,6 +226,23 @@ describe('CookSessionsService', () => {
     expect(del).not.toHaveBeenCalled()
   })
 
+  it('finishSession still deletes both Redis keys even if recordCook rejects', async () => {
+    const existing = {
+      userId: 'user_1', recipeId: 'recipe_a', startedAt: '2026-08-14T10:00:00.000Z',
+      events: [{ stepKey: '0-0', stepNum: 1, enteredAt: '2026-08-14T10:00:30.000Z' }],
+      currentStepKey: '0-0', currentStepNum: 1, checkedSteps: [], checkedIngredients: [],
+    }
+    get.mockResolvedValue(JSON.stringify(existing))
+    create.mockResolvedValue({})
+    recordCook.mockRejectedValue(new Error('cook-log service down'))
+    const service = await makeService()
+
+    await service.finishSession('session_1', 'user_1')
+
+    expect(del).toHaveBeenCalledWith('cook-session:session_1')
+    expect(del).toHaveBeenCalledWith('cook-session-active:user_1:recipe_a')
+  })
+
   it('abandonSession deletes both the session and index Redis keys', async () => {
     const existing = {
       userId: 'user_1', recipeId: 'recipe_a', startedAt: '2026-08-14T10:00:00.000Z',
