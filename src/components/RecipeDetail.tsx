@@ -28,7 +28,10 @@ import ConfirmDialog from './ConfirmDialog'
 import type { TimerState, RecipeRevision, QualityReview } from '../types'
 import { resizedImage } from '../lib/image'
 import { downloadRecipePdf } from '../lib/recipePdf'
-import { startCookSession, logCookSessionStep, finishCookSession, abandonCookSession } from '../lib/cookSessions'
+import {
+  startCookSession, logCookSessionStep, finishCookSession, abandonCookSession,
+  getActiveCookSession, syncCookSession,
+} from '../lib/cookSessions'
 import SkeletonImage from './SkeletonImage'
 import { useTranslatedText } from '../hooks/useTranslatedText'
 import TranslatedText from './TranslatedText'
@@ -66,7 +69,13 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
   // treats a null id as "skip the network call", so anonymous cooking is
   // unaffected.
   const [cookSessionId, setCookSessionId] = useState<string | null>(null)
+  const [cookSessionStartedAt, setCookSessionStartedAt] = useState<string | null>(null)
   const pendingCookStepRef = useRef<{ stepKey: string; stepNum: number } | null>(null)
+  // Tracks the last stepKey/stepNum passed to handleStepEntered (including
+  // 'checklist') so the checked-state-only sync effect below can include
+  // it without RecipeDetail needing to know CookDock's internal screen
+  // state directly.
+  const lastEnteredStepRef = useRef<{ stepKey: string; stepNum: number }>({ stepKey: 'checklist', stepNum: 0 })
   const [wizardIndex, setWizardIndex] = useState(0)
   // The overflow menu (Edit/Delete/Save to collection/Download PDF/Copy
   // link) consolidates what used to be scattered separate buttons. It's a
@@ -466,6 +475,64 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
     setRevisions(null)
   }, [id])
 
+  // Cross-device resume (Phase D): on loading a recipe, check whether the
+  // signed-in user already has an active cook session for it elsewhere -
+  // if so, silently resume into it (no prompt, per design - this applies
+  // identically whether reached by page load or by clicking "Start
+  // cooking" again on the same recipe) instead of the sessionStorage-only
+  // restore above.
+  useEffect(() => {
+    if (!id || !currentUserId) return
+    let cancelled = false
+    getActiveCookSession(id, getToken).then(session => {
+      if (cancelled || !session) return
+      setCheckedSteps(new Set(session.checkedSteps))
+      setCheckedIngredients(new Set(session.checkedIngredients))
+      const resumedIndex = session.currentStepKey && session.currentStepKey !== 'checklist'
+        ? Math.max(0, session.currentStepNum - 1)
+        : 0
+      setWizardIndex(resumedIndex)
+      lastEnteredStepRef.current = session.currentStepKey
+        ? { stepKey: session.currentStepKey, stepNum: session.currentStepNum }
+        : { stepKey: 'checklist', stepNum: 0 }
+      setCookSessionId(session.sessionId)
+      setCookSessionStartedAt(session.startedAt)
+      setCookSessionActive(true)
+    })
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- getToken is a new function every render from useAuth(); only id/currentUserId changing should re-trigger discovery
+  }, [id, currentUserId])
+
+  // While a session is active, poll for changes made from another device
+  // (Phase D) - server-wins on every tick, no merge logic.
+  useEffect(() => {
+    if (!cookSessionActive || !id || !currentUserId) return
+    const interval = setInterval(() => {
+      getActiveCookSession(id, getToken).then(session => {
+        if (!session) return
+        setCheckedSteps(new Set(session.checkedSteps))
+        setCheckedIngredients(new Set(session.checkedIngredients))
+        const resumedIndex = session.currentStepKey && session.currentStepKey !== 'checklist'
+          ? Math.max(0, session.currentStepNum - 1)
+          : 0
+        setWizardIndex(resumedIndex)
+      })
+    }, 5000)
+    return () => clearInterval(interval)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- getToken is a new function every render; only cookSessionActive/id/currentUserId changing should restart polling
+  }, [cookSessionActive, id, currentUserId])
+
+  // Push checked-state changes to the backend session (Phase D) even when
+  // they happen without a step transition (e.g. ticking an ingredient
+  // while staying on the checklist screen) - step-transition-triggered
+  // syncs are already covered inside handleStepEntered above.
+  useEffect(() => {
+    if (!cookSessionId) return
+    const { stepKey, stepNum } = lastEnteredStepRef.current
+    syncCookSession(cookSessionId, stepKey, stepNum, [...checkedSteps], [...checkedIngredients], getToken)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- getToken is a new function every render; this effect should only re-fire on an actual checked-state change, not on every render
+  }, [checkedSteps, checkedIngredients])
+
   // Track this recipe as recently viewed once it has loaded
   useEffect(() => {
     if (recipe) addRecent(recipe.id)
@@ -739,7 +806,9 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
     setWizardIndex(firstUnchecked === -1 ? 0 : firstUnchecked)
     setCookSessionActive(true)
     setCookSessionId(null)
+    setCookSessionStartedAt(null)
     pendingCookStepRef.current = null
+    lastEnteredStepRef.current = { stepKey: 'checklist', stepNum: 0 }
     if (currentUserId && recipe) {
       startCookSession(recipe.id, getToken).then(id => {
         setCookSessionId(id)
@@ -771,16 +840,19 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
       abandonCookSession(cookSessionId, getToken)
       setCookSessionId(null)
     }
+    setCookSessionStartedAt(null)
     setCookSessionActive(false)
     backgroundCookStatusRef.current?.exitFloatingView()
   }
 
   function handleStepEntered(stepKey: string, stepNum: number) {
+    lastEnteredStepRef.current = { stepKey, stepNum }
     if (!cookSessionId) {
       pendingCookStepRef.current = { stepKey, stepNum }
       return
     }
     logCookSessionStep(cookSessionId, stepKey, stepNum, getToken)
+    syncCookSession(cookSessionId, stepKey, stepNum, [...checkedSteps], [...checkedIngredients], getToken)
   }
 
   const sectionNavItems = [
@@ -2084,6 +2156,7 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
           onOpenLightbox={setLightboxUrl}
           timerBarHeight={timerBarHeight}
           lightboxOpen={!!lightboxUrl}
+          elapsedBaselineMs={cookSessionStartedAt ? new Date(cookSessionStartedAt).getTime() : undefined}
         />
       )}
 

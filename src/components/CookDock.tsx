@@ -41,6 +41,7 @@ interface CookDockProps {
   onOpenLightbox: (url: string) => void
   timerBarHeight: number
   lightboxOpen: boolean
+  elapsedBaselineMs?: number
 }
 
 const SWIPE_THRESHOLD_PX = 60
@@ -74,7 +75,7 @@ export default function CookDock({
   lang, ingredients, checkedIngredients, onToggleIngredient, multiplier,
   steps, wizardIndex, onPrev, onAdvance, onMarkDone, onStop, onStepEntered, onExpand,
   checkedSteps, nearestTimer, onToggleNearestTimer, getTimerForStep, onStartTimer,
-  onOpenLightbox, timerBarHeight, lightboxOpen,
+  onOpenLightbox, timerBarHeight, lightboxOpen, elapsedBaselineMs,
 }: CookDockProps) {
   const tx = t[lang]
   const dockRef = useRef<HTMLDivElement>(null)
@@ -127,7 +128,11 @@ export default function CookDock({
   // real steps screen (not the unmeasured checklist) is shown. No backend
   // involved in this phase; this is purely a local Date.now() clock.
   const [elapsedSeconds, setElapsedSeconds] = useState(0)
-  const elapsedStartRef = useRef<number | null>(null)
+  // Resumed sessions (Phase D) pass their real start time here so the
+  // stopwatch continues from the correct offset instead of restarting at
+  // 0 - a fresh (non-resumed) session gets undefined and behaves exactly
+  // as before (Date.now() the first time the real steps screen is shown).
+  const elapsedStartRef = useRef<number | null>(elapsedBaselineMs ?? null)
   useEffect(() => {
     if (screen !== 'steps') return
     if (elapsedStartRef.current === null) elapsedStartRef.current = Date.now()
