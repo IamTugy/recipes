@@ -18,8 +18,8 @@ describe('RecipesService', () => {
     return { viewCountsById: jest.fn().mockResolvedValue(viewCounts), record: jest.fn().mockResolvedValue(undefined) }
   }
 
-  function makeCookLog(cookCounts: Map<string, number> = new Map()) {
-    return { countsById: jest.fn().mockResolvedValue(cookCounts) }
+  function makeCookLog(cookCounts: Map<string, number> = new Map(), userCookCounts: Map<string, number> = new Map()) {
+    return { countsById: jest.fn().mockResolvedValue(cookCounts), userCountsById: jest.fn().mockResolvedValue(userCookCounts) }
   }
 
   function makeUsers() {

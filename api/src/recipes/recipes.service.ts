@@ -176,6 +176,7 @@ export class RecipesService implements OnModuleInit {
     ratings: Map<string, { avg: number; count: number }>,
     views: Map<string, number>,
     cooks: Map<string, number>,
+    userCooks?: Map<string, number>,
   ) {
     const ownerIds = [...new Set(recipes.map(r => r.ownerId).filter((v): v is string => !!v))]
     const names = await this.usersService.namesByIds(ownerIds)
@@ -187,6 +188,7 @@ export class RecipesService implements OnModuleInit {
         ratingCount: rating?.count ?? 0,
         viewCount: views.get(recipe.id) ?? 0,
         cookCount: cooks.get(recipe.id) ?? 0,
+        ...(userCooks ? { userCookCount: userCooks.get(recipe.id) ?? 0 } : {}),
         ownerName: recipe.ownerId ? names[recipe.ownerId] ?? null : null,
       }
     })
@@ -286,12 +288,13 @@ export class RecipesService implements OnModuleInit {
 
     if (recipe.publishedRevision != null) {
       const base = isOwnerOrAdmin ? { ...recipe.toObject(), id: recipe.id } : await this.overlayPublishedSnapshot(recipe)
-      const [ratings, views, cooks] = await Promise.all([
+      const [ratings, views, cooks, userCooks] = await Promise.all([
         this.ratingsById([recipe.id]),
         this.activityLogService.viewCountsById([recipe.id]),
         this.cookLogService.countsById([recipe.id]),
+        this.cookLogService.userCountsById(userId, [recipe.id]),
       ])
-      return (await this.attachRatingsAndViews([base], ratings, views, cooks))[0]
+      return (await this.attachRatingsAndViews([base], ratings, views, cooks, userCooks))[0]
     }
     const ownerName = recipe.ownerId ? (await this.usersService.namesByIds([recipe.ownerId]))[recipe.ownerId] ?? null : null
     return { ...recipe.toObject(), averageRating: null, ratingCount: 0, viewCount: 0, cookCount: 0, ownerName }

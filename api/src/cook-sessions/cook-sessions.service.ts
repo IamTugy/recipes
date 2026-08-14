@@ -4,6 +4,7 @@ import { Model } from 'mongoose'
 import { randomUUID } from 'crypto'
 import { CookSession, CookSessionDocument } from './schemas/cook-session.schema'
 import { RedisService } from '../redis/redis.service'
+import { CookLogService } from '../cook-log/cook-log.service'
 
 const SESSION_TTL_SECONDS = 86400
 
@@ -49,6 +50,7 @@ export class CookSessionsService {
   constructor(
     @InjectModel(CookSession.name) private readonly cookSessionModel: Model<CookSessionDocument>,
     private readonly redis: RedisService,
+    private readonly cookLogService: CookLogService,
   ) {}
 
   async startSession(userId: string, recipeId: string): Promise<string> {
@@ -162,6 +164,8 @@ export class CookSessionsService {
       totalDurationSeconds: Math.round((finishedAt.getTime() - startedAt.getTime()) / 1000),
       steps,
     })
+
+    await this.cookLogService.recordCook(session.userId, session.recipeId)
 
     const client = this.redis.getClient()
     await client.del(redisKey(sessionId))

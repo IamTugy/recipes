@@ -3,6 +3,7 @@ import { getModelToken } from '@nestjs/mongoose'
 import { CookSessionsService } from './cook-sessions.service'
 import { CookSession } from './schemas/cook-session.schema'
 import { RedisService } from '../redis/redis.service'
+import { CookLogService } from '../cook-log/cook-log.service'
 
 describe('CookSessionsService', () => {
   const get = jest.fn()
@@ -13,6 +14,8 @@ describe('CookSessionsService', () => {
   const redisService = { getClient: () => redisClient }
   const create = jest.fn()
   const model = { create }
+  const recordCook = jest.fn()
+  const cookLogService = { recordCook }
 
   beforeEach(() => jest.clearAllMocks())
 
@@ -22,6 +25,7 @@ describe('CookSessionsService', () => {
         CookSessionsService,
         { provide: getModelToken(CookSession.name), useValue: model },
         { provide: RedisService, useValue: redisService },
+        { provide: CookLogService, useValue: cookLogService },
       ],
     }).compile()
     return moduleRef.get(CookSessionsService)
@@ -197,6 +201,7 @@ describe('CookSessionsService', () => {
         { stepKey: '0-1', stepNum: 2, enteredAt: new Date('2026-08-14T10:02:00.000Z'), durationSeconds: 60 },
       ],
     })
+    expect(recordCook).toHaveBeenCalledWith('user_1', 'recipe_a')
     expect(del).toHaveBeenCalledWith('cook-session:session_1')
     expect(del).toHaveBeenCalledWith('cook-session-active:user_1:recipe_a')
   })
