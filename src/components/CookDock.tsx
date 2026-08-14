@@ -39,6 +39,7 @@ interface CookDockProps {
   onStartTimer: (label: string, minutes: number, groupIdx: number, stepIdx: number) => void
   onOpenLightbox: (url: string) => void
   timerBarHeight: number
+  lightboxOpen: boolean
 }
 
 const SWIPE_THRESHOLD_PX = 60
@@ -72,7 +73,7 @@ export default function CookDock({
   lang, ingredients, checkedIngredients, onToggleIngredient, multiplier,
   steps, wizardIndex, onPrev, onAdvance, onMarkDone, onStop, onExpand,
   checkedSteps, nearestTimer, onToggleNearestTimer, getTimerForStep, onStartTimer,
-  onOpenLightbox, timerBarHeight,
+  onOpenLightbox, timerBarHeight, lightboxOpen,
 }: CookDockProps) {
   const tx = t[lang]
   const dockRef = useRef<HTMLDivElement>(null)
@@ -88,7 +89,25 @@ export default function CookDock({
     if (next) onExpand()
   }
 
-  useFocusTrap(dockRef, expanded)
+  // The ring should disappear for a paused timer the user never interacted
+  // with here (e.g. some unrelated leftover timer becoming "nearest" by
+  // remaining time), but must stay visible - dimmed/paused - for the exact
+  // timer the user just paused via this ring, until it resumes or a
+  // different timer becomes the nearest *running* one. Tracking the last
+  // timer id we saw running (rather than trusting `nearestTimer.running`
+  // alone) is what makes that distinction.
+  const lastRunningTimerIdRef = useRef<string | null>(null)
+  useEffect(() => {
+    if (nearestTimer?.running) lastRunningTimerIdRef.current = nearestTimer.id
+  }, [nearestTimer])
+  const displayedTimer = nearestTimer && (nearestTimer.running || nearestTimer.id === lastRunningTimerIdRef.current)
+    ? nearestTimer
+    : null
+
+  // Suspended while the photo lightbox is open on top of the dock - it has
+  // its own focus trap, and without this both trap/Escape handlers would
+  // fire together (Escape would close the lightbox AND collapse the dock).
+  useFocusTrap(dockRef, expanded && !lightboxOpen)
 
   // Client-side elapsed-time stopwatch - starts once, the first time the
   // real steps screen (not the unmeasured checklist) is shown. No backend
@@ -130,12 +149,21 @@ export default function CookDock({
   useEffect(() => {
     if (!expanded) return
     function handleKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') setExpandedState(false)
+      // The lightbox has its own Escape handler while it's open on top of
+      // the dock - let it own Escape alone rather than also collapsing the
+      // dock underneath in the same keypress.
+      if (e.key === 'Escape' && !lightboxOpen) {
+        setExpandedState(false)
+        return
+      }
+      if (screen !== 'steps') return
+      if (e.key === 'ArrowRight') onAdvance(`${steps[wizardIndex].groupIdx}-${steps[wizardIndex].stepIdx}`)
+      if (e.key === 'ArrowLeft') onPrev()
     }
     document.addEventListener('keydown', handleKey)
     return () => document.removeEventListener('keydown', handleKey)
     // eslint-disable-next-line react-hooks/exhaustive-deps -- setExpandedState is a new function every render; it doesn't close over stale state
-  }, [expanded])
+  }, [expanded, lightboxOpen, screen, steps, wizardIndex, onAdvance, onPrev])
 
   useEffect(() => {
     if (!expanded) return
@@ -159,6 +187,7 @@ export default function CookDock({
       ref={dockRef}
       role={expanded ? 'dialog' : undefined}
       aria-modal={expanded || undefined}
+      aria-label={expanded ? tx.instructions : undefined}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       onClick={() => { if (!expanded) setExpandedState(true) }}
@@ -218,6 +247,12 @@ export default function CookDock({
                             <li
                               key={ii}
                               onClick={() => onToggleIngredient(ingredientKey)}
+                              onKeyDown={e => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                  e.preventDefault()
+                                  onToggleIngredient(ingredientKey)
+                                }
+                              }}
                               role="checkbox"
                               aria-checked={itemChecked}
                               tabIndex={0}
@@ -247,6 +282,16 @@ export default function CookDock({
                                     primary={lang === 'he' ? item.name : item.nameEn}
                                     secondary={lang === 'he' ? item.nameEn : item.name}
                                   />
+                                )}
+                                {(item.note || item.noteEn) && (
+                                  <span className="text-cream/40 italic">
+                                    {' ('}
+                                    <TranslatedText
+                                      primary={lang === 'he' ? item.note : item.noteEn}
+                                      secondary={lang === 'he' ? item.noteEn : item.note}
+                                    />
+                                    {')'}
+                                  </span>
                                 )}
                               </span>
                             </li>
@@ -350,13 +395,13 @@ export default function CookDock({
           <svg className="w-4 h-4 shrink-0 text-cream/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
           </svg>
-          {nearestTimer && (
+          {displayedTimer && (
             <button type="button"
               onClick={e => { e.stopPropagation(); onToggleNearestTimer() }}
-              aria-label={nearestTimer.running ? tx.pauseTimer : tx.resumeTimer}
+              aria-label={displayedTimer.running ? tx.pauseTimer : tx.resumeTimer}
             >
-              <TimerRing fraction={nearestTimer.remainingSeconds / nearestTimer.totalSeconds}>
-                {formatDockDuration(nearestTimer.remainingSeconds)}
+              <TimerRing fraction={displayedTimer.totalSeconds > 0 ? displayedTimer.remainingSeconds / displayedTimer.totalSeconds : 0}>
+                {formatDockDuration(displayedTimer.remainingSeconds)}
               </TimerRing>
             </button>
           )}

@@ -55,11 +55,9 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
   const { recipes: allRecipes } = useRecipes()
   const { favoriteSlugs, toggle: toggleFavorite } = useFavorites()
   const { collections, create: createCollection, addRecipe: addRecipeToCollection, removeRecipe: removeRecipeFromCollection } = useCollections()
-  // Stays true while cooking is "in progress" even after the fullscreen
-  // wizard is minimized into Picture-in-Picture - wizardOpen alone can't
-  // drive this since it goes false the moment the modal is minimized, and
-  // the PiP stream/step tracking need to keep running independent of
-  // whether the modal itself is currently mounted.
+  // Drives the persistent CookDock, the wake lock, and the PiP/notification
+  // hand-off together - true for the whole cook session, independent of
+  // whether the dock is currently collapsed or expanded.
   const [cookSessionActive, setCookSessionActive] = useState(false)
   const [wizardIndex, setWizardIndex] = useState(0)
   // The overflow menu (Edit/Delete/Save to collection/Download PDF/Copy
@@ -716,9 +714,9 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
   const nearestTimer = (runningRecipeTimers.length > 0 ? runningRecipeTimers : recipeTimers)
     .slice().sort((a, b) => a.remainingSeconds - b.remainingSeconds)[0] ?? null
 
-  // Depends on cookSessionActive, not wizardOpen - this (and the PiP feed
-  // it drives) must keep reflecting the current step even while the
-  // fullscreen modal is minimized.
+  // Feeds both the CookDock and the PiP/notification widget, so it must
+  // keep reflecting the current step for the whole session regardless of
+  // whether the dock is collapsed, expanded, or backgrounded into PiP.
   const currentWizardStep = cookSessionActive ? flatSteps[wizardIndex] : undefined
   const wizardStepLabel = lang === 'he'
     ? `שלב ${wizardIndex + 1} מתוך ${flatSteps.length}`
@@ -2022,7 +2020,7 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
       {/* Reserves layout space for the persistent cook-session dock below,
           so the fixed-position dock doesn't visually hide page content. */}
       {cookSessionActive && flatSteps.length > 0 && (
-        <div aria-hidden="true" className="h-[20dvh] sm:h-24" style={{ marginBottom: timerBarHeight }} />
+        <div aria-hidden="true" className="h-[20dvh] sm:h-24" style={{ paddingBottom: timerBarHeight }} />
       )}
 
       {/* Persistent cook-session dock - collapsed by default, expands to
@@ -2042,12 +2040,13 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
           onStop={stopCooking}
           onExpand={() => backgroundCookStatusRef.current?.exitFloatingView()}
           checkedSteps={checkedSteps}
-          nearestTimer={nearestTimer?.running ? nearestTimer : null}
+          nearestTimer={nearestTimer}
           onToggleNearestTimer={pipToggleNearestTimer}
           getTimerForStep={getTimerForStep}
           onStartTimer={startTimer}
           onOpenLightbox={setLightboxUrl}
           timerBarHeight={timerBarHeight}
+          lightboxOpen={!!lightboxUrl}
         />
       )}
 
