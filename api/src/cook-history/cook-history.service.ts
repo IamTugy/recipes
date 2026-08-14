@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model } from 'mongoose'
+import { Model, Types } from 'mongoose'
 import { CookSession, CookSessionDocument } from '../cook-sessions/schemas/cook-session.schema'
 import { Recipe, RecipeDocument } from '../recipes/schemas/recipe.schema'
 
@@ -44,13 +44,18 @@ export class CookHistoryService {
   ) {}
 
   private async resolveTitles(recipeIds: string[]): Promise<Map<string, string>> {
-    if (recipeIds.length === 0) return new Map()
-    const recipes = await this.recipeModel
-      .find({ _id: { $in: recipeIds } })
-      .select('title')
-      .lean()
-      .exec()
-    return new Map(recipes.map(r => [String(r._id), r.title]))
+    const validIds = recipeIds.filter(id => Types.ObjectId.isValid(id))
+    if (validIds.length === 0) return new Map()
+    try {
+      const recipes = await this.recipeModel
+        .find({ _id: { $in: validIds } })
+        .select('title')
+        .lean()
+        .exec()
+      return new Map(recipes.map(r => [String(r._id), r.title]))
+    } catch {
+      return new Map()
+    }
   }
 
   async getStats(userId: string): Promise<CookHistoryStats> {
