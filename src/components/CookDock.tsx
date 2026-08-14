@@ -31,6 +31,7 @@ interface CookDockProps {
   onAdvance: (stepKey: string) => void
   onMarkDone: (stepKey: string) => void
   onStop: () => void
+  onStepEntered: (stepKey: string, stepNum: number) => void
   onExpand: () => void
   checkedSteps: Set<string>
   nearestTimer: TimerState | null
@@ -71,7 +72,7 @@ function TimerRing({ fraction, children }: { fraction: number; children: React.R
 
 export default function CookDock({
   lang, ingredients, checkedIngredients, onToggleIngredient, multiplier,
-  steps, wizardIndex, onPrev, onAdvance, onMarkDone, onStop, onExpand,
+  steps, wizardIndex, onPrev, onAdvance, onMarkDone, onStop, onStepEntered, onExpand,
   checkedSteps, nearestTimer, onToggleNearestTimer, getTimerForStep, onStartTimer,
   onOpenLightbox, timerBarHeight, lightboxOpen,
 }: CookDockProps) {
@@ -82,6 +83,19 @@ export default function CookDock({
   const [screen, setScreen] = useState<'checklist' | 'steps'>(() =>
     allIngredientKeys.some(k => !checkedIngredients.has(k)) ? 'checklist' : 'steps'
   )
+
+  // Logs every screen/step transition to the backend cook-session (Phase
+  // C) - a fire-and-forget recording layer the frontend never reads back
+  // from. Fires once per transition, including the initial mount.
+  useEffect(() => {
+    if (screen === 'checklist') {
+      onStepEntered('checklist', 0)
+      return
+    }
+    const current = steps[wizardIndex]
+    if (current) onStepEntered(`${current.groupIdx}-${current.stepIdx}`, current.stepNum)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- onStepEntered/steps are new references every render; only an actual screen/step change should re-fire this
+  }, [screen, wizardIndex])
 
   const [expanded, setExpanded] = useState(false)
   function setExpandedState(next: boolean) {

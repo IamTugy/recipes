@@ -28,6 +28,7 @@ import ConfirmDialog from './ConfirmDialog'
 import type { TimerState, RecipeRevision, QualityReview } from '../types'
 import { resizedImage } from '../lib/image'
 import { downloadRecipePdf } from '../lib/recipePdf'
+import { startCookSession, logCookSessionStep, finishCookSession, abandonCookSession } from '../lib/cookSessions'
 import SkeletonImage from './SkeletonImage'
 import { useTranslatedText } from '../hooks/useTranslatedText'
 import TranslatedText from './TranslatedText'
@@ -59,6 +60,12 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
   // hand-off together - true for the whole cook session, independent of
   // whether the dock is currently collapsed or expanded.
   const [cookSessionActive, setCookSessionActive] = useState(false)
+  // Backend cook-session id for the in-progress session (Phase C) - null
+  // whenever there's no session, the user is signed out, or the start
+  // call hasn't resolved/failed silently. Every call site below already
+  // treats a null id as "skip the network call", so anonymous cooking is
+  // unaffected.
+  const [cookSessionId, setCookSessionId] = useState<string | null>(null)
   const [wizardIndex, setWizardIndex] = useState(0)
   // The overflow menu (Edit/Delete/Save to collection/Download PDF/Copy
   // link) consolidates what used to be scattered separate buttons. It's a
@@ -639,6 +646,10 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
   // step) only toggles it off, since that's a correction, not progress.
   function advanceWizardOrFinish() {
     if (wizardIndex === flatSteps.length - 1) {
+      if (cookSessionId) {
+        finishCookSession(cookSessionId, getToken)
+        setCookSessionId(null)
+      }
       setCookSessionActive(false)
     } else {
       setWizardIndex(i => Math.min(i + 1, flatSteps.length - 1))
@@ -726,6 +737,10 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
     const firstUnchecked = flatSteps.findIndex(s => !checkedSteps.has(`${s.groupIdx}-${s.stepIdx}`))
     setWizardIndex(firstUnchecked === -1 ? 0 : firstUnchecked)
     setCookSessionActive(true)
+    setCookSessionId(null)
+    if (currentUserId && recipe) {
+      startCookSession(recipe.id, getToken).then(setCookSessionId)
+    }
   }
 
   function pipToggleNearestTimer() {
@@ -743,8 +758,17 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
   }
 
   function stopCooking() {
+    if (cookSessionId) {
+      abandonCookSession(cookSessionId, getToken)
+      setCookSessionId(null)
+    }
     setCookSessionActive(false)
     backgroundCookStatusRef.current?.exitFloatingView()
+  }
+
+  function handleStepEntered(stepKey: string, stepNum: number) {
+    if (!cookSessionId) return
+    logCookSessionStep(cookSessionId, stepKey, stepNum, getToken)
   }
 
   const sectionNavItems = [
@@ -2038,6 +2062,7 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
           onAdvance={key => { markStepChecked(key); advanceWizardOrFinish() }}
           onMarkDone={handleWizardMarkDone}
           onStop={stopCooking}
+          onStepEntered={handleStepEntered}
           onExpand={() => backgroundCookStatusRef.current?.exitFloatingView()}
           checkedSteps={checkedSteps}
           nearestTimer={nearestTimer}
