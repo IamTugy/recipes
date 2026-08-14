@@ -90,6 +90,7 @@ export interface Recipe {
   ratingCount?: number
   viewCount?: number
   cookCount?: number
+  userCookCount?: number
   createdAt?: string
   ownerId?: string
   ownerName?: string | null

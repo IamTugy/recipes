@@ -75,6 +75,11 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
   // unaffected.
   const [cookSessionId, setCookSessionId] = useState<string | null>(null)
   const [cookSessionStartedAt, setCookSessionStartedAt] = useState<string | null>(null)
+  // Only true for the render right after a fresh "Start cooking" click -
+  // reset immediately after CookDock reads it, so cross-device resume
+  // (Phase D) and the discovery/polling effects never force-expand an
+  // already-collapsed dock.
+  const [startDockExpanded, setStartDockExpanded] = useState(false)
   const pendingCookStepRef = useRef<{ stepKey: string; stepNum: number } | null>(null)
   // Tracks the last stepKey/stepNum passed to handleStepEntered (including
   // 'checklist') so the checked-state-only sync effect below can include
@@ -839,6 +844,7 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
     const startIndex = firstUnchecked === -1 ? 0 : firstUnchecked
     setWizardIndex(startIndex)
     setCookSessionActive(true)
+    setStartDockExpanded(true)
     setCookSessionId(null)
     setCookSessionStartedAt(null)
     pendingCookStepRef.current = null
@@ -1450,13 +1456,10 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
                   btn.classList.add('start-cooking-fill-active')
                   openWizard()
                 }}
-                className="relative overflow-hidden flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors bg-amber text-bg hover:bg-amber/90"
+                className="relative overflow-hidden flex items-center justify-center gap-2 w-full sm:w-auto px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors bg-amber text-bg hover:bg-amber/90"
               >
                 <span className="text-lg leading-none">🍳</span>
                 {tx.startCooking}
-                {!!recipe.cookCount && (
-                  <span className="opacity-70 text-xs">({recipe.cookCount})</span>
-                )}
               </button>
             )}
           </div>
@@ -2213,6 +2216,8 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
           timerBarHeight={timerBarHeight}
           lightboxOpen={!!lightboxUrl}
           elapsedBaselineMs={cookSessionStartedAt ? new Date(cookSessionStartedAt).getTime() : undefined}
+          startExpanded={startDockExpanded}
+          onExpandConsumed={() => setStartDockExpanded(false)}
         />
       )}
 

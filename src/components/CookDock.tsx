@@ -42,6 +42,8 @@ interface CookDockProps {
   timerBarHeight: number
   lightboxOpen: boolean
   elapsedBaselineMs?: number
+  startExpanded?: boolean
+  onExpandConsumed?: () => void
 }
 
 const SWIPE_THRESHOLD_PX = 60
@@ -75,7 +77,7 @@ export default function CookDock({
   lang, ingredients, checkedIngredients, onToggleIngredient, multiplier,
   steps, wizardIndex, onPrev, onAdvance, onMarkDone, onStop, onStepEntered, onExpand,
   checkedSteps, nearestTimer, onToggleNearestTimer, getTimerForStep, onStartTimer,
-  onOpenLightbox, timerBarHeight, lightboxOpen, elapsedBaselineMs,
+  onOpenLightbox, timerBarHeight, lightboxOpen, elapsedBaselineMs, startExpanded, onExpandConsumed,
 }: CookDockProps) {
   const tx = t[lang]
   const dockRef = useRef<HTMLDivElement>(null)
@@ -85,7 +87,10 @@ export default function CookDock({
     allIngredientKeys.some(k => !checkedIngredients.has(k)) ? 'checklist' : 'steps'
   )
 
-  const [expanded, setExpanded] = useState(false)
+  const [expanded, setExpanded] = useState(() => {
+    if (startExpanded) onExpandConsumed?.()
+    return !!startExpanded
+  })
   function setExpandedState(next: boolean) {
     setExpanded(next)
     if (next) onExpand()
@@ -213,23 +218,24 @@ export default function CookDock({
     >
       {expanded ? (
         <>
-          <div className="flex items-center justify-between px-4 h-14 border-b border-tint/[0.06] shrink-0">
+          <div className="flex items-center justify-center h-6 shrink-0" onClick={e => e.stopPropagation()}>
             <button type="button"
-              onClick={e => { e.stopPropagation(); setExpandedState(false) }}
+              onClick={() => setExpandedState(false)}
               aria-label={tx.collapse}
-              className="h-9 w-9 flex items-center justify-center rounded-lg text-cream/40 hover:text-cream/70 transition-colors"
+              className="h-6 w-16 flex items-center justify-center text-cream/40 hover:text-cream/70 transition-colors"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
             </button>
+          </div>
+          <div className="flex items-center justify-between px-4 h-14 border-b border-tint/[0.06] shrink-0">
             <span className="text-cream/40 text-sm">{collapsedStepLabel}</span>
             <button type="button"
               onClick={e => { e.stopPropagation(); onStop() }}
-              aria-label={tx.closeGuidedMode}
-              className="h-9 w-9 flex items-center justify-center rounded-lg text-cream/40 hover:text-cream/70 transition-colors"
+              className="px-3 h-9 flex items-center justify-center rounded-lg text-sm font-medium text-cream/60 hover:text-cream/90 transition-colors"
             >
-              ✕
+              {tx.stopCooking}
             </button>
           </div>
 
