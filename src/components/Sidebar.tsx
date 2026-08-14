@@ -132,6 +132,7 @@ export default function Sidebar({ sidebar }: SidebarProps) {
   ]
 
   const moreLinks: SidebarLinkDef[] = [
+    { key: 'cook-history', label: tx.cookHistory, path: '/cook-history', icon: <span className="w-4 h-4 flex items-center justify-center text-sm">📊</span> },
     { key: 'leaderboard', label: tx.leaderboard, path: '/leaderboard', icon: <span className="w-4 h-4 flex items-center justify-center text-sm">🏆</span> },
     { key: 'feature-requests', label: tx.featureRequests, path: '/feature-requests', icon: <span className="w-4 h-4 flex items-center justify-center text-sm">💡</span> },
   ]
