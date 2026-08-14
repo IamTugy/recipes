@@ -43,10 +43,10 @@ export default function CookHistoryPage() {
             {stats && (
               <div className="card p-4">
                 <h2 className="text-sm font-semibold text-cream/70 mb-3">{tx.cooksPerMonth}</h2>
-                <ResponsiveContainer width="100%" height={180}>
+                <ResponsiveContainer width="100%" height={180} className="text-cream/40">
                   <BarChart data={stats.cooksByMonth}>
-                    <XAxis dataKey="month" stroke="#cream" fontSize={10} tickLine={false} axisLine={false} />
-                    <YAxis allowDecimals={false} stroke="#cream" fontSize={10} tickLine={false} axisLine={false} width={24} />
+                    <XAxis dataKey="month" stroke="currentColor" fontSize={10} tickLine={false} axisLine={false} />
+                    <YAxis allowDecimals={false} stroke="currentColor" fontSize={10} tickLine={false} axisLine={false} width={24} />
                     <Tooltip contentStyle={{ background: '#1a1a1a', border: 'none', borderRadius: 8, fontSize: 12 }} />
                     <Bar dataKey="count" fill="#d97706" radius={[4, 4, 0, 0]} />
                   </BarChart>
