@@ -3,6 +3,7 @@ import { getModelToken } from '@nestjs/mongoose'
 import { CookSessionsService } from './cook-sessions.service'
 import { CookSession } from './schemas/cook-session.schema'
 import { Recipe } from '../recipes/schemas/recipe.schema'
+import { Rating } from '../ratings/schemas/rating.schema'
 import { RedisService } from '../redis/redis.service'
 import { CookLogService } from '../cook-log/cook-log.service'
 
@@ -14,11 +15,14 @@ describe('CookSessionsService', () => {
   const redisClient = { get, set, expire, del }
   const redisService = { getClient: () => redisClient }
   const create = jest.fn()
-  const model = { create }
+  const cookSessionFind = jest.fn()
+  const model = { create, find: cookSessionFind }
   const recordCook = jest.fn()
   const cookLogService = { recordCook }
   const recipeFindOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(null) })
   const recipeModel = { findOne: recipeFindOne }
+  const ratingFind = jest.fn()
+  const ratingModel = { find: ratingFind }
 
   beforeEach(() => jest.clearAllMocks())
 
@@ -30,6 +34,7 @@ describe('CookSessionsService', () => {
         { provide: RedisService, useValue: redisService },
         { provide: CookLogService, useValue: cookLogService },
         { provide: getModelToken(Recipe.name), useValue: recipeModel },
+        { provide: getModelToken(Rating.name), useValue: ratingModel },
       ],
     }).compile()
     return moduleRef.get(CookSessionsService)
@@ -389,5 +394,74 @@ describe('CookSessionsService', () => {
     const service = await makeService()
     await service.abandonSession('session_1', 'user_1')
     expect(del).not.toHaveBeenCalledWith('cook-session-current:user_1')
+  })
+
+  it('getReminders returns a finished, unreviewed, >24h-old session', async () => {
+    const oldEnough = new Date(Date.now() - 25 * 60 * 60 * 1000)
+    cookSessionFind.mockReturnValue({
+      exec: jest.fn().mockResolvedValue([
+        { userId: 'user_1', recipeId: 'recipe_a', finishedAt: oldEnough },
+      ]),
+    })
+    ratingFind.mockReturnValue({ exec: jest.fn().mockResolvedValue([]) })
+    recipeFindOne.mockReturnValue({ exec: jest.fn().mockResolvedValue({ title: 'Chicken Soup' }) })
+    const service = await makeService()
+    const result = await service.getReminders('user_1')
+    expect(result).toEqual([
+      { recipeId: 'recipe_a', recipeTitle: 'Chicken Soup', finishedAt: oldEnough.toISOString() },
+    ])
+  })
+
+  it('getReminders excludes a session finished less than 24 hours ago', async () => {
+    const tooRecent = new Date(Date.now() - 2 * 60 * 60 * 1000)
+    cookSessionFind.mockReturnValue({
+      exec: jest.fn().mockResolvedValue([
+        { userId: 'user_1', recipeId: 'recipe_a', finishedAt: tooRecent },
+      ]),
+    })
+    ratingFind.mockReturnValue({ exec: jest.fn().mockResolvedValue([]) })
+    const service = await makeService()
+    const result = await service.getReminders('user_1')
+    expect(result).toEqual([])
+  })
+
+  it('getReminders excludes a session for a recipe that already has a reviewed rating (non-empty comment)', async () => {
+    const oldEnough = new Date(Date.now() - 25 * 60 * 60 * 1000)
+    cookSessionFind.mockReturnValue({
+      exec: jest.fn().mockResolvedValue([
+        { userId: 'user_1', recipeId: 'recipe_a', finishedAt: oldEnough },
+      ]),
+    })
+    ratingFind.mockReturnValue({
+      exec: jest.fn().mockResolvedValue([{ userId: 'user_1', recipeId: 'recipe_a', comment: 'Great recipe!' }]),
+    })
+    const service = await makeService()
+    const result = await service.getReminders('user_1')
+    expect(result).toEqual([])
+  })
+
+  it('getReminders includes a session for a recipe with only a star rating and no comment', async () => {
+    const oldEnough = new Date(Date.now() - 25 * 60 * 60 * 1000)
+    cookSessionFind.mockReturnValue({
+      exec: jest.fn().mockResolvedValue([
+        { userId: 'user_1', recipeId: 'recipe_a', finishedAt: oldEnough },
+      ]),
+    })
+    ratingFind.mockReturnValue({
+      exec: jest.fn().mockResolvedValue([{ userId: 'user_1', recipeId: 'recipe_a', comment: '' }]),
+    })
+    recipeFindOne.mockReturnValue({ exec: jest.fn().mockResolvedValue({ title: 'Chicken Soup' }) })
+    const service = await makeService()
+    const result = await service.getReminders('user_1')
+    expect(result).toEqual([
+      { recipeId: 'recipe_a', recipeTitle: 'Chicken Soup', finishedAt: oldEnough.toISOString() },
+    ])
+  })
+
+  it('getReminders scopes the CookSession query to the given userId', async () => {
+    cookSessionFind.mockReturnValue({ exec: jest.fn().mockResolvedValue([]) })
+    const service = await makeService()
+    await service.getReminders('user_1')
+    expect(cookSessionFind).toHaveBeenCalledWith(expect.objectContaining({ userId: 'user_1' }))
   })
 })

@@ -9,6 +9,7 @@ describe('CookSessionsController', () => {
     getCurrentSession: jest.fn(),
     finishSession: jest.fn(),
     abandonSession: jest.fn(),
+    getReminders: jest.fn(),
   }
 
   beforeEach(() => jest.clearAllMocks())
@@ -84,5 +85,14 @@ describe('CookSessionsController', () => {
     const controller = new CookSessionsController(cookSessionsService as any)
     const result = await controller.getCurrent({ userId: 'user_1' } as any)
     expect(result).toBeNull()
+  })
+
+  it('GET /cook-sessions/reminders returns the reminders list for the authenticated user', async () => {
+    const reminders = [{ recipeId: 'recipe_a', recipeTitle: 'Chicken Soup', finishedAt: '2026-08-14T10:00:00.000Z' }]
+    cookSessionsService.getReminders.mockResolvedValue(reminders)
+    const controller = new CookSessionsController(cookSessionsService as any)
+    const result = await controller.getReminders({ userId: 'user_1' } as any)
+    expect(cookSessionsService.getReminders).toHaveBeenCalledWith('user_1')
+    expect(result).toEqual(reminders)
   })
 })

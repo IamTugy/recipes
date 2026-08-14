@@ -4,6 +4,7 @@ import { Model } from 'mongoose'
 import { randomUUID } from 'crypto'
 import { CookSession, CookSessionDocument } from './schemas/cook-session.schema'
 import { Recipe, RecipeDocument } from '../recipes/schemas/recipe.schema'
+import { Rating, RatingDocument } from '../ratings/schemas/rating.schema'
 import { RedisService } from '../redis/redis.service'
 import { CookLogService } from '../cook-log/cook-log.service'
 
@@ -41,6 +42,12 @@ export interface CurrentCookSessionView {
   recipeTitle: string
 }
 
+export interface CookReminderView {
+  recipeId: string
+  recipeTitle: string
+  finishedAt: string
+}
+
 function redisKey(sessionId: string): string {
   return `cook-session:${sessionId}`
 }
@@ -67,6 +74,7 @@ export class CookSessionsService {
   constructor(
     @InjectModel(CookSession.name) private readonly cookSessionModel: Model<CookSessionDocument>,
     @InjectModel(Recipe.name) private readonly recipeModel: Model<RecipeDocument>,
+    @InjectModel(Rating.name) private readonly ratingModel: Model<RatingDocument>,
     private readonly redis: RedisService,
     private readonly cookLogService: CookLogService,
   ) {}
@@ -238,5 +246,42 @@ export class CookSessionsService {
         await client.del(currentPointerKey(session.userId))
       }
     }
+  }
+
+  // "Reviewed" here matches the exact definition already used across the
+  // frontend for hasPostedReview: a Rating with a non-empty comment - a
+  // star-only rating doesn't count, since it doesn't represent the
+  // written review this nudge is trying to collect.
+  async getReminders(userId: string): Promise<CookReminderView[]> {
+    const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000)
+    const allSessions = await this.cookSessionModel
+      .find({ userId, finishedAt: { $lte: cutoff } })
+      .exec()
+    const finishedSessions = allSessions.filter(s => new Date(s.finishedAt).getTime() <= cutoff.getTime())
+    if (finishedSessions.length === 0) return []
+
+    const recipeIds = [...new Set(finishedSessions.map(s => s.recipeId))]
+    const reviewedRatings = await this.ratingModel
+      .find({ userId, recipeId: { $in: recipeIds } })
+      .exec()
+    const reviewedRecipeIds = new Set(
+      reviewedRatings.filter(r => !!r.comment?.trim()).map(r => r.recipeId)
+    )
+
+    const unreviewedRecipeIds = recipeIds.filter(id => !reviewedRecipeIds.has(id))
+    if (unreviewedRecipeIds.length === 0) return []
+
+    const reminders: CookReminderView[] = []
+    for (const recipeId of unreviewedRecipeIds) {
+      const session = finishedSessions.find(s => s.recipeId === recipeId)
+      if (!session) continue
+      const recipe = await this.recipeModel.findOne({ _id: recipeId }).exec()
+      reminders.push({
+        recipeId,
+        recipeTitle: recipe?.title ?? '',
+        finishedAt: session.finishedAt.toISOString(),
+      })
+    }
+    return reminders
   }
 }

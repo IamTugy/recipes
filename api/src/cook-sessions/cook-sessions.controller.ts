@@ -18,6 +18,11 @@ export class CookSessionsController {
     return this.cookSessionsService.getCurrentSession(req.userId)
   }
 
+  @Get('reminders')
+  async getReminders(@Req() req: Request & { userId: string }) {
+    return this.cookSessionsService.getReminders(req.userId)
+  }
+
   @Post(':recipeId')
   async start(@Param('recipeId') recipeId: string, @Req() req: Request & { userId: string }) {
     const sessionId = await this.cookSessionsService.startSession(req.userId, recipeId)
