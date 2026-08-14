@@ -13,6 +13,7 @@ import { UploadsModule } from './uploads/uploads.module'
 import { FeatureRequestsModule } from './feature-requests/feature-requests.module'
 import { TranslationsModule } from './translations/translations.module'
 import { CookLogModule } from './cook-log/cook-log.module'
+import { CookSessionsModule } from './cook-sessions/cook-sessions.module'
 import { MealPlanModule } from './meal-plan/meal-plan.module'
 import { ShareModule } from './share/share.module'
 import { RankingModule } from './ranking/ranking.module'
@@ -33,6 +34,7 @@ import { JobsModule } from './jobs/jobs.module'
     FeatureRequestsModule,
     TranslationsModule,
     CookLogModule,
+    CookSessionsModule,
     MealPlanModule,
     ShareModule,
     RankingModule,
