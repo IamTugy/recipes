@@ -1,6 +1,8 @@
 import Modal from './Modal'
 import { Dialog } from '@base-ui/react/dialog'
 import { t } from '../i18n'
+import SkeletonImage from './SkeletonImage'
+import { resizedImage } from '../lib/image'
 
 interface PostCookReviewModalProps {
   open: boolean
@@ -46,7 +48,7 @@ export default function PostCookReviewModal({
       <textarea
         value={reviewComment}
         onChange={e => onCommentChange(e.target.value)}
-        placeholder={userRating ? undefined : ' '}
+        placeholder={userRating ? tx.shareYourThoughtsOnThisRecipe : tx.rateTheRecipeWithStarsAbove}
         rows={2}
         maxLength={500}
         disabled={!userRating}
@@ -55,10 +57,14 @@ export default function PostCookReviewModal({
       />
       {reviewPhotoUrl && (
         <div className="relative w-24 h-24">
-          <img src={reviewPhotoUrl} alt="" className="w-full h-full object-cover rounded-lg" />
+          <SkeletonImage
+            src={resizedImage(reviewPhotoUrl, 160)}
+            alt=""
+            className="w-full h-full object-cover rounded-lg"
+          />
           <button type="button"
             onClick={onRemovePhoto}
-            aria-label="✕"
+            aria-label={tx.removePhoto}
             className="absolute -top-1.5 -right-1.5 h-5 w-5 flex items-center justify-center rounded-full bg-black/60 text-white text-[10px] hover:bg-black/80"
           >
             ✕
@@ -73,7 +79,7 @@ export default function PostCookReviewModal({
             <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
-          {reviewPhotoUploading ? '...' : reviewPhotoUrl ? '↻' : '+'}
+          {reviewPhotoUploading ? tx.uploading : reviewPhotoUrl ? tx.replacePhoto : tx.addPhoto}
           <input
             type="file"
             accept="image/jpeg,image/png,image/webp"

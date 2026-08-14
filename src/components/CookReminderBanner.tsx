@@ -47,7 +47,7 @@ export default function CookReminderBanner() {
       toastManager.add({
         description: tx.reminderToReview(unshown.recipeTitle),
         type: 'info',
-        timeout: 0,
+        timeout: 10000,
         data: { href: `/recipes/${unshown.recipeId}` },
       })
     })

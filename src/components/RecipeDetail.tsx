@@ -762,7 +762,7 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
         setCookSessionId(null)
       }
       setCookSessionActive(false)
-      if (!hasPostedReview) setShowPostCookReviewModal(true)
+      if (currentUserId && !hasPostedReview) setShowPostCookReviewModal(true)
     } else {
       setWizardIndex(i => Math.min(i + 1, flatSteps.length - 1))
     }
