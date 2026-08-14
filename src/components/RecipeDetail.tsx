@@ -14,7 +14,6 @@ import { OWNER_USER_ID } from '../lib/admin'
 import { ApiError, apiFetch } from '../lib/api'
 import { useWakeLock } from '../hooks/useWakeLock'
 import { useFavorites } from '../hooks/useFavorites'
-import { useCookedRecipes } from '../hooks/useCookedRecipes'
 import { useCollections } from '../hooks/useCollections'
 import { useRecentlyViewed } from '../hooks/useRecentlyViewed'
 import { useNote } from '../hooks/useNote'
@@ -54,7 +53,6 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
   const { recipe, loading: recipeLoading, reload: reloadRecipe } = useRecipe(id)
   const { recipes: allRecipes } = useRecipes()
   const { favoriteSlugs, toggle: toggleFavorite } = useFavorites()
-  const { cookedSlugs, toggle: toggleCooked } = useCookedRecipes()
   const { collections, create: createCollection, addRecipe: addRecipeToCollection, removeRecipe: removeRecipeFromCollection } = useCollections()
   const [wizardOpen, setWizardOpen] = useState(false)
   // Stays true while cooking is "in progress" even after the fullscreen
@@ -837,6 +835,21 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
             </button>
           )}
 
+          {isViewingPublishedContent && (
+            <button type="button"
+              onClick={() => toggleFavorite(recipe.id)}
+              aria-label={tx.favorite}
+              title={tx.favorite}
+              className={`flex items-center justify-center h-9 w-9 rounded-xl bg-black/40 backdrop-blur-sm border border-white/10 transition-colors ${
+                favoriteSlugs.has(recipe.id) ? 'text-amber' : 'text-white/80 hover:text-white'
+              }`}
+            >
+              <svg className="w-4 h-4" fill={favoriteSlugs.has(recipe.id) ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 010-6.364z" />
+              </svg>
+            </button>
+          )}
+
           <div className="relative" ref={actionsMenuRef}>
             <button type="button"
               onClick={() => setActionsMenuOpen(v => !v)}
@@ -1301,36 +1314,21 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
 
             {isViewingPublishedContent && (
               <button type="button"
-                onClick={() => id && toggleCooked(id)}
-                aria-pressed={!!id && cookedSlugs.has(id)}
-                title={tx.markThatYouVeActuallyCooked}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                  id && cookedSlugs.has(id)
-                    ? 'bg-herb text-white'
-                    : 'bg-amber text-bg hover:bg-amber/90'
-                }`}
+                onClick={e => {
+                  const btn = e.currentTarget
+                  btn.classList.remove('start-cooking-fill-active')
+                  // Force reflow so re-adding the class restarts the animation on rapid re-clicks.
+                  void btn.offsetWidth
+                  btn.classList.add('start-cooking-fill-active')
+                  openWizard()
+                }}
+                className="relative overflow-hidden flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors bg-amber text-bg hover:bg-amber/90"
               >
-                <span className="text-lg leading-none">{id && cookedSlugs.has(id) ? '✅' : '🍳'}</span>
-                {id && cookedSlugs.has(id)
-                  ? (tx.madeIt)
-                  : (tx.markAsCooked)}
+                <span className="text-lg leading-none">🍳</span>
+                {tx.startCooking}
                 {!!recipe.cookCount && (
                   <span className="opacity-70 text-xs">({recipe.cookCount})</span>
                 )}
-              </button>
-            )}
-
-            {isViewingPublishedContent && (
-              <button type="button"
-                onClick={() => toggleFavorite(recipe.id)}
-                className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${
-                  favoriteSlugs.has(recipe.id) ? 'text-amber' : 'text-cream/40 hover:text-cream/70'
-                }`}
-              >
-                <svg className="w-4 h-4" fill={favoriteSlugs.has(recipe.id) ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 010-6.364z" />
-                </svg>
-                {tx.favorite}
               </button>
             )}
           </div>
@@ -1527,21 +1525,6 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
           <div className="sm:col-span-3 print:col-span-3 print:ps-5">
             <div className={`flex items-center justify-between ${flatSteps.length > 0 ? 'mb-1' : 'mb-4'}`}>
               <h2 id="steps-heading" className="font-serif text-xl font-bold text-cream scroll-mt-20">{tx.instructions}</h2>
-              <div className="print:hidden flex items-center gap-2">
-                {flatSteps.length > 0 && (
-                  <button type="button"
-                    onClick={openWizard}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-tint/10 text-cream/40 hover:text-cream/70 transition-colors"
-                    title={tx.guideMeStepByStep}
-                  >
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    {tx.guidedMode}
-                  </button>
-                )}
-              </div>
             </div>
             {flatSteps.length > 0 && (
               <p className="print:hidden text-xs text-cream/40 mb-4">{tx.instructionsInteractiveHint}</p>

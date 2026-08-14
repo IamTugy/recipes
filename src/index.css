@@ -71,6 +71,22 @@
   body.printing-shopping-list .app-routes { display: none !important; }
 }
 
+@keyframes start-cooking-fill {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+.start-cooking-fill-active::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  right: 0;
+  width: 0%;
+  background: rgba(255, 255, 255, 0.18);
+  animation: start-cooking-fill 0.6s ease-out forwards;
+  pointer-events: none;
+}
+
 @layer base {
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html { scroll-behavior: auto; }
