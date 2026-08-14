@@ -26,3 +26,6 @@ public/images/*.jpg
 
 # Feature-request worker scratch worktrees
 .worktrees/
+
+# Subagent-driven-development scratch workspace (ledgers, briefs, reports)
+.superpowers/
