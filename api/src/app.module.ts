@@ -14,6 +14,7 @@ import { FeatureRequestsModule } from './feature-requests/feature-requests.modul
 import { TranslationsModule } from './translations/translations.module'
 import { CookLogModule } from './cook-log/cook-log.module'
 import { CookSessionsModule } from './cook-sessions/cook-sessions.module'
+import { CookHistoryModule } from './cook-history/cook-history.module'
 import { MealPlanModule } from './meal-plan/meal-plan.module'
 import { ShareModule } from './share/share.module'
 import { RankingModule } from './ranking/ranking.module'
@@ -35,6 +36,7 @@ import { JobsModule } from './jobs/jobs.module'
     TranslationsModule,
     CookLogModule,
     CookSessionsModule,
+    CookHistoryModule,
     MealPlanModule,
     ShareModule,
     RankingModule,
