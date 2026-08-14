@@ -49,6 +49,11 @@ interface RecipeDetailProps {
 const presetMultipliers = [0.5, 1, 1.5, 2, 3, 4]
 const presetLabels: Record<number, string> = { 0.5: '½x', 1: '1x', 1.5: '1.5x', 2: '2x', 3: '3x', 4: '4x' }
 
+function sameStringSet(a: string[], b: Set<string>): boolean {
+  if (a.length !== b.size) return false
+  return a.every(item => b.has(item))
+}
+
 export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerBarHeight, onAddToShoppingList }: RecipeDetailProps) {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
@@ -486,12 +491,18 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
     let cancelled = false
     getActiveCookSession(id, getToken).then(session => {
       if (cancelled || !session) return
-      setCheckedSteps(new Set(session.checkedSteps))
-      setCheckedIngredients(new Set(session.checkedIngredients))
+      if (!sameStringSet(session.checkedSteps, checkedSteps)) {
+        setCheckedSteps(new Set(session.checkedSteps))
+      }
+      if (!sameStringSet(session.checkedIngredients, checkedIngredients)) {
+        setCheckedIngredients(new Set(session.checkedIngredients))
+      }
       const resumedIndex = session.currentStepKey && session.currentStepKey !== 'checklist'
         ? Math.max(0, session.currentStepNum - 1)
         : 0
-      setWizardIndex(resumedIndex)
+      if (resumedIndex !== wizardIndex) {
+        setWizardIndex(resumedIndex)
+      }
       lastEnteredStepRef.current = session.currentStepKey
         ? { stepKey: session.currentStepKey, stepNum: session.currentStepNum }
         : { stepKey: 'checklist', stepNum: 0 }
@@ -500,7 +511,7 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
       setCookSessionActive(true)
     })
     return () => { cancelled = true }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- getToken is a new function every render from useAuth(); only id/currentUserId changing should re-trigger discovery
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- getToken is a new function every render from useAuth(); checkedSteps/checkedIngredients/wizardIndex are read via closure for comparison only (not to trigger the effect), so exclusion is intentional
   }, [id, currentUserId])
 
   // While a session is active, poll for changes made from another device
@@ -510,16 +521,22 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
     const interval = setInterval(() => {
       getActiveCookSession(id, getToken).then(session => {
         if (!session) return
-        setCheckedSteps(new Set(session.checkedSteps))
-        setCheckedIngredients(new Set(session.checkedIngredients))
+        if (!sameStringSet(session.checkedSteps, checkedSteps)) {
+          setCheckedSteps(new Set(session.checkedSteps))
+        }
+        if (!sameStringSet(session.checkedIngredients, checkedIngredients)) {
+          setCheckedIngredients(new Set(session.checkedIngredients))
+        }
         const resumedIndex = session.currentStepKey && session.currentStepKey !== 'checklist'
           ? Math.max(0, session.currentStepNum - 1)
           : 0
-        setWizardIndex(resumedIndex)
+        if (resumedIndex !== wizardIndex) {
+          setWizardIndex(resumedIndex)
+        }
       })
     }, 5000)
     return () => clearInterval(interval)
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- getToken is a new function every render; only cookSessionActive/id/currentUserId changing should restart polling
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- getToken is a new function every render; checkedSteps/checkedIngredients/wizardIndex are read via closure for comparison only (not to trigger the effect), so exclusion is intentional
   }, [cookSessionActive, id, currentUserId])
 
   // Push checked-state changes to the backend session (Phase D) even when
@@ -802,6 +819,7 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
     : `Step ${wizardIndex + 1} of ${flatSteps.length}`
 
   function openWizard() {
+    if (cookSessionActive) return
     const firstUnchecked = flatSteps.findIndex(s => !checkedSteps.has(`${s.groupIdx}-${s.stepIdx}`))
     setWizardIndex(firstUnchecked === -1 ? 0 : firstUnchecked)
     setCookSessionActive(true)
