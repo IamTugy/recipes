@@ -254,10 +254,9 @@ export class CookSessionsService {
   // written review this nudge is trying to collect.
   async getReminders(userId: string): Promise<CookReminderView[]> {
     const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000)
-    const allSessions = await this.cookSessionModel
+    const finishedSessions = await this.cookSessionModel
       .find({ userId, finishedAt: { $lte: cutoff } })
       .exec()
-    const finishedSessions = allSessions.filter(s => new Date(s.finishedAt).getTime() <= cutoff.getTime())
     if (finishedSessions.length === 0) return []
 
     const recipeIds = [...new Set(finishedSessions.map(s => s.recipeId))]
@@ -275,10 +274,16 @@ export class CookSessionsService {
     for (const recipeId of unreviewedRecipeIds) {
       const session = finishedSessions.find(s => s.recipeId === recipeId)
       if (!session) continue
-      const recipe = await this.recipeModel.findOne({ _id: recipeId }).exec()
+      let recipeTitle = ''
+      try {
+        const recipe = await this.recipeModel.findOne({ _id: recipeId }).exec()
+        recipeTitle = recipe?.title ?? ''
+      } catch (err) {
+        this.logger.error(`Failed to look up title for recipe ${recipeId}`, err instanceof Error ? err.stack : err)
+      }
       reminders.push({
         recipeId,
-        recipeTitle: recipe?.title ?? '',
+        recipeTitle,
         finishedAt: session.finishedAt.toISOString(),
       })
     }
