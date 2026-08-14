@@ -82,6 +82,7 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
   const [startDockExpanded, setStartDockExpanded] = useState(false)
   const [cookConflict, setCookConflict] = useState<{ sessionId: string; recipeTitle: string } | null>(null)
   const [resolvingCookConflict, setResolvingCookConflict] = useState(false)
+  const [startingCook, setStartingCook] = useState(false)
   const pendingCookStepRef = useRef<{ stepKey: string; stepNum: number } | null>(null)
   // Tracks the last stepKey/stepNum passed to handleStepEntered (including
   // 'checklist') so the checked-state-only sync effect below can include
@@ -841,19 +842,24 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
     : `Step ${wizardIndex + 1} of ${flatSteps.length}`
 
   function openWizard() {
-    if (cookSessionActive) return
+    if (cookSessionActive || startingCook) return
+    setStartingCook(true)
     void startCookingWithConflictCheck()
   }
 
   async function startCookingWithConflictCheck() {
-    if (currentUserId) {
-      const current = await getCurrentCookSession(getToken)
-      if (current && current.recipeId !== id) {
-        setCookConflict({ sessionId: current.sessionId, recipeTitle: current.recipeTitle })
-        return
+    try {
+      if (currentUserId) {
+        const current = await getCurrentCookSession(getToken)
+        if (current && current.recipeId !== id) {
+          setCookConflict({ sessionId: current.sessionId, recipeTitle: current.recipeTitle })
+          return
+        }
       }
+      startCookingNow()
+    } finally {
+      setStartingCook(false)
     }
-    startCookingNow()
   }
 
   function startCookingNow() {
@@ -1474,7 +1480,7 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
 
             {isViewingPublishedContent && (
               <button type="button"
-                disabled={cookSessionActive}
+                disabled={cookSessionActive || startingCook}
                 onClick={e => {
                   const btn = e.currentTarget
                   btn.classList.remove('start-cooking-fill-active')
