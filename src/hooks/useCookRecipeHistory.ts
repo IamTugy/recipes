@@ -9,12 +9,18 @@ export function useCookRecipeHistory(recipeId: string | undefined) {
 
   const load = useCallback(() => {
     if (!isLoaded || !isSignedIn || !recipeId) return
+    let cancelled = false
     fetchCookRecipeHistory(recipeId, getToken)
-      .then(setHistory)
-      .finally(() => setLoading(false))
+      .then(result => {
+        if (cancelled) return
+        setHistory(result)
+      })
+      .catch(() => { /* stale/empty history is a minor annoyance, not worth surfacing an error for */ })
+      .finally(() => { if (!cancelled) setLoading(false) })
+    return () => { cancelled = true }
   }, [isLoaded, isSignedIn, getToken, recipeId])
 
-  useEffect(() => { load() }, [load])
+  useEffect(() => load(), [load])
 
   return { history, loading }
 }

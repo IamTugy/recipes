@@ -10,15 +10,19 @@ export function useCookHistory() {
 
   const load = useCallback(() => {
     if (!isLoaded || !isSignedIn) return
+    let cancelled = false
     Promise.all([fetchCookHistoryStats(getToken), fetchCookHistory(getToken)])
       .then(([statsResult, entriesResult]) => {
+        if (cancelled) return
         setStats(statsResult)
         setEntries(entriesResult)
       })
-      .finally(() => setLoading(false))
+      .catch(() => { /* stale/empty history is a minor annoyance, not worth surfacing an error for */ })
+      .finally(() => { if (!cancelled) setLoading(false) })
+    return () => { cancelled = true }
   }, [isLoaded, isSignedIn, getToken])
 
-  useEffect(() => { load() }, [load])
+  useEffect(() => load(), [load])
 
   return { stats, entries, loading }
 }

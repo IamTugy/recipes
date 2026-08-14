@@ -75,9 +75,20 @@ export default function CookHistoryRecipePage() {
                   <button
                     type="button"
                     onClick={() => setExpandedIndex(expandedIndex === i ? null : i)}
+                    aria-expanded={expandedIndex === i}
                     className="w-full flex items-center justify-between text-sm text-cream/80"
                   >
-                    <span>{new Date(session.finishedAt).toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-US')}</span>
+                    <span className="flex items-center gap-1.5">
+                      {new Date(session.finishedAt).toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-US')}
+                      {session.steps.length > 0 && (
+                        <svg
+                          className={`w-3 h-3 text-cream/30 transition-transform ${expandedIndex === i ? 'rotate-180' : ''}`}
+                          fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                        </svg>
+                      )}
+                    </span>
                     <span className="text-cream/40 text-xs">{formatTime(Math.round(session.totalDurationSeconds / 60))}</span>
                   </button>
                   {expandedIndex === i && session.steps.length > 0 && (

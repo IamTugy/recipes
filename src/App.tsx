@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import { useAuth, SignIn } from '@clerk/react'
@@ -18,8 +18,8 @@ import MyRecipesPage from './components/MyRecipesPage'
 import MealPlanPage from './components/MealPlanPage'
 import ChefProfilePage from './components/ChefProfilePage'
 import LeaderboardPage from './components/LeaderboardPage'
-import CookHistoryPage from './components/CookHistoryPage'
-import CookHistoryRecipePage from './components/CookHistoryRecipePage'
+const CookHistoryPage = lazy(() => import('./components/CookHistoryPage'))
+const CookHistoryRecipePage = lazy(() => import('./components/CookHistoryRecipePage'))
 import TimerPanel from './components/TimerPanel'
 import ShoppingListPanel from './components/ShoppingListPanel'
 import ScrollToTopButton from './components/ScrollToTopButton'
@@ -31,6 +31,7 @@ import { useEdgeSwipeToOpenSidebar } from './hooks/useEdgeSwipeToOpenSidebar'
 import { useLanguage } from './hooks/useLanguage'
 import { useTheme } from './hooks/useTheme'
 import { fetchPreferences } from './lib/preferences'
+import { t } from './i18n'
 
 export default function App() {
   const { timers, addTimer, toggleTimer, removeTimer, resetTimer } = useTimers()
@@ -44,6 +45,7 @@ export default function App() {
   const navigate = useNavigate()
   const { lang, setLang } = useLanguage()
   const { setMode } = useTheme()
+  const tx = t[lang]
 
   useEdgeSwipeToOpenSidebar(lang, sidebar.mobileOpen, sidebar.setMobileOpen)
 
@@ -166,8 +168,22 @@ export default function App() {
           <Route path="/meal-plan" element={<MealPlanPage onAddToShoppingList={shoppingList.addItems} />} />
           <Route path="/chef/:userId" element={<ChefProfilePage />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />
-          <Route path="/cook-history" element={<CookHistoryPage />} />
-          <Route path="/cook-history/:recipeId" element={<CookHistoryRecipePage />} />
+          <Route
+            path="/cook-history"
+            element={
+              <Suspense fallback={<p className="text-cream/30 text-sm p-6">{tx.loading}</p>}>
+                <CookHistoryPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/cook-history/:recipeId"
+            element={
+              <Suspense fallback={<p className="text-cream/30 text-sm p-6">{tx.loading}</p>}>
+                <CookHistoryRecipePage />
+              </Suspense>
+            }
+          />
           <Route
             path="/recipes/:id"
             element={
