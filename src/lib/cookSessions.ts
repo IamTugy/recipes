@@ -121,3 +121,24 @@ export async function syncCookSession(
     // best-effort, never blocks cooking
   }
 }
+
+export interface CurrentCookSession {
+  sessionId: string
+  recipeId: string
+  recipeTitle: string
+}
+
+export async function getCurrentCookSession(
+  getToken: () => Promise<string | null>
+): Promise<CurrentCookSession | null> {
+  try {
+    const token = await getToken()
+    const res = await fetch('/api/cook-sessions/current', {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+    if (!res.ok) return null
+    return (await res.json()) as CurrentCookSession | null
+  } catch {
+    return null
+  }
+}

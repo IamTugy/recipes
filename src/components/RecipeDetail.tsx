@@ -30,7 +30,7 @@ import { resizedImage } from '../lib/image'
 import { downloadRecipePdf } from '../lib/recipePdf'
 import {
   startCookSession, logCookSessionStep, finishCookSession, abandonCookSession,
-  getActiveCookSession, syncCookSession,
+  getActiveCookSession, syncCookSession, getCurrentCookSession,
 } from '../lib/cookSessions'
 import SkeletonImage from './SkeletonImage'
 import { useTranslatedText } from '../hooks/useTranslatedText'
@@ -80,6 +80,8 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
   // (Phase D) and the discovery/polling effects never force-expand an
   // already-collapsed dock.
   const [startDockExpanded, setStartDockExpanded] = useState(false)
+  const [cookConflict, setCookConflict] = useState<{ sessionId: string; recipeTitle: string } | null>(null)
+  const [resolvingCookConflict, setResolvingCookConflict] = useState(false)
   const pendingCookStepRef = useRef<{ stepKey: string; stepNum: number } | null>(null)
   // Tracks the last stepKey/stepNum passed to handleStepEntered (including
   // 'checklist') so the checked-state-only sync effect below can include
@@ -840,6 +842,21 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
 
   function openWizard() {
     if (cookSessionActive) return
+    void startCookingWithConflictCheck()
+  }
+
+  async function startCookingWithConflictCheck() {
+    if (currentUserId) {
+      const current = await getCurrentCookSession(getToken)
+      if (current && current.recipeId !== id) {
+        setCookConflict({ sessionId: current.sessionId, recipeTitle: current.recipeTitle })
+        return
+      }
+    }
+    startCookingNow()
+  }
+
+  function startCookingNow() {
     const firstUnchecked = flatSteps.findIndex(s => !checkedSteps.has(`${s.groupIdx}-${s.stepIdx}`))
     const startIndex = firstUnchecked === -1 ? 0 : firstUnchecked
     setWizardIndex(startIndex)
@@ -874,6 +891,15 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
         }
       })
     }
+  }
+
+  async function confirmStartNewCook() {
+    if (!cookConflict) return
+    setResolvingCookConflict(true)
+    await abandonCookSession(cookConflict.sessionId, getToken)
+    setResolvingCookConflict(false)
+    setCookConflict(null)
+    startCookingNow()
   }
 
   function pipToggleNearestTimer() {
@@ -1448,6 +1474,7 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
 
             {isViewingPublishedContent && (
               <button type="button"
+                disabled={cookSessionActive}
                 onClick={e => {
                   const btn = e.currentTarget
                   btn.classList.remove('start-cooking-fill-active')
@@ -1456,10 +1483,10 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
                   btn.classList.add('start-cooking-fill-active')
                   openWizard()
                 }}
-                className="relative overflow-hidden flex items-center justify-center gap-2 w-full sm:w-auto px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors bg-amber text-bg hover:bg-amber/90"
+                className="relative overflow-hidden flex items-center justify-center gap-2 w-full sm:w-auto px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors bg-amber text-bg hover:bg-amber/90 disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 <span className="text-lg leading-none">🍳</span>
-                {tx.startCooking}
+                {cookSessionActive ? tx.cooking : tx.startCooking}
               </button>
             )}
           </div>
@@ -2284,6 +2311,17 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
         busy={submitting}
         onConfirm={() => { setPublishConfirmOpen(false); handleSubmitForReview() }}
         onCancel={() => setPublishConfirmOpen(false)}
+      />
+
+      <ConfirmDialog
+        open={!!cookConflict}
+        title={tx.alreadyCookingElsewhere}
+        message={cookConflict ? tx.cookingElsewhereWarning(cookConflict.recipeTitle) : ''}
+        confirmLabel={tx.startNewCook}
+        cancelLabel={tx.cancel}
+        busy={resolvingCookConflict}
+        onConfirm={confirmStartNewCook}
+        onCancel={() => setCookConflict(null)}
       />
     </div>
   )

@@ -302,6 +302,11 @@ export const t = {
       saveToCollection: "שמור לאוסף",
       favorite: "מועדף",
       startCooking: "התחילו לבשל",
+      cooking: "מבשל...",
+      alreadyCookingElsewhere: "כבר מבשלים משהו אחר",
+      cookingElsewhereWarning: (recipeTitle: string) =>
+        `אתם כבר מבשלים את "${recipeTitle}". התחלת בישול חדש תבטל את הבישול הקודם באמצע.`,
+      startNewCook: "התחל בישול חדש",
       viewPublishedVersion: "צפה בגרסה המפורסמת",
       source: "מקור: ",
       publishedBy: "פורסם על ידי ",
@@ -741,6 +746,11 @@ export const t = {
       saveToCollection: "Save to collection",
       favorite: "Favorite",
       startCooking: "Start cooking",
+      cooking: "Cooking...",
+      alreadyCookingElsewhere: "Already cooking something else",
+      cookingElsewhereWarning: (recipeTitle: string) =>
+        `You're already cooking "${recipeTitle}". Starting a new cook will abandon that one unfinished.`,
+      startNewCook: "Start new cook",
       viewPublishedVersion: "View published version",
       source: "Source: ",
       publishedBy: "Published by ",
