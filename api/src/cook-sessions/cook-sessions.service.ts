@@ -83,8 +83,14 @@ export class CookSessionsService {
       checkedSteps: [],
       checkedIngredients: [],
     }
-    const recipe = await this.recipeModel.findOne({ _id: recipeId }).exec()
-    const pointer: CurrentCookSessionView = { sessionId, recipeId, recipeTitle: recipe?.title ?? '' }
+    let recipeTitle = ''
+    try {
+      const recipe = await this.recipeModel.findOne({ _id: recipeId }).exec()
+      recipeTitle = recipe?.title ?? ''
+    } catch (err) {
+      this.logger.error(`Failed to look up title for recipe ${recipeId}`, err instanceof Error ? err.stack : err)
+    }
+    const pointer: CurrentCookSessionView = { sessionId, recipeId, recipeTitle }
 
     const client = this.redis.getClient()
     await client.set(redisKey(sessionId), JSON.stringify(session), 'EX', SESSION_TTL_SECONDS)
@@ -118,6 +124,7 @@ export class CookSessionsService {
     const client = this.redis.getClient()
     await client.set(redisKey(sessionId), JSON.stringify(session), 'EX', SESSION_TTL_SECONDS)
     await client.expire(activeIndexKey(session.userId, session.recipeId), SESSION_TTL_SECONDS)
+    await client.expire(currentPointerKey(session.userId), SESSION_TTL_SECONDS)
   }
 
   async syncState(
@@ -139,6 +146,7 @@ export class CookSessionsService {
     const client = this.redis.getClient()
     await client.set(redisKey(sessionId), JSON.stringify(session), 'EX', SESSION_TTL_SECONDS)
     await client.expire(activeIndexKey(session.userId, session.recipeId), SESSION_TTL_SECONDS)
+    await client.expire(currentPointerKey(session.userId), SESSION_TTL_SECONDS)
   }
 
   async getActiveSession(userId: string, recipeId: string): Promise<ActiveCookSessionView | null> {
@@ -207,7 +215,13 @@ export class CookSessionsService {
     const client = this.redis.getClient()
     await client.del(redisKey(sessionId))
     await client.del(activeIndexKey(session.userId, session.recipeId))
-    await client.del(currentPointerKey(session.userId))
+    const currentPointerRaw = await client.get(currentPointerKey(session.userId))
+    if (currentPointerRaw) {
+      const currentPointer = JSON.parse(currentPointerRaw) as CurrentCookSessionView
+      if (currentPointer.sessionId === sessionId) {
+        await client.del(currentPointerKey(session.userId))
+      }
+    }
   }
 
   async abandonSession(sessionId: string, userId: string): Promise<void> {
@@ -217,6 +231,12 @@ export class CookSessionsService {
     const client = this.redis.getClient()
     await client.del(redisKey(sessionId))
     await client.del(activeIndexKey(session.userId, session.recipeId))
-    await client.del(currentPointerKey(session.userId))
+    const currentPointerRaw = await client.get(currentPointerKey(session.userId))
+    if (currentPointerRaw) {
+      const currentPointer = JSON.parse(currentPointerRaw) as CurrentCookSessionView
+      if (currentPointer.sessionId === sessionId) {
+        await client.del(currentPointerKey(session.userId))
+      }
+    }
   }
 }

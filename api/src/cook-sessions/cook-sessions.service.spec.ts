@@ -294,6 +294,23 @@ describe('CookSessionsService', () => {
     )
   })
 
+  it('startSession still creates the session and index keys even if the recipe title lookup throws', async () => {
+    recipeFindOne.mockReturnValue({ exec: jest.fn().mockRejectedValue(new Error('cast error')) })
+    const service = await makeService()
+    const sessionId = await service.startSession('user_1', 'recipe_a')
+    expect(sessionId).toBeTruthy()
+    expect(set).toHaveBeenCalledWith(
+      `cook-session:${sessionId}`,
+      expect.stringContaining('"userId":"user_1"'),
+      'EX', 86400,
+    )
+    expect(set).toHaveBeenCalledWith(
+      'cook-session-current:user_1',
+      expect.stringContaining('"recipeTitle":""'),
+      'EX', 86400,
+    )
+  })
+
   it('getCurrentSession returns the pointer contents when one exists', async () => {
     get.mockResolvedValue(JSON.stringify({ sessionId: 'session_1', recipeId: 'recipe_a', recipeTitle: 'Chicken Soup' }))
     const service = await makeService()
@@ -313,7 +330,12 @@ describe('CookSessionsService', () => {
       userId: 'user_1', recipeId: 'recipe_a', startedAt: '2026-08-14T10:00:00.000Z',
       events: [], currentStepKey: null, currentStepNum: 0, checkedSteps: [], checkedIngredients: [],
     }
-    get.mockResolvedValue(JSON.stringify(existing))
+    get.mockImplementation((key: string) => {
+      if (key === 'cook-session-current:user_1') {
+        return Promise.resolve(JSON.stringify({ sessionId: 'session_1', recipeId: 'recipe_a', recipeTitle: 'Test' }))
+      }
+      return Promise.resolve(JSON.stringify(existing))
+    })
     create.mockResolvedValue({})
     const service = await makeService()
     await service.finishSession('session_1', 'user_1')
@@ -325,9 +347,47 @@ describe('CookSessionsService', () => {
       userId: 'user_1', recipeId: 'recipe_a', startedAt: '2026-08-14T10:00:00.000Z',
       events: [], currentStepKey: null, currentStepNum: 0, checkedSteps: [], checkedIngredients: [],
     }
-    get.mockResolvedValue(JSON.stringify(existing))
+    get.mockImplementation((key: string) => {
+      if (key === 'cook-session-current:user_1') {
+        return Promise.resolve(JSON.stringify({ sessionId: 'session_1', recipeId: 'recipe_a', recipeTitle: 'Test' }))
+      }
+      return Promise.resolve(JSON.stringify(existing))
+    })
     const service = await makeService()
     await service.abandonSession('session_1', 'user_1')
     expect(del).toHaveBeenCalledWith('cook-session-current:user_1')
+  })
+
+  it('finishSession does not delete the current-cook pointer if it now belongs to a different session', async () => {
+    const existing = {
+      userId: 'user_1', recipeId: 'recipe_a', startedAt: '2026-08-14T10:00:00.000Z',
+      events: [], currentStepKey: null, currentStepNum: 0, checkedSteps: [], checkedIngredients: [],
+    }
+    get.mockImplementation((key: string) => {
+      if (key === 'cook-session-current:user_1') {
+        return Promise.resolve(JSON.stringify({ sessionId: 'session_OTHER', recipeId: 'recipe_b', recipeTitle: 'Other Recipe' }))
+      }
+      return Promise.resolve(JSON.stringify(existing))
+    })
+    create.mockResolvedValue({})
+    const service = await makeService()
+    await service.finishSession('session_1', 'user_1')
+    expect(del).not.toHaveBeenCalledWith('cook-session-current:user_1')
+  })
+
+  it('abandonSession does not delete the current-cook pointer if it now belongs to a different session', async () => {
+    const existing = {
+      userId: 'user_1', recipeId: 'recipe_a', startedAt: '2026-08-14T10:00:00.000Z',
+      events: [], currentStepKey: null, currentStepNum: 0, checkedSteps: [], checkedIngredients: [],
+    }
+    get.mockImplementation((key: string) => {
+      if (key === 'cook-session-current:user_1') {
+        return Promise.resolve(JSON.stringify({ sessionId: 'session_OTHER', recipeId: 'recipe_b', recipeTitle: 'Other Recipe' }))
+      }
+      return Promise.resolve(JSON.stringify(existing))
+    })
+    const service = await makeService()
+    await service.abandonSession('session_1', 'user_1')
+    expect(del).not.toHaveBeenCalledWith('cook-session-current:user_1')
   })
 })
