@@ -121,7 +121,7 @@ if (resumedIndex !== wizardIndex) {
 
 4. Updated both effects' `eslint-disable-next-line` comments to document that `checkedSteps`/`checkedIngredients`/`wizardIndex` are intentionally excluded from dependency arrays because they're read via closure for comparison only, not to trigger the effect.
 
-## Build and Lint Results (Post-Fix)
+## Build and Lint Results (Post-Fix Round 1)
 
 ```
 ✓ build: 506ms, no errors
@@ -129,3 +129,61 @@ if (resumedIndex !== wizardIndex) {
 ```
 
 All fixes verified to compile and pass linting.
+
+---
+
+## Scoped Re-Review Findings & Fixes (Round 2)
+
+Two additional bugs discovered in round 1's fixes:
+
+### Bug 1: Non-Recipe-Scoped Session Guard
+
+**Issue:** The `openWizard()` early-return guard (`if (cookSessionActive) return`) was not scoped to the current recipe. Navigating from recipe A (with an active session) to recipe B and clicking "Start cooking" would silently no-op instead of starting a new session for recipe B.
+
+**Root Cause:** `cookSessionActive` is a bare boolean with no recipe association. RecipeDetail remounts per-route but the component itself doesn't remount, so session state from recipe A persisted when navigating to recipe B.
+
+**Fix Applied:** Added recipe-scoped session reset to the existing "Reset checked steps/ingredients and scroll when recipe changes" effect (keyed on `[id]`). This effect runs whenever `id` changes, clearing stale session state before the discovery effect runs:
+
+```tsx
+setCookSessionActive(false)
+setCookSessionId(null)
+setCookSessionStartedAt(null)
+```
+
+Effect ordering verified: the reset effect (line 468-484) runs before the discovery effect (line 491+), so on recipe change: (1) session state clears for the old recipe, (2) discovery effect checks for a session on the *new* recipe, correctly resuming if one exists or leaving it cleared if not.
+
+### Bug 2: Stale Closure in Polling Effect
+
+**Issue:** The polling effect's `setInterval` callback captured `checkedSteps`/`checkedIngredients`/`wizardIndex` as of the moment the effect was set up. After ANY local edit, those variables became stale in the closure and the comparison kept running against outdated values, spuriously detecting "changed" on nearly every 5-second tick and restarting the unnecessary POST cycle.
+
+**Root Cause:** React's `useEffect` closure captures state variables by value at the time the effect runs. The polling interval runs indefinitely, but the captured state variables don't update; the effect doesn't restart when they change (intentionally, to keep the 5-second interval stable), so the callback always compares against stale values.
+
+**Fix Applied:** Use refs that always hold current values, updated via their own small effects:
+
+1. Added refs with updater effects after state declarations:
+```tsx
+const checkedStepsRef = useRef(checkedSteps)
+const checkedIngredientsRef = useRef(checkedIngredients)
+const wizardIndexRef = useRef(wizardIndex)
+useEffect(() => { checkedStepsRef.current = checkedSteps }, [checkedSteps])
+useEffect(() => { checkedIngredientsRef.current = checkedIngredients }, [checkedIngredients])
+useEffect(() => { wizardIndexRef.current = wizardIndex }, [wizardIndex])
+```
+
+2. Updated polling effect's `setInterval` callback to read from refs instead of closed-over state:
+   - `checkedSteps` → `checkedStepsRef.current`
+   - `checkedIngredients` → `checkedIngredientsRef.current`
+   - `wizardIndex` → `wizardIndexRef.current`
+
+The polling effect's dependency array stays `[cookSessionActive, id, currentUserId]` — it doesn't need to restart when the tracked values change; the refs ensure the callback always reads the freshest value on every tick.
+
+3. Applied the same ref-reading fix to the discovery effect's comparison for consistency (lower risk since discovery only runs once per `id`/`currentUserId` change, but same correctness issue).
+
+## Build and Lint Results (Post-Fix Round 2)
+
+```
+✓ build: 540ms, no errors
+✓ eslint src/components/RecipeDetail.tsx: no errors
+```
+
+All round 2 fixes verified to compile and pass linting.

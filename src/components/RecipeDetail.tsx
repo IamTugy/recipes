@@ -137,6 +137,12 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
   const [customInput, setCustomInput] = useState('')
   const [checkedSteps, setCheckedSteps] = useState<Set<string>>(new Set())
   const [checkedIngredients, setCheckedIngredients] = useState<Set<string>>(new Set())
+  const checkedStepsRef = useRef(checkedSteps)
+  const checkedIngredientsRef = useRef(checkedIngredients)
+  const wizardIndexRef = useRef(wizardIndex)
+  useEffect(() => { checkedStepsRef.current = checkedSteps }, [checkedSteps])
+  useEffect(() => { checkedIngredientsRef.current = checkedIngredients }, [checkedIngredients])
+  useEffect(() => { wizardIndexRef.current = wizardIndex }, [wizardIndex])
   const [userRating, setUserRating] = useState<number | null>(null)
   const [hoverRating, setHoverRating] = useState<number | null>(null)
   const [pdfGenerating, setPdfGenerating] = useState(false)
@@ -478,6 +484,9 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
     setViewingRevision(null)
     setRevisionsOpen(false)
     setRevisions(null)
+    setCookSessionActive(false)
+    setCookSessionId(null)
+    setCookSessionStartedAt(null)
   }, [id])
 
   // Cross-device resume (Phase D): on loading a recipe, check whether the
@@ -491,16 +500,16 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
     let cancelled = false
     getActiveCookSession(id, getToken).then(session => {
       if (cancelled || !session) return
-      if (!sameStringSet(session.checkedSteps, checkedSteps)) {
+      if (!sameStringSet(session.checkedSteps, checkedStepsRef.current)) {
         setCheckedSteps(new Set(session.checkedSteps))
       }
-      if (!sameStringSet(session.checkedIngredients, checkedIngredients)) {
+      if (!sameStringSet(session.checkedIngredients, checkedIngredientsRef.current)) {
         setCheckedIngredients(new Set(session.checkedIngredients))
       }
       const resumedIndex = session.currentStepKey && session.currentStepKey !== 'checklist'
         ? Math.max(0, session.currentStepNum - 1)
         : 0
-      if (resumedIndex !== wizardIndex) {
+      if (resumedIndex !== wizardIndexRef.current) {
         setWizardIndex(resumedIndex)
       }
       lastEnteredStepRef.current = session.currentStepKey
@@ -521,16 +530,16 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
     const interval = setInterval(() => {
       getActiveCookSession(id, getToken).then(session => {
         if (!session) return
-        if (!sameStringSet(session.checkedSteps, checkedSteps)) {
+        if (!sameStringSet(session.checkedSteps, checkedStepsRef.current)) {
           setCheckedSteps(new Set(session.checkedSteps))
         }
-        if (!sameStringSet(session.checkedIngredients, checkedIngredients)) {
+        if (!sameStringSet(session.checkedIngredients, checkedIngredientsRef.current)) {
           setCheckedIngredients(new Set(session.checkedIngredients))
         }
         const resumedIndex = session.currentStepKey && session.currentStepKey !== 'checklist'
           ? Math.max(0, session.currentStepNum - 1)
           : 0
-        if (resumedIndex !== wizardIndex) {
+        if (resumedIndex !== wizardIndexRef.current) {
           setWizardIndex(resumedIndex)
         }
       })
