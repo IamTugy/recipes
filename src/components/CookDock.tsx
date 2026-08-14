@@ -87,10 +87,11 @@ export default function CookDock({
     allIngredientKeys.some(k => !checkedIngredients.has(k)) ? 'checklist' : 'steps'
   )
 
-  const [expanded, setExpanded] = useState(() => {
+  const [expanded, setExpanded] = useState(() => !!startExpanded)
+  useEffect(() => {
     if (startExpanded) onExpandConsumed?.()
-    return !!startExpanded
-  })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once on mount only, matching the lazy useState initializer it replaces; startExpanded/onExpandConsumed are read once at mount, not re-evaluated on later prop changes
+  }, [])
   function setExpandedState(next: boolean) {
     setExpanded(next)
     if (next) onExpand()
