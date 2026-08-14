@@ -3,6 +3,7 @@ import type { IngredientGroup, TimerState } from '../types'
 import { formatDockDuration, scaleAmount } from '../utils/format'
 import { heUnit, canonicalUnit, t } from '../i18n'
 import { resizedImage } from '../lib/image'
+import { useFocusTrap } from '../hooks/useFocusTrap'
 import TranslatedText from './TranslatedText'
 import LinkedIngredientName from './LinkedIngredientName'
 
@@ -87,6 +88,8 @@ export default function CookDock({
     if (next) onExpand()
   }
 
+  useFocusTrap(dockRef, expanded)
+
   // Client-side elapsed-time stopwatch - starts once, the first time the
   // real steps screen (not the unmeasured checklist) is shown. No backend
   // involved in this phase; this is purely a local Date.now() clock.
@@ -131,6 +134,7 @@ export default function CookDock({
     }
     document.addEventListener('keydown', handleKey)
     return () => document.removeEventListener('keydown', handleKey)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- setExpandedState is a new function every render; it doesn't close over stale state
   }, [expanded])
 
   useEffect(() => {
@@ -187,7 +191,12 @@ export default function CookDock({
           </div>
 
           {screen === 'checklist' ? (
-            <div className="flex-1 overflow-y-auto px-6 py-6" onClick={e => e.stopPropagation()}>
+            <div
+              className="flex-1 overflow-y-auto px-6 py-6"
+              onClick={e => e.stopPropagation()}
+              onTouchStart={e => e.stopPropagation()}
+              onTouchEnd={e => e.stopPropagation()}
+            >
               <div className="space-y-4 max-w-lg mx-auto">
                 {ingredients.map((group, gi) => {
                   const hasGroupLabel = !!(group.group || group.groupEn)
@@ -262,7 +271,12 @@ export default function CookDock({
               <div className="h-1 bg-tint/[0.06] shrink-0">
                 <div className="h-full bg-amber transition-all" style={{ width: `${((wizardIndex + 1) / steps.length) * 100}%` }} />
               </div>
-              <div className="flex-1 flex flex-col items-center justify-center px-6 text-center gap-6 overflow-y-auto py-8" onClick={e => e.stopPropagation()}>
+              <div
+                className="flex-1 flex flex-col items-center justify-center px-6 text-center gap-6 overflow-y-auto py-8"
+                onClick={e => e.stopPropagation()}
+                onTouchStart={e => e.stopPropagation()}
+                onTouchEnd={e => e.stopPropagation()}
+              >
                 <div className={`w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold ${
                   checked ? 'bg-herb text-white' : 'bg-tint/10 text-cream/60'
                 }`}>

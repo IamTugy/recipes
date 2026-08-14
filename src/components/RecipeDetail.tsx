@@ -2042,7 +2042,7 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
           onStop={stopCooking}
           onExpand={() => backgroundCookStatusRef.current?.exitFloatingView()}
           checkedSteps={checkedSteps}
-          nearestTimer={nearestTimer}
+          nearestTimer={nearestTimer?.running ? nearestTimer : null}
           onToggleNearestTimer={pipToggleNearestTimer}
           getTimerForStep={getTimerForStep}
           onStartTimer={startTimer}
