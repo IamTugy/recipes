@@ -2,6 +2,7 @@ import { Test } from '@nestjs/testing'
 import { getModelToken } from '@nestjs/mongoose'
 import { CookSessionsService } from './cook-sessions.service'
 import { CookSession } from './schemas/cook-session.schema'
+import { Recipe } from '../recipes/schemas/recipe.schema'
 import { RedisService } from '../redis/redis.service'
 import { CookLogService } from '../cook-log/cook-log.service'
 
@@ -16,6 +17,8 @@ describe('CookSessionsService', () => {
   const model = { create }
   const recordCook = jest.fn()
   const cookLogService = { recordCook }
+  const recipeFindOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(null) })
+  const recipeModel = { findOne: recipeFindOne }
 
   beforeEach(() => jest.clearAllMocks())
 
@@ -26,6 +29,7 @@ describe('CookSessionsService', () => {
         { provide: getModelToken(CookSession.name), useValue: model },
         { provide: RedisService, useValue: redisService },
         { provide: CookLogService, useValue: cookLogService },
+        { provide: getModelToken(Recipe.name), useValue: recipeModel },
       ],
     }).compile()
     return moduleRef.get(CookSessionsService)
@@ -264,5 +268,66 @@ describe('CookSessionsService', () => {
     const service = await makeService()
     await service.abandonSession('session_1', 'attacker_1')
     expect(del).not.toHaveBeenCalled()
+  })
+
+  it('startSession also writes a per-user "current cook" pointer with the recipe title', async () => {
+    recipeFindOne.mockReturnValue({ exec: jest.fn().mockResolvedValue({ title: 'Chicken Soup' }) })
+    const service = await makeService()
+    const sessionId = await service.startSession('user_1', 'recipe_a')
+    expect(set).toHaveBeenCalledWith(
+      'cook-session-current:user_1',
+      JSON.stringify({ sessionId, recipeId: 'recipe_a', recipeTitle: 'Chicken Soup' }),
+      'EX',
+      86400,
+    )
+  })
+
+  it('startSession falls back to an empty title if the recipe lookup finds nothing', async () => {
+    recipeFindOne.mockReturnValue({ exec: jest.fn().mockResolvedValue(null) })
+    const service = await makeService()
+    const sessionId = await service.startSession('user_1', 'recipe_a')
+    expect(set).toHaveBeenCalledWith(
+      'cook-session-current:user_1',
+      JSON.stringify({ sessionId, recipeId: 'recipe_a', recipeTitle: '' }),
+      'EX',
+      86400,
+    )
+  })
+
+  it('getCurrentSession returns the pointer contents when one exists', async () => {
+    get.mockResolvedValue(JSON.stringify({ sessionId: 'session_1', recipeId: 'recipe_a', recipeTitle: 'Chicken Soup' }))
+    const service = await makeService()
+    const result = await service.getCurrentSession('user_1')
+    expect(get).toHaveBeenCalledWith('cook-session-current:user_1')
+    expect(result).toEqual({ sessionId: 'session_1', recipeId: 'recipe_a', recipeTitle: 'Chicken Soup' })
+  })
+
+  it('getCurrentSession returns null when no pointer exists', async () => {
+    get.mockResolvedValue(null)
+    const service = await makeService()
+    await expect(service.getCurrentSession('user_1')).resolves.toBeNull()
+  })
+
+  it('finishSession deletes the current-cook pointer alongside the other Redis keys', async () => {
+    const existing = {
+      userId: 'user_1', recipeId: 'recipe_a', startedAt: '2026-08-14T10:00:00.000Z',
+      events: [], currentStepKey: null, currentStepNum: 0, checkedSteps: [], checkedIngredients: [],
+    }
+    get.mockResolvedValue(JSON.stringify(existing))
+    create.mockResolvedValue({})
+    const service = await makeService()
+    await service.finishSession('session_1', 'user_1')
+    expect(del).toHaveBeenCalledWith('cook-session-current:user_1')
+  })
+
+  it('abandonSession deletes the current-cook pointer alongside the other Redis keys', async () => {
+    const existing = {
+      userId: 'user_1', recipeId: 'recipe_a', startedAt: '2026-08-14T10:00:00.000Z',
+      events: [], currentStepKey: null, currentStepNum: 0, checkedSteps: [], checkedIngredients: [],
+    }
+    get.mockResolvedValue(JSON.stringify(existing))
+    const service = await makeService()
+    await service.abandonSession('session_1', 'user_1')
+    expect(del).toHaveBeenCalledWith('cook-session-current:user_1')
   })
 })

@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { randomUUID } from 'crypto'
 import { CookSession, CookSessionDocument } from './schemas/cook-session.schema'
+import { Recipe, RecipeDocument } from '../recipes/schemas/recipe.schema'
 import { RedisService } from '../redis/redis.service'
 import { CookLogService } from '../cook-log/cook-log.service'
 
@@ -34,6 +35,12 @@ export interface ActiveCookSessionView {
   startedAt: string
 }
 
+export interface CurrentCookSessionView {
+  sessionId: string
+  recipeId: string
+  recipeTitle: string
+}
+
 function redisKey(sessionId: string): string {
   return `cook-session:${sessionId}`
 }
@@ -45,10 +52,21 @@ function activeIndexKey(userId: string, recipeId: string): string {
   return `cook-session-active:${userId}:${recipeId}`
 }
 
+// Points at whichever session the user is *currently* cooking, if any -
+// unlike activeIndexKey (scoped to one recipe), this is scoped to the
+// user alone, which is what makes it possible to detect a conflict when
+// they try to start a DIFFERENT recipe while already cooking one.
+function currentPointerKey(userId: string): string {
+  return `cook-session-current:${userId}`
+}
+
 @Injectable()
 export class CookSessionsService {
+  private readonly logger = new Logger(CookSessionsService.name)
+
   constructor(
     @InjectModel(CookSession.name) private readonly cookSessionModel: Model<CookSessionDocument>,
+    @InjectModel(Recipe.name) private readonly recipeModel: Model<RecipeDocument>,
     private readonly redis: RedisService,
     private readonly cookLogService: CookLogService,
   ) {}
@@ -65,9 +83,13 @@ export class CookSessionsService {
       checkedSteps: [],
       checkedIngredients: [],
     }
+    const recipe = await this.recipeModel.findOne({ _id: recipeId }).exec()
+    const pointer: CurrentCookSessionView = { sessionId, recipeId, recipeTitle: recipe?.title ?? '' }
+
     const client = this.redis.getClient()
     await client.set(redisKey(sessionId), JSON.stringify(session), 'EX', SESSION_TTL_SECONDS)
     await client.set(activeIndexKey(userId, recipeId), sessionId, 'EX', SESSION_TTL_SECONDS)
+    await client.set(currentPointerKey(userId), JSON.stringify(pointer), 'EX', SESSION_TTL_SECONDS)
     return sessionId
   }
 
@@ -136,6 +158,12 @@ export class CookSessionsService {
     }
   }
 
+  async getCurrentSession(userId: string): Promise<CurrentCookSessionView | null> {
+    const raw = await this.redis.getClient().get(currentPointerKey(userId))
+    if (!raw) return null
+    return JSON.parse(raw) as CurrentCookSessionView
+  }
+
   async finishSession(sessionId: string, userId: string): Promise<void> {
     const session = await this.readSession(sessionId)
     if (!session || session.userId !== userId) return
@@ -169,12 +197,17 @@ export class CookSessionsService {
       await this.cookLogService.recordCook(session.userId, session.recipeId)
     } catch (err) {
       // recordCook never throws itself, but guard defensively - a failure
-      // here must never prevent Redis cleanup
+      // here must never prevent Redis cleanup.
+      this.logger.error(
+        `recordCook threw unexpectedly for user ${session.userId} on recipe ${session.recipeId}`,
+        err instanceof Error ? err.stack : err,
+      )
     }
 
     const client = this.redis.getClient()
     await client.del(redisKey(sessionId))
     await client.del(activeIndexKey(session.userId, session.recipeId))
+    await client.del(currentPointerKey(session.userId))
   }
 
   async abandonSession(sessionId: string, userId: string): Promise<void> {
@@ -184,5 +217,6 @@ export class CookSessionsService {
     const client = this.redis.getClient()
     await client.del(redisKey(sessionId))
     await client.del(activeIndexKey(session.userId, session.recipeId))
+    await client.del(currentPointerKey(session.userId))
   }
 }

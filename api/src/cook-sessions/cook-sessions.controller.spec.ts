@@ -6,6 +6,7 @@ describe('CookSessionsController', () => {
     logStep: jest.fn(),
     syncState: jest.fn(),
     getActiveSession: jest.fn(),
+    getCurrentSession: jest.fn(),
     finishSession: jest.fn(),
     abandonSession: jest.fn(),
   }
@@ -67,5 +68,21 @@ describe('CookSessionsController', () => {
     const result = await controller.abandon('session_1', { userId: 'user_1' } as any)
     expect(cookSessionsService.abandonSession).toHaveBeenCalledWith('session_1', 'user_1')
     expect(result).toEqual({ ok: true })
+  })
+
+  it('GET /cook-sessions/current returns the current session view for the authenticated user', async () => {
+    const view = { sessionId: 'session_1', recipeId: 'recipe_a', recipeTitle: 'Chicken Soup' }
+    cookSessionsService.getCurrentSession.mockResolvedValue(view)
+    const controller = new CookSessionsController(cookSessionsService as any)
+    const result = await controller.getCurrent({ userId: 'user_1' } as any)
+    expect(cookSessionsService.getCurrentSession).toHaveBeenCalledWith('user_1')
+    expect(result).toEqual(view)
+  })
+
+  it('GET /cook-sessions/current returns null when there is no active session', async () => {
+    cookSessionsService.getCurrentSession.mockResolvedValue(null)
+    const controller = new CookSessionsController(cookSessionsService as any)
+    const result = await controller.getCurrent({ userId: 'user_1' } as any)
+    expect(result).toBeNull()
   })
 })

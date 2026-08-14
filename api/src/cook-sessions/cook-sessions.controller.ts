@@ -13,6 +13,11 @@ export class CookSessionsController {
     return this.cookSessionsService.getActiveSession(req.userId, recipeId)
   }
 
+  @Get('current')
+  async getCurrent(@Req() req: Request & { userId: string }) {
+    return this.cookSessionsService.getCurrentSession(req.userId)
+  }
+
   @Post(':recipeId')
   async start(@Param('recipeId') recipeId: string, @Req() req: Request & { userId: string }) {
     const sessionId = await this.cookSessionsService.startSession(req.userId, recipeId)
