@@ -256,6 +256,9 @@ export class CookSessionsService {
     const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000)
     const finishedSessions = await this.cookSessionModel
       .find({ userId, finishedAt: { $lte: cutoff } })
+      .select('recipeId finishedAt')
+      .sort({ finishedAt: -1 })
+      .lean()
       .exec()
     if (finishedSessions.length === 0) return []
 
@@ -270,17 +273,20 @@ export class CookSessionsService {
     const unreviewedRecipeIds = recipeIds.filter(id => !reviewedRecipeIds.has(id))
     if (unreviewedRecipeIds.length === 0) return []
 
+    let recipes: { _id: unknown; title: string }[] = []
+    try {
+      recipes = await this.recipeModel.find({ _id: { $in: unreviewedRecipeIds } }).select('title').lean().exec()
+    } catch (err) {
+      this.logger.error('Failed to look up recipe titles for reminders', err instanceof Error ? err.stack : err)
+    }
+    const titleByRecipeId = new Map(recipes.map(r => [String(r._id), r.title]))
+
     const reminders: CookReminderView[] = []
     for (const recipeId of unreviewedRecipeIds) {
       const session = finishedSessions.find(s => s.recipeId === recipeId)
       if (!session) continue
-      let recipeTitle = ''
-      try {
-        const recipe = await this.recipeModel.findOne({ _id: recipeId }).exec()
-        recipeTitle = recipe?.title ?? ''
-      } catch (err) {
-        this.logger.error(`Failed to look up title for recipe ${recipeId}`, err instanceof Error ? err.stack : err)
-      }
+      const recipeTitle = titleByRecipeId.get(recipeId)
+      if (!recipeTitle) continue
       reminders.push({
         recipeId,
         recipeTitle,

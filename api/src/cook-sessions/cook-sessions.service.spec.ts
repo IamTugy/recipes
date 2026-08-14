@@ -20,7 +20,8 @@ describe('CookSessionsService', () => {
   const recordCook = jest.fn()
   const cookLogService = { recordCook }
   const recipeFindOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(null) })
-  const recipeModel = { findOne: recipeFindOne }
+  const recipeFind = jest.fn()
+  const recipeModel = { findOne: recipeFindOne, find: recipeFind }
   const ratingFind = jest.fn()
   const ratingModel = { find: ratingFind }
 
@@ -399,12 +400,14 @@ describe('CookSessionsService', () => {
   it('getReminders returns a finished, unreviewed, >24h-old session', async () => {
     const oldEnough = new Date(Date.now() - 25 * 60 * 60 * 1000)
     cookSessionFind.mockReturnValue({
-      exec: jest.fn().mockResolvedValue([
-        { userId: 'user_1', recipeId: 'recipe_a', finishedAt: oldEnough },
-      ]),
+      select: () => ({ sort: () => ({ lean: () => ({ exec: jest.fn().mockResolvedValue([
+        { recipeId: 'recipe_a', finishedAt: oldEnough },
+      ]) }) }) }),
     })
     ratingFind.mockReturnValue({ exec: jest.fn().mockResolvedValue([]) })
-    recipeFindOne.mockReturnValue({ exec: jest.fn().mockResolvedValue({ title: 'Chicken Soup' }) })
+    recipeFind.mockReturnValue({ select: () => ({ lean: () => ({ exec: jest.fn().mockResolvedValue([
+      { _id: 'recipe_a', title: 'Chicken Soup' },
+    ]) }) }) })
     const service = await makeService()
     const result = await service.getReminders('user_1')
     expect(result).toEqual([
@@ -412,24 +415,27 @@ describe('CookSessionsService', () => {
     ])
   })
 
-  it('getReminders excludes a session finished less than 24 hours ago', async () => {
-    // The Mongo query correctly filters by finishedAt: { $lte: cutoff },
-    // so a session finished less than 24 hours ago is not returned by the query
+  it('getReminders queries CookSession with a cutoff approximately 24 hours in the past', async () => {
     cookSessionFind.mockReturnValue({
-      exec: jest.fn().mockResolvedValue([]),
+      select: () => ({ sort: () => ({ lean: () => ({ exec: jest.fn().mockResolvedValue([]) }) }) }),
     })
-    ratingFind.mockReturnValue({ exec: jest.fn().mockResolvedValue([]) })
     const service = await makeService()
-    const result = await service.getReminders('user_1')
-    expect(result).toEqual([])
+    const before = Date.now() - 24 * 60 * 60 * 1000
+    await service.getReminders('user_1')
+    const after = Date.now() - 24 * 60 * 60 * 1000
+    const callArg = cookSessionFind.mock.calls[0][0]
+    expect(callArg.userId).toBe('user_1')
+    const cutoffUsed = callArg.finishedAt.$lte.getTime()
+    expect(cutoffUsed).toBeGreaterThanOrEqual(before - 1000)
+    expect(cutoffUsed).toBeLessThanOrEqual(after + 1000)
   })
 
   it('getReminders excludes a session for a recipe that already has a reviewed rating (non-empty comment)', async () => {
     const oldEnough = new Date(Date.now() - 25 * 60 * 60 * 1000)
     cookSessionFind.mockReturnValue({
-      exec: jest.fn().mockResolvedValue([
-        { userId: 'user_1', recipeId: 'recipe_a', finishedAt: oldEnough },
-      ]),
+      select: () => ({ sort: () => ({ lean: () => ({ exec: jest.fn().mockResolvedValue([
+        { recipeId: 'recipe_a', finishedAt: oldEnough },
+      ]) }) }) }),
     })
     ratingFind.mockReturnValue({
       exec: jest.fn().mockResolvedValue([{ userId: 'user_1', recipeId: 'recipe_a', comment: 'Great recipe!' }]),
@@ -442,14 +448,16 @@ describe('CookSessionsService', () => {
   it('getReminders includes a session for a recipe with only a star rating and no comment', async () => {
     const oldEnough = new Date(Date.now() - 25 * 60 * 60 * 1000)
     cookSessionFind.mockReturnValue({
-      exec: jest.fn().mockResolvedValue([
-        { userId: 'user_1', recipeId: 'recipe_a', finishedAt: oldEnough },
-      ]),
+      select: () => ({ sort: () => ({ lean: () => ({ exec: jest.fn().mockResolvedValue([
+        { recipeId: 'recipe_a', finishedAt: oldEnough },
+      ]) }) }) }),
     })
     ratingFind.mockReturnValue({
       exec: jest.fn().mockResolvedValue([{ userId: 'user_1', recipeId: 'recipe_a', comment: '' }]),
     })
-    recipeFindOne.mockReturnValue({ exec: jest.fn().mockResolvedValue({ title: 'Chicken Soup' }) })
+    recipeFind.mockReturnValue({ select: () => ({ lean: () => ({ exec: jest.fn().mockResolvedValue([
+      { _id: 'recipe_a', title: 'Chicken Soup' },
+    ]) }) }) })
     const service = await makeService()
     const result = await service.getReminders('user_1')
     expect(result).toEqual([
@@ -458,7 +466,9 @@ describe('CookSessionsService', () => {
   })
 
   it('getReminders scopes the CookSession query to the given userId', async () => {
-    cookSessionFind.mockReturnValue({ exec: jest.fn().mockResolvedValue([]) })
+    cookSessionFind.mockReturnValue({
+      select: () => ({ sort: () => ({ lean: () => ({ exec: jest.fn().mockResolvedValue([]) }) }) }),
+    })
     const service = await makeService()
     await service.getReminders('user_1')
     expect(cookSessionFind).toHaveBeenCalledWith(expect.objectContaining({ userId: 'user_1' }))
@@ -468,32 +478,46 @@ describe('CookSessionsService', () => {
     const oldEnough1 = new Date(Date.now() - 25 * 60 * 60 * 1000)
     const oldEnough2 = new Date(Date.now() - 30 * 60 * 60 * 1000)
     cookSessionFind.mockReturnValue({
-      exec: jest.fn().mockResolvedValue([
-        { userId: 'user_1', recipeId: 'recipe_a', finishedAt: oldEnough1 },
-        { userId: 'user_1', recipeId: 'recipe_a', finishedAt: oldEnough2 },
-      ]),
+      select: () => ({ sort: () => ({ lean: () => ({ exec: jest.fn().mockResolvedValue([
+        { recipeId: 'recipe_a', finishedAt: oldEnough1 },
+        { recipeId: 'recipe_a', finishedAt: oldEnough2 },
+      ]) }) }) }),
     })
     ratingFind.mockReturnValue({ exec: jest.fn().mockResolvedValue([]) })
-    recipeFindOne.mockReturnValue({ exec: jest.fn().mockResolvedValue({ title: 'Chicken Soup' }) })
+    recipeFind.mockReturnValue({ select: () => ({ lean: () => ({ exec: jest.fn().mockResolvedValue([
+      { _id: 'recipe_a', title: 'Chicken Soup' },
+    ]) }) }) })
     const service = await makeService()
     const result = await service.getReminders('user_1')
     expect(result).toHaveLength(1)
     expect(result[0].recipeId).toBe('recipe_a')
   })
 
-  it('getReminders falls back to an empty title and does not throw when the recipe lookup fails', async () => {
+  it('getReminders omits a reminder when the recipe title lookup finds nothing for it', async () => {
     const oldEnough = new Date(Date.now() - 25 * 60 * 60 * 1000)
     cookSessionFind.mockReturnValue({
-      exec: jest.fn().mockResolvedValue([
-        { userId: 'user_1', recipeId: 'recipe_a', finishedAt: oldEnough },
-      ]),
+      select: () => ({ sort: () => ({ lean: () => ({ exec: jest.fn().mockResolvedValue([
+        { recipeId: 'recipe_a', finishedAt: oldEnough },
+      ]) }) }) }),
     })
     ratingFind.mockReturnValue({ exec: jest.fn().mockResolvedValue([]) })
-    recipeFindOne.mockReturnValue({ exec: jest.fn().mockRejectedValue(new Error('cast error')) })
+    recipeFind.mockReturnValue({ select: () => ({ lean: () => ({ exec: jest.fn().mockResolvedValue([]) }) }) })
     const service = await makeService()
     const result = await service.getReminders('user_1')
-    expect(result).toEqual([
-      { recipeId: 'recipe_a', recipeTitle: '', finishedAt: oldEnough.toISOString() },
-    ])
+    expect(result).toEqual([])
+  })
+
+  it('getReminders handles batched recipe lookup failure gracefully without throwing', async () => {
+    const oldEnough = new Date(Date.now() - 25 * 60 * 60 * 1000)
+    cookSessionFind.mockReturnValue({
+      select: () => ({ sort: () => ({ lean: () => ({ exec: jest.fn().mockResolvedValue([
+        { recipeId: 'recipe_a', finishedAt: oldEnough },
+      ]) }) }) }),
+    })
+    ratingFind.mockReturnValue({ exec: jest.fn().mockResolvedValue([]) })
+    recipeFind.mockReturnValue({ select: () => ({ lean: () => ({ exec: jest.fn().mockRejectedValue(new Error('cast error')) }) }) })
+    const service = await makeService()
+    const result = await service.getReminders('user_1')
+    expect(result).toEqual([])
   })
 })
