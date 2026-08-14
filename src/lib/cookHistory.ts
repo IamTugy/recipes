@@ -22,3 +22,21 @@ export function fetchCookHistoryStats(getToken: () => Promise<string | null>): P
 export function fetchCookHistory(getToken: () => Promise<string | null>): Promise<CookHistoryEntry[]> {
   return apiFetch<CookHistoryEntry[]>('/cook-history', getToken)
 }
+
+export interface CookRecipeHistorySession {
+  finishedAt: string
+  totalDurationSeconds: number
+  steps: { stepNum: number; durationSeconds: number }[]
+}
+
+export interface CookRecipeHistory {
+  recipeTitle: string
+  sessions: CookRecipeHistorySession[]
+}
+
+export function fetchCookRecipeHistory(
+  recipeId: string,
+  getToken: () => Promise<string | null>
+): Promise<CookRecipeHistory> {
+  return apiFetch<CookRecipeHistory>(`/cook-history/${recipeId}`, getToken)
+}
