@@ -18,20 +18,24 @@ export class CookSessionsController {
   }
 
   @Post(':sessionId/steps')
-  async logStep(@Param('sessionId') sessionId: string, @Body() body: LogStepBody) {
-    await this.cookSessionsService.logStep(sessionId, body.stepKey, body.stepNum)
+  async logStep(
+    @Param('sessionId') sessionId: string,
+    @Body() body: LogStepBody,
+    @Req() req: Request & { userId: string },
+  ) {
+    await this.cookSessionsService.logStep(sessionId, req.userId, body.stepKey, body.stepNum)
     return { ok: true }
   }
 
   @Post(':sessionId/finish')
-  async finish(@Param('sessionId') sessionId: string) {
-    await this.cookSessionsService.finishSession(sessionId)
+  async finish(@Param('sessionId') sessionId: string, @Req() req: Request & { userId: string }) {
+    await this.cookSessionsService.finishSession(sessionId, req.userId)
     return { ok: true }
   }
 
   @Delete(':sessionId')
-  async abandon(@Param('sessionId') sessionId: string) {
-    await this.cookSessionsService.abandonSession(sessionId)
+  async abandon(@Param('sessionId') sessionId: string, @Req() req: Request & { userId: string }) {
+    await this.cookSessionsService.abandonSession(sessionId, req.userId)
     return { ok: true }
   }
 }

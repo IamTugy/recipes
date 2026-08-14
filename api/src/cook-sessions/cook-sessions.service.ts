@@ -51,9 +51,9 @@ export class CookSessionsService {
     return JSON.parse(raw) as RedisSession
   }
 
-  async logStep(sessionId: string, stepKey: string, stepNum: number): Promise<void> {
+  async logStep(sessionId: string, userId: string, stepKey: string, stepNum: number): Promise<void> {
     const session = await this.readSession(sessionId)
-    if (!session) return
+    if (!session || session.userId !== userId) return
 
     session.events.push({ stepKey, stepNum, enteredAt: new Date().toISOString() })
     const client = this.redis.getClient()
@@ -61,9 +61,9 @@ export class CookSessionsService {
     await client.expire(redisKey(sessionId), SESSION_TTL_SECONDS)
   }
 
-  async finishSession(sessionId: string): Promise<void> {
+  async finishSession(sessionId: string, userId: string): Promise<void> {
     const session = await this.readSession(sessionId)
-    if (!session) return
+    if (!session || session.userId !== userId) return
 
     const finishedAt = new Date(Date.now())
     const realSteps = session.events.filter(e => e.stepKey !== 'checklist')
@@ -93,7 +93,9 @@ export class CookSessionsService {
     await this.redis.getClient().del(redisKey(sessionId))
   }
 
-  async abandonSession(sessionId: string): Promise<void> {
+  async abandonSession(sessionId: string, userId: string): Promise<void> {
+    const session = await this.readSession(sessionId)
+    if (!session || session.userId !== userId) return
     await this.redis.getClient().del(redisKey(sessionId))
   }
 }

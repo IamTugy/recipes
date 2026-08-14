@@ -48,7 +48,7 @@ describe('CookSessionsService', () => {
     }
     get.mockResolvedValue(JSON.stringify(existing))
     const service = await makeService()
-    await service.logStep('session_1', '0-0', 1)
+    await service.logStep('session_1', 'user_1', '0-0', 1)
 
     expect(set).toHaveBeenCalledWith(
       'cook-session:session_1',
@@ -60,7 +60,7 @@ describe('CookSessionsService', () => {
   it('logStep on a missing Redis key silently no-ops', async () => {
     get.mockResolvedValue(null)
     const service = await makeService()
-    await expect(service.logStep('gone', '0-0', 1)).resolves.toBeUndefined()
+    await expect(service.logStep('gone', 'user_1', '0-0', 1)).resolves.toBeUndefined()
     expect(set).not.toHaveBeenCalled()
   })
 
@@ -82,7 +82,7 @@ describe('CookSessionsService', () => {
     const realDateNow = Date.now
     Date.now = () => new Date('2026-08-14T10:03:00.000Z').getTime()
     try {
-      await service.finishSession('session_1')
+      await service.finishSession('session_1', 'user_1')
     } finally {
       Date.now = realDateNow
     }
@@ -104,14 +104,41 @@ describe('CookSessionsService', () => {
   it('finishSession on a missing Redis key silently no-ops without writing to Mongo', async () => {
     get.mockResolvedValue(null)
     const service = await makeService()
-    await expect(service.finishSession('gone')).resolves.toBeUndefined()
+    await expect(service.finishSession('gone', 'user_1')).resolves.toBeUndefined()
     expect(create).not.toHaveBeenCalled()
     expect(del).not.toHaveBeenCalled()
   })
 
   it('abandonSession deletes the Redis key', async () => {
+    const existing = { userId: 'user_1', recipeId: 'recipe_a', startedAt: '2026-08-14T10:00:00.000Z', events: [] }
+    get.mockResolvedValue(JSON.stringify(existing))
     const service = await makeService()
-    await service.abandonSession('session_1')
+    await service.abandonSession('session_1', 'user_1')
     expect(del).toHaveBeenCalledWith('cook-session:session_1')
+  })
+
+  it('logStep silently no-ops when the caller does not own the session', async () => {
+    const existing = { userId: 'owner_1', recipeId: 'recipe_a', startedAt: '2026-08-14T10:00:00.000Z', events: [] }
+    get.mockResolvedValue(JSON.stringify(existing))
+    const service = await makeService()
+    await service.logStep('session_1', 'attacker_1', '0-0', 1)
+    expect(set).not.toHaveBeenCalled()
+  })
+
+  it('finishSession silently no-ops when the caller does not own the session', async () => {
+    const existing = { userId: 'owner_1', recipeId: 'recipe_a', startedAt: '2026-08-14T10:00:00.000Z', events: [] }
+    get.mockResolvedValue(JSON.stringify(existing))
+    const service = await makeService()
+    await service.finishSession('session_1', 'attacker_1')
+    expect(create).not.toHaveBeenCalled()
+    expect(del).not.toHaveBeenCalled()
+  })
+
+  it('abandonSession silently no-ops when the caller does not own the session', async () => {
+    const existing = { userId: 'owner_1', recipeId: 'recipe_a', startedAt: '2026-08-14T10:00:00.000Z', events: [] }
+    get.mockResolvedValue(JSON.stringify(existing))
+    const service = await makeService()
+    await service.abandonSession('session_1', 'attacker_1')
+    expect(del).not.toHaveBeenCalled()
   })
 })

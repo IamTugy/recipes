@@ -20,22 +20,22 @@ describe('CookSessionsController', () => {
 
   it('POST /cook-sessions/:sessionId/steps logs a step', async () => {
     const controller = new CookSessionsController(cookSessionsService as any)
-    const result = await controller.logStep('session_1', { stepKey: '0-0', stepNum: 1 })
-    expect(cookSessionsService.logStep).toHaveBeenCalledWith('session_1', '0-0', 1)
+    const result = await controller.logStep('session_1', { stepKey: '0-0', stepNum: 1 }, { userId: 'user_1' } as any)
+    expect(cookSessionsService.logStep).toHaveBeenCalledWith('session_1', 'user_1', '0-0', 1)
     expect(result).toEqual({ ok: true })
   })
 
   it('POST /cook-sessions/:sessionId/finish finishes a session', async () => {
     const controller = new CookSessionsController(cookSessionsService as any)
-    const result = await controller.finish('session_1')
-    expect(cookSessionsService.finishSession).toHaveBeenCalledWith('session_1')
+    const result = await controller.finish('session_1', { userId: 'user_1' } as any)
+    expect(cookSessionsService.finishSession).toHaveBeenCalledWith('session_1', 'user_1')
     expect(result).toEqual({ ok: true })
   })
 
   it('DELETE /cook-sessions/:sessionId abandons a session', async () => {
     const controller = new CookSessionsController(cookSessionsService as any)
-    const result = await controller.abandon('session_1')
-    expect(cookSessionsService.abandonSession).toHaveBeenCalledWith('session_1')
+    const result = await controller.abandon('session_1', { userId: 'user_1' } as any)
+    expect(cookSessionsService.abandonSession).toHaveBeenCalledWith('session_1', 'user_1')
     expect(result).toEqual({ ok: true })
   })
 })
