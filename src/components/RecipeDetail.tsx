@@ -81,6 +81,7 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
   // it without RecipeDetail needing to know CookDock's internal screen
   // state directly.
   const lastEnteredStepRef = useRef<{ stepKey: string; stepNum: number }>({ stepKey: 'checklist', stepNum: 0 })
+  const suppressNextCheckedSyncRef = useRef(false)
   const [wizardIndex, setWizardIndex] = useState(0)
   // The overflow menu (Edit/Delete/Save to collection/Download PDF/Copy
   // link) consolidates what used to be scattered separate buttons. It's a
@@ -555,6 +556,10 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
   // syncs are already covered inside handleStepEntered above.
   useEffect(() => {
     if (!cookSessionId) return
+    if (suppressNextCheckedSyncRef.current) {
+      suppressNextCheckedSyncRef.current = false
+      return
+    }
     const { stepKey, stepNum } = lastEnteredStepRef.current
     syncCookSession(cookSessionId, stepKey, stepNum, [...checkedSteps], [...checkedIngredients], getToken)
     // eslint-disable-next-line react-hooks/exhaustive-deps -- getToken is a new function every render; this effect should only re-fire on an actual checked-state change, not on every render
@@ -831,7 +836,8 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
   function openWizard() {
     if (cookSessionActive) return
     const firstUnchecked = flatSteps.findIndex(s => !checkedSteps.has(`${s.groupIdx}-${s.stepIdx}`))
-    setWizardIndex(firstUnchecked === -1 ? 0 : firstUnchecked)
+    const startIndex = firstUnchecked === -1 ? 0 : firstUnchecked
+    setWizardIndex(startIndex)
     setCookSessionActive(true)
     setCookSessionId(null)
     setCookSessionStartedAt(null)
@@ -840,7 +846,22 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
     if (currentUserId && recipe) {
       startCookSession(recipe.id, getToken).then(id => {
         setCookSessionId(id)
-        if (id && pendingCookStepRef.current) {
+        if (!id) return
+        // Mirrors CookDock's own screen-selection logic: if every
+        // ingredient is already checked, the dock mounts directly on the
+        // "steps" screen and (by design) never calls onStepEntered for
+        // that initial step on mount - log it here instead so a fresh
+        // session that skips the checklist doesn't silently miss step 1
+        // in its timeline.
+        const allIngredientsChecked = (displayRecipe?.ingredients ?? []).every((group, gi) =>
+          group.items.every((_, ii) => checkedIngredients.has(`${gi}-${ii}`))
+        )
+        const initialStep = flatSteps[startIndex]
+        if (allIngredientsChecked && initialStep) {
+          const stepKey = `${initialStep.groupIdx}-${initialStep.stepIdx}`
+          lastEnteredStepRef.current = { stepKey, stepNum: initialStep.stepNum }
+          logCookSessionStep(id, stepKey, initialStep.stepNum, [...checkedSteps], [...checkedIngredients], getToken)
+        } else if (pendingCookStepRef.current) {
           const { stepKey, stepNum } = pendingCookStepRef.current
           pendingCookStepRef.current = null
           logCookSessionStep(id, stepKey, stepNum, [...checkedSteps], [...checkedIngredients], getToken)
@@ -879,6 +900,14 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
       pendingCookStepRef.current = { stepKey, stepNum }
       return
     }
+    // logCookSessionStep already atomically writes the checked-state
+    // snapshot alongside the step-entry event server-side - suppress the
+    // standalone checked-state sync effect's next firing so it doesn't
+    // race that same write with a second concurrent request (this fires
+    // when the click that triggered this step change also happened to
+    // change checkedSteps, e.g. Next/mark-done both check the current
+    // step as they advance).
+    suppressNextCheckedSyncRef.current = true
     logCookSessionStep(cookSessionId, stepKey, stepNum, [...checkedSteps], [...checkedIngredients], getToken)
   }
 
