@@ -4,6 +4,8 @@ describe('CookSessionsController', () => {
   const cookSessionsService = {
     startSession: jest.fn(),
     logStep: jest.fn(),
+    syncState: jest.fn(),
+    getActiveSession: jest.fn(),
     finishSession: jest.fn(),
     abandonSession: jest.fn(),
   }
@@ -23,6 +25,33 @@ describe('CookSessionsController', () => {
     const result = await controller.logStep('session_1', { stepKey: '0-0', stepNum: 1 }, { userId: 'user_1' } as any)
     expect(cookSessionsService.logStep).toHaveBeenCalledWith('session_1', 'user_1', '0-0', 1)
     expect(result).toEqual({ ok: true })
+  })
+
+  it('POST /cook-sessions/:sessionId/sync updates the resumable snapshot', async () => {
+    const controller = new CookSessionsController(cookSessionsService as any)
+    const body = { currentStepKey: '0-1', currentStepNum: 2, checkedSteps: ['0-0'], checkedIngredients: ['0-0'] }
+    const result = await controller.sync('session_1', body, { userId: 'user_1' } as any)
+    expect(cookSessionsService.syncState).toHaveBeenCalledWith('session_1', 'user_1', '0-1', 2, ['0-0'], ['0-0'])
+    expect(result).toEqual({ ok: true })
+  })
+
+  it('GET /cook-sessions/active/:recipeId returns the active session view for the authenticated user', async () => {
+    const view = {
+      sessionId: 'session_1', currentStepKey: '0-1', currentStepNum: 2,
+      checkedSteps: ['0-0'], checkedIngredients: [], startedAt: '2026-08-14T10:00:00.000Z',
+    }
+    cookSessionsService.getActiveSession.mockResolvedValue(view)
+    const controller = new CookSessionsController(cookSessionsService as any)
+    const result = await controller.getActive('recipe_a', { userId: 'user_1' } as any)
+    expect(cookSessionsService.getActiveSession).toHaveBeenCalledWith('user_1', 'recipe_a')
+    expect(result).toEqual(view)
+  })
+
+  it('GET /cook-sessions/active/:recipeId returns null when there is no active session', async () => {
+    cookSessionsService.getActiveSession.mockResolvedValue(null)
+    const controller = new CookSessionsController(cookSessionsService as any)
+    const result = await controller.getActive('recipe_a', { userId: 'user_1' } as any)
+    expect(result).toBeNull()
   })
 
   it('POST /cook-sessions/:sessionId/finish finishes a session', async () => {

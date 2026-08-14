@@ -1,11 +1,17 @@
-import { Body, Controller, Delete, Param, Post, Req } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Post, Req } from '@nestjs/common'
 import { Request } from 'express'
 import { CookSessionsService } from './cook-sessions.service'
 import { LogStepDto } from './dto/log-step.dto'
+import { SyncCookSessionDto } from './dto/sync-cook-session.dto'
 
 @Controller('cook-sessions')
 export class CookSessionsController {
   constructor(private readonly cookSessionsService: CookSessionsService) {}
+
+  @Get('active/:recipeId')
+  async getActive(@Param('recipeId') recipeId: string, @Req() req: Request & { userId: string }) {
+    return this.cookSessionsService.getActiveSession(req.userId, recipeId)
+  }
 
   @Post(':recipeId')
   async start(@Param('recipeId') recipeId: string, @Req() req: Request & { userId: string }) {
@@ -20,6 +26,23 @@ export class CookSessionsController {
     @Req() req: Request & { userId: string },
   ) {
     await this.cookSessionsService.logStep(sessionId, req.userId, body.stepKey, body.stepNum)
+    return { ok: true }
+  }
+
+  @Post(':sessionId/sync')
+  async sync(
+    @Param('sessionId') sessionId: string,
+    @Body() body: SyncCookSessionDto,
+    @Req() req: Request & { userId: string },
+  ) {
+    await this.cookSessionsService.syncState(
+      sessionId,
+      req.userId,
+      body.currentStepKey,
+      body.currentStepNum,
+      body.checkedSteps,
+      body.checkedIngredients,
+    )
     return { ok: true }
   }
 

@@ -18,10 +18,30 @@ interface RedisSession {
   recipeId: string
   startedAt: string
   events: RedisEvent[]
+  currentStepKey: string | null
+  currentStepNum: number
+  checkedSteps: string[]
+  checkedIngredients: string[]
+}
+
+export interface ActiveCookSessionView {
+  sessionId: string
+  currentStepKey: string | null
+  currentStepNum: number
+  checkedSteps: string[]
+  checkedIngredients: string[]
+  startedAt: string
 }
 
 function redisKey(sessionId: string): string {
   return `cook-session:${sessionId}`
+}
+
+// Reverse index: sessionId is an opaque UUID with no other way to look it
+// up by (userId, recipeId) - this key is what makes cross-device discovery
+// possible at all.
+function activeIndexKey(userId: string, recipeId: string): string {
+  return `cook-session-active:${userId}:${recipeId}`
 }
 
 @Injectable()
@@ -38,9 +58,14 @@ export class CookSessionsService {
       recipeId,
       startedAt: new Date().toISOString(),
       events: [],
+      currentStepKey: null,
+      currentStepNum: 0,
+      checkedSteps: [],
+      checkedIngredients: [],
     }
     const client = this.redis.getClient()
     await client.set(redisKey(sessionId), JSON.stringify(session), 'EX', SESSION_TTL_SECONDS)
+    await client.set(activeIndexKey(userId, recipeId), sessionId, 'EX', SESSION_TTL_SECONDS)
     return sessionId
   }
 
@@ -57,6 +82,45 @@ export class CookSessionsService {
     session.events.push({ stepKey, stepNum, enteredAt: new Date().toISOString() })
     const client = this.redis.getClient()
     await client.set(redisKey(sessionId), JSON.stringify(session), 'EX', SESSION_TTL_SECONDS)
+    await client.expire(activeIndexKey(session.userId, session.recipeId), SESSION_TTL_SECONDS)
+  }
+
+  async syncState(
+    sessionId: string,
+    userId: string,
+    currentStepKey: string | null,
+    currentStepNum: number,
+    checkedSteps: string[],
+    checkedIngredients: string[],
+  ): Promise<void> {
+    const session = await this.readSession(sessionId)
+    if (!session || session.userId !== userId) return
+
+    session.currentStepKey = currentStepKey
+    session.currentStepNum = currentStepNum
+    session.checkedSteps = checkedSteps
+    session.checkedIngredients = checkedIngredients
+
+    const client = this.redis.getClient()
+    await client.set(redisKey(sessionId), JSON.stringify(session), 'EX', SESSION_TTL_SECONDS)
+    await client.expire(activeIndexKey(session.userId, session.recipeId), SESSION_TTL_SECONDS)
+  }
+
+  async getActiveSession(userId: string, recipeId: string): Promise<ActiveCookSessionView | null> {
+    const sessionId = await this.redis.getClient().get(activeIndexKey(userId, recipeId))
+    if (!sessionId) return null
+
+    const session = await this.readSession(sessionId)
+    if (!session || session.userId !== userId) return null
+
+    return {
+      sessionId,
+      currentStepKey: session.currentStepKey,
+      currentStepNum: session.currentStepNum,
+      checkedSteps: session.checkedSteps,
+      checkedIngredients: session.checkedIngredients,
+      startedAt: session.startedAt,
+    }
   }
 
   async finishSession(sessionId: string, userId: string): Promise<void> {
@@ -88,12 +152,17 @@ export class CookSessionsService {
       steps,
     })
 
-    await this.redis.getClient().del(redisKey(sessionId))
+    const client = this.redis.getClient()
+    await client.del(redisKey(sessionId))
+    await client.del(activeIndexKey(session.userId, session.recipeId))
   }
 
   async abandonSession(sessionId: string, userId: string): Promise<void> {
     const session = await this.readSession(sessionId)
     if (!session || session.userId !== userId) return
-    await this.redis.getClient().del(redisKey(sessionId))
+
+    const client = this.redis.getClient()
+    await client.del(redisKey(sessionId))
+    await client.del(activeIndexKey(session.userId, session.recipeId))
   }
 }
