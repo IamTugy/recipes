@@ -39,6 +39,7 @@ describe('CookLogService', () => {
     const service = await makeService()
     await service.recordCook('user_1', 'recipe_a')
     expect(create).toHaveBeenCalledWith(expect.objectContaining({ userId: 'user_1', recipeId: 'recipe_a' }))
+    expect(activityLogRecord).toHaveBeenCalledWith('user_1', 'recipe_a', 'recipe_cooked')
   })
 
   it('recordCook silently no-ops when the last cook was inside the cooldown window', async () => {
@@ -53,6 +54,7 @@ describe('CookLogService', () => {
       const service = await makeService()
       await service.recordCook('user_1', 'recipe_a')
       expect(create).not.toHaveBeenCalled()
+      expect(activityLogRecord).not.toHaveBeenCalled()
     } finally {
       Date.now = realDateNow
     }
