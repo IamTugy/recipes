@@ -32,6 +32,7 @@ import SkeletonImage from './SkeletonImage'
 import { useTranslatedText } from '../hooks/useTranslatedText'
 import TranslatedText from './TranslatedText'
 import BackgroundCookStatus, { type BackgroundCookStatusHandle } from './BackgroundCookStatus'
+import CookDock from './CookDock'
 
 interface RecipeDetailProps {
   onAddTimer: (label: string, minutes: number, recipeId: string, stepIndex: number) => void
@@ -54,7 +55,6 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
   const { recipes: allRecipes } = useRecipes()
   const { favoriteSlugs, toggle: toggleFavorite } = useFavorites()
   const { collections, create: createCollection, addRecipe: addRecipeToCollection, removeRecipe: removeRecipeFromCollection } = useCollections()
-  const [wizardOpen, setWizardOpen] = useState(false)
   // Stays true while cooking is "in progress" even after the fullscreen
   // wizard is minimized into Picture-in-Picture - wizardOpen alone can't
   // drive this since it goes false the moment the modal is minimized, and
@@ -465,63 +465,26 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
     if (recipe) addRecent(recipe.id)
   }, [recipe, addRecent])
 
-  const stepsCount = recipe?.steps.reduce((n, g) => n + g.items.length, 0) ?? 0
-  const wizardRef = useRef<HTMLDivElement>(null)
-  useFocusTrap(wizardRef, wizardOpen)
   const backgroundCookStatusRef = useRef<BackgroundCookStatusHandle>(null)
   const lightboxRef = useRef<HTMLDivElement>(null)
   useFocusTrap(lightboxRef, !!lightboxUrl)
   useFocusTrap(actionsMenuRef, actionsMenuOpen)
 
   useEffect(() => {
-    if (!wizardOpen) return
-    function handleKey(e: KeyboardEvent) {
-      if (e.key === 'ArrowRight') setWizardIndex(i => Math.min(i + 1, stepsCount - 1))
-      if (e.key === 'ArrowLeft') setWizardIndex(i => Math.max(i - 1, 0))
-      if (e.key === 'Escape') setWizardOpen(false)
-    }
-    document.addEventListener('keydown', handleKey)
-    return () => document.removeEventListener('keydown', handleKey)
-  }, [wizardOpen, stepsCount])
-
-  useEffect(() => {
-    if (!wizardOpen) return
-    const previousOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => { document.body.style.overflow = previousOverflow }
-  }, [wizardOpen])
-
-  useEffect(() => {
-    if (wizardOpen) void cookMode.request()
+    if (cookSessionActive) void cookMode.request()
     else void cookMode.release()
     // eslint-disable-next-line react-hooks/exhaustive-deps -- cookMode is a new object every render; request/release are individually stable
-  }, [wizardOpen, cookMode.request, cookMode.release])
+  }, [cookSessionActive, cookMode.request, cookMode.release])
 
-  // The fullscreen wizard and the PiP floating view are mutually exclusive -
-  // whichever one the user is looking at should be the only one live.
-  // Reopening the fullscreen view (manually, or automatically below when
-  // the app comes back to the foreground) always wins over PiP.
-  useEffect(() => {
-    if (wizardOpen) backgroundCookStatusRef.current?.exitFloatingView()
-  }, [wizardOpen])
-
-  // Auto-enter/exit the floating cook view as the app is backgrounded and
-  // foregrounded, for whenever a session is ongoing but the fullscreen
-  // modal isn't the thing currently on screen (either because it was
-  // minimized, or because the OS switched away from the tab/app).
+  // Auto-enter/exit the floating PiP view as the app is backgrounded and
+  // foregrounded - the dock itself is always present in-page while a
+  // session is active, so there's nothing to "restore" here beyond exiting
+  // PiP; entering PiP on hide is the only action needed on that side.
   useEffect(() => {
     if (!cookSessionActive) return
     function handleVisibility() {
-      if (document.hidden) {
-        backgroundCookStatusRef.current?.enterFloatingView()
-      } else {
-        // Coming back to the app mid-cook: restore the real wizard view and
-        // close PiP directly - wizardOpen may already have been true this
-        // whole time (tab hidden without ever minimizing), so the separate
-        // "wizardOpen just became true" effect wouldn't fire again to do it.
-        setWizardOpen(true)
-        backgroundCookStatusRef.current?.exitFloatingView()
-      }
+      if (document.hidden) backgroundCookStatusRef.current?.enterFloatingView()
+      else backgroundCookStatusRef.current?.exitFloatingView()
     }
     document.addEventListener('visibilitychange', handleVisibility)
     return () => document.removeEventListener('visibilitychange', handleVisibility)
@@ -678,7 +641,6 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
   // step) only toggles it off, since that's a correction, not progress.
   function advanceWizardOrFinish() {
     if (wizardIndex === flatSteps.length - 1) {
-      setWizardOpen(false)
       setCookSessionActive(false)
     } else {
       setWizardIndex(i => Math.min(i + 1, flatSteps.length - 1))
@@ -765,7 +727,6 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
   function openWizard() {
     const firstUnchecked = flatSteps.findIndex(s => !checkedSteps.has(`${s.groupIdx}-${s.stepIdx}`))
     setWizardIndex(firstUnchecked === -1 ? 0 : firstUnchecked)
-    setWizardOpen(true)
     setCookSessionActive(true)
   }
 
@@ -781,6 +742,11 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
     if (!currentWizardStep) return
     markStepChecked(`${currentWizardStep.groupIdx}-${currentWizardStep.stepIdx}`)
     advanceWizardOrFinish()
+  }
+
+  function stopCooking() {
+    setCookSessionActive(false)
+    backgroundCookStatusRef.current?.exitFloatingView()
   }
 
   const sectionNavItems = [
@@ -2053,134 +2019,37 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
         )}
       </div>
 
-      {/* Guided step-by-step wizard */}
-      {wizardOpen && flatSteps.length > 0 && (() => {
-        const step = flatSteps[wizardIndex]
-        const stepKey = `${step.groupIdx}-${step.stepIdx}`
-        const checked = checkedSteps.has(stepKey)
-        const existingTimer = getTimerForStep(step.groupIdx, step.stepIdx)
-        return (
-          <div
-            ref={wizardRef}
-            role="dialog"
-            aria-modal="true"
-            className="print:hidden fixed inset-0 z-[60] bg-bg flex flex-col"
-            style={timerBarHeight > 0 ? { paddingBottom: timerBarHeight } : undefined}
-            dir={lang === 'he' ? 'rtl' : 'ltr'}
-          >
-            <div className="flex items-center justify-between px-4 h-14 border-b border-tint/[0.06]">
-              <span className="text-cream/40 text-sm">
-                {wizardStepLabel}
-              </span>
-              <div className="flex items-center gap-1">
-                <button type="button"
-                  onClick={() => {
-                    // Minimize: hand off to the PiP widget and dismiss the
-                    // fullscreen modal - cooking keeps going, just not here.
-                    backgroundCookStatusRef.current?.enterFloatingView()
-                    setWizardOpen(false)
-                  }}
-                  aria-label={tx.floatingCookView}
-                  title={tx.floatingCookView}
-                  className="h-9 w-9 flex items-center justify-center rounded-lg text-cream/40 hover:text-cream/70 transition-colors"
-                >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16v10H4V6z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} fill="currentColor" d="M13 12h6v5h-6z" />
-                  </svg>
-                </button>
-                <button type="button"
-                  onClick={() => {
-                    // Close (not minimize): end the cook session entirely,
-                    // no PiP hand-off.
-                    setWizardOpen(false)
-                    setCookSessionActive(false)
-                    backgroundCookStatusRef.current?.exitFloatingView()
-                  }}
-                  aria-label={tx.closeGuidedMode}
-                  className="h-9 w-9 flex items-center justify-center rounded-lg text-cream/40 hover:text-cream/70 transition-colors"
-                >
-                  ✕
-                </button>
-              </div>
-            </div>
-            <div className="h-1 bg-tint/[0.06]">
-              <div className="h-full bg-amber transition-all" style={{ width: `${((wizardIndex + 1) / flatSteps.length) * 100}%` }} />
-            </div>
+      {/* Reserves layout space for the persistent cook-session dock below,
+          so the fixed-position dock doesn't visually hide page content. */}
+      {cookSessionActive && flatSteps.length > 0 && (
+        <div aria-hidden="true" className="h-[20dvh] sm:h-24" style={{ marginBottom: timerBarHeight }} />
+      )}
 
-            <div className="flex-1 flex flex-col items-center justify-center px-6 text-center gap-6 overflow-y-auto py-8">
-              <div className={`w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold ${
-                checked ? 'bg-herb text-white' : 'bg-tint/10 text-cream/60'
-              }`}>
-                {checked ? '✓' : step.stepNum}
-              </div>
-              <p className="max-w-lg text-xl sm:text-2xl leading-relaxed text-cream">
-                <TranslatedText
-                  primary={lang === 'he' ? step.instructionHe : step.instructionEn}
-                  secondary={lang === 'he' ? step.instructionEn : step.instructionHe}
-                />
-              </p>
-              {step.image && (
-                <img
-                  src={resizedImage(step.image, 320)}
-                  alt=""
-                  onClick={() => setLightboxUrl(step.image!)}
-                  className="max-w-xs w-full max-h-52 object-cover rounded-xl cursor-zoom-in"
-                />
-              )}
-              {step.tip && (
-                <p className="max-w-md text-sm text-amber/70 flex items-start gap-1.5">
-                  <span className="mt-0.5">💡</span>
-                  <span>{step.tip}</span>
-                </p>
-              )}
-              <div className="flex items-center gap-3">
-                {step.timerMinutes && !existingTimer && (
-                  <button type="button"
-                    onClick={() => startTimer(step.instruction.slice(0, 40), step.timerMinutes!, step.groupIdx, step.stepIdx)}
-                    className="px-4 py-2 rounded-lg text-sm font-medium bg-amber/10 border border-amber/30 text-amber hover:bg-amber/20 transition-colors"
-                  >
-                    ⏱ {lang === 'he' ? `התחל טיימר ${step.timerMinutes} דק'` : `Start ${step.timerMinutes}m timer`}
-                  </button>
-                )}
-                <button type="button"
-                  onClick={() => handleWizardMarkDone(stepKey)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
-                    checked ? 'border-herb/30 bg-herb/10 text-herb' : 'border-tint/10 text-cream/50 hover:text-cream/80'
-                  }`}
-                >
-                  {checked ? (tx.done) : (tx.markDone)}
-                </button>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 px-6 py-4 border-t border-tint/[0.06]">
-              <button type="button"
-                onClick={() => setWizardIndex(i => Math.max(i - 1, 0))}
-                disabled={wizardIndex === 0}
-                className="flex-1 py-3 rounded-xl text-sm font-medium border border-tint/10 text-cream/60 hover:text-cream/90 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-              >
-                {tx.previous}
-              </button>
-              {wizardIndex === flatSteps.length - 1 ? (
-                <button type="button"
-                  onClick={() => { markStepChecked(stepKey); setWizardOpen(false) }}
-                  className="flex-1 py-3 rounded-xl text-sm font-semibold bg-amber/90 text-bg hover:bg-amber transition-colors"
-                >
-                  {tx.finish}
-                </button>
-              ) : (
-                <button type="button"
-                  onClick={() => { markStepChecked(stepKey); advanceWizardOrFinish() }}
-                  className="flex-1 py-3 rounded-xl text-sm font-semibold bg-amber/90 text-bg hover:bg-amber transition-colors"
-                >
-                  {tx.next}
-                </button>
-              )}
-            </div>
-          </div>
-        )
-      })()}
+      {/* Persistent cook-session dock - collapsed by default, expands to
+          90dvh on tap/swipe. Replaces the old fullscreen wizard modal. */}
+      {cookSessionActive && flatSteps.length > 0 && (
+        <CookDock
+          lang={lang}
+          ingredients={displayRecipe.ingredients}
+          checkedIngredients={checkedIngredients}
+          onToggleIngredient={toggleIngredient}
+          multiplier={multiplier}
+          steps={flatSteps}
+          wizardIndex={wizardIndex}
+          onPrev={() => setWizardIndex(i => Math.max(i - 1, 0))}
+          onAdvance={key => { markStepChecked(key); advanceWizardOrFinish() }}
+          onMarkDone={handleWizardMarkDone}
+          onStop={stopCooking}
+          onExpand={() => backgroundCookStatusRef.current?.exitFloatingView()}
+          checkedSteps={checkedSteps}
+          nearestTimer={nearestTimer}
+          onToggleNearestTimer={pipToggleNearestTimer}
+          getTimerForStep={getTimerForStep}
+          onStartTimer={startTimer}
+          onOpenLightbox={setLightboxUrl}
+          timerBarHeight={timerBarHeight}
+        />
+      )}
 
       {/* Ongoing-cook status: mirrors the current guided step + nearest timer into an OS
           notification and a floating Picture-in-Picture widget while the app is minimized. */}

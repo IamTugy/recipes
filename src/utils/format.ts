@@ -17,6 +17,20 @@ export function formatSeconds(seconds: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`
 }
 
+// 2-digit HH:MM once the duration is an hour or more, else 2-digit MM:SS -
+// used by the cook-mode dock's elapsed-time display and timer ring (unlike
+// formatSeconds, which doesn't zero-pad minutes or handle hours at all).
+export function formatDockDuration(totalSeconds: number): string {
+  const s = Math.max(0, Math.floor(totalSeconds))
+  const hours = Math.floor(s / 3600)
+  const minutes = Math.floor((s % 3600) / 60)
+  const seconds = s % 60
+  if (hours > 0) {
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
+  }
+  return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+}
+
 export function scaleAmount(amount: number, multiplier: number): string {
   const scaled = amount * multiplier
   // Nice fractions
