@@ -307,6 +307,10 @@ export const t = {
       cookingElsewhereWarning: (recipeTitle: string) =>
         `אתם כבר מבשלים את "${recipeTitle}". התחלת בישול חדש תבטל את הבישול הקודם באמצע.`,
       startNewCook: "התחל בישול חדש",
+      howWasIt: "איך היה?",
+      tellUsAboutYourCook: "ספרו לנו איך היה הבישול הזה",
+      maybeLater: "אולי אחר כך",
+      reminderToReview: (recipeTitle: string) => `איך היה "${recipeTitle}"? נשמח לחוות דעתכם`,
       viewPublishedVersion: "צפה בגרסה המפורסמת",
       source: "מקור: ",
       publishedBy: "פורסם על ידי ",
@@ -751,6 +755,10 @@ export const t = {
       cookingElsewhereWarning: (recipeTitle: string) =>
         `You're already cooking "${recipeTitle}". Starting a new cook will abandon that one unfinished.`,
       startNewCook: "Start new cook",
+      howWasIt: "How was it?",
+      tellUsAboutYourCook: "Tell us how this cook went",
+      maybeLater: "Maybe later",
+      reminderToReview: (recipeTitle: string) => `How was "${recipeTitle}"? We'd love your review`,
       viewPublishedVersion: "View published version",
       source: "Source: ",
       publishedBy: "Published by ",

@@ -25,6 +25,7 @@ import { useLanguage } from '../hooks/useLanguage'
 import { useToast } from '../hooks/useToast'
 import ReviewItem, { type Review } from './ReviewItem'
 import ConfirmDialog from './ConfirmDialog'
+import PostCookReviewModal from './PostCookReviewModal'
 import type { TimerState, RecipeRevision, QualityReview } from '../types'
 import { resizedImage } from '../lib/image'
 import { downloadRecipePdf } from '../lib/recipePdf'
@@ -162,6 +163,7 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
   const [reviewPhotoUploading, setReviewPhotoUploading] = useState(false)
   const [distribution, setDistribution] = useState<Record<1 | 2 | 3 | 4 | 5, number> | null>(null)
   const [hasPostedReview, setHasPostedReview] = useState(false)
+  const [showPostCookReviewModal, setShowPostCookReviewModal] = useState(false)
   const [isEditingReview, setIsEditingReview] = useState(false)
   const [translations, setTranslations] = useState<Record<string, { text: string; showing: boolean; loading: boolean }>>({})
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null)
@@ -288,6 +290,7 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
     const wasAlreadyPosted = hasPostedReview
     setHasPostedReview(true)
     setIsEditingReview(false)
+    setShowPostCookReviewModal(false)
     showToast(
       wasAlreadyPosted
         ? (tx.reviewUpdated)
@@ -759,6 +762,7 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
         setCookSessionId(null)
       }
       setCookSessionActive(false)
+      if (!hasPostedReview) setShowPostCookReviewModal(true)
     } else {
       setWizardIndex(i => Math.min(i + 1, flatSteps.length - 1))
     }
@@ -2328,6 +2332,23 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
         busy={resolvingCookConflict}
         onConfirm={confirmStartNewCook}
         onCancel={() => setCookConflict(null)}
+      />
+
+      <PostCookReviewModal
+        open={showPostCookReviewModal}
+        lang={lang}
+        userRating={userRating}
+        hoverRating={hoverRating}
+        onHoverRating={setHoverRating}
+        onRate={rate}
+        reviewComment={reviewComment}
+        onCommentChange={setReviewComment}
+        reviewPhotoUrl={reviewPhotoUrl}
+        reviewPhotoUploading={reviewPhotoUploading}
+        onPhotoSelect={handlePhotoSelect}
+        onRemovePhoto={() => setReviewPhotoUrl(null)}
+        onSubmit={postReview}
+        onDismiss={() => setShowPostCookReviewModal(false)}
       />
     </div>
   )

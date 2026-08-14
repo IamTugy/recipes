@@ -6,6 +6,7 @@ import { ThemeProvider } from './context/ThemeContext'
 import { LocalizedClerkProvider } from './context/LocalizedClerkProvider'
 import { ToastProvider } from './context/ToastContext'
 import JobsWatcher from './components/JobsWatcher'
+import CookReminderBanner from './components/CookReminderBanner'
 import './index.css'
 import App from './App.tsx'
 
@@ -21,6 +22,7 @@ createRoot(document.getElementById('root')!).render(
           <LocalizedClerkProvider>
             <ToastProvider>
               <JobsWatcher />
+              <CookReminderBanner />
               <App />
             </ToastProvider>
           </LocalizedClerkProvider>

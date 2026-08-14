@@ -142,3 +142,24 @@ export async function getCurrentCookSession(
     return null
   }
 }
+
+export interface CookReminder {
+  recipeId: string
+  recipeTitle: string
+  finishedAt: string
+}
+
+export async function getCookReminders(
+  getToken: () => Promise<string | null>
+): Promise<CookReminder[]> {
+  try {
+    const token = await getToken()
+    const res = await fetch('/api/cook-sessions/reminders', {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+    if (!res.ok) return []
+    return (await res.json()) as CookReminder[]
+  } catch {
+    return []
+  }
+}
