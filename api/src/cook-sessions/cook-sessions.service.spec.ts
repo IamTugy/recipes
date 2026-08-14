@@ -34,9 +34,10 @@ describe('CookSessionsService', () => {
     expect(sessionId.length).toBeGreaterThan(0)
     expect(set).toHaveBeenCalledWith(
       `cook-session:${sessionId}`,
-      expect.stringContaining('"userId":"user_1"')
+      expect.stringContaining('"userId":"user_1"'),
+      'EX',
+      86400,
     )
-    expect(expire).toHaveBeenCalledWith(`cook-session:${sessionId}`, 86400)
   })
 
   it('logStep appends an event to the existing Redis entry and refreshes the TTL', async () => {
@@ -52,9 +53,10 @@ describe('CookSessionsService', () => {
 
     expect(set).toHaveBeenCalledWith(
       'cook-session:session_1',
-      expect.stringContaining('"stepKey":"0-0"')
+      expect.stringContaining('"stepKey":"0-0"'),
+      'EX',
+      86400,
     )
-    expect(expire).toHaveBeenCalledWith('cook-session:session_1', 86400)
   })
 
   it('logStep on a missing Redis key silently no-ops', async () => {

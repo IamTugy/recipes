@@ -40,8 +40,7 @@ export class CookSessionsService {
       events: [],
     }
     const client = this.redis.getClient()
-    await client.set(redisKey(sessionId), JSON.stringify(session))
-    await client.expire(redisKey(sessionId), SESSION_TTL_SECONDS)
+    await client.set(redisKey(sessionId), JSON.stringify(session), 'EX', SESSION_TTL_SECONDS)
     return sessionId
   }
 
@@ -57,8 +56,7 @@ export class CookSessionsService {
 
     session.events.push({ stepKey, stepNum, enteredAt: new Date().toISOString() })
     const client = this.redis.getClient()
-    await client.set(redisKey(sessionId), JSON.stringify(session))
-    await client.expire(redisKey(sessionId), SESSION_TTL_SECONDS)
+    await client.set(redisKey(sessionId), JSON.stringify(session), 'EX', SESSION_TTL_SECONDS)
   }
 
   async finishSession(sessionId: string, userId: string): Promise<void> {

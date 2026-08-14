@@ -1,11 +1,7 @@
 import { Body, Controller, Delete, Param, Post, Req } from '@nestjs/common'
 import { Request } from 'express'
 import { CookSessionsService } from './cook-sessions.service'
-
-interface LogStepBody {
-  stepKey: string
-  stepNum: number
-}
+import { LogStepDto } from './dto/log-step.dto'
 
 @Controller('cook-sessions')
 export class CookSessionsController {
@@ -20,7 +16,7 @@ export class CookSessionsController {
   @Post(':sessionId/steps')
   async logStep(
     @Param('sessionId') sessionId: string,
-    @Body() body: LogStepBody,
+    @Body() body: LogStepDto,
     @Req() req: Request & { userId: string },
   ) {
     await this.cookSessionsService.logStep(sessionId, req.userId, body.stepKey, body.stepNum)
