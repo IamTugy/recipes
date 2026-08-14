@@ -25,7 +25,9 @@ export class CookSessionsController {
     @Body() body: LogStepDto,
     @Req() req: Request & { userId: string },
   ) {
-    await this.cookSessionsService.logStep(sessionId, req.userId, body.stepKey, body.stepNum)
+    await this.cookSessionsService.logStep(
+      sessionId, req.userId, body.stepKey, body.stepNum, body.checkedSteps, body.checkedIngredients,
+    )
     return { ok: true }
   }
 

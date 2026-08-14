@@ -25,6 +25,8 @@ export async function logCookSessionStep(
   sessionId: string,
   stepKey: string,
   stepNum: number,
+  checkedSteps: string[],
+  checkedIngredients: string[],
   getToken: () => Promise<string | null>
 ): Promise<void> {
   try {
@@ -35,7 +37,7 @@ export async function logCookSessionStep(
         'Content-Type': 'application/json',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-      body: JSON.stringify({ stepKey, stepNum }),
+      body: JSON.stringify({ stepKey, stepNum, checkedSteps, checkedIngredients }),
     })
   } catch {
     // best-effort, never blocks cooking

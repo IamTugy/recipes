@@ -85,19 +85,6 @@ export default function CookDock({
     allIngredientKeys.some(k => !checkedIngredients.has(k)) ? 'checklist' : 'steps'
   )
 
-  // Logs every screen/step transition to the backend cook-session (Phase
-  // C) - a fire-and-forget recording layer the frontend never reads back
-  // from. Fires once per transition, including the initial mount.
-  useEffect(() => {
-    if (screen === 'checklist') {
-      onStepEntered('checklist', 0)
-      return
-    }
-    const current = steps[wizardIndex]
-    if (current) onStepEntered(`${current.groupIdx}-${current.stepIdx}`, current.stepNum)
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- onStepEntered/steps are new references every render; only an actual screen/step change should re-fire this
-  }, [screen, wizardIndex])
-
   const [expanded, setExpanded] = useState(false)
   function setExpandedState(next: boolean) {
     setExpanded(next)
@@ -176,12 +163,20 @@ export default function CookDock({
         return
       }
       if (screen !== 'steps') return
-      if (e.key === 'ArrowRight') onAdvance(`${steps[wizardIndex].groupIdx}-${steps[wizardIndex].stepIdx}`)
-      if (e.key === 'ArrowLeft') onPrev()
+      if (e.key === 'ArrowRight') {
+        const next = steps[wizardIndex + 1]
+        if (next) onStepEntered(`${next.groupIdx}-${next.stepIdx}`, next.stepNum)
+        onAdvance(`${steps[wizardIndex].groupIdx}-${steps[wizardIndex].stepIdx}`)
+      }
+      if (e.key === 'ArrowLeft') {
+        const prev = steps[wizardIndex - 1]
+        if (prev) onStepEntered(`${prev.groupIdx}-${prev.stepIdx}`, prev.stepNum)
+        onPrev()
+      }
     }
     document.addEventListener('keydown', handleKey)
     return () => document.removeEventListener('keydown', handleKey)
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- setExpandedState is a new function every render; it doesn't close over stale state
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- setExpandedState/onStepEntered are new functions every render; they don't close over stale state
   }, [expanded, lightboxOpen, screen, steps, wizardIndex, onAdvance, onPrev])
 
   useEffect(() => {
@@ -323,7 +318,11 @@ export default function CookDock({
               </div>
               <div className="max-w-lg mx-auto mt-6">
                 <button type="button"
-                  onClick={() => setScreen('steps')}
+                  onClick={() => {
+                    setScreen('steps')
+                    const first = steps[wizardIndex]
+                    if (first) onStepEntered(`${first.groupIdx}-${first.stepIdx}`, first.stepNum)
+                  }}
                   className="w-full py-3 rounded-xl text-sm font-semibold bg-amber/90 text-bg hover:bg-amber transition-colors"
                 >
                   {tx.next}
@@ -376,7 +375,13 @@ export default function CookDock({
                     </button>
                   )}
                   <button type="button"
-                    onClick={() => onMarkDone(stepKey)}
+                    onClick={() => {
+                      if (!checked && !isLastStep) {
+                        const next = steps[wizardIndex + 1]
+                        if (next) onStepEntered(`${next.groupIdx}-${next.stepIdx}`, next.stepNum)
+                      }
+                      onMarkDone(stepKey)
+                    }}
                     className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
                       checked ? 'border-herb/30 bg-herb/10 text-herb' : 'border-tint/10 text-cream/50 hover:text-cream/80'
                     }`}
@@ -387,14 +392,24 @@ export default function CookDock({
               </div>
               <div className="flex items-center gap-3 px-6 py-4 border-t border-tint/[0.06] shrink-0" onClick={e => e.stopPropagation()}>
                 <button type="button"
-                  onClick={onPrev}
+                  onClick={() => {
+                    const prev = steps[wizardIndex - 1]
+                    if (prev) onStepEntered(`${prev.groupIdx}-${prev.stepIdx}`, prev.stepNum)
+                    onPrev()
+                  }}
                   disabled={wizardIndex === 0}
                   className="flex-1 py-3 rounded-xl text-sm font-medium border border-tint/10 text-cream/60 hover:text-cream/90 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                   {tx.previous}
                 </button>
                 <button type="button"
-                  onClick={() => onAdvance(stepKey)}
+                  onClick={() => {
+                    if (!isLastStep) {
+                      const next = steps[wizardIndex + 1]
+                      if (next) onStepEntered(`${next.groupIdx}-${next.stepIdx}`, next.stepNum)
+                    }
+                    onAdvance(stepKey)
+                  }}
                   className="flex-1 py-3 rounded-xl text-sm font-semibold bg-amber/90 text-bg hover:bg-amber transition-colors"
                 >
                   {isLastStep ? tx.finish : tx.next}

@@ -527,9 +527,10 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
   // (Phase D) - server-wins on every tick, no merge logic.
   useEffect(() => {
     if (!cookSessionActive || !id || !currentUserId) return
+    let cancelled = false
     const interval = setInterval(() => {
       getActiveCookSession(id, getToken).then(session => {
-        if (!session) return
+        if (cancelled || !session) return
         if (!sameStringSet(session.checkedSteps, checkedStepsRef.current)) {
           setCheckedSteps(new Set(session.checkedSteps))
         }
@@ -544,7 +545,7 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
         }
       })
     }, 5000)
-    return () => clearInterval(interval)
+    return () => { cancelled = true; clearInterval(interval) }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- getToken is a new function every render; checkedSteps/checkedIngredients/wizardIndex are read via closure for comparison only (not to trigger the effect), so exclusion is intentional
   }, [cookSessionActive, id, currentUserId])
 
@@ -842,7 +843,7 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
         if (id && pendingCookStepRef.current) {
           const { stepKey, stepNum } = pendingCookStepRef.current
           pendingCookStepRef.current = null
-          logCookSessionStep(id, stepKey, stepNum, getToken)
+          logCookSessionStep(id, stepKey, stepNum, [...checkedSteps], [...checkedIngredients], getToken)
         }
       })
     }
@@ -878,8 +879,7 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
       pendingCookStepRef.current = { stepKey, stepNum }
       return
     }
-    logCookSessionStep(cookSessionId, stepKey, stepNum, getToken)
-    syncCookSession(cookSessionId, stepKey, stepNum, [...checkedSteps], [...checkedIngredients], getToken)
+    logCookSessionStep(cookSessionId, stepKey, stepNum, [...checkedSteps], [...checkedIngredients], getToken)
   }
 
   const sectionNavItems = [

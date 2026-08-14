@@ -1,4 +1,4 @@
-import { IsInt, IsString, MaxLength, Min } from 'class-validator'
+import { ArrayMaxSize, IsArray, IsInt, IsString, MaxLength, Min } from 'class-validator'
 
 export class LogStepDto {
   @IsString()
@@ -8,4 +8,16 @@ export class LogStepDto {
   @IsInt()
   @Min(0)
   stepNum!: number
+
+  @IsArray()
+  @ArrayMaxSize(500)
+  @IsString({ each: true })
+  @MaxLength(64, { each: true })
+  checkedSteps!: string[]
+
+  @IsArray()
+  @ArrayMaxSize(500)
+  @IsString({ each: true })
+  @MaxLength(64, { each: true })
+  checkedIngredients!: string[]
 }

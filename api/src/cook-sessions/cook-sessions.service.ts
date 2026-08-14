@@ -75,11 +75,22 @@ export class CookSessionsService {
     return JSON.parse(raw) as RedisSession
   }
 
-  async logStep(sessionId: string, userId: string, stepKey: string, stepNum: number): Promise<void> {
+  async logStep(
+    sessionId: string,
+    userId: string,
+    stepKey: string,
+    stepNum: number,
+    checkedSteps: string[],
+    checkedIngredients: string[],
+  ): Promise<void> {
     const session = await this.readSession(sessionId)
     if (!session || session.userId !== userId) return
 
     session.events.push({ stepKey, stepNum, enteredAt: new Date().toISOString() })
+    session.currentStepKey = stepKey
+    session.currentStepNum = stepNum
+    session.checkedSteps = checkedSteps
+    session.checkedIngredients = checkedIngredients
     const client = this.redis.getClient()
     await client.set(redisKey(sessionId), JSON.stringify(session), 'EX', SESSION_TTL_SECONDS)
     await client.expire(activeIndexKey(session.userId, session.recipeId), SESSION_TTL_SECONDS)

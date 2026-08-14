@@ -48,7 +48,7 @@ describe('CookSessionsService', () => {
     }
     get.mockResolvedValue(JSON.stringify(existing))
     const service = await makeService()
-    await service.logStep('session_1', 'user_1', '0-0', 1)
+    await service.logStep('session_1', 'user_1', '0-0', 1, ['prior-step'], ['ing-1'])
 
     expect(set).toHaveBeenCalledWith(
       'cook-session:session_1',
@@ -56,6 +56,12 @@ describe('CookSessionsService', () => {
       'EX',
       86400,
     )
+    const [, valueJson] = set.mock.calls[0]
+    const written = JSON.parse(valueJson)
+    expect(written.currentStepKey).toBe('0-0')
+    expect(written.currentStepNum).toBe(1)
+    expect(written.checkedSteps).toEqual(['prior-step'])
+    expect(written.checkedIngredients).toEqual(['ing-1'])
     expect(expire).toHaveBeenCalledWith('cook-session-active:user_1:recipe_a', 86400)
   })
 
@@ -66,14 +72,14 @@ describe('CookSessionsService', () => {
     }
     get.mockResolvedValue(JSON.stringify(existing))
     const service = await makeService()
-    await service.logStep('session_1', 'attacker_1', '0-0', 1)
+    await service.logStep('session_1', 'attacker_1', '0-0', 1, [], [])
     expect(set).not.toHaveBeenCalled()
   })
 
   it('logStep on a missing Redis key silently no-ops', async () => {
     get.mockResolvedValue(null)
     const service = await makeService()
-    await expect(service.logStep('gone', 'user_1', '0-0', 1)).resolves.toBeUndefined()
+    await expect(service.logStep('gone', 'user_1', '0-0', 1, [], [])).resolves.toBeUndefined()
     expect(set).not.toHaveBeenCalled()
   })
 

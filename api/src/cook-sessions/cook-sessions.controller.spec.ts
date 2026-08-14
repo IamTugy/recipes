@@ -22,8 +22,9 @@ describe('CookSessionsController', () => {
 
   it('POST /cook-sessions/:sessionId/steps logs a step', async () => {
     const controller = new CookSessionsController(cookSessionsService as any)
-    const result = await controller.logStep('session_1', { stepKey: '0-0', stepNum: 1 }, { userId: 'user_1' } as any)
-    expect(cookSessionsService.logStep).toHaveBeenCalledWith('session_1', 'user_1', '0-0', 1)
+    const body = { stepKey: '0-0', stepNum: 1, checkedSteps: ['0-0'], checkedIngredients: ['ing-1'] }
+    const result = await controller.logStep('session_1', body, { userId: 'user_1' } as any)
+    expect(cookSessionsService.logStep).toHaveBeenCalledWith('session_1', 'user_1', '0-0', 1, ['0-0'], ['ing-1'])
     expect(result).toEqual({ ok: true })
   })
 

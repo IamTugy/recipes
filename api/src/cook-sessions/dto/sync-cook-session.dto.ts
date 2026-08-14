@@ -1,4 +1,4 @@
-import { IsArray, IsInt, IsOptional, IsString, MaxLength, Min } from 'class-validator'
+import { ArrayMaxSize, IsArray, IsInt, IsOptional, IsString, MaxLength, Min } from 'class-validator'
 
 export class SyncCookSessionDto {
   @IsOptional()
@@ -11,10 +11,14 @@ export class SyncCookSessionDto {
   currentStepNum!: number
 
   @IsArray()
+  @ArrayMaxSize(500)
   @IsString({ each: true })
+  @MaxLength(64, { each: true })
   checkedSteps!: string[]
 
   @IsArray()
+  @ArrayMaxSize(500)
   @IsString({ each: true })
+  @MaxLength(64, { each: true })
   checkedIngredients!: string[]
 }
