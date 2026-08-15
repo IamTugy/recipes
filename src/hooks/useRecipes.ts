@@ -233,6 +233,17 @@ export function useRecipe(id: string | undefined) {
   // no reset call needed, and no timing window where a stale true can leak
   // into a sibling effect's read (see useCookSession's self-heal effect).
   const [notFoundId, setNotFoundId] = useState<string | null>(null)
+  const [lastId, setLastId] = useState(id)
+
+  // Synchronous render-phase reset (React's documented "adjust state when
+  // props change" pattern) - runs during render, before any effect, so a
+  // sibling effect elsewhere in the same component can never observe a
+  // stale notFoundId for the new id. An effect-based reset would run one
+  // flush too late for that guarantee.
+  if (lastId !== id) {
+    setLastId(id)
+    setNotFoundId(null)
+  }
 
   function reload() {
     if (!id) return Promise.resolve()
@@ -250,6 +261,7 @@ export function useRecipe(id: string | undefined) {
       .then(data => {
         if (cancelled) return
         setRecipe(data)
+        setNotFoundId(prev => (prev === id ? null : prev))
       })
       .catch(() => {
         if (cancelled) return
