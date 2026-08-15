@@ -25,7 +25,9 @@ import { useToast } from '../hooks/useToast'
 import ReviewItem, { type Review } from './ReviewItem'
 import ConfirmDialog from './ConfirmDialog'
 import PostCookReviewModal from './PostCookReviewModal'
-import type { TimerState, RecipeRevision, QualityReview } from '../types'
+import ReportRecipeModal from './ReportRecipeModal'
+import { useReport } from '../hooks/useReport'
+import type { TimerState, RecipeRevision, QualityReview, ReportReason } from '../types'
 import { resizedImage } from '../lib/image'
 import { downloadRecipePdf } from '../lib/recipePdf'
 import SkeletonImage from './SkeletonImage'
@@ -378,6 +380,19 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const [publishConfirmOpen, setPublishConfirmOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [reportModalOpen, setReportModalOpen] = useState(false)
+  const { submit: submitReport, submitting: reportSubmitting } = useReport()
+
+  async function handleSubmitReport(reason: ReportReason, message: string) {
+    if (!recipe) return
+    try {
+      await submitReport(recipe.id, reason, message)
+      setReportModalOpen(false)
+      showToast(tx.reportSubmitted)
+    } catch {
+      showToast(tx.reportFailed, 'error')
+    }
+  }
 
   async function handleDeleteRecipe() {
     if (!id) return
@@ -955,6 +970,20 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
                         </svg>
                         {tx.printRecipe}
                       </button>
+
+                      {recipe.publishedRevision != null && !isOwner && (
+                        <button type="button"
+                          onClick={() => { closeActionsMenu(); setReportModalOpen(true) }}
+                          className="flex items-center gap-3 w-full text-start px-3 py-[13.5px] rounded-lg text-sm font-medium text-cream/80 hover:bg-tint/[0.06] transition-colors"
+                        >
+                          <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <circle cx="12" cy="12" r="9" />
+                            <line x1="12" y1="8" x2="12" y2="13" strokeLinecap="round" />
+                            <circle cx="12" cy="16" r="0.75" fill="currentColor" stroke="none" />
+                          </svg>
+                          {tx.reportRecipe}
+                        </button>
+                      )}
 
                       {/* Personal recipes (never published) have nothing
                           public to preview or link to, so sharing isn't
@@ -2052,6 +2081,14 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
         onRemovePhoto={() => setReviewPhotoUrl(null)}
         onSubmit={postReview}
         onDismiss={() => setShowPostCookReviewModal(false)}
+      />
+
+      <ReportRecipeModal
+        open={reportModalOpen}
+        lang={lang}
+        submitting={reportSubmitting}
+        onSubmit={handleSubmitReport}
+        onCancel={() => setReportModalOpen(false)}
       />
     </div>
   )

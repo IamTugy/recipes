@@ -21,6 +21,7 @@ import { RecipeSimilarityService } from './similarity/recipe-similarity.service'
 import { DishGroup, DishGroupSchema } from './schemas/dish-group.schema'
 import { RecipeGroupingService } from './grouping/recipe-grouping.service'
 import { FollowsModule } from '../follows/follows.module'
+import { ReportsModule } from '../reports/reports.module'
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { FollowsModule } from '../follows/follows.module'
     AiModule,
     JobsModule,
     FollowsModule,
+    ReportsModule,
   ],
   providers: [RecipesService, RecipeImportService, NutritionService, RecipeAiGenerateService, RecipeQualityService, RecipeSimilarityService, RecipeGroupingService],
   controllers: [RecipesController, RecipeImportController, NutritionController, RecipeAiGenerateController],

@@ -5,10 +5,12 @@ import { RecipesService } from './recipes.service'
 import { ActivityLogService } from '../activity-log/activity-log.service'
 import { UsersService } from '../users/users.service'
 import { FollowsService } from '../follows/follows.service'
+import { ReportsService } from '../reports/reports.service'
 import { SaveRecipeDraftDto } from './dto/save-recipe-draft.dto'
 import { UpdateRecipeImageDto } from './dto/update-recipe-image.dto'
 import { DisputeDuplicateDto } from './dto/dispute-duplicate.dto'
 import { ResolveDuplicateDisputeDto } from './dto/resolve-duplicate-dispute.dto'
+import { CreateReportDto } from '../reports/dto/create-report.dto'
 
 @Controller('recipes')
 export class RecipesController {
@@ -18,6 +20,7 @@ export class RecipesController {
     private readonly config: ConfigService,
     private readonly usersService: UsersService,
     private readonly followsService: FollowsService,
+    private readonly reportsService: ReportsService,
   ) {}
 
   private isAdmin(userId: string): boolean {
@@ -137,6 +140,17 @@ export class RecipesController {
   async submit(@Param('id') id: string, @Req() req: Request & { userId: string }) {
     const recipe = await this.recipesService.submitForReview(id, req.userId, this.isAdmin(req.userId))
     return recipe.toObject()
+  }
+
+  @Post(':id/report')
+  async report(
+    @Param('id') id: string,
+    @Body() body: CreateReportDto,
+    @Req() req: Request & { userId: string },
+  ) {
+    await this.reportsService.create(id, req.userId, body.reason, body.message)
+    await this.activityLog.record(req.userId, id, 'recipe_reported', { reason: body.reason })
+    return { reported: true }
   }
 
   @Post(':id/dispute-duplicate')

@@ -512,6 +512,18 @@ export const t = {
       generatingPdf: 'מכינים PDF...',
       pdfGenerationFailed: 'יצירת ה-PDF נכשלה, נסו שוב',
       printRecipe: 'הדפסת המתכון',
+      reportRecipe: 'דיווח על המתכון',
+      reportReasons: {
+        inappropriate: 'תוכן לא הולם',
+        incorrect: 'מידע שגוי',
+        spam: 'ספאם',
+        copyright: 'הפרת זכויות יוצרים',
+        other: 'אחר',
+      },
+      reportMessagePlaceholder: 'פרטים נוספים (לא חובה)',
+      submitReport: 'שליחת דיווח',
+      reportSubmitted: 'הדיווח נשלח, תודה',
+      reportFailed: 'שליחת הדיווח נכשלה, נסו שוב',
 },
   en: {
     siteTitle: "Tugy's Cookbook",
@@ -978,6 +990,18 @@ export const t = {
     generatingPdf: 'Generating PDF...',
     pdfGenerationFailed: 'Could not generate the PDF - try again',
     printRecipe: 'Print recipe',
+    reportRecipe: 'Report recipe',
+    reportReasons: {
+      inappropriate: 'Inappropriate content',
+      incorrect: 'Incorrect information',
+      spam: 'Spam',
+      copyright: 'Copyright violation',
+      other: 'Other',
+    },
+    reportMessagePlaceholder: 'Additional details (optional)',
+    submitReport: 'Submit report',
+    reportSubmitted: 'Report sent, thank you',
+    reportFailed: 'Failed to send the report, try again',
 },
 }
 

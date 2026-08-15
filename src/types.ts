@@ -153,6 +153,8 @@ export interface TimerState {
   endsAt?: number
 }
 
+export type ReportReason = 'inappropriate' | 'incorrect' | 'spam' | 'copyright' | 'other'
+
 export interface Job {
   id: string
   type: 'import' | 'ai_generate'

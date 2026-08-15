@@ -20,6 +20,7 @@ import { ShareModule } from './share/share.module'
 import { RankingModule } from './ranking/ranking.module'
 import { JobsModule } from './jobs/jobs.module'
 import { FollowsModule } from './follows/follows.module'
+import { ReportsModule } from './reports/reports.module'
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { FollowsModule } from './follows/follows.module'
     RankingModule,
     JobsModule,
     FollowsModule,
+    ReportsModule,
   ],
   controllers: [HealthController],
 })
