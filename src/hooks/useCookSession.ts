@@ -34,7 +34,7 @@ export function useCookSession(
   // startCookingNow() call has ingredients/steps to work with before
   // useRecipe(activeRecipeId)'s own fetch has had a chance to resolve.
   const [seedRecipe, setSeedRecipe] = useState<Recipe | null>(null)
-  const { recipe: fetchedRecipe } = useRecipe(activeRecipeId)
+  const { recipe: fetchedRecipe, notFound: activeRecipeNotFound } = useRecipe(activeRecipeId)
   // useRecipe(id) never clears its own recipe state when id changes - it
   // only overwrites it once a new fetch resolves - so fetchedRecipe can
   // still hold the PREVIOUS activeRecipeId's recipe for a full round-trip
@@ -70,6 +70,11 @@ export function useCookSession(
   const checkedIngredientsRef = useRef(checkedIngredients)
   const wizardIndexRef = useRef(wizardIndex)
   const discoveryRequestIdRef = useRef(0)
+  // Counts consecutive `null` responses from the 5s poll - a single null
+  // could just be a transient network hiccup, but two in a row means the
+  // server has confirmed (for ~10s) there's no active session left, so it's
+  // safe to tear down local state. Reset whenever a new session starts.
+  const consecutiveNullPollsRef = useRef(0)
   const backgroundCookStatusRef = useRef<BackgroundCookStatusHandle>(null)
 
   useEffect(() => { checkedStepsRef.current = checkedSteps }, [checkedSteps])
@@ -139,14 +144,31 @@ export function useCookSession(
     onAddTimer(label, minutes, recipe.id, groupIdx * 10000 + stepIdx)
   }
 
+  // Resets all active-session state to its inactive defaults. Called from
+  // stopCooking (a deliberate Stop, which also needs to notify the server),
+  // the notFound self-heal effect and the consecutive-null-poll handler
+  // below (both cases where the server has already lost the session, so
+  // there's nothing left to abandon), and the finish branch of
+  // advanceWizardOrFinish (which calls finishCookSession separately, so it
+  // never abandons here either).
+  function endSessionLocally(alsoAbandon: boolean) {
+    if (alsoAbandon && cookSessionId) {
+      abandonCookSession(cookSessionId, getToken)
+    }
+    setCookSessionActive(false)
+    setCookSessionId(null)
+    setCookSessionStartedAt(null)
+    setActiveRecipeId(undefined)
+    setSeedRecipe(null)
+  }
+
   function advanceWizardOrFinish() {
     if (wizardIndex === flatSteps.length - 1) {
       const finishedRecipeId = activeRecipeId
       if (cookSessionId) {
         finishCookSession(cookSessionId, getToken)
-        setCookSessionId(null)
       }
-      setCookSessionActive(false)
+      endSessionLocally(false)
       if (currentUserId && finishedRecipeId) setJustFinishedRecipeId(finishedRecipeId)
     } else {
       setWizardIndex(i => Math.min(i + 1, flatSteps.length - 1))
@@ -238,6 +260,16 @@ export function useCookSession(
     try {
       if (currentUserId) {
         const current = await getCurrentCookSession(getToken)
+        if (current && current.recipeId === seed.id) {
+          // Same recipe already has an active session elsewhere - adopt it
+          // instead of minting a duplicate (that would leave two live
+          // sessions fighting over state). Seed the recipe data up front
+          // since discoverActiveSession itself doesn't (see the notFound
+          // self-heal effect for why that matters).
+          setSeedRecipe(seed)
+          await discoverActiveSession(seed.id)
+          return
+        }
         if (current && current.recipeId !== seed.id) {
           setCookConflict({ sessionId: current.sessionId, recipeTitle: current.recipeTitle })
           return
@@ -279,12 +311,7 @@ export function useCookSession(
   }
 
   function stopCooking() {
-    if (cookSessionId) {
-      abandonCookSession(cookSessionId, getToken)
-      setCookSessionId(null)
-    }
-    setCookSessionStartedAt(null)
-    setCookSessionActive(false)
+    endSessionLocally(true)
     backgroundCookStatusRef.current?.exitFloatingView()
   }
 
@@ -328,15 +355,47 @@ export function useCookSession(
     if (nearestTimer) onToggleTimer(nearestTimer.id)
   }
 
+  // Mirrors CookDock's own Prev/Next handlers, which call handleStepEntered
+  // for the DESTINATION step before changing wizardIndex - that's what keeps
+  // lastEnteredStepRef/the server's currentStepNum in sync. Without this,
+  // the PiP widget's prev/next controls would get silently reverted by the
+  // next poll tick (which recomputes wizardIndex from the stale server step).
   function pipPreviousStep() {
-    setWizardIndex(i => Math.max(i - 1, 0))
+    const prevIndex = wizardIndex - 1
+    if (prevIndex < 0) return
+    const prev = flatSteps[prevIndex]
+    if (prev) handleStepEntered(`${prev.groupIdx}-${prev.stepIdx}`, prev.stepNum)
+    setWizardIndex(prevIndex)
   }
 
   function pipNextStep() {
     if (!currentWizardStep) return
     markStepChecked(`${currentWizardStep.groupIdx}-${currentWizardStep.stepIdx}`)
+    if (wizardIndex < flatSteps.length - 1) {
+      const next = flatSteps[wizardIndex + 1]
+      if (next) handleStepEntered(`${next.groupIdx}-${next.stepIdx}`, next.stepNum)
+    }
     advanceWizardOrFinish()
   }
+
+  // A resumed session whose recipe fetch never resolves (fails, or is just
+  // slow) would otherwise leave `recipe`/`flatSteps` permanently empty while
+  // cookSessionActive stays true - no dock, no Stop button, wake lock held
+  // forever. Self-heal by tearing the session down locally once useRecipe
+  // gives up on it; the server already has whatever state it had.
+  useEffect(() => {
+    if (activeRecipeNotFound && activeRecipeId) {
+      endSessionLocally(false)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- endSessionLocally is a new function every render; it only needs to run when the notFound flag flips true for the current activeRecipeId
+  }, [activeRecipeNotFound, activeRecipeId])
+
+  // Reset the "misses" counter whenever a genuinely new session/recipe comes
+  // into play, so a brand new session doesn't inherit a stale miss count
+  // from whatever was polled right before it.
+  useEffect(() => {
+    consecutiveNullPollsRef.current = 0
+  }, [cookSessionId, activeRecipeId])
 
   // While a session is active, poll for changes made from another device
   // (Phase D) - server-wins on every tick, no merge logic. Runs regardless
@@ -346,17 +405,42 @@ export function useCookSession(
     let cancelled = false
     const interval = setInterval(() => {
       getActiveCookSession(activeRecipeId, getToken).then(session => {
-        if (cancelled || !session) return
+        if (cancelled) return
+        if (!session) {
+          // A single null could be a transient network hiccup rather than a
+          // reliable "session is over" signal - only tear down after a
+          // couple of consecutive misses (~10s of the server confirming
+          // there's no active session).
+          consecutiveNullPollsRef.current += 1
+          if (consecutiveNullPollsRef.current >= 2) {
+            endSessionLocally(false)
+          }
+          return
+        }
+        consecutiveNullPollsRef.current = 0
+        const resumedIndex = session.currentStepKey && session.currentStepKey !== 'checklist'
+          ? Math.max(0, session.currentStepNum - 1)
+          : 0
+        const stepChanged = resumedIndex !== wizardIndexRef.current
+        // Adopt lastEnteredStepRef/suppress the checked-state-sync effect
+        // BEFORE the setCheckedSteps/setCheckedIngredients/setWizardIndex
+        // calls below that will trigger it - otherwise that effect echoes
+        // this tab's stale step pointer back to the server, overwriting the
+        // remote change this poll just adopted (cross-tab step ping-pong).
+        if (stepChanged) {
+          lastEnteredStepRef.current = {
+            stepKey: session.currentStepKey ?? 'checklist',
+            stepNum: session.currentStepNum ?? 0,
+          }
+          suppressNextCheckedSyncRef.current = true
+        }
         if (!sameStringSet(session.checkedSteps, checkedStepsRef.current)) {
           setCheckedSteps(new Set(session.checkedSteps))
         }
         if (!sameStringSet(session.checkedIngredients, checkedIngredientsRef.current)) {
           setCheckedIngredients(new Set(session.checkedIngredients))
         }
-        const resumedIndex = session.currentStepKey && session.currentStepKey !== 'checklist'
-          ? Math.max(0, session.currentStepNum - 1)
-          : 0
-        if (resumedIndex !== wizardIndexRef.current) {
+        if (stepChanged) {
           setWizardIndex(resumedIndex)
         }
       })
