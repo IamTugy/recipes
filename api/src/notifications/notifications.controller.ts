@@ -20,6 +20,7 @@ export class NotificationsController {
       actorId: n.actorId,
       actorName: profiles[n.actorId]?.name ?? null,
       actorImageUrl: profiles[n.actorId]?.imageUrl ?? null,
+      recipeId: n.recipeId ?? null,
       read: n.read,
       createdAt: (n as unknown as { createdAt: Date }).createdAt,
     }))

@@ -72,12 +72,16 @@ export default function NotificationsBell() {
               <button
                 key={n.id}
                 type="button"
-                onClick={() => { setOpen(false); navigate(`/chef/${n.actorId}`) }}
+                onClick={() => {
+                  setOpen(false)
+                  navigate(n.type === 'new_rating' && n.recipeId ? `/recipes/${n.recipeId}` : `/chef/${n.actorId}`)
+                }}
                 className="w-full flex items-center gap-3 text-start px-2 py-2 rounded-lg text-sm text-cream/80 hover:bg-tint/[0.06] transition-colors"
               >
                 <Avatar name={n.actorName ?? tx.chef} imageUrl={n.actorImageUrl} size="sm" />
                 <span className="min-w-0 truncate">
                   {n.type === 'new_follower' && tx.startedFollowingYou(n.actorName ?? tx.chef)}
+                  {n.type === 'new_rating' && tx.ratedYourRecipe(n.actorName ?? tx.chef)}
                 </span>
               </button>
             ))

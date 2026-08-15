@@ -27,7 +27,7 @@ describe('NotificationsController', () => {
     expect(result).toEqual([{
       id: 'n1', type: 'new_follower', actorId: 'user_2',
       actorName: 'Tugy', actorImageUrl: 'https://img.clerk.dev/a.jpg',
-      read: false, createdAt: new Date('2026-01-01'),
+      recipeId: null, read: false, createdAt: new Date('2026-01-01'),
     }])
   })
 

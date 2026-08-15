@@ -1,10 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Document } from 'mongoose'
 
-// 'new_follower' is the only type for now - kept as a union (not a bare
-// string) so adding a second trigger later (e.g. 'new_review') is a type
+// Kept as a union (not a bare string) so adding a new trigger is a type
 // error everywhere this needs updating, not a silent gap.
-export type NotificationType = 'new_follower'
+export type NotificationType = 'new_follower' | 'new_rating'
 
 export type NotificationDocument = Notification & Document
 
@@ -14,13 +13,18 @@ export class Notification {
   @Prop({ required: true, index: true })
   userId!: string
 
-  @Prop({ required: true, enum: ['new_follower'] })
+  @Prop({ required: true, enum: ['new_follower', 'new_rating'] })
   type!: NotificationType
 
-  // Whoever triggered it (the new follower) - resolved to a name/photo at
-  // read time via UsersService, not denormalized here.
+  // Whoever triggered it (the new follower / the rater) - resolved to a
+  // name/photo at read time via UsersService, not denormalized here.
   @Prop({ required: true })
   actorId!: string
+
+  // Set only for recipe-scoped types (new_rating) - lets the frontend deep
+  // link to the recipe itself rather than the actor's profile.
+  @Prop()
+  recipeId?: string
 
   @Prop({ default: false, index: true })
   read!: boolean

@@ -3,11 +3,16 @@ import { getModelToken } from '@nestjs/mongoose'
 import { RatingsService } from './ratings.service'
 import { Rating } from './schemas/rating.schema'
 import { Recipe } from '../recipes/schemas/recipe.schema'
+import { NotificationsService } from '../notifications/notifications.service'
 
 describe('RatingsService', () => {
   function noRecipeLookup() {
     return { findOne: jest.fn().mockReturnValue({ select: () => ({ lean: () => ({ exec: jest.fn().mockResolvedValue(null) }) }) }) }
   }
+
+  const notificationsService = { create: jest.fn() }
+
+  beforeEach(() => jest.clearAllMocks())
 
   async function makeService(ratingModel: Record<string, unknown>, recipeModel: Record<string, unknown> = noRecipeLookup()) {
     const moduleRef = await Test.createTestingModule({
@@ -15,6 +20,7 @@ describe('RatingsService', () => {
         RatingsService,
         { provide: getModelToken(Rating.name), useValue: ratingModel },
         { provide: getModelToken(Recipe.name), useValue: recipeModel },
+        { provide: NotificationsService, useValue: notificationsService },
       ],
     }).compile()
     return moduleRef.get(RatingsService)
@@ -69,6 +75,24 @@ describe('RatingsService', () => {
       { $set: { userId: 'user_1', recipeId: 'a', score: 5, recipeRevision: 3 } },
       { upsert: true, new: true },
     )
+  })
+
+  it('rate notifies the recipe owner when someone else rates it', async () => {
+    const findOneAndUpdate = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue({ score: 5 }) })
+    const recipeModel = { findOne: jest.fn().mockReturnValue({ select: () => ({ lean: () => ({ exec: jest.fn().mockResolvedValue({ ownerId: 'owner_1' }) }) }) }) }
+    const service = await makeService({ findOneAndUpdate }, recipeModel)
+    await service.rate('user_1', 'a', 5)
+
+    expect(notificationsService.create).toHaveBeenCalledWith('owner_1', 'new_rating', 'user_1', 'a')
+  })
+
+  it('rate does not notify when the recipe owner rates their own recipe', async () => {
+    const findOneAndUpdate = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue({ score: 5 }) })
+    const recipeModel = { findOne: jest.fn().mockReturnValue({ select: () => ({ lean: () => ({ exec: jest.fn().mockResolvedValue({ ownerId: 'owner_1' }) }) }) }) }
+    const service = await makeService({ findOneAndUpdate }, recipeModel)
+    await service.rate('owner_1', 'a', 5)
+
+    expect(notificationsService.create).not.toHaveBeenCalled()
   })
 
   it("deleteRating deletes only the requesting user's rating for a recipe", async () => {

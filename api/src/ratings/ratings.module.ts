@@ -8,6 +8,7 @@ import { ReviewRepliesService } from './review-replies.service'
 import { RatingsController } from './ratings.controller'
 import { UsersModule } from '../users/users.module'
 import { ActivityLogModule } from '../activity-log/activity-log.module'
+import { NotificationsModule } from '../notifications/notifications.module'
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ActivityLogModule } from '../activity-log/activity-log.module'
     ]),
     UsersModule,
     ActivityLogModule,
+    NotificationsModule,
   ],
   providers: [RatingsService, ReviewRepliesService],
   controllers: [RatingsController],

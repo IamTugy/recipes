@@ -9,17 +9,16 @@ const LIST_CAP = 50
 export class NotificationsService {
   constructor(@InjectModel(Notification.name) private readonly notificationModel: Model<NotificationDocument>) {}
 
-  async create(userId: string, type: NotificationType, actorId: string): Promise<void> {
-    // A user following/unfollowing/re-following the same person shouldn't
-    // pile up duplicate "X followed you" notifications - one live
-    // notification per (recipient, type, actor) is enough, refreshed
-    // (unread again) on each new trigger.
+  async create(userId: string, type: NotificationType, actorId: string, recipeId?: string): Promise<void> {
+    // One live notification per (recipient, type, actor[, recipe]) is
+    // enough, refreshed (unread again) on each new trigger, rather than
+    // piling up duplicates - e.g. re-following the same person, or
+    // re-rating the same recipe, just refreshes the existing notification.
+    // recipeId is part of the key so rating two different recipes owned
+    // by the same person produces two separate notifications, not one.
+    const key = recipeId ? { userId, type, actorId, recipeId } : { userId, type, actorId }
     await this.notificationModel
-      .findOneAndUpdate(
-        { userId, type, actorId },
-        { userId, type, actorId, read: false },
-        { upsert: true },
-      )
+      .findOneAndUpdate(key, { ...key, read: false }, { upsert: true })
       .exec()
   }
 

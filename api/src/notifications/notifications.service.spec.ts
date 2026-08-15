@@ -32,6 +32,17 @@ describe('NotificationsService', () => {
     )
   })
 
+  it('create includes recipeId in the upsert key when given, so different recipes get separate notifications', async () => {
+    findOneAndUpdate.mockReturnValue({ exec: jest.fn().mockResolvedValue({}) })
+    const service = await makeService()
+    await service.create('owner_1', 'new_rating', 'user_2', 'recipe_a')
+    expect(findOneAndUpdate).toHaveBeenCalledWith(
+      { userId: 'owner_1', type: 'new_rating', actorId: 'user_2', recipeId: 'recipe_a' },
+      { userId: 'owner_1', type: 'new_rating', actorId: 'user_2', recipeId: 'recipe_a', read: false },
+      { upsert: true },
+    )
+  })
+
   it('listForUser returns the caller\'s notifications, most recently updated first, capped', async () => {
     const limit = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue([{ actorId: 'a' }]) })
     const sort = jest.fn().mockReturnValue({ limit })

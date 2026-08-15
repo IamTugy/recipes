@@ -4,10 +4,11 @@ import { apiFetch } from '../lib/api'
 
 export interface AppNotification {
   id: string
-  type: 'new_follower'
+  type: 'new_follower' | 'new_rating'
   actorId: string
   actorName: string | null
   actorImageUrl: string | null
+  recipeId: string | null
   read: boolean
   createdAt: string
 }

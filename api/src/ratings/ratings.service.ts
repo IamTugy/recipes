@@ -3,23 +3,28 @@ import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { Rating, RatingDocument } from './schemas/rating.schema'
 import { Recipe, RecipeDocument } from '../recipes/schemas/recipe.schema'
+import { NotificationsService } from '../notifications/notifications.service'
 
 @Injectable()
 export class RatingsService {
   constructor(
     @InjectModel(Rating.name) private readonly ratingModel: Model<RatingDocument>,
     @InjectModel(Recipe.name) private readonly recipeModel: Model<RecipeDocument>,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async rate(userId: string, recipeId: string, score: number, comment?: string, photoUrl?: string): Promise<{ score: number }> {
     const setDoc: { userId: string; recipeId: string; score: number; comment?: string; photoUrl?: string; recipeRevision?: number } = { userId, recipeId, score }
     if (comment !== undefined) setDoc.comment = comment
     if (photoUrl !== undefined) setDoc.photoUrl = photoUrl
-    const recipe = await this.recipeModel.findOne({ _id: recipeId }).select('publishedRevision').lean().exec()
+    const recipe = await this.recipeModel.findOne({ _id: recipeId }).select('publishedRevision ownerId').lean().exec()
     if (recipe?.publishedRevision != null) setDoc.recipeRevision = recipe.publishedRevision
     const doc = await this.ratingModel
       .findOneAndUpdate({ userId, recipeId }, { $set: setDoc }, { upsert: true, new: true })
       .exec()
+    if (recipe?.ownerId && recipe.ownerId !== userId) {
+      await this.notificationsService.create(recipe.ownerId, 'new_rating', userId, recipeId)
+    }
     return { score: doc!.score }
   }
 
