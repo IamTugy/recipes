@@ -12,7 +12,6 @@ import { motion, AnimatePresence, useDragControls } from 'framer-motion'
 import { useRecipe, useRecipes, deleteRecipe, submitForReview, disputeDuplicate } from '../hooks/useRecipes'
 import { OWNER_USER_ID } from '../lib/admin'
 import { ApiError, apiFetch } from '../lib/api'
-import { useWakeLock } from '../hooks/useWakeLock'
 import { useFavorites } from '../hooks/useFavorites'
 import { useCollections } from '../hooks/useCollections'
 import { useRecentlyViewed } from '../hooks/useRecentlyViewed'
@@ -29,15 +28,10 @@ import PostCookReviewModal from './PostCookReviewModal'
 import type { TimerState, RecipeRevision, QualityReview } from '../types'
 import { resizedImage } from '../lib/image'
 import { downloadRecipePdf } from '../lib/recipePdf'
-import {
-  startCookSession, logCookSessionStep, finishCookSession, abandonCookSession,
-  getActiveCookSession, syncCookSession, getCurrentCookSession,
-} from '../lib/cookSessions'
 import SkeletonImage from './SkeletonImage'
 import { useTranslatedText } from '../hooks/useTranslatedText'
 import TranslatedText from './TranslatedText'
-import BackgroundCookStatus, { type BackgroundCookStatusHandle } from './BackgroundCookStatus'
-import CookDock from './CookDock'
+import { useCookSession } from '../hooks/useCookSession'
 
 interface RecipeDetailProps {
   onAddTimer: (label: string, minutes: number, recipeId: string, stepIndex: number) => void
@@ -45,17 +39,13 @@ interface RecipeDetailProps {
   timers: TimerState[]
   timerBarHeight: number
   onAddToShoppingList: (items: { name: string; amount: number | null; unit: string }[]) => void
+  cookSession: ReturnType<typeof useCookSession>
 }
 
 const presetMultipliers = [0.5, 1, 1.5, 2, 3, 4]
 const presetLabels: Record<number, string> = { 0.5: '½x', 1: '1x', 1.5: '1.5x', 2: '2x', 3: '3x', 4: '4x' }
 
-function sameStringSet(a: string[], b: Set<string>): boolean {
-  if (a.length !== b.size) return false
-  return a.every(item => b.has(item))
-}
-
-export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerBarHeight, onAddToShoppingList }: RecipeDetailProps) {
+export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, cookSession }: RecipeDetailProps) {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -65,33 +55,6 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
   const { recipes: allRecipes } = useRecipes()
   const { favoriteSlugs, toggle: toggleFavorite } = useFavorites()
   const { collections, create: createCollection, addRecipe: addRecipeToCollection, removeRecipe: removeRecipeFromCollection } = useCollections()
-  // Drives the persistent CookDock, the wake lock, and the PiP/notification
-  // hand-off together - true for the whole cook session, independent of
-  // whether the dock is currently collapsed or expanded.
-  const [cookSessionActive, setCookSessionActive] = useState(false)
-  // Backend cook-session id for the in-progress session (Phase C) - null
-  // whenever there's no session, the user is signed out, or the start
-  // call hasn't resolved/failed silently. Every call site below already
-  // treats a null id as "skip the network call", so anonymous cooking is
-  // unaffected.
-  const [cookSessionId, setCookSessionId] = useState<string | null>(null)
-  const [cookSessionStartedAt, setCookSessionStartedAt] = useState<string | null>(null)
-  // Only true for the render right after a fresh "Start cooking" click -
-  // reset immediately after CookDock reads it, so cross-device resume
-  // (Phase D) and the discovery/polling effects never force-expand an
-  // already-collapsed dock.
-  const [startDockExpanded, setStartDockExpanded] = useState(false)
-  const [cookConflict, setCookConflict] = useState<{ sessionId: string; recipeTitle: string } | null>(null)
-  const [resolvingCookConflict, setResolvingCookConflict] = useState(false)
-  const [startingCook, setStartingCook] = useState(false)
-  const pendingCookStepRef = useRef<{ stepKey: string; stepNum: number } | null>(null)
-  // Tracks the last stepKey/stepNum passed to handleStepEntered (including
-  // 'checklist') so the checked-state-only sync effect below can include
-  // it without RecipeDetail needing to know CookDock's internal screen
-  // state directly.
-  const lastEnteredStepRef = useRef<{ stepKey: string; stepNum: number }>({ stepKey: 'checklist', stepNum: 0 })
-  const suppressNextCheckedSyncRef = useRef(false)
-  const [wizardIndex, setWizardIndex] = useState(0)
   // The overflow menu (Edit/Delete/Save to collection/Download PDF/Copy
   // link) consolidates what used to be scattered separate buttons. It's a
   // single sheet with two "views" - the root list, and a collections
@@ -143,16 +106,47 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
   const isOwner = !!currentUserId && (!recipe?.ownerId || recipe.ownerId === currentUserId)
   const canEdit = isOwner || isAdmin
 
-  const [multiplier, setMultiplier] = useState(1)
   const [customInput, setCustomInput] = useState('')
-  const [checkedSteps, setCheckedSteps] = useState<Set<string>>(new Set())
-  const [checkedIngredients, setCheckedIngredients] = useState<Set<string>>(new Set())
-  const checkedStepsRef = useRef(checkedSteps)
-  const checkedIngredientsRef = useRef(checkedIngredients)
-  const wizardIndexRef = useRef(wizardIndex)
-  useEffect(() => { checkedStepsRef.current = checkedSteps }, [checkedSteps])
-  useEffect(() => { checkedIngredientsRef.current = checkedIngredients }, [checkedIngredients])
-  useEffect(() => { wizardIndexRef.current = wizardIndex }, [wizardIndex])
+  // True while this page is showing the exact recipe currently being
+  // cooked - in that case the checklist mirrors the global cook-session
+  // state live (so ticking a box here shows up in the dock too, and vice
+  // versa). Any other recipe keeps its own independent local state,
+  // unaffected by whatever's being cooked elsewhere.
+  const isActiveCookingRecipe = !!id && id === cookSession.activeRecipeId
+  const [localCheckedSteps, setLocalCheckedSteps] = useState<Set<string>>(new Set())
+  const [localCheckedIngredients, setLocalCheckedIngredients] = useState<Set<string>>(new Set())
+  const checkedSteps = isActiveCookingRecipe ? cookSession.checkedSteps : localCheckedSteps
+  const checkedIngredients = isActiveCookingRecipe ? cookSession.checkedIngredients : localCheckedIngredients
+
+  function localToggleStep(key: string) {
+    setLocalCheckedSteps(prev => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      try { sessionStorage.setItem(`checked-${id}`, JSON.stringify([...next])) } catch { /* sessionStorage unavailable */ }
+      return next
+    })
+  }
+
+  function localToggleIngredient(key: string) {
+    setLocalCheckedIngredients(prev => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      try { sessionStorage.setItem(`checked-ingredients-${id}`, JSON.stringify([...next])) } catch { /* sessionStorage unavailable */ }
+      return next
+    })
+  }
+
+  const toggleStep = isActiveCookingRecipe ? cookSession.toggleStep : localToggleStep
+  const toggleIngredient = isActiveCookingRecipe ? cookSession.toggleIngredient : localToggleIngredient
+
+  const [localMultiplier, setLocalMultiplier] = useState(1)
+  const multiplier = isActiveCookingRecipe ? cookSession.multiplier : localMultiplier
+  function setMultiplierValue(m: number) {
+    if (isActiveCookingRecipe) cookSession.setMultiplier(m)
+    else setLocalMultiplier(m)
+  }
   const [userRating, setUserRating] = useState<number | null>(null)
   const [hoverRating, setHoverRating] = useState<number | null>(null)
   const [pdfGenerating, setPdfGenerating] = useState(false)
@@ -167,7 +161,19 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
   const [isEditingReview, setIsEditingReview] = useState(false)
   const [translations, setTranslations] = useState<Record<string, { text: string; showing: boolean; loading: boolean }>>({})
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null)
-  const cookMode = useWakeLock()
+
+  // The global cook session signals a natural finish (last step reached)
+  // for whichever recipe just finished cooking - if that's the recipe
+  // this page is showing and the user hasn't reviewed it yet, offer the
+  // post-cook review nudge (Phase G). If the user finished cooking while
+  // on a different page, this simply waits until they navigate back here;
+  // CookReminderBanner (Phase G) catches the case where they never do.
+  useEffect(() => {
+    if (cookSession.justFinishedRecipeId === id && currentUserId && !hasPostedReview) {
+      setShowPostCookReviewModal(true)
+      cookSession.clearJustFinished()
+    }
+  }, [cookSession.justFinishedRecipeId, id, currentUserId, hasPostedReview, cookSession])
 
   // Sync the textarea once the saved note has loaded for this recipe
   useEffect(() => {
@@ -486,125 +492,36 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
   useEffect(() => {
     try {
       const saved = sessionStorage.getItem(`checked-${id}`)
-      setCheckedSteps(saved ? new Set(JSON.parse(saved)) : new Set())
-    } catch { setCheckedSteps(new Set()) }
+      setLocalCheckedSteps(saved ? new Set(JSON.parse(saved)) : new Set())
+    } catch { setLocalCheckedSteps(new Set()) }
     try {
       const saved = sessionStorage.getItem(`checked-ingredients-${id}`)
-      setCheckedIngredients(saved ? new Set(JSON.parse(saved)) : new Set())
-    } catch { setCheckedIngredients(new Set()) }
+      setLocalCheckedIngredients(saved ? new Set(JSON.parse(saved)) : new Set())
+    } catch { setLocalCheckedIngredients(new Set()) }
     window.scrollTo({ top: 0, behavior: 'instant' })
     setViewingRevision(null)
     setRevisionsOpen(false)
     setRevisions(null)
-    setCookSessionActive(false)
-    setCookSessionId(null)
-    setCookSessionStartedAt(null)
   }, [id])
 
   // Cross-device resume (Phase D): on loading a recipe, check whether the
   // signed-in user already has an active cook session for it elsewhere -
-  // if so, silently resume into it (no prompt, per design - this applies
-  // identically whether reached by page load or by clicking "Start
-  // cooking" again on the same recipe) instead of the sessionStorage-only
-  // restore above.
+  // if so, silently resume into it via the global hook (no prompt, per
+  // design). discoverActiveSession guards its own races internally.
   useEffect(() => {
     if (!id || !currentUserId) return
-    let cancelled = false
-    getActiveCookSession(id, getToken).then(session => {
-      if (cancelled || !session) return
-      if (!sameStringSet(session.checkedSteps, checkedStepsRef.current)) {
-        setCheckedSteps(new Set(session.checkedSteps))
-      }
-      if (!sameStringSet(session.checkedIngredients, checkedIngredientsRef.current)) {
-        setCheckedIngredients(new Set(session.checkedIngredients))
-      }
-      const resumedIndex = session.currentStepKey && session.currentStepKey !== 'checklist'
-        ? Math.max(0, session.currentStepNum - 1)
-        : 0
-      if (resumedIndex !== wizardIndexRef.current) {
-        setWizardIndex(resumedIndex)
-      }
-      lastEnteredStepRef.current = session.currentStepKey
-        ? { stepKey: session.currentStepKey, stepNum: session.currentStepNum }
-        : { stepKey: 'checklist', stepNum: 0 }
-      setCookSessionId(session.sessionId)
-      setCookSessionStartedAt(session.startedAt)
-      setCookSessionActive(true)
-    })
-    return () => { cancelled = true }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- getToken is a new function every render from useAuth(); checkedSteps/checkedIngredients/wizardIndex are read via closure for comparison only (not to trigger the effect), so exclusion is intentional
+    cookSession.discoverActiveSession(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- cookSession.discoverActiveSession is a new function every render from useCookSession(); it's stable enough for this one-shot-per-id-change call
   }, [id, currentUserId])
-
-  // While a session is active, poll for changes made from another device
-  // (Phase D) - server-wins on every tick, no merge logic.
-  useEffect(() => {
-    if (!cookSessionActive || !id || !currentUserId) return
-    let cancelled = false
-    const interval = setInterval(() => {
-      getActiveCookSession(id, getToken).then(session => {
-        if (cancelled || !session) return
-        if (!sameStringSet(session.checkedSteps, checkedStepsRef.current)) {
-          setCheckedSteps(new Set(session.checkedSteps))
-        }
-        if (!sameStringSet(session.checkedIngredients, checkedIngredientsRef.current)) {
-          setCheckedIngredients(new Set(session.checkedIngredients))
-        }
-        const resumedIndex = session.currentStepKey && session.currentStepKey !== 'checklist'
-          ? Math.max(0, session.currentStepNum - 1)
-          : 0
-        if (resumedIndex !== wizardIndexRef.current) {
-          setWizardIndex(resumedIndex)
-        }
-      })
-    }, 5000)
-    return () => { cancelled = true; clearInterval(interval) }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- getToken is a new function every render; checkedSteps/checkedIngredients/wizardIndex are read via closure for comparison only (not to trigger the effect), so exclusion is intentional
-  }, [cookSessionActive, id, currentUserId])
-
-  // Push checked-state changes to the backend session (Phase D) even when
-  // they happen without a step transition (e.g. ticking an ingredient
-  // while staying on the checklist screen) - step-transition-triggered
-  // syncs are already covered inside handleStepEntered above.
-  useEffect(() => {
-    if (!cookSessionId) return
-    if (suppressNextCheckedSyncRef.current) {
-      suppressNextCheckedSyncRef.current = false
-      return
-    }
-    const { stepKey, stepNum } = lastEnteredStepRef.current
-    syncCookSession(cookSessionId, stepKey, stepNum, [...checkedSteps], [...checkedIngredients], getToken)
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- getToken is a new function every render; this effect should only re-fire on an actual checked-state change, not on every render
-  }, [checkedSteps, checkedIngredients])
 
   // Track this recipe as recently viewed once it has loaded
   useEffect(() => {
     if (recipe) addRecent(recipe.id)
   }, [recipe, addRecent])
 
-  const backgroundCookStatusRef = useRef<BackgroundCookStatusHandle>(null)
   const lightboxRef = useRef<HTMLDivElement>(null)
   useFocusTrap(lightboxRef, !!lightboxUrl)
   useFocusTrap(actionsMenuRef, actionsMenuOpen)
-
-  useEffect(() => {
-    if (cookSessionActive) void cookMode.request()
-    else void cookMode.release()
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- cookMode is a new object every render; request/release are individually stable
-  }, [cookSessionActive, cookMode.request, cookMode.release])
-
-  // Auto-enter/exit the floating PiP view as the app is backgrounded and
-  // foregrounded - the dock itself is always present in-page while a
-  // session is active, so there's nothing to "restore" here beyond exiting
-  // PiP; entering PiP on hide is the only action needed on that side.
-  useEffect(() => {
-    if (!cookSessionActive) return
-    function handleVisibility() {
-      if (document.hidden) backgroundCookStatusRef.current?.enterFloatingView()
-      else backgroundCookStatusRef.current?.exitFloatingView()
-    }
-    document.addEventListener('visibilitychange', handleVisibility)
-    return () => document.removeEventListener('visibilitychange', handleVisibility)
-  }, [cookSessionActive])
 
   useEffect(() => {
     if (!lightboxUrl) return
@@ -733,60 +650,6 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
     showToast(lang === 'he' ? `${items.length} פריטים נוספו לרשימת הקניות` : `Added ${items.length} items to your shopping list`)
   }
 
-  function toggleStep(key: string) {
-    setCheckedSteps(prev => {
-      const next = new Set(prev)
-      if (next.has(key)) next.delete(key)
-      else next.add(key)
-      try { sessionStorage.setItem(`checked-${id}`, JSON.stringify([...next])) } catch { /* sessionStorage unavailable */ }
-      return next
-    })
-  }
-
-  function markStepChecked(key: string) {
-    setCheckedSteps(prev => {
-      if (prev.has(key)) return prev
-      const next = new Set(prev).add(key)
-      try { sessionStorage.setItem(`checked-${id}`, JSON.stringify([...next])) } catch { /* sessionStorage unavailable */ }
-      return next
-    })
-  }
-
-  // "Mark done" in guided mode both checks the step and advances the wizard,
-  // same as Next - but un-marking (clicking it again on an already-checked
-  // step) only toggles it off, since that's a correction, not progress.
-  function advanceWizardOrFinish() {
-    if (wizardIndex === flatSteps.length - 1) {
-      if (cookSessionId) {
-        finishCookSession(cookSessionId, getToken)
-        setCookSessionId(null)
-      }
-      setCookSessionActive(false)
-      if (currentUserId && !hasPostedReview) setShowPostCookReviewModal(true)
-    } else {
-      setWizardIndex(i => Math.min(i + 1, flatSteps.length - 1))
-    }
-  }
-
-  function handleWizardMarkDone(key: string) {
-    if (checkedSteps.has(key)) {
-      toggleStep(key)
-      return
-    }
-    markStepChecked(key)
-    advanceWizardOrFinish()
-  }
-
-  function toggleIngredient(key: string) {
-    setCheckedIngredients(prev => {
-      const next = new Set(prev)
-      if (next.has(key)) next.delete(key)
-      else next.add(key)
-      try { sessionStorage.setItem(`checked-ingredients-${id}`, JSON.stringify([...next])) } catch { /* sessionStorage unavailable */ }
-      return next
-    })
-  }
-
   function getTimerForStep(groupIdx: number, stepIdx: number) {
     const key = groupIdx * 10000 + stepIdx
     return timers.find(t => t.recipeId === recipe!.id && t.stepIndex === key)
@@ -799,17 +662,17 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
   function handleCustomInput(val: string) {
     setCustomInput(val)
     if (val === '') {
-      setMultiplier(1)
+      setMultiplierValue(1)
       return
     }
     const n = parseFloat(val)
     if (!isNaN(n) && n > 0 && n <= 100 && recipe!.servings > 0) {
-      setMultiplier(n / recipe!.servings)
+      setMultiplierValue(n / recipe!.servings)
     }
   }
 
   function handlePresetClick(m: number) {
-    setMultiplier(m)
+    setMultiplierValue(m)
     setCustomInput('')
   }
 
@@ -830,128 +693,6 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
       image: step.image,
     }))
   )
-
-  // Most urgent timer for this recipe - what a backgrounded notification/PiP widget should show.
-  const recipeTimers = timers.filter(t => t.recipeId === recipe?.id && !t.done)
-  const runningRecipeTimers = recipeTimers.filter(t => t.running)
-  const nearestTimer = (runningRecipeTimers.length > 0 ? runningRecipeTimers : recipeTimers)
-    .slice().sort((a, b) => a.remainingSeconds - b.remainingSeconds)[0] ?? null
-
-  // Feeds both the CookDock and the PiP/notification widget, so it must
-  // keep reflecting the current step for the whole session regardless of
-  // whether the dock is collapsed, expanded, or backgrounded into PiP.
-  const currentWizardStep = cookSessionActive ? flatSteps[wizardIndex] : undefined
-  const wizardStepLabel = lang === 'he'
-    ? `שלב ${wizardIndex + 1} מתוך ${flatSteps.length}`
-    : `Step ${wizardIndex + 1} of ${flatSteps.length}`
-
-  function openWizard() {
-    if (cookSessionActive || startingCook) return
-    setStartingCook(true)
-    void startCookingWithConflictCheck()
-  }
-
-  async function startCookingWithConflictCheck() {
-    try {
-      if (currentUserId) {
-        const current = await getCurrentCookSession(getToken)
-        if (current && current.recipeId !== id) {
-          setCookConflict({ sessionId: current.sessionId, recipeTitle: current.recipeTitle })
-          return
-        }
-      }
-      startCookingNow()
-    } finally {
-      setStartingCook(false)
-    }
-  }
-
-  function startCookingNow() {
-    const firstUnchecked = flatSteps.findIndex(s => !checkedSteps.has(`${s.groupIdx}-${s.stepIdx}`))
-    const startIndex = firstUnchecked === -1 ? 0 : firstUnchecked
-    setWizardIndex(startIndex)
-    setCookSessionActive(true)
-    setStartDockExpanded(true)
-    setCookSessionId(null)
-    setCookSessionStartedAt(null)
-    pendingCookStepRef.current = null
-    lastEnteredStepRef.current = { stepKey: 'checklist', stepNum: 0 }
-    if (currentUserId && recipe) {
-      startCookSession(recipe.id, getToken).then(id => {
-        setCookSessionId(id)
-        if (!id) return
-        // Mirrors CookDock's own screen-selection logic: if every
-        // ingredient is already checked, the dock mounts directly on the
-        // "steps" screen and (by design) never calls onStepEntered for
-        // that initial step on mount - log it here instead so a fresh
-        // session that skips the checklist doesn't silently miss step 1
-        // in its timeline.
-        const allIngredientsChecked = (displayRecipe?.ingredients ?? []).every((group, gi) =>
-          group.items.every((_, ii) => checkedIngredients.has(`${gi}-${ii}`))
-        )
-        const initialStep = flatSteps[startIndex]
-        if (allIngredientsChecked && initialStep) {
-          const stepKey = `${initialStep.groupIdx}-${initialStep.stepIdx}`
-          lastEnteredStepRef.current = { stepKey, stepNum: initialStep.stepNum }
-          logCookSessionStep(id, stepKey, initialStep.stepNum, [...checkedSteps], [...checkedIngredients], getToken)
-        } else if (pendingCookStepRef.current) {
-          const { stepKey, stepNum } = pendingCookStepRef.current
-          pendingCookStepRef.current = null
-          logCookSessionStep(id, stepKey, stepNum, [...checkedSteps], [...checkedIngredients], getToken)
-        }
-      })
-    }
-  }
-
-  async function confirmStartNewCook() {
-    if (!cookConflict) return
-    setResolvingCookConflict(true)
-    await abandonCookSession(cookConflict.sessionId, getToken)
-    setResolvingCookConflict(false)
-    setCookConflict(null)
-    startCookingNow()
-  }
-
-  function pipToggleNearestTimer() {
-    if (nearestTimer) onToggleTimer(nearestTimer.id)
-  }
-
-  function pipPreviousStep() {
-    setWizardIndex(i => Math.max(i - 1, 0))
-  }
-
-  function pipNextStep() {
-    if (!currentWizardStep) return
-    markStepChecked(`${currentWizardStep.groupIdx}-${currentWizardStep.stepIdx}`)
-    advanceWizardOrFinish()
-  }
-
-  function stopCooking() {
-    if (cookSessionId) {
-      abandonCookSession(cookSessionId, getToken)
-      setCookSessionId(null)
-    }
-    setCookSessionStartedAt(null)
-    setCookSessionActive(false)
-    backgroundCookStatusRef.current?.exitFloatingView()
-  }
-
-  function handleStepEntered(stepKey: string, stepNum: number) {
-    lastEnteredStepRef.current = { stepKey, stepNum }
-    if (!cookSessionId) {
-      pendingCookStepRef.current = { stepKey, stepNum }
-      return
-    }
-    // logCookSessionStep already atomically writes the checked-state
-    // snapshot alongside the step-entry event server-side - suppress the
-    // standalone checked-state sync effect's next firing so it doesn't
-    // race that same write with a second concurrent request (this fires
-    // when the click that triggered this step change also happened to
-    // change checkedSteps, e.g. Next/mark-done both check the current
-    // step as they advance).
-    suppressNextCheckedSyncRef.current = true
-    logCookSessionStep(cookSessionId, stepKey, stepNum, [...checkedSteps], [...checkedIngredients], getToken)
-  }
 
   const sectionNavItems = [
     displayRecipe.ingredients.length > 0 && { id: 'ingredients-heading', label: tx.ingredients, emoji: '🥕' },
@@ -1484,19 +1225,19 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
 
             {isViewingPublishedContent && (
               <button type="button"
-                disabled={cookSessionActive || startingCook}
+                disabled={cookSession.cookSessionActive || cookSession.startingCook}
                 onClick={e => {
                   const btn = e.currentTarget
                   btn.classList.remove('start-cooking-fill-active')
                   // Force reflow so re-adding the class restarts the animation on rapid re-clicks.
                   void btn.offsetWidth
                   btn.classList.add('start-cooking-fill-active')
-                  openWizard()
+                  if (recipe) cookSession.openWizard(recipe, multiplier)
                 }}
                 className="relative overflow-hidden flex items-center justify-center gap-2 w-full sm:w-auto px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors bg-amber text-bg hover:bg-amber/90 disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 <span className="text-lg leading-none">🍳</span>
-                {cookSessionActive ? tx.cooking : tx.startCooking}
+                {cookSession.cookSessionActive ? tx.cooking : tx.startCooking}
               </button>
             )}
           </div>
@@ -2221,60 +1962,6 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
         )}
       </div>
 
-      {/* Reserves layout space for the persistent cook-session dock below,
-          so the fixed-position dock doesn't visually hide page content. */}
-      {cookSessionActive && flatSteps.length > 0 && (
-        <div aria-hidden="true" className="h-[20dvh] sm:h-24" style={{ paddingBottom: timerBarHeight }} />
-      )}
-
-      {/* Persistent cook-session dock - collapsed by default, expands to
-          90dvh on tap/swipe. Replaces the old fullscreen wizard modal. */}
-      {cookSessionActive && flatSteps.length > 0 && (
-        <CookDock
-          lang={lang}
-          ingredients={displayRecipe.ingredients}
-          checkedIngredients={checkedIngredients}
-          onToggleIngredient={toggleIngredient}
-          multiplier={multiplier}
-          steps={flatSteps}
-          wizardIndex={wizardIndex}
-          onPrev={() => setWizardIndex(i => Math.max(i - 1, 0))}
-          onAdvance={key => { markStepChecked(key); advanceWizardOrFinish() }}
-          onMarkDone={handleWizardMarkDone}
-          onStop={stopCooking}
-          onStepEntered={handleStepEntered}
-          onExpand={() => backgroundCookStatusRef.current?.exitFloatingView()}
-          checkedSteps={checkedSteps}
-          nearestTimer={nearestTimer}
-          onToggleNearestTimer={pipToggleNearestTimer}
-          getTimerForStep={getTimerForStep}
-          onStartTimer={startTimer}
-          onOpenLightbox={setLightboxUrl}
-          timerBarHeight={timerBarHeight}
-          lightboxOpen={!!lightboxUrl}
-          elapsedBaselineMs={cookSessionStartedAt ? new Date(cookSessionStartedAt).getTime() : undefined}
-          startExpanded={startDockExpanded}
-          onExpandConsumed={() => setStartDockExpanded(false)}
-        />
-      )}
-
-      {/* Ongoing-cook status: mirrors the current guided step + nearest timer into an OS
-          notification and a floating Picture-in-Picture widget while the app is minimized. */}
-      <BackgroundCookStatus
-        ref={backgroundCookStatusRef}
-        active={cookSessionActive && !!currentWizardStep}
-        recipeTitle={displayTitle ?? ''}
-        stepLabel={wizardStepLabel}
-        stepText={currentWizardStep?.instruction ?? ''}
-        nearestTimer={nearestTimer}
-        lang={lang}
-        canGoPrev={wizardIndex > 0}
-        canGoNext={wizardIndex < flatSteps.length - 1}
-        onToggleNearestTimer={pipToggleNearestTimer}
-        onPrevStep={pipPreviousStep}
-        onNextStep={pipNextStep}
-      />
-
       {/* Photo lightbox */}
       {lightboxUrl && (
         <div
@@ -2324,14 +2011,14 @@ export default function RecipeDetail({ onAddTimer, onToggleTimer, timers, timerB
       />
 
       <ConfirmDialog
-        open={!!cookConflict}
+        open={!!cookSession.cookConflict}
         title={tx.alreadyCookingElsewhere}
-        message={cookConflict ? tx.cookingElsewhereWarning(cookConflict.recipeTitle) : ''}
+        message={cookSession.cookConflict ? tx.cookingElsewhereWarning(cookSession.cookConflict.recipeTitle) : ''}
         confirmLabel={tx.startNewCook}
         cancelLabel={tx.cancel}
-        busy={resolvingCookConflict}
-        onConfirm={confirmStartNewCook}
-        onCancel={() => setCookConflict(null)}
+        busy={cookSession.resolvingCookConflict}
+        onConfirm={() => recipe && cookSession.confirmStartNewCook(recipe, multiplier)}
+        onCancel={cookSession.dismissCookConflict}
       />
 
       <PostCookReviewModal

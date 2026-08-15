@@ -234,7 +234,7 @@ export default function CookDock({
             <span className="text-cream/40 text-sm">{collapsedStepLabel}</span>
             <button type="button"
               onClick={e => { e.stopPropagation(); onStop() }}
-              className="px-3 h-9 flex items-center justify-center rounded-lg text-sm font-medium text-cream/60 hover:text-cream/90 transition-colors"
+              className="px-3 h-8 flex items-center justify-center rounded-full text-xs font-medium border border-tint/[0.12] text-cream/55 bg-transparent hover:border-amber/40 hover:text-amber transition-colors"
             >
               {tx.stopCooking}
             </button>
@@ -426,27 +426,31 @@ export default function CookDock({
           )}
         </>
       ) : (
-        <div className="flex-1 flex items-center justify-between px-4 gap-3">
-          <div className="min-w-0 flex-1">
-            <p className="text-[10px] text-cream/30 tabular-nums mb-0.5">
-              {formatDockDuration(elapsedSeconds)}
-            </p>
-            <p className="text-sm text-cream/80 truncate">{collapsedStepLabel}</p>
+        <>
+          <div className="flex items-center justify-center h-6 shrink-0">
+            <svg className="w-4 h-4 text-cream/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
+            </svg>
           </div>
-          <svg className="w-4 h-4 shrink-0 text-cream/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
-          </svg>
-          {displayedTimer && (
-            <button type="button"
-              onClick={e => { e.stopPropagation(); onToggleNearestTimer() }}
-              aria-label={displayedTimer.running ? tx.pauseTimer : tx.resumeTimer}
-            >
-              <TimerRing fraction={displayedTimer.totalSeconds > 0 ? displayedTimer.remainingSeconds / displayedTimer.totalSeconds : 0}>
-                {formatDockDuration(displayedTimer.remainingSeconds)}
-              </TimerRing>
-            </button>
-          )}
-        </div>
+          <div className="flex-1 flex items-center justify-between px-4 gap-3">
+            <div className="min-w-0 flex-1">
+              <p className="text-[10px] text-cream/30 tabular-nums mb-0.5">
+                {formatDockDuration(elapsedSeconds)}
+              </p>
+              <p className="text-sm text-cream/80 truncate">{collapsedStepLabel}</p>
+            </div>
+            {displayedTimer && (
+              <button type="button"
+                onClick={e => { e.stopPropagation(); onToggleNearestTimer() }}
+                aria-label={displayedTimer.running ? tx.pauseTimer : tx.resumeTimer}
+              >
+                <TimerRing fraction={displayedTimer.totalSeconds > 0 ? displayedTimer.remainingSeconds / displayedTimer.totalSeconds : 0}>
+                  {formatDockDuration(displayedTimer.remainingSeconds)}
+                </TimerRing>
+              </button>
+            )}
+          </div>
+        </>
       )}
     </div>
   )
