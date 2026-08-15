@@ -669,6 +669,29 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
     showToast(lang === 'he' ? `${items.length} פריטים נוספו לרשימת הקניות` : `Added ${items.length} items to your shopping list`)
   }
 
+  async function copyIngredientsToClipboard() {
+    const lines = displayRecipe!.ingredients.flatMap(group => {
+      const groupLabel = lang === 'he' ? group.group : (group.groupEn ?? group.group)
+      const itemLines = group.items
+        .filter(item => !item.linkedRecipeId)
+        .map(item => {
+          const itemName = lang === 'he' ? item.name : (item.nameEn ?? item.name)
+          if (!item.amount) return `- ${itemName}`
+          const scaled = item.amount * multiplier
+          const amt = scaleAmount(item.amount, multiplier)
+          const unitCode = canonicalUnit(item.unit)
+          const unit = lang === 'he' ? heUnit(unitCode, scaled) : unitCode
+          return `- ${amt}${unit ? ` ${unit}` : ''} ${itemName}`
+        })
+      return groupLabel ? [`${groupLabel}:`, ...itemLines] : itemLines
+    })
+    const text = [displayTitle, '', ...lines].join('\n')
+    try {
+      await navigator.clipboard.writeText(text)
+      showToast(tx.copied)
+    } catch { /* clipboard unavailable */ }
+  }
+
   function getTimerForStep(groupIdx: number, stepIdx: number) {
     const key = groupIdx * 10000 + stepIdx
     return timers.find(t => t.recipeId === recipe!.id && t.stepIndex === key)
@@ -945,6 +968,19 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
                             <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m-10 0a2 2 0 100 4 2 2 0 000-4zm10 0a2 2 0 100 4 2 2 0 000-4z" />
                           </svg>
                           {tx.addToList}
+                        </button>
+                      )}
+
+                      {displayRecipe.ingredients.length > 0 && (
+                        <button type="button"
+                          onClick={() => { closeActionsMenu(); void copyIngredientsToClipboard() }}
+                          className="flex items-center gap-3 w-full text-start px-3 py-[13.5px] rounded-lg text-sm font-medium text-cream/80 hover:bg-tint/[0.06] transition-colors"
+                        >
+                          <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <rect x="9" y="3" width="12" height="14" rx="1.5" />
+                            <rect x="3" y="7" width="12" height="14" rx="1.5" />
+                          </svg>
+                          {tx.copyIngredients}
                         </button>
                       )}
 
