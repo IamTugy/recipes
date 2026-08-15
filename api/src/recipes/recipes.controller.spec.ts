@@ -9,6 +9,7 @@ describe('RecipesController', () => {
     findMine: jest.fn(),
     findPending: jest.fn(),
     findPublishedByOwner: jest.fn(),
+    findPublishedByOwners: jest.fn(),
     createDraft: jest.fn(),
     updateDraft: jest.fn(),
     updateImage: jest.fn(),
@@ -107,6 +108,16 @@ describe('RecipesController', () => {
     const result = await controller.findPending({ userId: 'user_1' } as any)
     expect(recipesService.findPending).toHaveBeenCalledWith('user_1')
     expect(result).toEqual([{ id: 'a', title: 'Soup' }])
+  })
+
+  it("GET /recipes/following returns published recipes from the requester's followed chefs", async () => {
+    followsService.followingIds.mockResolvedValue(['user_2', 'user_3'])
+    recipesService.findPublishedByOwners.mockResolvedValue([{ id: 'a', ownerId: 'user_2' }])
+    const controller = makeController()
+    const result = await controller.findFollowingFeed({ userId: 'user_1' } as any)
+    expect(followsService.followingIds).toHaveBeenCalledWith('user_1')
+    expect(recipesService.findPublishedByOwners).toHaveBeenCalledWith(['user_2', 'user_3'])
+    expect(result).toEqual([{ id: 'a', ownerId: 'user_2' }])
   })
 
   it("GET /recipes/chef/:userId returns that owner's published recipes with their display name and photo", async () => {

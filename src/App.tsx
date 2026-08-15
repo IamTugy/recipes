@@ -17,6 +17,7 @@ import FeatureRequestsPage from './components/FeatureRequestsPage'
 import MyRecipesPage from './components/MyRecipesPage'
 import MealPlanPage from './components/MealPlanPage'
 import ChefProfilePage from './components/ChefProfilePage'
+import FollowingFeedPage from './components/FollowingFeedPage'
 import LeaderboardPage from './components/LeaderboardPage'
 const CookHistoryPage = lazy(() => import('./components/CookHistoryPage'))
 const CookHistoryRecipePage = lazy(() => import('./components/CookHistoryRecipePage'))
@@ -181,6 +182,7 @@ export default function App() {
           <Route path="/jobs" element={<Navigate to="/my-recipes?tab=jobs" replace />} />
           <Route path="/meal-plan" element={<MealPlanPage onAddToShoppingList={shoppingList.addItems} />} />
           <Route path="/chef/:userId" element={<ChefProfilePage />} />
+          <Route path="/following" element={<FollowingFeedPage />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route
             path="/cook-history"

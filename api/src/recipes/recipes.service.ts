@@ -252,6 +252,28 @@ export class RecipesService implements OnModuleInit {
     return this.attachRatingsAndViews(plain, ratings, views, cooks)
   }
 
+  // Powers the "Following" feed - published recipes from a set of chef ids
+  // (the caller's followingIds), most-recently-created first, capped at a
+  // fixed page size rather than full cursor pagination (same tradeoff as
+  // cook-history's list endpoint - this is one user's own feed, not a
+  // public firehose, so the cap is plenty).
+  async findPublishedByOwners(ownerIds: string[]) {
+    if (ownerIds.length === 0) return []
+    const recipes = await this.recipeModel
+      .find({ ownerId: { $in: ownerIds }, hidden: { $ne: true }, publishedRevision: { $ne: null } })
+      .sort({ createdAt: -1 })
+      .limit(100)
+      .exec()
+    const plain = await Promise.all(recipes.map(r => this.overlayPublishedSnapshot(r)))
+    const ids = plain.map(r => r.id)
+    const [ratings, views, cooks] = await Promise.all([
+      this.ratingsById(ids),
+      this.activityLogService.viewCountsById(ids),
+      this.cookLogService.countsById(ids),
+    ])
+    return this.attachRatingsAndViews(plain, ratings, views, cooks)
+  }
+
   async findById(id: string) {
     let recipe: RecipeDocument | null
     try {

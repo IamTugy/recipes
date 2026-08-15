@@ -111,6 +111,29 @@ export function useMyRecipes(enabled = true) {
   return { recipes, loading, reload }
 }
 
+// Recently published recipes from chefs the caller follows - a fresh
+// fetch per page visit, no live updates (matches cook-history's precedent:
+// a stale view until refresh is acceptable for a feed page).
+export function useFollowingFeed() {
+  const { getToken, isLoaded, isSignedIn } = useAuth()
+  const [recipes, setRecipes] = useState<Recipe[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn) return
+    let cancelled = false
+
+    apiFetch<Recipe[]>('/recipes/following', getToken)
+      .then(data => { if (!cancelled) setRecipes(data) })
+      .catch(() => { /* empty feed on failure is an acceptable fallback for a nice-to-have page */ })
+      .finally(() => { if (!cancelled) setLoading(false) })
+
+    return () => { cancelled = true }
+  }, [isLoaded, isSignedIn, getToken])
+
+  return { recipes, loading }
+}
+
 // Bulk-AI drafts the user hasn't reviewed/saved yet - powers the
 // "drafts in progress" panel on the recipe editor.
 export function usePendingDrafts(enabled = true) {

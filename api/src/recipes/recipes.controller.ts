@@ -46,6 +46,12 @@ export class RecipesController {
     return this.recipesService.findPending(req.userId)
   }
 
+  @Get('following')
+  async findFollowingFeed(@Req() req: Request & { userId: string }) {
+    const followingIds = await this.followsService.followingIds(req.userId)
+    return this.recipesService.findPublishedByOwners(followingIds)
+  }
+
   @Get('chef/:userId')
   async chefProfile(@Param('userId') userId: string) {
     const [recipes, profiles, followerCount] = await Promise.all([

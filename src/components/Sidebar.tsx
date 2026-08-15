@@ -129,6 +129,7 @@ export default function Sidebar({ sidebar }: SidebarProps) {
     },
     { key: 'collections', label: tx.myCollections, path: '/collections', icon: <span className="w-4 h-4 flex items-center justify-center text-sm">📚</span> },
     { key: 'meal-plan', label: tx.mealPlan, path: '/meal-plan', icon: <span className="w-4 h-4 flex items-center justify-center text-sm">🗓️</span> },
+    { key: 'following', label: tx.followingFeed, path: '/following', icon: <span className="w-4 h-4 flex items-center justify-center text-sm">👥</span> },
   ]
 
   const moreLinks: SidebarLinkDef[] = [
