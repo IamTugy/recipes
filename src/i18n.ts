@@ -511,6 +511,7 @@ export const t = {
       downloadRecipePdf: 'הורדת PDF',
       generatingPdf: 'מכינים PDF...',
       pdfGenerationFailed: 'יצירת ה-PDF נכשלה, נסו שוב',
+      printRecipe: 'הדפסת המתכון',
 },
   en: {
     siteTitle: "Tugy's Cookbook",
@@ -976,6 +977,7 @@ export const t = {
     downloadRecipePdf: 'Download PDF',
     generatingPdf: 'Generating PDF...',
     pdfGenerationFailed: 'Could not generate the PDF - try again',
+    printRecipe: 'Print recipe',
 },
 }
 

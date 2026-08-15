@@ -944,6 +944,18 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
                         {pdfGenerating ? tx.generatingPdf : tx.downloadRecipePdf}
                       </button>
 
+                      <button type="button"
+                        onClick={() => { closeActionsMenu(); window.print() }}
+                        className="flex items-center gap-3 w-full text-start px-3 py-[13.5px] rounded-lg text-sm font-medium text-cream/80 hover:bg-tint/[0.06] transition-colors"
+                      >
+                        <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <rect x="6" y="3" width="12" height="6" rx="1" />
+                          <rect x="4" y="9" width="16" height="8" rx="1.5" />
+                          <rect x="7" y="14" width="10" height="7" rx="1" />
+                        </svg>
+                        {tx.printRecipe}
+                      </button>
+
                       {/* Personal recipes (never published) have nothing
                           public to preview or link to, so sharing isn't
                           offered at all. */}
