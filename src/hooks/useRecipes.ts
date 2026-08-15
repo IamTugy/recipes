@@ -231,6 +231,7 @@ export function useRecipe(id: string | undefined) {
 
   function reload() {
     if (!id) return Promise.resolve()
+    setNotFound(false)
     return apiFetch<Recipe>(`/recipes/${id}`, getToken)
       .then(data => setRecipe(data))
       .catch(() => setNotFound(true))
@@ -240,9 +241,20 @@ export function useRecipe(id: string | undefined) {
     if (!isLoaded || !isSignedIn || !id) return
     let cancelled = false
 
-    apiFetch<Recipe>(`/recipes/${id}`, getToken)
-      .then(data => {
+    // A fresh id (or a retry) always starts from a clean notFound state -
+    // reset it inside the resolved-promise callback rather than directly in
+    // the effect body, since a stale notFound flag from a previous id/fetch
+    // would otherwise permanently stick around (see useCookSession's
+    // self-heal effect, which tears down a session the instant notFound is
+    // true and never gets a chance to see it go false again).
+    Promise.resolve()
+      .then(() => {
         if (cancelled) return
+        setNotFound(false)
+        return apiFetch<Recipe>(`/recipes/${id}`, getToken)
+      })
+      .then(data => {
+        if (cancelled || !data) return
         setRecipe(data)
       })
       .catch(() => {

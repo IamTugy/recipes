@@ -152,6 +152,10 @@ export function useCookSession(
   // advanceWizardOrFinish (which calls finishCookSession separately, so it
   // never abandons here either).
   function endSessionLocally(alsoAbandon: boolean) {
+    // Invalidate any in-flight discoverActiveSession call so its eventual
+    // resolution can't resurrect the session we're tearing down here - see
+    // discoverActiveSession's own race guard, which checks this same ref.
+    discoveryRequestIdRef.current++
     if (alsoAbandon && cookSessionId) {
       abandonCookSession(cookSessionId, getToken)
     }
@@ -190,7 +194,11 @@ export function useCookSession(
       pendingCookStepRef.current = { stepKey, stepNum }
       return
     }
-    suppressNextCheckedSyncRef.current = true
+    // No suppressNextCheckedSyncRef set here: this function never itself
+    // calls setCheckedSteps/setCheckedIngredients, so the checked-state-sync
+    // effect (deps [checkedSteps, checkedIngredients]) won't fire from this
+    // call alone - setting the flag here would just leave it stuck true
+    // until some later, unrelated checked-state change silently swallows it.
     logCookSessionStep(cookSessionId, stepKey, stepNum, [...checkedSteps], [...checkedIngredients], getToken)
   }
 
@@ -267,7 +275,17 @@ export function useCookSession(
           // since discoverActiveSession itself doesn't (see the notFound
           // self-heal effect for why that matters).
           setSeedRecipe(seed)
-          await discoverActiveSession(seed.id)
+          const resumed = await discoverActiveSession(seed.id)
+          if (resumed) {
+            setMultiplier(initialMultiplier)
+            setStartDockExpanded(true)
+            return
+          }
+          // The session that the earlier getCurrentCookSession conflict
+          // check saw may have ended in the brief window before this fetch
+          // (e.g. another device raced a Stop) - fall through to starting a
+          // fresh session rather than silently doing nothing.
+          startCookingNow(seed, initialMultiplier, initialCheckedSteps, initialCheckedIngredients)
           return
         }
         if (current && current.recipeId !== seed.id) {
@@ -322,16 +340,16 @@ export function useCookSession(
   // Cross-device resume (Phase D): call this from a recipe page's mount
   // effect - if the signed-in user already has an active session for that
   // recipe elsewhere, silently resume into it.
-  async function discoverActiveSession(recipeId: string) {
-    if (!currentUserId) return
+  async function discoverActiveSession(recipeId: string): Promise<boolean> {
+    if (!currentUserId) return false
     // Don't let visiting some other (possibly stale/abandoned) recipe's
     // page silently hijack an already-in-progress cook elsewhere - that's
     // exactly the cross-recipe collision the conflict dialog exists to
     // catch, and this path would bypass it.
-    if (cookSessionActive && activeRecipeId && activeRecipeId !== recipeId) return
+    if (cookSessionActive && activeRecipeId && activeRecipeId !== recipeId) return false
     const myRequestId = ++discoveryRequestIdRef.current
     const session = await getActiveCookSession(recipeId, getToken)
-    if (discoveryRequestIdRef.current !== myRequestId || !session) return
+    if (discoveryRequestIdRef.current !== myRequestId || !session) return false
     if (!sameStringSet(session.checkedSteps, checkedStepsRef.current)) {
       setCheckedSteps(new Set(session.checkedSteps))
     }
@@ -349,6 +367,7 @@ export function useCookSession(
     setCookSessionId(session.sessionId)
     setCookSessionStartedAt(session.startedAt)
     setCookSessionActive(true)
+    return true
   }
 
   function pipToggleNearestTimer() {
@@ -422,22 +441,30 @@ export function useCookSession(
           ? Math.max(0, session.currentStepNum - 1)
           : 0
         const stepChanged = resumedIndex !== wizardIndexRef.current
+        const checkedStepsChanged = !sameStringSet(session.checkedSteps, checkedStepsRef.current)
+        const checkedIngredientsChanged = !sameStringSet(session.checkedIngredients, checkedIngredientsRef.current)
         // Adopt lastEnteredStepRef/suppress the checked-state-sync effect
-        // BEFORE the setCheckedSteps/setCheckedIngredients/setWizardIndex
-        // calls below that will trigger it - otherwise that effect echoes
-        // this tab's stale step pointer back to the server, overwriting the
-        // remote change this poll just adopted (cross-tab step ping-pong).
+        // BEFORE the setCheckedSteps/setCheckedIngredients calls below that
+        // will trigger it - otherwise that effect echoes this tab's stale
+        // step pointer back to the server, overwriting the remote change
+        // this poll just adopted (cross-tab step ping-pong). Only set the
+        // flag when a checked-state setter below will actually fire - if
+        // neither checked Set changes, the sync effect never runs, so a
+        // flag set here would just stay stuck true and swallow the user's
+        // next real checkbox tick.
         if (stepChanged) {
           lastEnteredStepRef.current = {
             stepKey: session.currentStepKey ?? 'checklist',
             stepNum: session.currentStepNum ?? 0,
           }
-          suppressNextCheckedSyncRef.current = true
+          if (checkedStepsChanged || checkedIngredientsChanged) {
+            suppressNextCheckedSyncRef.current = true
+          }
         }
-        if (!sameStringSet(session.checkedSteps, checkedStepsRef.current)) {
+        if (checkedStepsChanged) {
           setCheckedSteps(new Set(session.checkedSteps))
         }
-        if (!sameStringSet(session.checkedIngredients, checkedIngredientsRef.current)) {
+        if (checkedIngredientsChanged) {
           setCheckedIngredients(new Set(session.checkedIngredients))
         }
         if (stepChanged) {
