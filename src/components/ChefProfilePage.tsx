@@ -1,6 +1,7 @@
 import { useParams } from 'react-router-dom'
 import { useChefProfile } from '../hooks/useRecipes'
 import { useFavorites } from '../hooks/useFavorites'
+import { useFollow } from '../hooks/useFollow'
 import { useLanguage } from '../hooks/useLanguage'
 import RecipeCard from './RecipeCard'
 import RecipeCardSkeleton from './RecipeCardSkeleton'
@@ -11,8 +12,9 @@ export default function ChefProfilePage() {
   const { userId } = useParams<{ userId: string }>()
   const { lang } = useLanguage()
         const tx = t[lang]
-  const { name, imageUrl, recipes, loading } = useChefProfile(userId)
+  const { name, imageUrl, recipes, followerCount, loading } = useChefProfile(userId)
   const { favoriteSlugs, toggle: toggleFavorite } = useFavorites()
+  const { following, toggle: toggleFollow, isSelf } = useFollow(userId)
   const displayName = name ?? (tx.chef)
 
   return (
@@ -23,11 +25,23 @@ export default function ChefProfilePage() {
           <h1 className="font-serif text-2xl font-bold text-cream">
             {displayName}
           </h1>
+          {!isSelf && !loading && (
+            <button type="button"
+              onClick={toggleFollow}
+              className={`shrink-0 px-4 h-9 rounded-full text-sm font-medium transition-colors ${
+                following
+                  ? 'border border-tint/[0.12] text-cream/60 hover:border-amber/40 hover:text-amber bg-transparent'
+                  : 'bg-amber text-bg hover:bg-amber/90'
+              }`}
+            >
+              {following ? tx.following : tx.follow}
+            </button>
+          )}
         </div>
         <p className="text-cream/30 text-xs mb-6">
           {loading
             ? (tx.loading)
-            : `${recipes.length} ${tx.publishedRecipes}`}
+            : `${recipes.length} ${tx.publishedRecipes} · ${tx.followers(followerCount)}`}
         </p>
 
         {loading ? (

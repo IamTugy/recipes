@@ -282,25 +282,27 @@ export function useChefProfile(userId: string | undefined) {
   const [name, setName] = useState<string | null>(null)
   const [imageUrl, setImageUrl] = useState<string | null>(null)
   const [recipes, setRecipes] = useState<Recipe[]>([])
+  const [followerCount, setFollowerCount] = useState(0)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (!isLoaded || !isSignedIn || !userId) return
     let cancelled = false
 
-    apiFetch<{ userId: string; name: string | null; imageUrl: string | null; recipes: Recipe[] }>(`/recipes/chef/${userId}`, getToken)
+    apiFetch<{ userId: string; name: string | null; imageUrl: string | null; recipes: Recipe[]; followerCount: number }>(`/recipes/chef/${userId}`, getToken)
       .then(data => {
         if (cancelled) return
         setName(data.name)
         setImageUrl(data.imageUrl)
         setRecipes(data.recipes)
+        setFollowerCount(data.followerCount)
       })
       .finally(() => { if (!cancelled) setLoading(false) })
 
     return () => { cancelled = true }
   }, [isLoaded, isSignedIn, userId, getToken])
 
-  return { name, imageUrl, recipes, loading }
+  return { name, imageUrl, recipes, followerCount, loading }
 }
 
 export function useTrending() {

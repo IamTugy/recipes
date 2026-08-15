@@ -19,6 +19,7 @@ import { MealPlanModule } from './meal-plan/meal-plan.module'
 import { ShareModule } from './share/share.module'
 import { RankingModule } from './ranking/ranking.module'
 import { JobsModule } from './jobs/jobs.module'
+import { FollowsModule } from './follows/follows.module'
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { JobsModule } from './jobs/jobs.module'
     ShareModule,
     RankingModule,
     JobsModule,
+    FollowsModule,
   ],
   controllers: [HealthController],
 })

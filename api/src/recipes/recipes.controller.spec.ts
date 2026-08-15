@@ -22,11 +22,12 @@ describe('RecipesController', () => {
     resolveDuplicateDispute: jest.fn(),
   }
   const usersService = { namesByIds: jest.fn().mockResolvedValue({}), profilesByIds: jest.fn().mockResolvedValue({}) }
+  const followsService = { followerCount: jest.fn().mockResolvedValue(0), isFollowing: jest.fn().mockResolvedValue(false), followingIds: jest.fn().mockResolvedValue([]) }
 
   function makeController(ownerUserId = 'admin_1') {
     const activityLog = { record: jest.fn(), trendingIds: jest.fn() }
     const config = { get: jest.fn().mockReturnValue(ownerUserId) }
-    return new RecipesController(recipesService as any, activityLog as any, config as any, usersService as any)
+    return new RecipesController(recipesService as any, activityLog as any, config as any, usersService as any, followsService as any)
   }
 
   beforeEach(() => jest.clearAllMocks())
@@ -66,7 +67,7 @@ describe('RecipesController', () => {
     recipesService.findByIdForUser.mockResolvedValue({ slug: 'a', status: 'draft' })
     const activityLog = { record: jest.fn(), trendingIds: jest.fn() }
     const config = { get: jest.fn().mockReturnValue('admin_1') }
-    const controller = new RecipesController(recipesService as any, activityLog as any, config as any, usersService as any)
+    const controller = new RecipesController(recipesService as any, activityLog as any, config as any, usersService as any, followsService as any)
 
     await controller.findOne('a', { userId: 'user_1' } as any)
 
@@ -85,7 +86,7 @@ describe('RecipesController', () => {
     recipesService.findById.mockImplementation((slug: string) =>
       slug === 'gone' ? Promise.resolve(null) : Promise.resolve({ slug }),
     )
-    const controller = new RecipesController(recipesService as any, activityLog as any, config as any, usersService as any)
+    const controller = new RecipesController(recipesService as any, activityLog as any, config as any, usersService as any, followsService as any)
 
     const result = await controller.trending()
 
@@ -115,7 +116,7 @@ describe('RecipesController', () => {
     const result = await controller.chefProfile('user_1')
     expect(recipesService.findPublishedByOwner).toHaveBeenCalledWith('user_1')
     expect(usersService.profilesByIds).toHaveBeenCalledWith(['user_1'])
-    expect(result).toEqual({ userId: 'user_1', name: 'Tugy', imageUrl: 'https://img.clerk.dev/a.jpg', recipes: [{ slug: 'a' }] })
+    expect(result).toEqual({ userId: 'user_1', name: 'Tugy', imageUrl: 'https://img.clerk.dev/a.jpg', recipes: [{ slug: 'a' }], followerCount: 0 })
   })
 
   it("GET /recipes/chef/:userId returns a null name/image when the user has no profile on record", async () => {
@@ -123,7 +124,7 @@ describe('RecipesController', () => {
     usersService.profilesByIds.mockResolvedValue({})
     const controller = makeController()
     const result = await controller.chefProfile('user_2')
-    expect(result).toEqual({ userId: 'user_2', name: null, imageUrl: null, recipes: [] })
+    expect(result).toEqual({ userId: 'user_2', name: null, imageUrl: null, recipes: [], followerCount: 0 })
   })
 
   it('GET /recipes/submissions returns the recent AI-review feed, annotated with owner display names', async () => {
@@ -213,7 +214,7 @@ describe('RecipesController', () => {
     recipesService.disputeDuplicate.mockResolvedValue(disputed)
     const activityLog = { record: jest.fn(), trendingIds: jest.fn() }
     const config = { get: jest.fn().mockReturnValue('admin_1') }
-    const controller = new RecipesController(recipesService as any, activityLog as any, config as any, usersService as any)
+    const controller = new RecipesController(recipesService as any, activityLog as any, config as any, usersService as any, followsService as any)
 
     const result = await controller.disputeDuplicate('a', { message: 'not a duplicate' }, { userId: 'user_1' } as any)
 
@@ -226,7 +227,7 @@ describe('RecipesController', () => {
     recipesService.listDuplicateDisputes.mockResolvedValue([{ toObject: () => ({ slug: 'a' }) }])
     const config = { get: jest.fn().mockReturnValue('owner_1') }
     const activityLog = { record: jest.fn(), trendingIds: jest.fn() }
-    const controller = new RecipesController(recipesService as any, activityLog as any, config as any, usersService as any)
+    const controller = new RecipesController(recipesService as any, activityLog as any, config as any, usersService as any, followsService as any)
 
     const result = await controller.listDuplicateDisputes({ userId: 'owner_1' } as any)
 
@@ -236,7 +237,7 @@ describe('RecipesController', () => {
   it('GET /recipes/disputes throws ForbiddenException for a non-owner', async () => {
     const config = { get: jest.fn().mockReturnValue('owner_1') }
     const activityLog = { record: jest.fn(), trendingIds: jest.fn() }
-    const controller = new RecipesController(recipesService as any, activityLog as any, config as any, usersService as any)
+    const controller = new RecipesController(recipesService as any, activityLog as any, config as any, usersService as any, followsService as any)
 
     await expect(controller.listDuplicateDisputes({ userId: 'user_1' } as any)).rejects.toThrow(ForbiddenException)
   })
@@ -246,7 +247,7 @@ describe('RecipesController', () => {
     recipesService.resolveDuplicateDispute.mockResolvedValue(resolved)
     const activityLog = { record: jest.fn(), trendingIds: jest.fn() }
     const config = { get: jest.fn().mockReturnValue('owner_1') }
-    const controller = new RecipesController(recipesService as any, activityLog as any, config as any, usersService as any)
+    const controller = new RecipesController(recipesService as any, activityLog as any, config as any, usersService as any, followsService as any)
 
     const result = await controller.resolveDuplicateDispute('a', { approve: true }, { userId: 'owner_1' } as any)
 
@@ -258,7 +259,7 @@ describe('RecipesController', () => {
   it('POST /recipes/:id/dispute-duplicate/resolve throws ForbiddenException for a non-owner', async () => {
     const config = { get: jest.fn().mockReturnValue('owner_1') }
     const activityLog = { record: jest.fn(), trendingIds: jest.fn() }
-    const controller = new RecipesController(recipesService as any, activityLog as any, config as any, usersService as any)
+    const controller = new RecipesController(recipesService as any, activityLog as any, config as any, usersService as any, followsService as any)
 
     await expect(controller.resolveDuplicateDispute('a', { approve: false }, { userId: 'user_1' } as any)).rejects.toThrow(ForbiddenException)
   })

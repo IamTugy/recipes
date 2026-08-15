@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config'
 import { RecipesService } from './recipes.service'
 import { ActivityLogService } from '../activity-log/activity-log.service'
 import { UsersService } from '../users/users.service'
+import { FollowsService } from '../follows/follows.service'
 import { SaveRecipeDraftDto } from './dto/save-recipe-draft.dto'
 import { UpdateRecipeImageDto } from './dto/update-recipe-image.dto'
 import { DisputeDuplicateDto } from './dto/dispute-duplicate.dto'
@@ -16,6 +17,7 @@ export class RecipesController {
     private readonly activityLog: ActivityLogService,
     private readonly config: ConfigService,
     private readonly usersService: UsersService,
+    private readonly followsService: FollowsService,
   ) {}
 
   private isAdmin(userId: string): boolean {
@@ -46,11 +48,12 @@ export class RecipesController {
 
   @Get('chef/:userId')
   async chefProfile(@Param('userId') userId: string) {
-    const [recipes, profiles] = await Promise.all([
+    const [recipes, profiles, followerCount] = await Promise.all([
       this.recipesService.findPublishedByOwner(userId),
       this.usersService.profilesByIds([userId]),
+      this.followsService.followerCount(userId),
     ])
-    return { userId, name: profiles[userId]?.name ?? null, imageUrl: profiles[userId]?.imageUrl ?? null, recipes }
+    return { userId, name: profiles[userId]?.name ?? null, imageUrl: profiles[userId]?.imageUrl ?? null, recipes, followerCount }
   }
 
   // Public "in progress" feed - any signed-in user can see recent AI review
