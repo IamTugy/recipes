@@ -24,6 +24,9 @@ import TimerPanel from './components/TimerPanel'
 import ShoppingListPanel from './components/ShoppingListPanel'
 import ScrollToTopButton from './components/ScrollToTopButton'
 import KeyboardShortcutsHelp from './components/KeyboardShortcutsHelp'
+import BackgroundCookStatus from './components/BackgroundCookStatus'
+import CookDock from './components/CookDock'
+import { useCookSession } from './hooks/useCookSession'
 import { useTimers } from './hooks/useTimers'
 import { useShoppingList } from './hooks/useShoppingList'
 import { useSidebar } from './hooks/useSidebar'
@@ -34,7 +37,9 @@ import { fetchPreferences } from './lib/preferences'
 import { t } from './i18n'
 
 export default function App() {
+  const { lang, setLang } = useLanguage()
   const { timers, addTimer, toggleTimer, removeTimer, resetTimer } = useTimers()
+  const cookSession = useCookSession(lang, timers, addTimer, toggleTimer)
   const shoppingList = useShoppingList()
   const sidebar = useSidebar()
   const [shoppingListOpen, setShoppingListOpen] = useState(false)
@@ -43,7 +48,6 @@ export default function App() {
   const timerPanelRef = useRef<HTMLDivElement>(null)
   const [timerBarHeight, setTimerBarHeight] = useState(0)
   const navigate = useNavigate()
-  const { lang, setLang } = useLanguage()
   const { setMode } = useTheme()
   const tx = t[lang]
 
@@ -127,6 +131,15 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
 
+  useEffect(() => {
+    if (!cookSession.lightboxUrl) return
+    function handleEscape(e: KeyboardEvent) {
+      if (e.key === 'Escape') cookSession.setLightboxUrl(null)
+    }
+    window.addEventListener('keydown', handleEscape)
+    return () => window.removeEventListener('keydown', handleEscape)
+  }, [cookSession.lightboxUrl, cookSession.setLightboxUrl])
+
   if (!isLoaded) {
     return <div className="min-h-dvh bg-bg" />
   }
@@ -193,6 +206,7 @@ export default function App() {
                 timers={timers}
                 timerBarHeight={timerBarHeight}
                 onAddToShoppingList={shoppingList.addItems}
+                cookSession={cookSession}
               />
             }
           />
@@ -209,6 +223,73 @@ export default function App() {
           />
         )}
       </AnimatePresence>
+      {cookSession.cookSessionActive && cookSession.flatSteps.length > 0 && (
+        <div aria-hidden="true" className="h-[20dvh] sm:h-24" style={{ paddingBottom: timerBarHeight }} />
+      )}
+      {cookSession.cookSessionActive && cookSession.flatSteps.length > 0 && (
+        <CookDock
+          lang={lang}
+          ingredients={cookSession.recipe?.ingredients ?? []}
+          checkedIngredients={cookSession.checkedIngredients}
+          onToggleIngredient={cookSession.toggleIngredient}
+          multiplier={cookSession.multiplier}
+          steps={cookSession.flatSteps}
+          wizardIndex={cookSession.wizardIndex}
+          onPrev={() => cookSession.setWizardIndex(i => Math.max(i - 1, 0))}
+          onAdvance={key => { cookSession.markStepChecked(key); cookSession.advanceWizardOrFinish() }}
+          onMarkDone={cookSession.handleWizardMarkDone}
+          onStop={cookSession.stopCooking}
+          onStepEntered={cookSession.handleStepEntered}
+          onExpand={() => cookSession.backgroundCookStatusRef.current?.exitFloatingView()}
+          checkedSteps={cookSession.checkedSteps}
+          nearestTimer={cookSession.nearestTimer}
+          onToggleNearestTimer={cookSession.pipToggleNearestTimer}
+          getTimerForStep={cookSession.getTimerForStep}
+          onStartTimer={cookSession.startTimer}
+          onOpenLightbox={cookSession.setLightboxUrl}
+          timerBarHeight={timerBarHeight}
+          lightboxOpen={!!cookSession.lightboxUrl}
+          elapsedBaselineMs={cookSession.cookSessionStartedAt ? new Date(cookSession.cookSessionStartedAt).getTime() : undefined}
+          startExpanded={cookSession.startDockExpanded}
+          onExpandConsumed={cookSession.onExpandConsumed}
+        />
+      )}
+      <BackgroundCookStatus
+        ref={cookSession.backgroundCookStatusRef}
+        active={cookSession.cookSessionActive && !!cookSession.currentWizardStep}
+        recipeTitle={lang === 'he' ? (cookSession.recipe?.titleHe ?? cookSession.recipe?.title ?? '') : (cookSession.recipe?.title ?? '')}
+        stepLabel={cookSession.wizardStepLabel}
+        stepText={cookSession.currentWizardStep?.instruction ?? ''}
+        nearestTimer={cookSession.nearestTimer}
+        lang={lang}
+        canGoPrev={cookSession.wizardIndex > 0}
+        canGoNext={cookSession.wizardIndex < cookSession.flatSteps.length - 1}
+        onToggleNearestTimer={cookSession.pipToggleNearestTimer}
+        onPrevStep={cookSession.pipPreviousStep}
+        onNextStep={cookSession.pipNextStep}
+      />
+      {cookSession.lightboxUrl && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="print:hidden fixed inset-0 z-[70] bg-black/90 flex items-center justify-center p-4"
+          onClick={() => cookSession.setLightboxUrl(null)}
+        >
+          <button type="button"
+            onClick={() => cookSession.setLightboxUrl(null)}
+            aria-label={tx.close}
+            className="absolute top-4 right-4 h-10 w-10 flex items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
+          >
+            ✕
+          </button>
+          <img
+            src={cookSession.lightboxUrl}
+            alt=""
+            onClick={e => e.stopPropagation()}
+            className="max-w-full max-h-full object-contain rounded-lg"
+          />
+        </div>
+      )}
       <ShoppingListPanel
         open={shoppingListOpen}
         onClose={() => setShoppingListOpen(false)}
