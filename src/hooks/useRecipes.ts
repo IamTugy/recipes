@@ -227,39 +227,33 @@ export function useRecipe(id: string | undefined) {
   const { getToken, isLoaded, isSignedIn } = useAuth()
   const [recipe, setRecipe] = useState<Recipe | undefined>(undefined)
   const [loading, setLoading] = useState(true)
-  const [notFound, setNotFound] = useState(false)
+  // Id-keyed rather than a plain boolean: notFound is DERIVED below as
+  // `notFoundId === id`, so the instant `id` changes to anything other than
+  // the id that failed, notFound is synchronously false on that very render -
+  // no reset call needed, and no timing window where a stale true can leak
+  // into a sibling effect's read (see useCookSession's self-heal effect).
+  const [notFoundId, setNotFoundId] = useState<string | null>(null)
 
   function reload() {
     if (!id) return Promise.resolve()
-    setNotFound(false)
+    setNotFoundId(null)
     return apiFetch<Recipe>(`/recipes/${id}`, getToken)
       .then(data => setRecipe(data))
-      .catch(() => setNotFound(true))
+      .catch(() => setNotFoundId(id))
   }
 
   useEffect(() => {
     if (!isLoaded || !isSignedIn || !id) return
     let cancelled = false
 
-    // A fresh id (or a retry) always starts from a clean notFound state -
-    // reset it inside the resolved-promise callback rather than directly in
-    // the effect body, since a stale notFound flag from a previous id/fetch
-    // would otherwise permanently stick around (see useCookSession's
-    // self-heal effect, which tears down a session the instant notFound is
-    // true and never gets a chance to see it go false again).
-    Promise.resolve()
-      .then(() => {
-        if (cancelled) return
-        setNotFound(false)
-        return apiFetch<Recipe>(`/recipes/${id}`, getToken)
-      })
+    apiFetch<Recipe>(`/recipes/${id}`, getToken)
       .then(data => {
-        if (cancelled || !data) return
+        if (cancelled) return
         setRecipe(data)
       })
       .catch(() => {
         if (cancelled) return
-        setNotFound(true)
+        setNotFoundId(id)
       })
       .finally(() => {
         if (!cancelled) setLoading(false)
@@ -268,7 +262,7 @@ export function useRecipe(id: string | undefined) {
     return () => { cancelled = true }
   }, [isLoaded, isSignedIn, id, getToken])
 
-  return { recipe, loading, notFound, reload }
+  return { recipe, loading, notFound: notFoundId === id && !!id, reload }
 }
 
 export function useChefProfile(userId: string | undefined) {

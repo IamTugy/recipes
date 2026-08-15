@@ -275,16 +275,27 @@ export function useCookSession(
           // since discoverActiveSession itself doesn't (see the notFound
           // self-heal effect for why that matters).
           setSeedRecipe(seed)
-          const resumed = await discoverActiveSession(seed.id)
-          if (resumed) {
+          const discoveryResult = await discoverActiveSession(seed.id)
+          if (discoveryResult === 'resumed') {
             setMultiplier(initialMultiplier)
             setStartDockExpanded(true)
             return
           }
-          // The session that the earlier getCurrentCookSession conflict
-          // check saw may have ended in the brief window before this fetch
-          // (e.g. another device raced a Stop) - fall through to starting a
-          // fresh session rather than silently doing nothing.
+          if (discoveryResult === 'discarded') {
+            // The discovery fetch was raced away (e.g. endSessionLocally
+            // bumped discoveryRequestIdRef while it was in flight) or was
+            // never attempted (no user / cross-recipe guard) - the state is
+            // ambiguous, and there may still be a live session out there.
+            // Do nothing rather than risk starting a fresh session that
+            // silently overwrites/destroys it; the user can just click
+            // "Start cooking" again.
+            return
+          }
+          // discoveryResult === 'none': the server genuinely confirmed there
+          // is no active session for this recipe (the earlier
+          // getCurrentCookSession conflict check may have seen one that
+          // ended in the brief window before this fetch, e.g. another
+          // device raced a Stop) - safe to fall through to a fresh session.
           startCookingNow(seed, initialMultiplier, initialCheckedSteps, initialCheckedIngredients)
           return
         }
@@ -340,16 +351,26 @@ export function useCookSession(
   // Cross-device resume (Phase D): call this from a recipe page's mount
   // effect - if the signed-in user already has an active session for that
   // recipe elsewhere, silently resume into it.
-  async function discoverActiveSession(recipeId: string): Promise<boolean> {
-    if (!currentUserId) return false
+  //
+  // Tri-state return distinguishes "no session exists" from "this call was
+  // discarded/inconclusive" - callers that fall back to starting a fresh
+  // session (startCookingWithConflictCheck's same-recipe resume branch) must
+  // only do so on 'none'. Treating 'discarded' the same as 'none' would risk
+  // starting a fresh session that silently overwrites/destroys a session
+  // that may genuinely still be live (the discovery fetch was raced away by
+  // endSessionLocally bumping discoveryRequestIdRef, not because the server
+  // said there's nothing to resume).
+  async function discoverActiveSession(recipeId: string): Promise<'resumed' | 'none' | 'discarded'> {
+    if (!currentUserId) return 'discarded'
     // Don't let visiting some other (possibly stale/abandoned) recipe's
     // page silently hijack an already-in-progress cook elsewhere - that's
     // exactly the cross-recipe collision the conflict dialog exists to
     // catch, and this path would bypass it.
-    if (cookSessionActive && activeRecipeId && activeRecipeId !== recipeId) return false
+    if (cookSessionActive && activeRecipeId && activeRecipeId !== recipeId) return 'discarded'
     const myRequestId = ++discoveryRequestIdRef.current
     const session = await getActiveCookSession(recipeId, getToken)
-    if (discoveryRequestIdRef.current !== myRequestId || !session) return false
+    if (discoveryRequestIdRef.current !== myRequestId) return 'discarded'
+    if (!session) return 'none'
     if (!sameStringSet(session.checkedSteps, checkedStepsRef.current)) {
       setCheckedSteps(new Set(session.checkedSteps))
     }
@@ -367,7 +388,7 @@ export function useCookSession(
     setCookSessionId(session.sessionId)
     setCookSessionStartedAt(session.startedAt)
     setCookSessionActive(true)
-    return true
+    return 'resumed'
   }
 
   function pipToggleNearestTimer() {
