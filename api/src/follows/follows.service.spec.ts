@@ -3,6 +3,7 @@ import { getModelToken } from '@nestjs/mongoose'
 import { BadRequestException } from '@nestjs/common'
 import { FollowsService } from './follows.service'
 import { Follow } from './schemas/follow.schema'
+import { NotificationsService } from '../notifications/notifications.service'
 
 describe('FollowsService', () => {
   const findOneAndUpdate = jest.fn()
@@ -12,17 +13,22 @@ describe('FollowsService', () => {
   const find = jest.fn()
 
   const model = { findOneAndUpdate, deleteOne, exists, countDocuments, find }
+  const notificationsService = { create: jest.fn() }
 
   beforeEach(() => jest.clearAllMocks())
 
   async function makeService() {
     const moduleRef = await Test.createTestingModule({
-      providers: [FollowsService, { provide: getModelToken(Follow.name), useValue: model }],
+      providers: [
+        FollowsService,
+        { provide: getModelToken(Follow.name), useValue: model },
+        { provide: NotificationsService, useValue: notificationsService },
+      ],
     }).compile()
     return moduleRef.get(FollowsService)
   }
 
-  it('follow upserts a follow by followerId+followingId', async () => {
+  it('follow upserts a follow by followerId+followingId and notifies the followed user', async () => {
     findOneAndUpdate.mockReturnValue({ exec: jest.fn().mockResolvedValue({}) })
     const service = await makeService()
     await service.follow('user_1', 'user_2')
@@ -31,12 +37,14 @@ describe('FollowsService', () => {
       { followerId: 'user_1', followingId: 'user_2' },
       { upsert: true },
     )
+    expect(notificationsService.create).toHaveBeenCalledWith('user_2', 'new_follower', 'user_1')
   })
 
   it('follow rejects following yourself', async () => {
     const service = await makeService()
     await expect(service.follow('user_1', 'user_1')).rejects.toThrow(BadRequestException)
     expect(findOneAndUpdate).not.toHaveBeenCalled()
+    expect(notificationsService.create).not.toHaveBeenCalled()
   })
 
   it('unfollow deletes the follow by followerId+followingId', async () => {

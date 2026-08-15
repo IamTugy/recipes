@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useLanguage } from '../hooks/useLanguage'
+import NotificationsBell from './NotificationsBell'
 import { t } from "../i18n";
 
 interface NavProps {
@@ -36,6 +37,7 @@ export default function Nav({ shoppingListCount, onOpenShoppingList, onToggleMob
         </div>
 
         <div className="flex items-center gap-0.5 sm:gap-2 shrink-0">
+          <NotificationsBell />
           <button type="button"
             onClick={onOpenShoppingList}
             className="relative h-10 w-10 sm:h-7 sm:w-7 flex items-center justify-center rounded-full text-cream/40 hover:text-cream/70 hover:bg-tint/[0.05] transition-colors"

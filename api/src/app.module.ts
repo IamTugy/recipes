@@ -21,6 +21,7 @@ import { RankingModule } from './ranking/ranking.module'
 import { JobsModule } from './jobs/jobs.module'
 import { FollowsModule } from './follows/follows.module'
 import { ReportsModule } from './reports/reports.module'
+import { NotificationsModule } from './notifications/notifications.module'
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { ReportsModule } from './reports/reports.module'
     JobsModule,
     FollowsModule,
     ReportsModule,
+    NotificationsModule,
   ],
   controllers: [HealthController],
 })

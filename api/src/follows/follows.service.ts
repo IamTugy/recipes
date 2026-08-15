@@ -2,10 +2,14 @@ import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { Follow, FollowDocument } from './schemas/follow.schema'
+import { NotificationsService } from '../notifications/notifications.service'
 
 @Injectable()
 export class FollowsService {
-  constructor(@InjectModel(Follow.name) private readonly followModel: Model<FollowDocument>) {}
+  constructor(
+    @InjectModel(Follow.name) private readonly followModel: Model<FollowDocument>,
+    private readonly notificationsService: NotificationsService,
+  ) {}
 
   async follow(followerId: string, followingId: string): Promise<void> {
     if (followerId === followingId) {
@@ -14,6 +18,7 @@ export class FollowsService {
     await this.followModel
       .findOneAndUpdate({ followerId, followingId }, { followerId, followingId }, { upsert: true })
       .exec()
+    await this.notificationsService.create(followingId, 'new_follower', followerId)
   }
 
   async unfollow(followerId: string, followingId: string): Promise<void> {
