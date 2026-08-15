@@ -35,9 +35,7 @@ import { useCookSession } from '../hooks/useCookSession'
 
 interface RecipeDetailProps {
   onAddTimer: (label: string, minutes: number, recipeId: string, stepIndex: number) => void
-  onToggleTimer: (id: string) => void
   timers: TimerState[]
-  timerBarHeight: number
   onAddToShoppingList: (items: { name: string; amount: number | null; unit: string }[]) => void
   cookSession: ReturnType<typeof useCookSession>
 }
@@ -157,6 +155,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
   const [reviewPhotoUploading, setReviewPhotoUploading] = useState(false)
   const [distribution, setDistribution] = useState<Record<1 | 2 | 3 | 4 | 5, number> | null>(null)
   const [hasPostedReview, setHasPostedReview] = useState(false)
+  const [ratingLoaded, setRatingLoaded] = useState(false)
   const [showPostCookReviewModal, setShowPostCookReviewModal] = useState(false)
   const [isEditingReview, setIsEditingReview] = useState(false)
   const [translations, setTranslations] = useState<Record<string, { text: string; showing: boolean; loading: boolean }>>({})
@@ -169,11 +168,11 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
   // on a different page, this simply waits until they navigate back here;
   // CookReminderBanner (Phase G) catches the case where they never do.
   useEffect(() => {
-    if (cookSession.justFinishedRecipeId === id && currentUserId && !hasPostedReview) {
+    if (cookSession.justFinishedRecipeId === id && currentUserId && ratingLoaded && !hasPostedReview) {
       setShowPostCookReviewModal(true)
       cookSession.clearJustFinished()
     }
-  }, [cookSession.justFinishedRecipeId, id, currentUserId, hasPostedReview, cookSession])
+  }, [cookSession.justFinishedRecipeId, id, currentUserId, ratingLoaded, hasPostedReview, cookSession])
 
   // Sync the textarea once the saved note has loaded for this recipe
   useEffect(() => {
@@ -217,16 +216,21 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
     const token = await getToken()
     const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {}
     const res = await fetch(`/api/ratings/${id}/mine`, { headers })
-    if (!res.ok) return
+    if (!res.ok) {
+      setRatingLoaded(true)
+      return
+    }
     const mine: { score: number; comment: string | null; photoUrl: string | null } | null = await res.json()
     setUserRating(mine?.score ?? null)
     setReviewComment(mine?.comment ?? '')
     setReviewPhotoUrl(mine?.photoUrl ?? null)
     setHasPostedReview(!!mine?.comment)
+    setRatingLoaded(true)
   }
 
   useEffect(() => {
     if (id) {
+      setRatingLoaded(false)
       loadReviews()
       loadMyRating()
     }
@@ -1232,7 +1236,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
                   // Force reflow so re-adding the class restarts the animation on rapid re-clicks.
                   void btn.offsetWidth
                   btn.classList.add('start-cooking-fill-active')
-                  if (recipe) cookSession.openWizard(recipe, multiplier)
+                  if (recipe) cookSession.openWizard(recipe, multiplier, checkedSteps, checkedIngredients)
                 }}
                 className="relative overflow-hidden flex items-center justify-center gap-2 w-full sm:w-auto px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors bg-amber text-bg hover:bg-amber/90 disabled:opacity-60 disabled:cursor-not-allowed"
               >
@@ -2017,7 +2021,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
         confirmLabel={tx.startNewCook}
         cancelLabel={tx.cancel}
         busy={cookSession.resolvingCookConflict}
-        onConfirm={() => recipe && cookSession.confirmStartNewCook(recipe, multiplier)}
+        onConfirm={() => recipe && cookSession.confirmStartNewCook(recipe, multiplier, checkedSteps, checkedIngredients)}
         onCancel={cookSession.dismissCookConflict}
       />
 

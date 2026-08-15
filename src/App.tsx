@@ -138,6 +138,7 @@ export default function App() {
     }
     window.addEventListener('keydown', handleEscape)
     return () => window.removeEventListener('keydown', handleEscape)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- cookSession is a new object every render from useCookSession(); lightboxUrl and setLightboxUrl are the only fields this effect reads/calls and are already listed, so excluding the parent object is intentional
   }, [cookSession.lightboxUrl, cookSession.setLightboxUrl])
 
   if (!isLoaded) {
@@ -202,9 +203,7 @@ export default function App() {
             element={
               <RecipeDetail
                 onAddTimer={addTimer}
-                onToggleTimer={toggleTimer}
                 timers={timers}
-                timerBarHeight={timerBarHeight}
                 onAddToShoppingList={shoppingList.addItems}
                 cookSession={cookSession}
               />

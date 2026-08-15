@@ -35,7 +35,16 @@ export function useCookSession(
   // useRecipe(activeRecipeId)'s own fetch has had a chance to resolve.
   const [seedRecipe, setSeedRecipe] = useState<Recipe | null>(null)
   const { recipe: fetchedRecipe } = useRecipe(activeRecipeId)
-  const recipe = fetchedRecipe ?? seedRecipe ?? undefined
+  // useRecipe(id) never clears its own recipe state when id changes - it
+  // only overwrites it once a new fetch resolves - so fetchedRecipe can
+  // still hold the PREVIOUS activeRecipeId's recipe for a full round-trip
+  // (or forever, on fetch failure) after switching recipes. Check identity
+  // explicitly instead of trusting fetch-resolution ordering via `??`.
+  const recipe = fetchedRecipe?.id === activeRecipeId
+    ? fetchedRecipe
+    : seedRecipe?.id === activeRecipeId
+      ? seedRecipe
+      : undefined
 
   const [cookSessionActive, setCookSessionActive] = useState(false)
   const [cookSessionId, setCookSessionId] = useState<string | null>(null)
@@ -165,13 +174,27 @@ export function useCookSession(
 
   // seed is whatever recipe RecipeDetail already had loaded - see the
   // seedRecipe comment above for why this can't wait for useRecipe's fetch.
-  function startCookingNow(seed: Recipe, initialMultiplier: number) {
+  // initialCheckedSteps/initialCheckedIngredients are RecipeDetail's own
+  // local checklist state at the moment "Start cooking" was clicked - the
+  // hook's own checkedSteps/checkedIngredients state hasn't been touched
+  // for this recipe yet (and may still hold stale state from a previous
+  // cook), so we must seed from what the page actually has rather than
+  // read our own state.
+  function startCookingNow(
+    seed: Recipe,
+    initialMultiplier: number,
+    initialCheckedSteps: Set<string>,
+    initialCheckedIngredients: Set<string>,
+  ) {
+    setCheckedSteps(new Set(initialCheckedSteps))
+    setCheckedIngredients(new Set(initialCheckedIngredients))
+
     let n = 0
     const localStepNums: number[][] = seed.steps.map(g => g.items.map(() => ++n))
     const localFlatSteps = seed.steps.flatMap((group, gi) =>
       group.items.map((_step, si) => ({ groupIdx: gi, stepIdx: si, stepNum: localStepNums[gi][si] }))
     )
-    const firstUnchecked = localFlatSteps.findIndex(s => !checkedSteps.has(`${s.groupIdx}-${s.stepIdx}`))
+    const firstUnchecked = localFlatSteps.findIndex(s => !initialCheckedSteps.has(`${s.groupIdx}-${s.stepIdx}`))
     const startIndex = firstUnchecked === -1 ? 0 : firstUnchecked
 
     setSeedRecipe(seed)
@@ -190,23 +213,28 @@ export function useCookSession(
         setCookSessionId(sessionId)
         if (!sessionId) return
         const allIngredientsChecked = seed.ingredients.every((group, gi) =>
-          group.items.every((_, ii) => checkedIngredients.has(`${gi}-${ii}`))
+          group.items.every((_, ii) => initialCheckedIngredients.has(`${gi}-${ii}`))
         )
         const initialStep = localFlatSteps[startIndex]
         if (allIngredientsChecked && initialStep) {
           const stepKey = `${initialStep.groupIdx}-${initialStep.stepIdx}`
           lastEnteredStepRef.current = { stepKey, stepNum: initialStep.stepNum }
-          logCookSessionStep(sessionId, stepKey, initialStep.stepNum, [...checkedSteps], [...checkedIngredients], getToken)
+          logCookSessionStep(sessionId, stepKey, initialStep.stepNum, [...initialCheckedSteps], [...initialCheckedIngredients], getToken)
         } else if (pendingCookStepRef.current) {
           const { stepKey, stepNum } = pendingCookStepRef.current
           pendingCookStepRef.current = null
-          logCookSessionStep(sessionId, stepKey, stepNum, [...checkedSteps], [...checkedIngredients], getToken)
+          logCookSessionStep(sessionId, stepKey, stepNum, [...initialCheckedSteps], [...initialCheckedIngredients], getToken)
         }
       })
     }
   }
 
-  async function startCookingWithConflictCheck(seed: Recipe, initialMultiplier: number) {
+  async function startCookingWithConflictCheck(
+    seed: Recipe,
+    initialMultiplier: number,
+    initialCheckedSteps: Set<string>,
+    initialCheckedIngredients: Set<string>,
+  ) {
     try {
       if (currentUserId) {
         const current = await getCurrentCookSession(getToken)
@@ -215,25 +243,35 @@ export function useCookSession(
           return
         }
       }
-      startCookingNow(seed, initialMultiplier)
+      startCookingNow(seed, initialMultiplier, initialCheckedSteps, initialCheckedIngredients)
     } finally {
       setStartingCook(false)
     }
   }
 
-  function openWizard(seed: Recipe, initialMultiplier: number) {
+  function openWizard(
+    seed: Recipe,
+    initialMultiplier: number,
+    initialCheckedSteps: Set<string>,
+    initialCheckedIngredients: Set<string>,
+  ) {
     if (cookSessionActive || startingCook) return
     setStartingCook(true)
-    void startCookingWithConflictCheck(seed, initialMultiplier)
+    void startCookingWithConflictCheck(seed, initialMultiplier, initialCheckedSteps, initialCheckedIngredients)
   }
 
-  async function confirmStartNewCook(seed: Recipe, initialMultiplier: number) {
+  async function confirmStartNewCook(
+    seed: Recipe,
+    initialMultiplier: number,
+    initialCheckedSteps: Set<string>,
+    initialCheckedIngredients: Set<string>,
+  ) {
     if (!cookConflict) return
     setResolvingCookConflict(true)
     await abandonCookSession(cookConflict.sessionId, getToken)
     setResolvingCookConflict(false)
     setCookConflict(null)
-    startCookingNow(seed, initialMultiplier)
+    startCookingNow(seed, initialMultiplier, initialCheckedSteps, initialCheckedIngredients)
   }
 
   function dismissCookConflict() {
@@ -259,6 +297,11 @@ export function useCookSession(
   // recipe elsewhere, silently resume into it.
   async function discoverActiveSession(recipeId: string) {
     if (!currentUserId) return
+    // Don't let visiting some other (possibly stale/abandoned) recipe's
+    // page silently hijack an already-in-progress cook elsewhere - that's
+    // exactly the cross-recipe collision the conflict dialog exists to
+    // catch, and this path would bypass it.
+    if (cookSessionActive && activeRecipeId && activeRecipeId !== recipeId) return
     const myRequestId = ++discoveryRequestIdRef.current
     const session = await getActiveCookSession(recipeId, getToken)
     if (discoveryRequestIdRef.current !== myRequestId || !session) return
