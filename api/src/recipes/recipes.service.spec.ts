@@ -189,13 +189,46 @@ describe('RecipesService', () => {
   })
 
   it('findAll overlays the published-revision snapshot instead of live in-progress edits', async () => {
-    const recipe = { slug: 'a', publishedRevision: 1, toObject: () => ({ slug: 'a', id: 'a', title: 'Live Draft Title' }) }
+    const recipe = { id: 'a', slug: 'a', publishedRevision: 1, toObject: () => ({ slug: 'a', id: 'a', title: 'Live Draft Title' }) }
     const find = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue([recipe]) })
-    const revisionModel = { findOne: jest.fn().mockReturnValue({ lean: () => ({ exec: jest.fn().mockResolvedValue({ snapshot: { title: 'Published Title' } }) }) }) }
+    const revisionModel = { find: jest.fn().mockReturnValue({ lean: () => ({ exec: jest.fn().mockResolvedValue([{ recipeId: 'a', revisionNumber: 1, snapshot: { title: 'Published Title' } }]) }) }) }
     const service = await makeService({ find }, revisionModel)
     const result = await service.findAll()
 
     expect(result[0]).toMatchObject({ slug: 'a', title: 'Published Title' })
+  })
+
+  it('findAll fetches every published recipe\'s revision snapshot in a single batched query, not one per recipe', async () => {
+    const recipes = [
+      { id: 'a', slug: 'a', publishedRevision: 1, toObject: () => ({ slug: 'a', id: 'a', title: 'Draft A' }) },
+      { id: 'b', slug: 'b', publishedRevision: 2, toObject: () => ({ slug: 'b', id: 'b', title: 'Draft B' }) },
+      { id: 'c', slug: 'c', publishedRevision: undefined, toObject: () => ({ slug: 'c', id: 'c', title: 'Never published' }) },
+    ]
+    const find = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipes) })
+    const revisionFind = jest.fn().mockReturnValue({
+      lean: () => ({
+        exec: jest.fn().mockResolvedValue([
+          { recipeId: 'a', revisionNumber: 1, snapshot: { title: 'Published A' } },
+          { recipeId: 'b', revisionNumber: 2, snapshot: { title: 'Published B' } },
+        ]),
+      }),
+    })
+    const revisionModel = { find: revisionFind }
+    const service = await makeService({ find }, revisionModel)
+    const result = await service.findAll()
+
+    expect(revisionFind).toHaveBeenCalledTimes(1)
+    expect(revisionFind).toHaveBeenCalledWith({
+      $or: [
+        { recipeId: 'a', revisionNumber: 1 },
+        { recipeId: 'b', revisionNumber: 2 },
+      ],
+    })
+    expect(result).toEqual(expect.arrayContaining([
+      expect.objectContaining({ slug: 'a', title: 'Published A' }),
+      expect.objectContaining({ slug: 'b', title: 'Published B' }),
+      expect.objectContaining({ slug: 'c', title: 'Never published' }),
+    ]))
   })
 
   it('findAll attaches averageRating, ratingCount, and viewCount', async () => {

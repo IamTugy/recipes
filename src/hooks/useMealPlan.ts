@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useAuth } from '@clerk/react'
 import { apiFetch, ApiError } from '../lib/api'
+import { useToast } from './useToast'
+import { useLanguage } from './useLanguage'
+import { t } from '../i18n'
 
 export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack'
 
@@ -15,6 +18,9 @@ export function useMealPlan(start: string, end: string) {
   const { getToken, isLoaded, isSignedIn } = useAuth()
   const [entries, setEntries] = useState<MealPlanEntry[]>([])
   const [loading, setLoading] = useState(true)
+  const { showToast } = useToast()
+  const { lang } = useLanguage()
+  const tx = t[lang]
 
   const reload = useCallback(() => {
     return apiFetch<MealPlanEntry[]>(`/meal-plan?start=${start}&end=${end}`, getToken)
@@ -44,12 +50,17 @@ export function useMealPlan(start: string, end: string) {
   }
 
   async function removeEntry(id: string): Promise<void> {
+    const previous = entries
     setEntries(prev => prev.filter(e => e.id !== id))
     const token = await getToken()
-    await fetch(`/api/meal-plan/${id}`, {
+    const res = await fetch(`/api/meal-plan/${id}`, {
       method: 'DELETE',
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     })
+    if (!res.ok) {
+      setEntries(previous)
+      showToast(tx.somethingWentWrong, 'error')
+    }
   }
 
   return { entries, loading, addEntry, removeEntry }

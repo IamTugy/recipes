@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useAuth } from '@clerk/react'
 import { apiFetch } from '../lib/api'
+import { useToast } from './useToast'
+import { useLanguage } from './useLanguage'
+import { t } from '../i18n'
 
 export interface RecipeCollection {
   _id: string
@@ -12,6 +15,9 @@ export function useCollections() {
   const { getToken, isLoaded, isSignedIn } = useAuth()
   const [collections, setCollections] = useState<RecipeCollection[]>([])
   const [loading, setLoading] = useState(true)
+  const { showToast } = useToast()
+  const { lang } = useLanguage()
+  const tx = t[lang]
 
   const load = useCallback(() => {
     if (!isLoaded || !isSignedIn) return
@@ -32,16 +38,20 @@ export function useCollections() {
       },
       body: JSON.stringify({ name }),
     })
-    if (!res.ok) return null
+    if (!res.ok) {
+      showToast(tx.somethingWentWrong, 'error')
+      return null
+    }
     const created = await res.json()
     setCollections(prev => [created, ...prev])
     return created
-  }, [getToken])
+  }, [getToken, showToast, tx])
 
   const rename = useCallback(async (id: string, name: string) => {
+    const previous = collections
     setCollections(prev => prev.map(c => (c._id === id ? { ...c, name } : c)))
     const token = await getToken()
-    await fetch(`/api/collections/${id}`, {
+    const res = await fetch(`/api/collections/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -49,21 +59,31 @@ export function useCollections() {
       },
       body: JSON.stringify({ name }),
     })
-  }, [getToken])
+    if (!res.ok) {
+      setCollections(previous)
+      showToast(tx.somethingWentWrong, 'error')
+    }
+  }, [getToken, collections, showToast, tx])
 
   const remove = useCallback(async (id: string) => {
+    const previous = collections
     setCollections(prev => prev.filter(c => c._id !== id))
     const token = await getToken()
-    await fetch(`/api/collections/${id}`, {
+    const res = await fetch(`/api/collections/${id}`, {
       method: 'DELETE',
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     })
-  }, [getToken])
+    if (!res.ok) {
+      setCollections(previous)
+      showToast(tx.somethingWentWrong, 'error')
+    }
+  }, [getToken, collections, showToast, tx])
 
   const addRecipe = useCallback(async (id: string, recipeId: string) => {
+    const previous = collections
     setCollections(prev => prev.map(c => (c._id === id ? { ...c, recipeIds: [...new Set([...c.recipeIds, recipeId])] } : c)))
     const token = await getToken()
-    await fetch(`/api/collections/${id}/recipes`, {
+    const res = await fetch(`/api/collections/${id}/recipes`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -71,16 +91,25 @@ export function useCollections() {
       },
       body: JSON.stringify({ recipeId }),
     })
-  }, [getToken])
+    if (!res.ok) {
+      setCollections(previous)
+      showToast(tx.somethingWentWrong, 'error')
+    }
+  }, [getToken, collections, showToast, tx])
 
   const removeRecipe = useCallback(async (id: string, recipeId: string) => {
+    const previous = collections
     setCollections(prev => prev.map(c => (c._id === id ? { ...c, recipeIds: c.recipeIds.filter(s => s !== recipeId) } : c)))
     const token = await getToken()
-    await fetch(`/api/collections/${id}/recipes/${recipeId}`, {
+    const res = await fetch(`/api/collections/${id}/recipes/${recipeId}`, {
       method: 'DELETE',
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     })
-  }, [getToken])
+    if (!res.ok) {
+      setCollections(previous)
+      showToast(tx.somethingWentWrong, 'error')
+    }
+  }, [getToken, collections, showToast, tx])
 
   return { collections, loading, create, rename, remove, addRecipe, removeRecipe }
 }

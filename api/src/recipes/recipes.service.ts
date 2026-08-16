@@ -210,6 +210,30 @@ export class RecipesService implements OnModuleInit {
     return { ...plain, ...revision.snapshot }
   }
 
+  // Batched form of overlayPublishedSnapshot - one query for every recipe's
+  // published-revision snapshot instead of one findOne per recipe. Every
+  // list-returning endpoint (findAll/findPublishedByOwner(s)) was previously
+  // doing N sequential-round-trip lookups via Promise.all(recipes.map(...)),
+  // which parallelizes the wait but still costs N real queries - this costs
+  // exactly one, regardless of list size.
+  private async overlayPublishedSnapshots(recipes: RecipeDocument[]): Promise<(Record<string, unknown> & { id: string })[]> {
+    const needRevision = recipes.filter(r => r.publishedRevision != null)
+    if (needRevision.length === 0) return recipes.map(r => r.toObject())
+
+    const revisions = await this.revisionModel
+      .find({ $or: needRevision.map(r => ({ recipeId: r.id, revisionNumber: r.publishedRevision })) })
+      .lean()
+      .exec()
+    const byKey = new Map(revisions.map(rev => [`${rev.recipeId}:${rev.revisionNumber}`, rev]))
+
+    return recipes.map(recipe => {
+      const plain = recipe.toObject()
+      if (recipe.publishedRevision == null) return plain
+      const revision = byKey.get(`${recipe.id}:${recipe.publishedRevision}`)
+      return revision ? { ...plain, ...revision.snapshot } : plain
+    })
+  }
+
   // Minimal id/title projection of every recipe the given user could
   // plausibly want to link an ingredient to: their own (published or not)
   // plus everyone else's published ones. Used by AI import/generate to spot
@@ -230,7 +254,7 @@ export class RecipesService implements OnModuleInit {
 
   async findAll() {
     const recipes = await this.recipeModel.find({ hidden: { $ne: true }, publishedRevision: { $ne: null } }).exec()
-    const plain = await Promise.all(recipes.map(r => this.overlayPublishedSnapshot(r)))
+    const plain = await this.overlayPublishedSnapshots(recipes)
     const ids = plain.map(r => r.id)
     const [ratings, views, cooks] = await Promise.all([
       this.ratingsById(ids),
@@ -242,7 +266,7 @@ export class RecipesService implements OnModuleInit {
 
   async findPublishedByOwner(ownerId: string) {
     const recipes = await this.recipeModel.find({ ownerId, hidden: { $ne: true }, publishedRevision: { $ne: null } }).exec()
-    const plain = await Promise.all(recipes.map(r => this.overlayPublishedSnapshot(r)))
+    const plain = await this.overlayPublishedSnapshots(recipes)
     const ids = plain.map(r => r.id)
     const [ratings, views, cooks] = await Promise.all([
       this.ratingsById(ids),
@@ -264,7 +288,7 @@ export class RecipesService implements OnModuleInit {
       .sort({ createdAt: -1 })
       .limit(100)
       .exec()
-    const plain = await Promise.all(recipes.map(r => this.overlayPublishedSnapshot(r)))
+    const plain = await this.overlayPublishedSnapshots(recipes)
     const ids = plain.map(r => r.id)
     const [ratings, views, cooks] = await Promise.all([
       this.ratingsById(ids),

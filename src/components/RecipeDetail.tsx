@@ -239,10 +239,11 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
 
-  async function submitRating(score: number, comment?: string, photoUrl?: string) {
+  async function submitRating(score: number, comment?: string, photoUrl?: string): Promise<boolean> {
+    const previousRating = userRating
     setUserRating(score)
     const token = await getToken()
-    await fetch(`/api/ratings/${id}`, {
+    const res = await fetch(`/api/ratings/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -250,7 +251,13 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
       },
       body: JSON.stringify({ score, comment, photoUrl }),
     })
+    if (!res.ok) {
+      setUserRating(previousRating)
+      showToast(tx.somethingWentWrong, 'error')
+      return false
+    }
     loadReviews()
+    return true
   }
 
   function rate(score: number) {
@@ -296,9 +303,14 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
     showToast(lang === 'he' ? `נוסף לאוסף "${name}"` : `Added to "${name}"`)
   }
 
-  function postReview() {
+  async function postReview() {
     if (!userRating) return
-    submitRating(userRating, reviewComment.trim(), reviewPhotoUrl ?? undefined)
+    const ok = await submitRating(userRating, reviewComment.trim(), reviewPhotoUrl ?? undefined)
+    // submitRating already rolled back the optimistic rating and showed its
+    // own error toast on failure - don't also claim success here, and leave
+    // the review form open so the user can retry instead of losing what
+    // they wrote.
+    if (!ok) return
     const wasAlreadyPosted = hasPostedReview
     setHasPostedReview(true)
     setIsEditingReview(false)
