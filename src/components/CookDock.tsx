@@ -44,14 +44,18 @@ interface CookDockProps {
   elapsedBaselineMs?: number
   startExpanded?: boolean
   onExpandConsumed?: () => void
+  cookingPaused: boolean
+  pausedAt: number | null
+  totalPausedMs: number
+  onPauseCooking: () => void
+  onResumeCooking: () => void
 }
 
 const SWIPE_THRESHOLD_PX = 60
 
 // Circle progress ring: a plain SVG (no charting lib), stroke-dashoffset
 // driven by `fraction` (0 = empty, 1 = full).
-function TimerRing({ fraction, children }: { fraction: number; children: React.ReactNode }) {
-  const size = 56
+function TimerRing({ fraction, children, size = 56 }: { fraction: number; children: React.ReactNode; size?: number }) {
   const strokeWidth = 4
   const radius = (size - strokeWidth) / 2
   const circumference = 2 * Math.PI * radius
@@ -78,14 +82,16 @@ export default function CookDock({
   steps, wizardIndex, onPrev, onAdvance, onMarkDone, onStop, onStepEntered, onExpand,
   checkedSteps, nearestTimer, onToggleNearestTimer, getTimerForStep, onStartTimer,
   onOpenLightbox, onCollapsedHeightChange, lightboxOpen, elapsedBaselineMs, startExpanded, onExpandConsumed,
+  cookingPaused, pausedAt, totalPausedMs, onPauseCooking, onResumeCooking,
 }: CookDockProps) {
   const tx = t[lang]
   const dockRef = useRef<HTMLDivElement>(null)
 
   const allIngredientKeys = ingredients.flatMap((g, gi) => g.items.map((_, ii) => `${gi}-${ii}`))
-  const [screen, setScreen] = useState<'checklist' | 'steps'>(() =>
-    allIngredientKeys.some(k => !checkedIngredients.has(k)) ? 'checklist' : 'steps'
-  )
+  const [screen, setScreen] = useState<'checklist' | 'steps'>(() => {
+    if (checkedSteps.size > 0) return 'steps'
+    return allIngredientKeys.some(k => !checkedIngredients.has(k)) ? 'checklist' : 'steps'
+  })
 
   const [expanded, setExpanded] = useState(() => !!startExpanded)
   useEffect(() => {
@@ -95,6 +101,10 @@ export default function CookDock({
   function setExpandedState(next: boolean) {
     setExpanded(next)
     if (next) onExpand()
+  }
+  function togglePauseCooking() {
+    if (cookingPaused) onResumeCooking()
+    else onPauseCooking()
   }
 
   // The ring should disappear for a paused timer the user never interacted
@@ -149,11 +159,15 @@ export default function CookDock({
   useEffect(() => {
     if (screen !== 'steps') return
     if (elapsedStartRef.current === null) elapsedStartRef.current = Date.now()
-    const interval = setInterval(() => {
-      setElapsedSeconds(Math.floor((Date.now() - elapsedStartRef.current!) / 1000))
-    }, 1000)
+    function tick() {
+      const now = cookingPaused && pausedAt !== null ? pausedAt : Date.now()
+      setElapsedSeconds(Math.floor((now - elapsedStartRef.current! - totalPausedMs) / 1000))
+    }
+    tick()
+    if (cookingPaused) return
+    const interval = setInterval(tick, 1000)
     return () => clearInterval(interval)
-  }, [screen])
+  }, [screen, cookingPaused, pausedAt, totalPausedMs])
 
   // Swipe up/down toggles expand/collapse. Plain touch-event tracking,
   // same style as Sidebar.tsx's existing drag-to-close handlers - no
@@ -218,9 +232,8 @@ export default function CookDock({
   const existingTimer = step ? getTimerForStep(step.groupIdx, step.stepIdx) : undefined
   const isLastStep = wizardIndex === steps.length - 1
 
-  const collapsedStepLabel = screen === 'checklist'
-    ? tx.ingredients
-    : (lang === 'he' ? `שלב ${wizardIndex + 1} מתוך ${steps.length}` : `Step ${wizardIndex + 1} of ${steps.length}`)
+  const currentStepText = screen === 'steps' ? steps[wizardIndex]?.instruction ?? '' : ''
+  const collapsedStepLabel = screen === 'checklist' ? tx.ingredients : currentStepText
 
   return (
     <div
@@ -249,14 +262,22 @@ export default function CookDock({
               </svg>
             </button>
           </div>
-          <div className="flex items-center justify-between px-4 h-14 border-b border-tint/[0.06] shrink-0">
-            <span className="text-cream/40 text-sm">{collapsedStepLabel}</span>
-            <button type="button"
-              onClick={e => { e.stopPropagation(); onStop() }}
-              className="px-3 h-8 flex items-center justify-center rounded-full text-xs font-medium border border-tint/[0.12] text-cream/55 bg-transparent hover:border-amber/40 hover:text-amber transition-colors"
-            >
-              {tx.stopCooking}
-            </button>
+          <div className="flex items-center justify-between gap-3 px-4 h-14 border-b border-tint/[0.06] shrink-0">
+            <span className="text-cream/40 text-sm truncate min-w-0">{collapsedStepLabel}</span>
+            <div className="flex items-center gap-2 shrink-0">
+              <button type="button"
+                onClick={e => { e.stopPropagation(); togglePauseCooking() }}
+                className="px-3 h-8 flex items-center justify-center rounded-full text-xs font-medium border border-tint/[0.12] text-cream/55 bg-transparent hover:border-amber/40 hover:text-amber transition-colors"
+              >
+                {cookingPaused ? tx.continueCooking : tx.pauseCooking}
+              </button>
+              <button type="button"
+                onClick={e => { e.stopPropagation(); onStop() }}
+                className="px-3 h-8 flex items-center justify-center rounded-full text-xs font-medium border border-tint/[0.12] text-cream/55 bg-transparent hover:border-amber/40 hover:text-amber transition-colors"
+              >
+                {tx.stopCooking}
+              </button>
+            </div>
           </div>
 
           {screen === 'checklist' ? (
@@ -391,6 +412,19 @@ export default function CookDock({
                     <span>{step.tip}</span>
                   </p>
                 )}
+                {displayedTimer && (
+                  <div className="flex flex-col items-center gap-2">
+                    <button type="button"
+                      onClick={() => onToggleNearestTimer()}
+                      aria-label={displayedTimer.running ? tx.pauseTimer : tx.resumeTimer}
+                    >
+                      <TimerRing fraction={displayedTimer.totalSeconds > 0 ? displayedTimer.remainingSeconds / displayedTimer.totalSeconds : 0} size={88}>
+                        {formatDockDuration(displayedTimer.remainingSeconds)}
+                      </TimerRing>
+                    </button>
+                    <p className="text-xs text-cream/40 max-w-xs text-center">{tx.timerFor(displayedTimer.label)}</p>
+                  </div>
+                )}
                 <div className="flex items-center gap-3">
                   {step.timerMinutes && !existingTimer && (
                     <button type="button"
@@ -458,6 +492,17 @@ export default function CookDock({
               </p>
               <p className="text-sm text-cream/80 truncate">{collapsedStepLabel}</p>
             </div>
+            <button type="button"
+              onClick={e => { e.stopPropagation(); togglePauseCooking() }}
+              aria-label={cookingPaused ? tx.continueCooking : tx.pauseCooking}
+              className="shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-cream/40 hover:text-cream/70 transition-colors"
+            >
+              {cookingPaused ? (
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,4 20,12 6,20" /></svg>
+              ) : (
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg>
+              )}
+            </button>
             {displayedTimer && (
               <button type="button"
                 onClick={e => { e.stopPropagation(); onToggleNearestTimer() }}

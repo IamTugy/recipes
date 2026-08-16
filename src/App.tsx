@@ -254,6 +254,11 @@ export default function App() {
           elapsedBaselineMs={cookSession.cookSessionStartedAt ? new Date(cookSession.cookSessionStartedAt).getTime() : undefined}
           startExpanded={cookSession.startDockExpanded}
           onExpandConsumed={cookSession.onExpandConsumed}
+          cookingPaused={cookSession.cookingPaused}
+          pausedAt={cookSession.pausedAt}
+          totalPausedMs={cookSession.totalPausedMs}
+          onPauseCooking={cookSession.pauseCooking}
+          onResumeCooking={cookSession.resumeCooking}
         />
       )}
       <BackgroundCookStatus

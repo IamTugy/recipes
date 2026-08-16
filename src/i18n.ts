@@ -80,6 +80,7 @@ export const t = {
     startTimer: (m: number) => `הפעל טיימר ${m} דקות`,
     pauseTimer: "השהה טיימר",
     resumeTimer: "המשך טיימר",
+    timerFor: (label: string) => `טיימר: ${label}`,
     difficulty: { easy: 'קל', medium: 'בינוני', hard: 'מאתגר' } as Record<Difficulty, string>,
     kosherType: { meat: 'בשרי', dairy: 'חלבי', parve: 'פרווה' } as Record<KosherType, string>,
     categories: {
@@ -565,6 +566,7 @@ export const t = {
     startTimer: (m: number) => `Start ${m}m timer`,
     pauseTimer: "Pause timer",
     resumeTimer: "Resume timer",
+    timerFor: (label: string) => `Timer: ${label}`,
     difficulty: { easy: 'Easy', medium: 'Medium', hard: 'Hard' } as Record<Difficulty, string>,
     kosherType: { meat: 'Meat', dairy: 'Dairy', parve: 'Parve' } as Record<KosherType, string>,
     categories: {
