@@ -41,6 +41,11 @@ export default function App() {
   const { lang, setLang } = useLanguage()
   const { timers, addTimer, toggleTimer, removeTimer, resetTimer } = useTimers()
   const cookSession = useCookSession(lang, timers, addTimer, toggleTimer)
+  // Timers TimerPanel should show - excludes whatever recipe CookDock is
+  // already displaying its own timer for, so the two never duplicate the
+  // same timer. A no-op when nobody's cooking (activeRecipeId undefined
+  // never matches a real timer's recipeId).
+  const otherTimers = timers.filter(t => t.recipeId !== cookSession.activeRecipeId)
   const shoppingList = useShoppingList()
   const sidebar = useSidebar()
   const [shoppingListOpen, setShoppingListOpen] = useState(false)
@@ -215,18 +220,15 @@ export default function App() {
         </Routes>
       </div>
       <AnimatePresence>
-        {(() => {
-          const otherTimers = timers.filter(t => t.recipeId !== cookSession.activeRecipeId)
-          return otherTimers.length > 0 && (
-            <TimerPanel
-              panelRef={timerPanelRef}
-              timers={otherTimers}
-              onToggle={toggleTimer}
-              onRemove={removeTimer}
-              onReset={resetTimer}
-            />
-          )
-        })()}
+        {otherTimers.length > 0 && (
+          <TimerPanel
+            panelRef={timerPanelRef}
+            timers={otherTimers}
+            onToggle={toggleTimer}
+            onRemove={removeTimer}
+            onReset={resetTimer}
+          />
+        )}
       </AnimatePresence>
       {cookSession.cookSessionActive && cookSession.flatSteps.length > 0 && (
         <div aria-hidden="true" className="h-[20dvh] sm:h-24" />
@@ -311,7 +313,7 @@ export default function App() {
         lastCleared={shoppingList.lastCleared}
         onUndoClear={shoppingList.undoClear}
       />
-      <ScrollToTopButton raised={timers.length > 0} />
+      <ScrollToTopButton raised={otherTimers.length > 0} />
       <KeyboardShortcutsHelp open={shortcutsHelpOpen} onClose={() => setShortcutsHelpOpen(false)} />
     </div>
   )
