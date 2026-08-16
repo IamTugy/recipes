@@ -156,12 +156,21 @@ export default function CookDock({
   // 0 - a fresh (non-resumed) session gets undefined and behaves exactly
   // as before (Date.now() the first time the real steps screen is shown).
   const elapsedStartRef = useRef<number | null>(elapsedBaselineMs ?? null)
+  // Baseline of totalPausedMs captured at the moment elapsedStartRef is set,
+  // so pause time that already accrued before the stopwatch's start point
+  // (e.g. pausing while still on the checklist screen) isn't subtracted a
+  // second time and doesn't leave the clock frozen at 00:00.
+  const pausedMsBaselineRef = useRef<number | null>(null)
   useEffect(() => {
     if (screen !== 'steps') return
-    if (elapsedStartRef.current === null) elapsedStartRef.current = Date.now()
+    if (elapsedStartRef.current === null) {
+      elapsedStartRef.current = Date.now()
+      pausedMsBaselineRef.current = totalPausedMs
+    }
     function tick() {
       const now = cookingPaused && pausedAt !== null ? pausedAt : Date.now()
-      setElapsedSeconds(Math.floor((now - elapsedStartRef.current! - totalPausedMs) / 1000))
+      const pausedMsSinceStart = totalPausedMs - (pausedMsBaselineRef.current ?? 0)
+      setElapsedSeconds(Math.floor((now - elapsedStartRef.current! - pausedMsSinceStart) / 1000))
     }
     tick()
     if (cookingPaused) return
@@ -230,6 +239,7 @@ export default function CookDock({
   const stepKey = step ? `${step.groupIdx}-${step.stepIdx}` : ''
   const checked = step ? checkedSteps.has(stepKey) : false
   const existingTimer = step ? getTimerForStep(step.groupIdx, step.stepIdx) : undefined
+  const stepTimer = (existingTimer && !existingTimer.done) ? existingTimer : displayedTimer
   const isLastStep = wizardIndex === steps.length - 1
 
   const currentStepText = screen === 'steps' ? steps[wizardIndex]?.instruction ?? '' : ''
@@ -412,21 +422,21 @@ export default function CookDock({
                     <span>{step.tip}</span>
                   </p>
                 )}
-                {displayedTimer && (
+                {stepTimer && (
                   <div className="flex flex-col items-center gap-2">
                     <button type="button"
                       onClick={() => onToggleNearestTimer()}
-                      aria-label={displayedTimer.running ? tx.pauseTimer : tx.resumeTimer}
+                      aria-label={stepTimer.running ? tx.pauseTimer : tx.resumeTimer}
                     >
-                      <TimerRing fraction={displayedTimer.totalSeconds > 0 ? displayedTimer.remainingSeconds / displayedTimer.totalSeconds : 0} size={88}>
-                        {formatDockDuration(displayedTimer.remainingSeconds)}
+                      <TimerRing fraction={stepTimer.totalSeconds > 0 ? stepTimer.remainingSeconds / stepTimer.totalSeconds : 0} size={88}>
+                        {formatDockDuration(stepTimer.remainingSeconds)}
                       </TimerRing>
                     </button>
-                    <p className="text-xs text-cream/40 max-w-xs text-center">{tx.timerFor(displayedTimer.label)}</p>
+                    <p className="text-xs text-cream/40 max-w-xs text-center">{tx.timerFor(stepTimer.label)}</p>
                   </div>
                 )}
                 <div className="flex items-center gap-3">
-                  {step.timerMinutes && !existingTimer && (
+                  {step.timerMinutes && !(existingTimer && !existingTimer.done) && (
                     <button type="button"
                       onClick={() => onStartTimer(step.instruction.slice(0, 40), step.timerMinutes!, step.groupIdx, step.stepIdx)}
                       className="px-4 py-2 rounded-lg text-sm font-medium bg-amber/10 border border-amber/30 text-amber hover:bg-amber/20 transition-colors"
