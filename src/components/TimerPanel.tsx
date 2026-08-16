@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type RefObject } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { TimerState } from '../types'
 import { formatSeconds } from '../utils/format'
 import { useLanguage } from '../hooks/useLanguage'
@@ -6,10 +6,10 @@ import { t } from "../i18n";
 
 interface TimerPanelProps {
   timers: TimerState[]
+  hiddenTimerId: string | null
   onToggle: (id: string) => void
   onRemove: (id: string) => void
   onReset: (id: string) => void
-  panelRef?: RefObject<HTMLDivElement | null>
 }
 
 function MiniRing({ timer, size = 36 }: { timer: TimerState; size?: number }) {
@@ -83,13 +83,16 @@ function playDoneSound() {
   } catch { /* AudioContext unavailable */ }
 }
 
-export default function TimerPanel({ timers, onToggle, onRemove, onReset, panelRef }: TimerPanelProps) {
+export default function TimerPanel({ timers, hiddenTimerId, onToggle, onRemove, onReset }: TimerPanelProps) {
   const { lang } = useLanguage()
         const tx = t[lang]
   const [mobileIdx, setMobileIdx] = useState(0)
   const prevDoneIds = useRef<Set<string>>(new Set(timers.filter(t => t.done).map(t => t.id)))
 
-  // Play sound (and notify, if the tab is backgrounded) when a timer newly completes
+  // Play sound (and notify, if the tab is backgrounded) when a timer newly
+  // completes - watches the FULL `timers` prop (not `visible` below), so a
+  // timer belonging to the recipe currently being cooked (hidden from this
+  // panel's own rendering, since CookDock already shows it) still chimes.
   useEffect(() => {
     timers.forEach(t => {
       if (t.done && !prevDoneIds.current.has(t.id)) {
@@ -106,14 +109,19 @@ export default function TimerPanel({ timers, onToggle, onRemove, onReset, panelR
     prevDoneIds.current = new Set(timers.filter(t => t.done).map(t => t.id))
   }, [timers, lang, tx])
 
+  // What this panel actually renders - excludes the one timer CookDock is
+  // already displaying elsewhere, so the two never show the same timer
+  // twice.
+  const visible = timers.filter(t => t.id !== hiddenTimerId)
+
   // Sort: running (soonest end first), then paused (soonest first), then done
-  const sorted = useMemo(() => [...timers].sort((a, b) => {
+  const sorted = useMemo(() => [...visible].sort((a, b) => {
     if (a.done !== b.done) return a.done ? 1 : -1
     if (a.running !== b.running) return a.running ? -1 : 1
     return a.remainingSeconds - b.remainingSeconds
-  }), [timers])
+  }), [visible])
 
-  if (timers.length === 0) return null
+  if (visible.length === 0) return null
 
   const safeIdx = Math.min(mobileIdx, sorted.length - 1)
   const mobileTimer = sorted[safeIdx]
@@ -122,7 +130,7 @@ export default function TimerPanel({ timers, onToggle, onRemove, onReset, panelR
   const progressTimer = sorted.find(t => t.running && !t.done) ?? sorted[0]
 
   return (
-    <div ref={panelRef} className="print:hidden fixed bottom-0 left-0 right-0 z-[65]" style={{ bottom: 'var(--cook-dock-bar-height, 0px)' }}>
+    <div className="print:hidden fixed bottom-0 left-0 right-0 z-[65]" style={{ bottom: 'var(--cook-dock-bar-height, 0px)' }}>
       {/* Progress bar */}
       <div className="h-0.5 bg-tint/[0.06] relative">
         <div

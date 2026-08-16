@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import { useAuth, SignIn } from '@clerk/react'
@@ -41,17 +41,20 @@ export default function App() {
   const { lang, setLang } = useLanguage()
   const { timers, addTimer, toggleTimer, removeTimer, resetTimer } = useTimers()
   const cookSession = useCookSession(lang, timers, addTimer, toggleTimer)
-  // Timers TimerPanel should show - excludes whatever recipe CookDock is
-  // already displaying its own timer for, so the two never duplicate the
-  // same timer. A no-op when nobody's cooking (activeRecipeId undefined
-  // never matches a real timer's recipeId).
-  const otherTimers = timers.filter(t => t.recipeId !== cookSession.activeRecipeId)
+  // Timers actually VISIBLE in TimerPanel - excludes only the one specific
+  // timer CookDock is already showing (by id, not by recipe), so a second
+  // concurrent timer or a just-finished one for the cooked recipe still
+  // shows up here instead of falling into a gap between the two. A no-op
+  // when nobody's cooking (dockDisplayedTimerId is null, matching no real
+  // timer's id). TimerPanel itself still receives the FULL timers list -
+  // its own completion-sound/notification effect must watch every timer,
+  // not just the ones it renders - see the <TimerPanel> call below.
+  const visibleTimers = timers.filter(t => t.id !== cookSession.dockDisplayedTimerId)
   const shoppingList = useShoppingList()
   const sidebar = useSidebar()
   const [shoppingListOpen, setShoppingListOpen] = useState(false)
   const [shortcutsHelpOpen, setShortcutsHelpOpen] = useState(false)
   const { isLoaded, isSignedIn, getToken } = useAuth()
-  const timerPanelRef = useRef<HTMLDivElement>(null)
   const [cookDockBarHeight, setCookDockBarHeight] = useState(0)
   const navigate = useNavigate()
   const { setMode } = useTheme()
@@ -220,10 +223,10 @@ export default function App() {
         </Routes>
       </div>
       <AnimatePresence>
-        {otherTimers.length > 0 && (
+        {timers.length > 0 && (
           <TimerPanel
-            panelRef={timerPanelRef}
-            timers={otherTimers}
+            timers={timers}
+            hiddenTimerId={cookSession.dockDisplayedTimerId}
             onToggle={toggleTimer}
             onRemove={removeTimer}
             onReset={resetTimer}
@@ -252,6 +255,7 @@ export default function App() {
           checkedSteps={cookSession.checkedSteps}
           nearestTimer={cookSession.nearestTimer}
           onToggleNearestTimer={cookSession.pipToggleNearestTimer}
+          onToggleTimer={toggleTimer}
           getTimerForStep={cookSession.getTimerForStep}
           onStartTimer={cookSession.startTimer}
           onOpenLightbox={cookSession.setLightboxUrl}
@@ -313,7 +317,7 @@ export default function App() {
         lastCleared={shoppingList.lastCleared}
         onUndoClear={shoppingList.undoClear}
       />
-      <ScrollToTopButton raised={otherTimers.length > 0} />
+      <ScrollToTopButton raised={visibleTimers.length > 0} />
       <KeyboardShortcutsHelp open={shortcutsHelpOpen} onClose={() => setShortcutsHelpOpen(false)} />
     </div>
   )

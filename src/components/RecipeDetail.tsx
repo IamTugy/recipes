@@ -847,8 +847,8 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
                   animate={{ y: 0, opacity: 1 }}
                   exit={isMobileMenu ? { y: '100%' } : { opacity: 0, y: -8 }}
                   transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
-                  className={`fixed inset-x-0 bottom-0 z-50 rounded-t-2xl border-t border-tint/10 sm:rounded-xl sm:border sm:absolute sm:inset-x-auto sm:bottom-auto sm:top-full sm:z-30 sm:mt-2 sm:w-72 ${lang === 'he' ? 'sm:left-0' : 'sm:right-0'} bg-bg shadow-2xl p-2 max-h-[75vh] overflow-y-auto`}
-                  style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))', bottom: 'var(--cook-dock-bar-height, 0px)' }}
+                  className={`fixed inset-x-0 bottom-[var(--cook-dock-bar-height,0px)] z-50 rounded-t-2xl border-t border-tint/10 sm:rounded-xl sm:border sm:absolute sm:inset-x-auto sm:bottom-auto sm:top-full sm:z-30 sm:mt-2 sm:w-72 ${lang === 'he' ? 'sm:left-0' : 'sm:right-0'} bg-bg shadow-2xl p-2 max-h-[75vh] overflow-y-auto`}
+                  style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}
                 >
                   {/* Drag handle - dragging is scoped to this bar (dragListener={false}
                       + imperative start on pointerdown) so it doesn't fight with

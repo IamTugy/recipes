@@ -36,6 +36,7 @@ interface CookDockProps {
   checkedSteps: Set<string>
   nearestTimer: TimerState | null
   onToggleNearestTimer: () => void
+  onToggleTimer: (id: string) => void
   getTimerForStep: (groupIdx: number, stepIdx: number) => TimerState | undefined
   onStartTimer: (label: string, minutes: number, groupIdx: number, stepIdx: number) => void
   onOpenLightbox: (url: string) => void
@@ -80,7 +81,7 @@ function TimerRing({ fraction, children, size = 56 }: { fraction: number; childr
 export default function CookDock({
   lang, ingredients, checkedIngredients, onToggleIngredient, multiplier,
   steps, wizardIndex, onPrev, onAdvance, onMarkDone, onStop, onStepEntered, onExpand,
-  checkedSteps, nearestTimer, onToggleNearestTimer, getTimerForStep, onStartTimer,
+  checkedSteps, nearestTimer, onToggleNearestTimer, onToggleTimer, getTimerForStep, onStartTimer,
   onOpenLightbox, onCollapsedHeightChange, lightboxOpen, elapsedBaselineMs, startExpanded, onExpandConsumed,
   cookingPaused, pausedAt, totalPausedMs, onPauseCooking, onResumeCooking,
 }: CookDockProps) {
@@ -425,7 +426,7 @@ export default function CookDock({
                 {stepTimer && (
                   <div className="flex flex-col items-center gap-2">
                     <button type="button"
-                      onClick={() => onToggleNearestTimer()}
+                      onClick={() => onToggleTimer(stepTimer.id)}
                       aria-label={stepTimer.running ? tx.pauseTimer : tx.resumeTimer}
                     >
                       <TimerRing fraction={stepTimer.totalSeconds > 0 ? stepTimer.remainingSeconds / stepTimer.totalSeconds : 0} size={88}>

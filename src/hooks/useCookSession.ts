@@ -51,6 +51,13 @@ export function useCookSession(
   const [cookSessionStartedAt, setCookSessionStartedAt] = useState<string | null>(null)
   const [pausedAt, setPausedAt] = useState<number | null>(null)
   const [totalPausedMs, setTotalPausedMs] = useState(0)
+  // Backs pausedAt for resumeIfPaused's idempotency check - several call
+  // sites (Next, Mark done, PiP prev/next) invoke resumeIfPaused more than
+  // once within a single synchronous handler, and all of those calls would
+  // see the same stale `pausedAt` state value in their closure. Clearing
+  // this ref synchronously on the first call makes every later call in the
+  // same tick a no-op instead of double/triple-counting the paused duration.
+  const pausedAtRef = useRef<number | null>(null)
   const [startDockExpanded, setStartDockExpanded] = useState(false)
   const [cookConflict, setCookConflict] = useState<{ sessionId: string; recipeTitle: string } | null>(null)
   const [resolvingCookConflict, setResolvingCookConflict] = useState(false)
@@ -110,6 +117,17 @@ export function useCookSession(
   const wizardStepLabel = lang === 'he'
     ? `שלב ${wizardIndex + 1} מתוך ${flatSteps.length}`
     : `Step ${wizardIndex + 1} of ${flatSteps.length}`
+
+  // The one timer CookDock actually displays (its own step's timer if it
+  // has a non-done one, else the recipe-wide nearest) - the single source
+  // of truth both CookDock's own display and TimerPanel's exclusion filter
+  // read, so the two can never drift apart or leave a timer visible nowhere.
+  const dockDisplayedTimer = (() => {
+    if (!currentWizardStep) return nearestTimer
+    const stepOwnTimer = getTimerForStep(currentWizardStep.groupIdx, currentWizardStep.stepIdx)
+    return (stepOwnTimer && !stepOwnTimer.done) ? stepOwnTimer : nearestTimer
+  })()
+  const dockDisplayedTimerId = dockDisplayedTimer?.id ?? null
 
   function toggleStep(key: string) {
     resumeIfPaused()
@@ -172,19 +190,28 @@ export function useCookSession(
     setSeedRecipe(null)
     setPausedAt(null)
     setTotalPausedMs(0)
+    pausedAtRef.current = null
   }
 
   function pauseCooking() {
-    if (pausedAt !== null) return
-    setPausedAt(Date.now())
+    if (pausedAtRef.current !== null) return
+    const now = Date.now()
+    pausedAtRef.current = now
+    setPausedAt(now)
   }
 
   // Also called internally (not just from an explicit "Continue" click) by
   // every interaction handler below, so any dock/page/PiP interaction while
   // paused implicitly resumes the elapsed-time clock. No-op when not paused.
+  // Reads/clears the ref (not the pausedAt state) so that multiple calls
+  // within the same synchronous handler (e.g. Next triggers both
+  // handleStepEntered and markStepChecked, each calling this) only count
+  // the paused duration once - the second call sees the ref already null.
   function resumeIfPaused() {
-    if (pausedAt === null) return
-    setTotalPausedMs(ms => ms + (Date.now() - pausedAt))
+    const at = pausedAtRef.current
+    if (at === null) return
+    pausedAtRef.current = null
+    setTotalPausedMs(ms => ms + (Date.now() - at))
     setPausedAt(null)
   }
 
@@ -557,6 +584,7 @@ export function useCookSession(
 
   return {
     activeRecipeId, recipe, flatSteps, nearestTimer, currentWizardStep, wizardStepLabel,
+    dockDisplayedTimer, dockDisplayedTimerId,
     cookSessionActive, cookSessionId, cookSessionStartedAt, startDockExpanded,
     cookConflict, resolvingCookConflict, startingCook, wizardIndex, multiplier,
     checkedSteps, checkedIngredients, lightboxUrl, justFinishedRecipeId,
