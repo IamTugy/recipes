@@ -1304,9 +1304,8 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
               </button>
             )}
 
-            {isViewingPublishedContent && (
+            {isViewingPublishedContent && !cookSession.cookSessionActive && (
               <button type="button"
-                disabled={cookSession.cookSessionActive || cookSession.startingCook}
                 onClick={e => {
                   const btn = e.currentTarget
                   btn.classList.remove('start-cooking-fill-active')
@@ -1315,11 +1314,38 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
                   btn.classList.add('start-cooking-fill-active')
                   if (recipe) cookSession.openWizard(recipe, multiplier, checkedSteps, checkedIngredients)
                 }}
+                disabled={cookSession.startingCook}
                 className="relative overflow-hidden flex items-center justify-center gap-2 w-full sm:w-auto px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors bg-amber text-bg hover:bg-amber/90 disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                <span className="text-lg leading-none">🍳</span>
-                {cookSession.cookSessionActive ? tx.cooking : tx.startCooking}
+                {tx.startCooking}
+                <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="8,5 19,12 8,19" />
+                </svg>
               </button>
+            )}
+
+            {isViewingPublishedContent && isActiveCookingRecipe && (
+              <button type="button"
+                onClick={() => {
+                  if (cookSession.cookingPaused) cookSession.resumeCooking()
+                  else cookSession.pauseCooking()
+                }}
+                className="flex items-center justify-center gap-2 w-full sm:w-auto px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors border border-amber/40 text-amber hover:bg-amber/10"
+              >
+                {cookSession.cookingPaused ? tx.continueCooking : tx.pauseCooking}
+              </button>
+            )}
+
+            {isViewingPublishedContent && cookSession.cookSessionActive && !isActiveCookingRecipe && (
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <button type="button"
+                  disabled
+                  className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-amber text-bg opacity-60 cursor-not-allowed"
+                >
+                  {tx.startCooking}
+                </button>
+                <FilterInfoPopover text={cookSession.recipe ? tx.cookingElsewhereWarning(lang === 'he' ? (cookSession.recipe.titleHe ?? cookSession.recipe.title) : cookSession.recipe.title) : tx.alreadyCookingElsewhere} />
+              </div>
             )}
           </div>
 

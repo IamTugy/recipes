@@ -314,6 +314,8 @@ export const t = {
       favorite: "מועדף",
       startCooking: "התחילו לבשל",
       cooking: "מבשל...",
+      pauseCooking: "השהה בישול",
+      continueCooking: "המשך בישול",
       alreadyCookingElsewhere: "כבר מבשלים משהו אחר",
       cookingElsewhereWarning: (recipeTitle: string) =>
         `אתם כבר מבשלים את "${recipeTitle}". התחלת בישול חדש תבטל את הבישול הקודם באמצע.`,
@@ -797,6 +799,8 @@ export const t = {
       favorite: "Favorite",
       startCooking: "Start cooking",
       cooking: "Cooking...",
+      pauseCooking: "Pause cooking",
+      continueCooking: "Continue cooking",
       alreadyCookingElsewhere: "Already cooking something else",
       cookingElsewhereWarning: (recipeTitle: string) =>
         `You're already cooking "${recipeTitle}". Starting a new cook will abandon that one unfinished.`,
