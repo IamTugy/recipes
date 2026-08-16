@@ -71,7 +71,7 @@ function TimerRing({ fraction, children, size = 56 }: { fraction: number; childr
           className="stroke-amber transition-[stroke-dashoffset] duration-1000 ease-linear"
         />
       </svg>
-      <div className="absolute inset-0 flex items-center justify-center text-[11px] font-bold text-cream tabular-nums">
+      <div className="absolute inset-0 flex items-center justify-center font-bold text-cream tabular-nums" style={{ fontSize: Math.round(size * 0.2) }}>
         {children}
       </div>
     </div>
@@ -496,30 +496,31 @@ export default function CookDock({
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
             </svg>
           </div>
-          <div className="flex-1 flex items-center justify-between px-4 gap-3">
+          <div className="flex-1 flex items-center px-5 gap-4">
             <div className="min-w-0 flex-1">
-              <p className="text-[10px] text-cream/30 tabular-nums mb-0.5">
+              <p className="text-xs text-cream/40 tabular-nums mb-1">
                 {formatDockDuration(elapsedSeconds)}
               </p>
-              <p className="text-sm text-cream/80 truncate">{collapsedStepLabel}</p>
+              <p className="text-base text-cream/85 leading-snug line-clamp-2">{collapsedStepLabel}</p>
             </div>
             <button type="button"
               onClick={e => { e.stopPropagation(); togglePauseCooking() }}
               aria-label={cookingPaused ? tx.continueCooking : tx.pauseCooking}
-              className="shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-cream/40 hover:text-cream/70 transition-colors"
+              className="shrink-0 w-9 h-9 flex items-center justify-center rounded-full text-cream/40 hover:text-cream/70 transition-colors"
             >
               {cookingPaused ? (
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,4 20,12 6,20" /></svg>
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,4 20,12 6,20" /></svg>
               ) : (
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg>
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg>
               )}
             </button>
             {displayedTimer && (
               <button type="button"
                 onClick={e => { e.stopPropagation(); onToggleNearestTimer() }}
                 aria-label={displayedTimer.running ? tx.pauseTimer : tx.resumeTimer}
+                className="shrink-0"
               >
-                <TimerRing fraction={displayedTimer.totalSeconds > 0 ? displayedTimer.remainingSeconds / displayedTimer.totalSeconds : 0}>
+                <TimerRing fraction={displayedTimer.totalSeconds > 0 ? displayedTimer.remainingSeconds / displayedTimer.totalSeconds : 0} size={72}>
                   {formatDockDuration(displayedTimer.remainingSeconds)}
                 </TimerRing>
               </button>

@@ -471,6 +471,23 @@ export function useCookSession(
     advanceWizardOrFinish()
   }
 
+  // App-wide bootstrap: RecipeDetail's own mount effect only discovers a
+  // resumable session for the SPECIFIC recipe it's showing, so a session
+  // started elsewhere is invisible on refresh/reload unless the user
+  // happens to land back on that exact recipe's page. This runs once, as
+  // soon as we know who's signed in, regardless of which page loaded -
+  // asks the server "what is this user cooking right now" (the same
+  // endpoint the conflict check uses) and resumes it if there is one.
+  const bootstrapDiscoveryDoneRef = useRef(false)
+  useEffect(() => {
+    if (!currentUserId || bootstrapDiscoveryDoneRef.current) return
+    bootstrapDiscoveryDoneRef.current = true
+    getCurrentCookSession(getToken).then(current => {
+      if (current) void discoverActiveSession(current.recipeId)
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- discoverActiveSession/getToken are new every render; the ref guard makes this genuinely once-per-app-load regardless
+  }, [currentUserId])
+
   // A resumed session whose recipe fetch never resolves (fails, or is just
   // slow) would otherwise leave `recipe`/`flatSteps` permanently empty while
   // cookSessionActive stays true - no dock, no Stop button, wake lock held
