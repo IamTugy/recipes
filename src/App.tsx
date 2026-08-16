@@ -215,15 +215,18 @@ export default function App() {
         </Routes>
       </div>
       <AnimatePresence>
-        {timers.length > 0 && (
-          <TimerPanel
-            panelRef={timerPanelRef}
-            timers={timers}
-            onToggle={toggleTimer}
-            onRemove={removeTimer}
-            onReset={resetTimer}
-          />
-        )}
+        {(() => {
+          const otherTimers = timers.filter(t => t.recipeId !== cookSession.activeRecipeId)
+          return otherTimers.length > 0 && (
+            <TimerPanel
+              panelRef={timerPanelRef}
+              timers={otherTimers}
+              onToggle={toggleTimer}
+              onRemove={removeTimer}
+              onReset={resetTimer}
+            />
+          )
+        })()}
       </AnimatePresence>
       {cookSession.cookSessionActive && cookSession.flatSteps.length > 0 && (
         <div aria-hidden="true" className="h-[20dvh] sm:h-24" />
