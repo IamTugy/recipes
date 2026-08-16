@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useAuth } from '@clerk/react'
 import Modal from './Modal'
 import { Dialog } from '@base-ui/react/dialog'
@@ -35,6 +35,13 @@ export default function EditableImageField({ image, onChange, uploadRecipeId, la
   // stale photo.
   const [preEnhanceImage, setPreEnhanceImage] = useState<string | null>(null)
   const busy = uploading
+  // A ref, not a DOM id lookup - every step in a recipe shares the same
+  // uploadRecipeId+size, so an id built from just those two (as this used
+  // to be) collides across every step's hidden input. document.getElementById
+  // always resolves to the FIRST matching element, so clicking "upload" on
+  // any step actually opened step 1's file input - the picked photo landed
+  // on whichever step happened to be first in the DOM, not the one clicked.
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   function handleFileSelected(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -112,10 +119,10 @@ export default function EditableImageField({ image, onChange, uploadRecipeId, la
     <>
       <button
         type="button"
-        onClick={() => image ? setModalOpen(true) : document.getElementById(`file-input-${uploadRecipeId}-${size}`)?.click()}
+        onClick={() => image ? setModalOpen(true) : fileInputRef.current?.click()}
         className={thumbClass}
       >
-        <input id={`file-input-${uploadRecipeId}-${size}`} type="file" accept="image/jpeg,image/png,image/webp" onChange={handleFileSelected} disabled={busy} className="hidden" />
+        <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={handleFileSelected} disabled={busy} className="hidden" />
         {image ? (
           <img src={image} alt="" className="w-full h-full object-cover" />
         ) : size === 'large' ? (
@@ -171,7 +178,7 @@ export default function EditableImageField({ image, onChange, uploadRecipeId, la
           <div className="flex flex-col gap-2">
             <button
               type="button"
-              onClick={() => { setModalOpen(false); document.getElementById(`file-input-${uploadRecipeId}-${size}`)?.click() }}
+              onClick={() => { setModalOpen(false); fileInputRef.current?.click() }}
               className="btn-ghost text-sm"
             >
               {tx.replacePhoto}
