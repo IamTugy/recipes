@@ -39,7 +39,7 @@ interface CookDockProps {
   getTimerForStep: (groupIdx: number, stepIdx: number) => TimerState | undefined
   onStartTimer: (label: string, minutes: number, groupIdx: number, stepIdx: number) => void
   onOpenLightbox: (url: string) => void
-  timerBarHeight: number
+  onCollapsedHeightChange?: (height: number) => void
   lightboxOpen: boolean
   elapsedBaselineMs?: number
   startExpanded?: boolean
@@ -77,7 +77,7 @@ export default function CookDock({
   lang, ingredients, checkedIngredients, onToggleIngredient, multiplier,
   steps, wizardIndex, onPrev, onAdvance, onMarkDone, onStop, onStepEntered, onExpand,
   checkedSteps, nearestTimer, onToggleNearestTimer, getTimerForStep, onStartTimer,
-  onOpenLightbox, timerBarHeight, lightboxOpen, elapsedBaselineMs, startExpanded, onExpandConsumed,
+  onOpenLightbox, onCollapsedHeightChange, lightboxOpen, elapsedBaselineMs, startExpanded, onExpandConsumed,
 }: CookDockProps) {
   const tx = t[lang]
   const dockRef = useRef<HTMLDivElement>(null)
@@ -116,6 +116,26 @@ export default function CookDock({
   // its own focus trap, and without this both trap/Escape handlers would
   // fire together (Escape would close the lightbox AND collapse the dock).
   useFocusTrap(dockRef, expanded && !lightboxOpen)
+
+  // Reports the collapsed bar's actual rendered height (0 while expanded,
+  // since a fully-expanded dock has nothing else visible around it to
+  // reserve space for) so App.tsx can mirror it onto a CSS custom property
+  // any fixed-bottom sheet elsewhere in the app can read - see App.tsx's
+  // cookDockBarHeight state.
+  useEffect(() => {
+    if (!onCollapsedHeightChange) return
+    if (expanded) {
+      onCollapsedHeightChange(0)
+      return
+    }
+    const el = dockRef.current
+    if (!el) return
+    const observer = new ResizeObserver(([entry]) => {
+      onCollapsedHeightChange(entry.contentRect.height)
+    })
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [expanded, onCollapsedHeightChange])
 
   // Client-side elapsed-time stopwatch - starts once, the first time the
   // real steps screen (not the unmeasured checklist) is shown. No backend
@@ -211,10 +231,9 @@ export default function CookDock({
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       onClick={() => { if (!expanded) setExpandedState(true) }}
-      className={`print:hidden fixed inset-x-0 bg-bg border-t border-tint/10 transition-[height] duration-200 flex flex-col ${
-        expanded ? 'h-[90dvh] bottom-0 z-[70]' : 'h-[20dvh] sm:h-24 z-[66] cursor-pointer'
+      className={`print:hidden fixed inset-x-0 bottom-0 bg-bg border-t border-tint/10 transition-[height] duration-200 flex flex-col ${
+        expanded ? 'h-[calc(100dvh-3.5rem)] z-[70]' : 'h-[20dvh] sm:h-24 z-[66] rounded-t-2xl cursor-pointer'
       }`}
-      style={expanded ? undefined : { bottom: timerBarHeight }}
       dir={lang === 'he' ? 'rtl' : 'ltr'}
     >
       {expanded ? (

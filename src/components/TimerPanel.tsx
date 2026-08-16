@@ -122,7 +122,7 @@ export default function TimerPanel({ timers, onToggle, onRemove, onReset, panelR
   const progressTimer = sorted.find(t => t.running && !t.done) ?? sorted[0]
 
   return (
-    <div ref={panelRef} className="print:hidden fixed bottom-0 left-0 right-0 z-[65]">
+    <div ref={panelRef} className="print:hidden fixed bottom-0 left-0 right-0 z-[65]" style={{ bottom: 'var(--cook-dock-bar-height, 0px)' }}>
       {/* Progress bar */}
       <div className="h-0.5 bg-tint/[0.06] relative">
         <div

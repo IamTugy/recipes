@@ -47,7 +47,7 @@ export default function App() {
   const [shortcutsHelpOpen, setShortcutsHelpOpen] = useState(false)
   const { isLoaded, isSignedIn, getToken } = useAuth()
   const timerPanelRef = useRef<HTMLDivElement>(null)
-  const [timerBarHeight, setTimerBarHeight] = useState(0)
+  const [cookDockBarHeight, setCookDockBarHeight] = useState(0)
   const navigate = useNavigate()
   const { setMode } = useTheme()
   const tx = t[lang]
@@ -101,21 +101,22 @@ export default function App() {
     navigate(target)
   }, [isLoaded, isSignedIn, navigate])
 
-  // Measured (not guessed) so guided mode's reserved bottom padding always
-  // matches the real timer bar - including when it wraps to more rows or
-  // grows for the safe-area inset on notched phones.
+  // Mirrors the dock's own reported collapsed height onto a CSS custom
+  // property so any fixed-bottom sheet anywhere in the app (RecipeDetail's
+  // actions menu, the shared ActionsMenu, TimerPanel) can read it without
+  // needing cookSession threaded down as a prop - see CookDock's
+  // onCollapsedHeightChange and ActionsMenu.tsx/TimerPanel.tsx's use of
+  // var(--cook-dock-bar-height, 0px).
   useEffect(() => {
-    const el = timerPanelRef.current
-    if (!el) return
-    const observer = new ResizeObserver(([entry]) => {
-      setTimerBarHeight(entry.contentRect.height)
-    })
-    observer.observe(el)
-    return () => {
-      observer.disconnect()
-      setTimerBarHeight(0)
-    }
-  }, [timers.length])
+    document.documentElement.style.setProperty('--cook-dock-bar-height', `${cookDockBarHeight}px`)
+  }, [cookDockBarHeight])
+
+  // The dock unmounts entirely when a session ends, so nothing would
+  // otherwise reset the property back to 0 - CookDock's own effect only
+  // ever reports while it's mounted.
+  useEffect(() => {
+    if (!cookSession.cookSessionActive) setCookDockBarHeight(0)
+  }, [cookSession.cookSessionActive])
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -225,7 +226,7 @@ export default function App() {
         )}
       </AnimatePresence>
       {cookSession.cookSessionActive && cookSession.flatSteps.length > 0 && (
-        <div aria-hidden="true" className="h-[20dvh] sm:h-24" style={{ paddingBottom: timerBarHeight }} />
+        <div aria-hidden="true" className="h-[20dvh] sm:h-24" />
       )}
       {cookSession.cookSessionActive && cookSession.flatSteps.length > 0 && (
         <CookDock
@@ -242,13 +243,13 @@ export default function App() {
           onStop={cookSession.stopCooking}
           onStepEntered={cookSession.handleStepEntered}
           onExpand={() => cookSession.backgroundCookStatusRef.current?.exitFloatingView()}
+          onCollapsedHeightChange={setCookDockBarHeight}
           checkedSteps={cookSession.checkedSteps}
           nearestTimer={cookSession.nearestTimer}
           onToggleNearestTimer={cookSession.pipToggleNearestTimer}
           getTimerForStep={cookSession.getTimerForStep}
           onStartTimer={cookSession.startTimer}
           onOpenLightbox={cookSession.setLightboxUrl}
-          timerBarHeight={timerBarHeight}
           lightboxOpen={!!cookSession.lightboxUrl}
           elapsedBaselineMs={cookSession.cookSessionStartedAt ? new Date(cookSession.cookSessionStartedAt).getTime() : undefined}
           startExpanded={cookSession.startDockExpanded}
