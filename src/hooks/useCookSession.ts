@@ -49,6 +49,8 @@ export function useCookSession(
   const [cookSessionActive, setCookSessionActive] = useState(false)
   const [cookSessionId, setCookSessionId] = useState<string | null>(null)
   const [cookSessionStartedAt, setCookSessionStartedAt] = useState<string | null>(null)
+  const [pausedAt, setPausedAt] = useState<number | null>(null)
+  const [totalPausedMs, setTotalPausedMs] = useState(0)
   const [startDockExpanded, setStartDockExpanded] = useState(false)
   const [cookConflict, setCookConflict] = useState<{ sessionId: string; recipeTitle: string } | null>(null)
   const [resolvingCookConflict, setResolvingCookConflict] = useState(false)
@@ -110,6 +112,7 @@ export function useCookSession(
     : `Step ${wizardIndex + 1} of ${flatSteps.length}`
 
   function toggleStep(key: string) {
+    resumeIfPaused()
     setCheckedSteps(prev => {
       const next = new Set(prev)
       if (next.has(key)) next.delete(key)
@@ -119,6 +122,7 @@ export function useCookSession(
   }
 
   function markStepChecked(key: string) {
+    resumeIfPaused()
     setCheckedSteps(prev => {
       if (prev.has(key)) return prev
       return new Set(prev).add(key)
@@ -126,6 +130,7 @@ export function useCookSession(
   }
 
   function toggleIngredient(key: string) {
+    resumeIfPaused()
     setCheckedIngredients(prev => {
       const next = new Set(prev)
       if (next.has(key)) next.delete(key)
@@ -140,6 +145,7 @@ export function useCookSession(
   }
 
   function startTimer(label: string, minutes: number, groupIdx: number, stepIdx: number) {
+    resumeIfPaused()
     if (!recipe) return
     onAddTimer(label, minutes, recipe.id, groupIdx * 10000 + stepIdx)
   }
@@ -164,6 +170,22 @@ export function useCookSession(
     setCookSessionStartedAt(null)
     setActiveRecipeId(undefined)
     setSeedRecipe(null)
+    setPausedAt(null)
+    setTotalPausedMs(0)
+  }
+
+  function pauseCooking() {
+    if (pausedAt !== null) return
+    setPausedAt(Date.now())
+  }
+
+  // Also called internally (not just from an explicit "Continue" click) by
+  // every interaction handler below, so any dock/page/PiP interaction while
+  // paused implicitly resumes the elapsed-time clock. No-op when not paused.
+  function resumeIfPaused() {
+    if (pausedAt === null) return
+    setTotalPausedMs(ms => ms + (Date.now() - pausedAt))
+    setPausedAt(null)
   }
 
   function advanceWizardOrFinish() {
@@ -189,6 +211,7 @@ export function useCookSession(
   }
 
   function handleStepEntered(stepKey: string, stepNum: number) {
+    resumeIfPaused()
     lastEnteredStepRef.current = { stepKey, stepNum }
     if (!cookSessionId) {
       pendingCookStepRef.current = { stepKey, stepNum }
@@ -392,6 +415,7 @@ export function useCookSession(
   }
 
   function pipToggleNearestTimer() {
+    resumeIfPaused()
     if (nearestTimer) onToggleTimer(nearestTimer.id)
   }
 
@@ -401,6 +425,7 @@ export function useCookSession(
   // the PiP widget's prev/next controls would get silently reverted by the
   // next poll tick (which recomputes wizardIndex from the stale server step).
   function pipPreviousStep() {
+    resumeIfPaused()
     const prevIndex = wizardIndex - 1
     if (prevIndex < 0) return
     const prev = flatSteps[prevIndex]
@@ -409,6 +434,7 @@ export function useCookSession(
   }
 
   function pipNextStep() {
+    resumeIfPaused()
     if (!currentWizardStep) return
     markStepChecked(`${currentWizardStep.groupIdx}-${currentWizardStep.stepIdx}`)
     if (wizardIndex < flatSteps.length - 1) {
@@ -535,6 +561,7 @@ export function useCookSession(
     cookConflict, resolvingCookConflict, startingCook, wizardIndex, multiplier,
     checkedSteps, checkedIngredients, lightboxUrl, justFinishedRecipeId,
     backgroundCookStatusRef,
+    cookingPaused: pausedAt !== null, pausedAt, totalPausedMs, pauseCooking, resumeCooking: resumeIfPaused,
     openWizard, discoverActiveSession, confirmStartNewCook, dismissCookConflict,
     stopCooking, clearJustFinished, handleStepEntered, toggleStep, markStepChecked,
     toggleIngredient, advanceWizardOrFinish, handleWizardMarkDone, getTimerForStep,
