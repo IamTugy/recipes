@@ -274,7 +274,7 @@ export default function CookDock({
             </button>
           </div>
           <div className="flex items-center justify-between gap-3 px-4 h-14 border-b border-tint/[0.06] shrink-0">
-            <span className="text-cream/40 text-sm truncate min-w-0">{collapsedStepLabel}</span>
+            <span className="text-cream text-lg font-bold tabular-nums truncate min-w-0">{formatDockDuration(elapsedSeconds)}</span>
             <div className="flex items-center gap-2 shrink-0">
               <button type="button"
                 onClick={e => { e.stopPropagation(); togglePauseCooking() }}
@@ -498,22 +498,11 @@ export default function CookDock({
           </div>
           <div className="flex-1 flex items-center px-5 gap-4">
             <div className="min-w-0 flex-1">
-              <p className="text-xs text-cream/40 tabular-nums mb-1">
-                {formatDockDuration(elapsedSeconds)}
+              <p className="text-xs text-cream/40 mb-1">
+                {tx.currentCookTime} <span className="tabular-nums text-cream/60">{formatDockDuration(elapsedSeconds)}</span>
               </p>
               <p className="text-base text-cream/85 leading-snug line-clamp-2">{collapsedStepLabel}</p>
             </div>
-            <button type="button"
-              onClick={e => { e.stopPropagation(); togglePauseCooking() }}
-              aria-label={cookingPaused ? tx.continueCooking : tx.pauseCooking}
-              className="shrink-0 w-9 h-9 flex items-center justify-center rounded-full text-cream/40 hover:text-cream/70 transition-colors"
-            >
-              {cookingPaused ? (
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,4 20,12 6,20" /></svg>
-              ) : (
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg>
-              )}
-            </button>
             {displayedTimer && (
               <button type="button"
                 onClick={e => { e.stopPropagation(); onToggleNearestTimer() }}
