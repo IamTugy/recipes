@@ -114,13 +114,22 @@ export class Recipe {
   reviewComment?: string
 
   // Result of the automated AI quality review that gates publishing.
-  // Overwritten on each resubmission - no history kept for v1.
+  // Overwritten on each resubmission - no history kept for v1. Findings
+  // from before the required/suggestion split lack `bucket` - the API
+  // and frontend both treat a missing bucket as 'required' so old
+  // rejected recipes keep rendering safely until their next resubmission.
   @Prop({ type: MongooseSchema.Types.Mixed })
   qualityReview?: {
     score: number
     checkedAt: string
-    findings: { category: string; severity: 'critical' | 'major' | 'minor'; message: string; field?: string }[]
-    suggestedFields?: Record<string, unknown>
+    findings: {
+      category: string
+      severity: 'critical' | 'major' | 'minor'
+      bucket?: 'required' | 'suggestion'
+      message: string
+      field?: string
+      suggestedFix?: Record<string, unknown>
+    }[]
   }
 
   // Result of the local-heuristic + AI duplicate check that runs before the
