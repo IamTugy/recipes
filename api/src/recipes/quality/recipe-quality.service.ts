@@ -3,24 +3,31 @@ import { ConfigService } from '@nestjs/config'
 import { GeminiService } from '../../ai/gemini.service'
 
 export type FindingSeverity = 'critical' | 'major' | 'minor'
+export type FindingBucket = 'required' | 'suggestion'
 
 export interface QualityFinding {
   category: string
   severity: FindingSeverity
+  // 'required' findings threaten accuracy/safety/consistency and count
+  // toward the score; 'suggestion' findings are stylistic nudges the owner
+  // is free to ignore and never affect the score.
+  bucket: FindingBucket
   message: string
   field?: string
+  // Full replacement value for `field`, not a diff - same semantics as
+  // the old top-level suggestedFields, just scoped to this one finding so
+  // the owner can select which specific fixes to apply.
+  suggestedFix?: Record<string, unknown>
 }
 
 export interface QualityReview {
   score: number
   checkedAt: string
   findings: QualityFinding[]
-  suggestedFields?: Record<string, unknown>
 }
 
 interface GeminiReviewResponse {
   findings: QualityFinding[]
-  suggestedFields?: Record<string, unknown>
 }
 
 // Fixed point deduction per finding severity - the score is computed here,
@@ -45,15 +52,20 @@ Check for all of the following and report a finding for each problem you find (n
 - Prep/cook time is implausible for what the steps describe
 - Poor translation quality or missing translation between the Hebrew and English fields (if both are present)
 - Inappropriate, offensive, or 18+ content anywhere in the text
+- Matters of taste or preference that don't threaten correctness: ingredient quantities that are unusual but not wrong (e.g. an unusually high or low amount of a seasoning like salt or MSG), stylistic wording choices, optional polish
 
 Be exhaustive: go through every check in the list above one by one and report every problem you find, not just the most obvious ones. The owner only gets to see this list once per submission, so a check that's silently skipped this round means a real problem ships or comes back as a surprise on a future resubmission - don't hold anything back for a "later" pass.
 
 For each finding, set "severity" to "critical" (recipe is unusable/wrong/inappropriate as-is), "major" (a real problem but the recipe is still usable), or "minor" (small polish issue).
 
-If you can confidently fix a finding by rewriting the affected field(s), include your fix in "suggestedFields". Only include fields you're actually suggesting a change for. If you suggest a change to ingredients or steps, include the ENTIRE corrected ingredients or steps array in that field (not just the changed item) - it fully replaces the current value, it is not a partial patch.
+For each finding, also set "bucket" to either "required" or "suggestion":
+- "required": anything threatening accuracy, safety, translation quality, or internal consistency of the recipe - the owner must address it (or it will keep blocking publish).
+- "suggestion": a stylistic or preference nudge that doesn't need fixing to publish - the owner is free to ignore it. Example: the amount of a seasoning like MSG being higher or lower than typical is a "suggestion", not a "required" finding, because it doesn't threaten the recipe's integrity - it's the owner's creative choice. Text issues (missing/wrong/awkward translation, typos, inconsistent instructions) and any real inconsistency (ingredients not matching steps, servings not matching quantities, etc.) are always "required".
+
+If you can confidently fix a finding by rewriting the affected field(s), include your fix in that finding's own "suggestedFix". Only set "suggestedFix" on a finding you're actually suggesting a change for. If you suggest a change to ingredients or steps, include the ENTIRE corrected ingredients or steps array in "suggestedFix" (not just the changed item) - it fully replaces the current value, it is not a partial patch. If two or more findings would both touch the same field, only put "suggestedFix" on ONE of them (the one whose fix should win) - never let two findings both claim a fix for the same field, since only one can actually be applied.
 
 Return ONLY JSON matching this shape:
-{"findings": [{"category": string, "severity": "critical"|"major"|"minor", "message": string, "field": string (optional)}], "suggestedFields": object (optional)}
+{"findings": [{"category": string, "severity": "critical"|"major"|"minor", "bucket": "required"|"suggestion", "message": string, "field": string (optional), "suggestedFix": object (optional)}]}
 
 Recipe JSON:
 `
@@ -86,12 +98,13 @@ export class RecipeQualityService {
       score,
       checkedAt: new Date().toISOString(),
       findings,
-      suggestedFields: response.suggestedFields,
     }
   }
 
   private computeScore(findings: QualityFinding[]): number {
-    const deduction = findings.reduce((sum, f) => sum + (PENALTY[f.severity] ?? 0), 0)
+    const deduction = findings
+      .filter(f => f.bucket === 'required')
+      .reduce((sum, f) => sum + (PENALTY[f.severity] ?? 0), 0)
     return Math.max(0, 100 - deduction)
   }
 

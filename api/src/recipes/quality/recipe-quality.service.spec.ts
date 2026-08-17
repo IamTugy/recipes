@@ -40,12 +40,12 @@ describe('RecipeQualityService', () => {
     expect(result.findings).toEqual([])
   })
 
-  it('deducts fixed points per finding by severity', async () => {
+  it('deducts fixed points per finding by severity, for required findings only', async () => {
     generateStructuredWithImage.mockResolvedValue({
       findings: [
-        { category: 'image', severity: 'critical', message: 'blurry' },
-        { category: 'translation', severity: 'major', message: 'missing english' },
-        { category: 'polish', severity: 'minor', message: 'typo' },
+        { category: 'image', severity: 'critical', bucket: 'required', message: 'blurry' },
+        { category: 'translation', severity: 'major', bucket: 'required', message: 'missing english' },
+        { category: 'polish', severity: 'minor', bucket: 'required', message: 'typo' },
       ],
     })
     const service = await makeService()
@@ -55,14 +55,28 @@ describe('RecipeQualityService', () => {
     expect(result.score).toBe(100 - 25 - 10 - 3)
   })
 
+  it('does not deduct points for suggestion-bucket findings, regardless of severity', async () => {
+    generateStructuredWithImage.mockResolvedValue({
+      findings: [
+        { category: 'seasoning', severity: 'major', bucket: 'suggestion', message: 'less MSG would be nicer' },
+        { category: 'polish', severity: 'critical', bucket: 'suggestion', message: 'stylistic nit' },
+      ],
+    })
+    const service = await makeService()
+
+    const result = await service.review(recipe)
+
+    expect(result.score).toBe(100)
+  })
+
   it('floors the score at 0 rather than going negative', async () => {
     generateStructuredWithImage.mockResolvedValue({
       findings: [
-        { category: 'a', severity: 'critical', message: '1' },
-        { category: 'b', severity: 'critical', message: '2' },
-        { category: 'c', severity: 'critical', message: '3' },
-        { category: 'd', severity: 'critical', message: '4' },
-        { category: 'e', severity: 'critical', message: '5' },
+        { category: 'a', severity: 'critical', bucket: 'required', message: '1' },
+        { category: 'b', severity: 'critical', bucket: 'required', message: '2' },
+        { category: 'c', severity: 'critical', bucket: 'required', message: '3' },
+        { category: 'd', severity: 'critical', bucket: 'required', message: '4' },
+        { category: 'e', severity: 'critical', bucket: 'required', message: '5' },
       ],
     })
     const service = await makeService()
@@ -72,16 +86,19 @@ describe('RecipeQualityService', () => {
     expect(result.score).toBe(0)
   })
 
-  it('passes suggestedFields through from the Gemini response', async () => {
+  it('passes each finding through including its own suggestedFix', async () => {
     generateStructuredWithImage.mockResolvedValue({
-      findings: [{ category: 'translation', severity: 'minor', message: 'awkward phrasing' }],
-      suggestedFields: { descriptionEn: 'A better description.' },
+      findings: [
+        { category: 'translation', severity: 'minor', bucket: 'required', message: 'awkward phrasing', field: 'descriptionEn', suggestedFix: { descriptionEn: 'A better description.' } },
+        { category: 'seasoning', severity: 'minor', bucket: 'suggestion', message: 'less MSG' },
+      ],
     })
     const service = await makeService()
 
     const result = await service.review(recipe)
 
-    expect(result.suggestedFields).toEqual({ descriptionEn: 'A better description.' })
+    expect(result.findings[0].suggestedFix).toEqual({ descriptionEn: 'A better description.' })
+    expect(result.findings[1].suggestedFix).toBeUndefined()
   })
 
   it('sends the recipe image and JSON to Gemini', async () => {
