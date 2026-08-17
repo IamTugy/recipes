@@ -27,7 +27,7 @@ import ConfirmDialog from './ConfirmDialog'
 import PostCookReviewModal from './PostCookReviewModal'
 import ReportRecipeModal from './ReportRecipeModal'
 import { useReport } from '../hooks/useReport'
-import type { TimerState, RecipeRevision, QualityReview, ReportReason } from '../types'
+import type { TimerState, RecipeRevision, QualityReview, QualityFinding, ReportReason } from '../types'
 import { resizedImage } from '../lib/image'
 import { downloadRecipePdf } from '../lib/recipePdf'
 import SkeletonImage from './SkeletonImage'
@@ -430,6 +430,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
   const [disputeMessageInput, setDisputeMessageInput] = useState('')
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [reviewResult, setReviewResult] = useState<QualityReview | null>(null)
+  const [selectedFindingIndices, setSelectedFindingIndices] = useState<Set<number>>(new Set())
   const [revisionsOpen, setRevisionsOpen] = useState(false)
   const [viewingRevision, setViewingRevision] = useState<RecipeRevision | null>(null)
   const [revisions, setRevisions] = useState<RecipeRevision[] | null>(null)
@@ -1212,48 +1213,100 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
           {/* AI review results - either the outcome of the submission just
               made, or the recipe's last stored review (so a rejected recipe
               still shows its findings on reload, not just right after
-              submitting). */}
-          {canEdit && review && recipe.status !== 'published' && (
-            <div className={`card p-4 mb-4 border ${review.score >= 95 ? 'border-herb/30' : 'border-red-400/20'}`}>
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-semibold text-cream">
-                  {tx.aIReviewResult}
-                </span>
-                <span className={`text-lg font-bold ${review.score >= 95 ? 'text-herb' : 'text-red-400'}`}>
-                  {review.score}%
-                </span>
+              submitting). Findings split into "required" (count toward the
+              score, must be addressed) and "suggestion" (informational,
+              never affect the score) - legacy reviews from before this
+              split lack `bucket` and are treated as required so they still
+              render safely. */}
+          {canEdit && review && recipe.status !== 'published' && (() => {
+            const requiredFindings = review.findings
+              .map((f, i) => ({ f, i }))
+              .filter(({ f }) => (f.bucket ?? 'required') === 'required')
+            const suggestionFindings = review.findings
+              .map((f, i) => ({ f, i }))
+              .filter(({ f }) => f.bucket === 'suggestion')
+            const findingBadge = (f: QualityFinding) => (
+              <span className={`shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded ${
+                f.severity === 'critical' ? 'bg-red-500/10 text-red-400'
+                : f.severity === 'major' ? 'bg-amber/10 text-amber'
+                : 'bg-tint/10 text-cream/50'
+              }`}>
+                {f.severity}
+              </span>
+            )
+            const toggleFinding = (i: number) => {
+              setSelectedFindingIndices(prev => {
+                const next = new Set(prev)
+                if (next.has(i)) next.delete(i)
+                else next.add(i)
+                return next
+              })
+            }
+            const findingRow = (f: QualityFinding, i: number) => (
+              <li key={i} className="flex items-start gap-2 text-xs text-cream/60">
+                {f.suggestedFix && (
+                  <input
+                    type="checkbox"
+                    checked={selectedFindingIndices.has(i)}
+                    onChange={() => toggleFinding(i)}
+                    className="mt-0.5 shrink-0"
+                  />
+                )}
+                {findingBadge(f)}
+                <span>{f.message}</span>
+              </li>
+            )
+            const hasSelectableFindings = review.findings.some(f => !!f.suggestedFix)
+            return (
+              <div className={`card p-4 mb-4 border ${review.score >= 95 ? 'border-herb/30' : 'border-red-400/20'}`}>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-semibold text-cream">
+                    {tx.aIReviewResult}
+                  </span>
+                  <span className={`text-lg font-bold ${review.score >= 95 ? 'text-herb' : 'text-red-400'}`}>
+                    {review.score}%
+                  </span>
+                </div>
+                {review.findings.length > 0 ? (
+                  <>
+                    {requiredFindings.length > 0 && (
+                      <div className="mb-3">
+                        <p className="text-[11px] font-semibold text-cream/50 mb-1.5">{tx.reviewRequests}</p>
+                        <ul className="space-y-1.5">
+                          {requiredFindings.map(({ f, i }) => findingRow(f, i))}
+                        </ul>
+                      </div>
+                    )}
+                    {suggestionFindings.length > 0 && (
+                      <div className="mb-3">
+                        <p className="text-[11px] font-semibold text-cream/50 mb-1.5">{tx.aiSuggestions}</p>
+                        <ul className="space-y-1.5">
+                          {suggestionFindings.map(({ f, i }) => findingRow(f, i))}
+                        </ul>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <p className="text-xs text-cream/40 mb-3">
+                    {tx.noIssuesFound}
+                  </p>
+                )}
+                {recipe.status === 'rejected' && hasSelectableFindings && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const indices = [...selectedFindingIndices].sort((a, b) => a - b).join(',')
+                      const query = indices ? `?applySuggestions=1&findings=${indices}` : '?applySuggestions=1'
+                      navigate(`/recipes/${id}/edit${query}`)
+                    }}
+                    className="btn-ghost text-xs"
+                  >
+                    {tx.applyChanges}
+                  </button>
+                )}
               </div>
-              {review.findings.length > 0 ? (
-                <ul className="space-y-1.5 mb-3">
-                  {review.findings.map((f, i) => (
-                    <li key={i} className="flex items-start gap-2 text-xs text-cream/60">
-                      <span className={`shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded ${
-                        f.severity === 'critical' ? 'bg-red-500/10 text-red-400'
-                        : f.severity === 'major' ? 'bg-amber/10 text-amber'
-                        : 'bg-tint/10 text-cream/50'
-                      }`}>
-                        {f.severity}
-                      </span>
-                      <span>{f.message}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-xs text-cream/40 mb-3">
-                  {tx.noIssuesFound}
-                </p>
-              )}
-              {recipe.status === 'rejected' && review.suggestedFields && (
-                <button
-                  type="button"
-                  onClick={() => navigate(`/recipes/${id}/edit?applySuggestions=1`)}
-                  className="btn-ghost text-xs"
-                >
-                  {tx.applyChanges}
-                </button>
-              )}
-            </div>
-          )}
+            )
+          })()}
 
           {displayRecipe.aiGenerated && (
             <div className="print:hidden inline-flex items-center gap-1.5 text-xs font-semibold text-amber bg-amber/10 border border-amber/20 rounded-full px-3 py-1 mb-3">
