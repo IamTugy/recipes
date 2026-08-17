@@ -3,7 +3,7 @@
 // readable without a connection. Bump the cache names below whenever the
 // caching strategy changes, to drop stale entries from returning users.
 const SHELL_CACHE = 'shell-v1'
-const RUNTIME_CACHE = 'runtime-v1'
+const RUNTIME_CACHE = 'runtime-v2'
 const SHELL_URLS = ['/', '/manifest.webmanifest', '/favicon.png']
 
 self.addEventListener('install', event => {
@@ -72,6 +72,16 @@ self.addEventListener('fetch', event => {
 
     if (url.pathname.startsWith('/api/recipes') || url.pathname.startsWith('/api/favorites')) {
       event.respondWith(networkFirst(request, RUNTIME_CACHE))
+      return
+    }
+
+    if (url.pathname === '/api/share/image') {
+      // Every hosted recipe photo (not just third-party ones below) is
+      // served through this resize proxy - response is content-immutable
+      // per (src, width) query pair, so it's safe and worth caching the
+      // same way. Without this, switching views and back re-downloaded
+      // every thumbnail instead of hitting the cache.
+      event.respondWith(cacheFirst(request, RUNTIME_CACHE))
       return
     }
 
