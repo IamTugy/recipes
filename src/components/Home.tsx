@@ -152,8 +152,10 @@ export default function Home() {
     }
     if (activeKosher.size) list = list.filter(r => r.kosherType && activeKosher.has(r.kosherType))
     if (activeGroupId) list = list.filter(r => r.dishGroupId === activeGroupId)
+    let relevance: Map<string, number> | null = null
     if (search.trim()) {
       const q = search.toLowerCase()
+      relevance = new Map()
       list = list.filter(r => {
         const hasIngredient = r.ingredients.some(group =>
           group.items.some(item => {
@@ -161,22 +163,24 @@ export default function Home() {
             return name.toLowerCase().includes(q)
           })
         )
-        if (lang === 'en') {
-          return (
-            r.title.toLowerCase().includes(q) ||
-            (r.descriptionEn ?? r.description).toLowerCase().includes(q) ||
-            (r.tagsEn ?? r.tags).some(t => t.toLowerCase().includes(q)) ||
-            (r.cuisine?.toLowerCase().includes(q)) ||
-            hasIngredient
-          )
+        const titleMatch = lang === 'en'
+          ? r.title.toLowerCase().includes(q)
+          : (r.titleHe ?? r.title).toLowerCase().includes(q)
+        const descriptionMatch = lang === 'en'
+          ? (r.descriptionEn ?? r.description).toLowerCase().includes(q)
+          : (r.description ?? '').toLowerCase().includes(q)
+        const otherMatch = lang === 'en'
+          ? (r.tagsEn ?? r.tags).some(t => t.toLowerCase().includes(q)) || (r.cuisine?.toLowerCase().includes(q))
+          : r.tags.some(t => t.toLowerCase().includes(q)) || (r.cuisine?.toLowerCase().includes(q))
+
+        // Recipes matching in title/description outrank ones that only
+        // match via an ingredient name or tag, so "white onion soup"
+        // surfaces above a recipe that merely uses white onion.
+        const matches = titleMatch || descriptionMatch || otherMatch || hasIngredient
+        if (matches) {
+          relevance!.set(r.id, titleMatch || descriptionMatch ? 1 : 0)
         }
-        return (
-          (r.titleHe ?? r.title).toLowerCase().includes(q) ||
-          (r.description ?? '').toLowerCase().includes(q) ||
-          r.tags.some(t => t.toLowerCase().includes(q)) ||
-          (r.cuisine?.toLowerCase().includes(q)) ||
-          hasIngredient
-        )
+        return matches
       })
     }
     if (sortBy === 'rating') {
@@ -185,6 +189,10 @@ export default function Home() {
       list = [...list].sort((a, b) => (a.prepTime + a.cookTime) - (b.prepTime + b.cookTime))
     } else if (sortBy === 'newest') {
       list = [...list].sort((a, b) => (b.createdAt ?? '').localeCompare(a.createdAt ?? ''))
+    }
+    if (relevance) {
+      const rel = relevance
+      list = [...list].sort((a, b) => (rel.get(b.id) ?? 0) - (rel.get(a.id) ?? 0))
     }
     return list
   }, [search, activeCategories, activeDifficulties, activeDietary, activeKosher, lang, recipes, showFavoritesOnly, showMineOnly, userId, favoriteSlugs, sortBy, activeGroupId])
