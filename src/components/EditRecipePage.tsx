@@ -30,21 +30,25 @@ export default function EditRecipePage() {
     )
   }
 
-  // Coming from the AI review's "Apply changes" button - layer the AI's
-  // suggested field fixes on top of the current recipe before handing it to
-  // the form, so the owner reviews/edits them rather than having them
-  // silently auto-saved.
-  const applySuggestions = searchParams.get('applySuggestions') === '1' && recipe.qualityReview?.suggestedFields
-  const existing = applySuggestions ? { ...recipe, ...recipe.qualityReview!.suggestedFields } : recipe
+  // Coming from the AI review's "Submit" button - the owner picked specific
+  // findings to apply via checkboxes, passed here as ?findings=0,2,5 (array
+  // indices into recipe.qualityReview.findings). Layer only THOSE findings'
+  // suggestedFix onto the current recipe before handing it to the form, so
+  // the owner reviews/edits them rather than having them silently auto-saved.
+  const findingsParam = searchParams.get('findings')
+  const appliedFindingIndices = searchParams.get('applySuggestions') === '1' && findingsParam
+    ? findingsParam.split(',').map(Number).filter(n => Number.isInteger(n) && n >= 0)
+    : undefined
+  const appliedFixes = appliedFindingIndices?.reduce<Record<string, unknown>>((acc, i) => {
+    const fix = recipe.qualityReview?.findings[i]?.suggestedFix
+    return fix ? { ...acc, ...fix } : acc
+  }, {}) ?? {}
+  const existing = appliedFindingIndices ? { ...recipe, ...appliedFixes } : recipe
 
   // Shown regardless of how the editor was reached (not just right after
-  // "Apply changes") so the owner can see what the last AI review flagged
-  // while they're actually fixing it, not only on the read-only recipe
-  // page. autoFixedFieldKeys (which findings the AI already patched for
-  // them) only makes sense right after the apply action, since those are
-  // exactly the values pre-filled into the form below.
+  // "Submit") so the owner can see what the last AI review flagged while
+  // they're actually fixing it, not only on the read-only recipe page.
   const reviewFindings = recipe.qualityReview?.findings
-  const autoFixedFieldKeys = applySuggestions ? Object.keys(recipe.qualityReview?.suggestedFields ?? {}) : undefined
 
   // Mutually exclusive - approving a dispute resets status away from
   // 'rejected', so only one of these ever shows at once. Rendered above
@@ -77,7 +81,7 @@ export default function EditRecipePage() {
           {duplicateBanner}
         </div>
       )}
-      <RecipeForm existing={existing} reviewFindings={reviewFindings} autoFixedFieldKeys={autoFixedFieldKeys} />
+      <RecipeForm existing={existing} reviewFindings={reviewFindings} appliedFindingIndices={appliedFindingIndices} />
     </>
   )
 }
