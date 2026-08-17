@@ -112,15 +112,18 @@ export interface Recipe {
 export interface QualityFinding {
   category: string
   severity: 'critical' | 'major' | 'minor'
+  // Legacy pre-redesign reviews lack this field - treat as 'required'
+  // wherever it's read (RecipeDetail.tsx does `f.bucket ?? 'required'`).
+  bucket?: 'required' | 'suggestion'
   message: string
   field?: string
+  suggestedFix?: Record<string, unknown>
 }
 
 export interface QualityReview {
   score: number
   checkedAt: string
   findings: QualityFinding[]
-  suggestedFields?: Record<string, unknown>
 }
 
 export interface DuplicateReview {
