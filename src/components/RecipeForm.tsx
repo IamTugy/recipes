@@ -29,7 +29,7 @@ interface RecipeFormProps {
   // blurry") don't silently linger past the fields that did get prefilled -
   // resubmitting without addressing those just gets rejected again.
   reviewFindings?: QualityFinding[]
-  autoFixedFieldKeys?: string[]
+  appliedFindingIndices?: number[]
 }
 
 const CATEGORIES: Category[] = ['breakfast', 'lunch', 'dinner', 'dessert', 'salad', 'soup', 'snack', 'bread', 'sauce']
@@ -122,7 +122,7 @@ function RegenerateButton({ lang, busy, onClick }: { lang: 'he' | 'en'; busy: bo
   )
 }
 
-export default function RecipeForm({ existing, reviewFindings, autoFixedFieldKeys }: RecipeFormProps) {
+export default function RecipeForm({ existing, reviewFindings, appliedFindingIndices }: RecipeFormProps) {
   const navigate = useNavigate()
   const { getToken } = useAuth()
   const { lang } = useLanguage()
@@ -548,7 +548,7 @@ export default function RecipeForm({ existing, reviewFindings, autoFixedFieldKey
             </p>
             <ul className="space-y-1.5">
               {reviewFindings.map((f, i) => {
-                const autoFixed = !!f.field && !!autoFixedFieldKeys?.includes(f.field)
+                const autoFixed = !!appliedFindingIndices?.includes(i)
                 return (
                   <li key={i} className="flex items-start gap-2 text-xs text-cream/60">
                     <span className={`shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded ${
