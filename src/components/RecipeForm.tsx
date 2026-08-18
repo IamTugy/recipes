@@ -161,6 +161,26 @@ export default function RecipeForm({ existing, reviewFindings, appliedFindingInd
   const [exitConfirmOpen, setExitConfirmOpen] = useState(false)
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }))
 
+  // Clicking a finding in the "from the last AI review" list below scrolls
+  // to and briefly highlights the field it's about, so the owner doesn't
+  // have to hunt for which input a comment refers to. Fields are matched by
+  // id="field-<name>" set on each field's wrapper div.
+  const [highlightedField, setHighlightedField] = useState<string | null>(null)
+  useEffect(() => {
+    if (!highlightedField) return
+    const timer = setTimeout(() => setHighlightedField(null), 1600)
+    return () => clearTimeout(timer)
+  }, [highlightedField])
+  function scrollToField(field: string) {
+    const el = document.getElementById(`field-${field}`)
+    if (!el) return
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    setHighlightedField(field)
+  }
+  function fieldHighlightClass(field: string) {
+    return highlightedField === field ? 'ring-2 ring-amber rounded-lg transition-shadow' : ''
+  }
+
   function snapshotDraft(): DraftSnapshot {
     return {
       title, titleHe, category, difficulty, kosherType, cuisine, image, description, descriptionEn,
@@ -549,8 +569,8 @@ export default function RecipeForm({ existing, reviewFindings, appliedFindingInd
             <ul className="space-y-1.5">
               {reviewFindings.map((f, i) => {
                 const autoFixed = !!appliedFindingIndices?.includes(i)
-                return (
-                  <li key={i} className="flex items-start gap-2 text-xs text-cream/60">
+                const content = (
+                  <>
                     <span className={`shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded ${
                       autoFixed ? 'bg-herb/10 text-herb'
                       : f.severity === 'critical' ? 'bg-red-500/10 text-red-400'
@@ -560,6 +580,21 @@ export default function RecipeForm({ existing, reviewFindings, appliedFindingInd
                       {autoFixed ? (tx.autoFixed) : f.severity}
                     </span>
                     <span>{f.message}{autoFixed ? (tx.doubleCheckTheFixBelow) : ''}</span>
+                  </>
+                )
+                return f.field ? (
+                  <li key={i}>
+                    <button
+                      type="button"
+                      onClick={() => scrollToField(f.field!)}
+                      className="flex items-start gap-2 text-xs text-cream/60 text-start hover:text-cream/90 transition-colors w-full"
+                    >
+                      {content}
+                    </button>
+                  </li>
+                ) : (
+                  <li key={i} className="flex items-start gap-2 text-xs text-cream/60">
+                    {content}
                   </li>
                 )
               })}
@@ -582,11 +617,11 @@ export default function RecipeForm({ existing, reviewFindings, appliedFindingInd
         {/* Basics */}
         <div className="card p-5 space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
+            <div id="field-title" className={fieldHighlightClass('title')}>
               <label className={labelClass}>{tx.titleEnglish}</label>
               <input required {...fieldBindings('title', title, setTitle, 'titleHe', titleHe, setTitleHe, 'he')} className={inputClass} />
             </div>
-            <div>
+            <div id="field-titleHe" className={fieldHighlightClass('titleHe')}>
               <div className="flex items-center justify-between mb-1">
                 <label className={labelClass}>{tx.titleHebrew}</label>
                 <RegenerateButton lang={lang} busy={regenerating.has('title')} onClick={() => regenerateTranslation('title', titleHe, title, setTitleHe, setTitle)} />
@@ -596,7 +631,7 @@ export default function RecipeForm({ existing, reviewFindings, appliedFindingInd
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div>
+            <div id="field-category" className={fieldHighlightClass('category')}>
               <label className={labelClass}>{tx.category}</label>
               <AppSelect
                 value={category}
@@ -605,7 +640,7 @@ export default function RecipeForm({ existing, reviewFindings, appliedFindingInd
                 options={CATEGORIES.map(c => ({ value: c, label: `${categoryEmoji[c]} ${tx.categories[c]}` }))}
               />
             </div>
-            <div>
+            <div id="field-difficulty" className={fieldHighlightClass('difficulty')}>
               <label className={labelClass}>{tx.difficulty2}</label>
               <AppSelect
                 value={difficulty}
@@ -614,11 +649,11 @@ export default function RecipeForm({ existing, reviewFindings, appliedFindingInd
                 options={DIFFICULTIES.map(d => ({ value: d, label: tx.difficulty[d] }))}
               />
             </div>
-            <div>
+            <div id="field-cuisine" className={fieldHighlightClass('cuisine')}>
               <label className={labelClass}>{tx.cuisine}</label>
               <input value={cuisine} onChange={e => setCuisine(e.target.value)} className={inputClass} />
             </div>
-            <div>
+            <div id="field-kosherType" className={fieldHighlightClass('kosherType')}>
               <label className={labelClass} title={tx.kosherClassificationMeatDairyOrParve}>
                 {tx.kosher}
               </label>
@@ -634,7 +669,7 @@ export default function RecipeForm({ existing, reviewFindings, appliedFindingInd
             </div>
           </div>
 
-          <div>
+          <div id="field-image" className={fieldHighlightClass('image')}>
             <label className={labelClass}>{tx.photo}</label>
             <EditableImageField
               image={image}
@@ -647,11 +682,11 @@ export default function RecipeForm({ existing, reviewFindings, appliedFindingInd
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
+            <div id="field-description" className={fieldHighlightClass('description')}>
               <label className={labelClass}>{tx.descriptionHebrew}</label>
               <textarea required {...fieldBindings('description', description, setDescription, 'descriptionEn', descriptionEn, setDescriptionEn, 'en')} rows={2} className={inputClass} dir="rtl" />
             </div>
-            <div>
+            <div id="field-descriptionEn" className={fieldHighlightClass('descriptionEn')}>
               <div className="flex items-center justify-between mb-1">
                 <label className={labelClass}>{tx.descriptionEnglish}</label>
                 <RegenerateButton lang={lang} busy={regenerating.has('description')} onClick={() => regenerateTranslation('description', description, descriptionEn, setDescription, setDescriptionEn)} />
@@ -661,21 +696,21 @@ export default function RecipeForm({ existing, reviewFindings, appliedFindingInd
           </div>
 
           <div className="grid grid-cols-3 gap-4">
-            <div>
+            <div id="field-prepTime" className={fieldHighlightClass('prepTime')}>
               <label className={labelClass}>{tx.prepMin}</label>
               <input type="number" min={0} value={prepTime} onChange={e => setPrepTime(Number(e.target.value))} className={inputClass} />
             </div>
-            <div>
+            <div id="field-cookTime" className={fieldHighlightClass('cookTime')}>
               <label className={labelClass}>{tx.cookMin}</label>
               <input type="number" min={0} value={cookTime} onChange={e => setCookTime(Number(e.target.value))} className={inputClass} />
             </div>
-            <div>
+            <div id="field-servings" className={fieldHighlightClass('servings')}>
               <label className={labelClass}>{tx.servings}</label>
               <input type="number" min={1} value={servings} onChange={e => setServings(Number(e.target.value))} className={inputClass} />
             </div>
           </div>
 
-          <div>
+          <div id="field-nutrition" className={fieldHighlightClass('nutrition')}>
             <div className="flex items-center justify-between mb-1">
               <label className={labelClass}>{tx.nutritionPer100g}</label>
               <button
@@ -716,11 +751,11 @@ export default function RecipeForm({ existing, reviewFindings, appliedFindingInd
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
+            <div id="field-tags" className={fieldHighlightClass('tags')}>
               <label className={labelClass}>{tx.tagsHebrewCommaSeparated}</label>
               <input {...fieldBindings('tags', tags, setTags, 'tagsEn', tagsEn, setTagsEn, 'en')} className={inputClass} dir="rtl" />
             </div>
-            <div>
+            <div id="field-tagsEn" className={fieldHighlightClass('tagsEn')}>
               <div className="flex items-center justify-between mb-1">
                 <label className={labelClass}>{tx.tagsEnglishCommaSeparated}</label>
                 <RegenerateButton lang={lang} busy={regenerating.has('tags')} onClick={() => regenerateTranslation('tags', tags, tagsEn, setTags, setTagsEn)} />
@@ -730,11 +765,11 @@ export default function RecipeForm({ existing, reviewFindings, appliedFindingInd
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
+            <div id="field-tips" className={fieldHighlightClass('tips')}>
               <label className={labelClass}>{tx.tipsHebrewOnePerLine}</label>
               <textarea {...fieldBindings('tips', tips, setTips, 'tipsEn', tipsEn, setTipsEn, 'en')} rows={2} className={inputClass} dir="rtl" />
             </div>
-            <div>
+            <div id="field-tipsEn" className={fieldHighlightClass('tipsEn')}>
               <div className="flex items-center justify-between mb-1">
                 <label className={labelClass}>{tx.tipsEnglishOnePerLine}</label>
                 <RegenerateButton lang={lang} busy={regenerating.has('tips')} onClick={() => regenerateTranslation('tips', tips, tipsEn, setTips, setTipsEn)} />
@@ -745,7 +780,7 @@ export default function RecipeForm({ existing, reviewFindings, appliedFindingInd
         </div>
 
         {/* Ingredients */}
-        <div className="card p-5 space-y-4">
+        <div id="field-ingredients" className={`card p-5 space-y-4 ${fieldHighlightClass('ingredients')}`}>
           <h2 className="font-serif text-lg font-bold text-cream">{tx.ingredients}</h2>
           <DndContext sensors={sensors} onDragEnd={reorderIngredientGroups}>
             <SortableContext items={ingredientGroups.map(g => g._key)} strategy={verticalListSortingStrategy}>
@@ -852,7 +887,7 @@ export default function RecipeForm({ existing, reviewFindings, appliedFindingInd
         )}
 
         {/* Steps */}
-        <div className="card p-5 space-y-4">
+        <div id="field-steps" className={`card p-5 space-y-4 ${fieldHighlightClass('steps')}`}>
           <h2 className="font-serif text-lg font-bold text-cream">{tx.instructions}</h2>
           <DndContext sensors={sensors} onDragEnd={reorderStepGroups}>
             <SortableContext items={stepGroups.map(g => g._key)} strategy={verticalListSortingStrategy}>
@@ -966,7 +1001,7 @@ export default function RecipeForm({ existing, reviewFindings, appliedFindingInd
         </div>
 
         {/* Sources - read-only once AI-generated, otherwise a normal editable field */}
-        <div className="card p-5 space-y-3">
+        <div id="field-sources" className={`card p-5 space-y-3 ${fieldHighlightClass('sources')}`}>
           <h2 className="font-serif text-lg font-bold text-cream">{tx.sources}</h2>
           {aiGenerated ? (
             <ul className="space-y-1.5">
