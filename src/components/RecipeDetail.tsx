@@ -1243,17 +1243,30 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
               })
             }
             const findingRow = (f: QualityFinding, i: number) => (
-              <li key={i} className="flex items-start gap-2 text-xs text-cream/60">
-                {f.suggestedFix && (
+              <li key={i} className="text-xs text-cream/60">
+                <div className="flex items-center gap-2">
                   <input
                     type="checkbox"
                     checked={selectedFindingIndices.has(i)}
+                    disabled={!f.suggestedFix}
                     onChange={() => toggleFinding(i)}
-                    className="mt-0.5 shrink-0"
+                    className={`shrink-0 ${!f.suggestedFix ? 'opacity-30' : ''}`}
                   />
-                )}
-                {findingBadge(f)}
-                <span>{f.message}</span>
+                  {findingBadge(f)}
+                  {f.field && (
+                    <button
+                      type="button"
+                      title={tx.goToFieldLocation}
+                      onClick={() => navigate(`/recipes/${id}/edit?field=${encodeURIComponent(f.field!)}`)}
+                      className="text-cream/40 hover:text-cream/80 transition-colors"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+                <p className="mt-1 ps-6">{f.message}</p>
               </li>
             )
             const hasSelectableFindings = review.findings.some(f => !!f.suggestedFix)

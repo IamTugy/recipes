@@ -30,6 +30,7 @@ interface RecipeFormProps {
   // resubmitting without addressing those just gets rejected again.
   reviewFindings?: QualityFinding[]
   appliedFindingIndices?: number[]
+  scrollToFieldOnMount?: string
 }
 
 const CATEGORIES: Category[] = ['breakfast', 'lunch', 'dinner', 'dessert', 'salad', 'soup', 'snack', 'bread', 'sauce']
@@ -122,7 +123,7 @@ function RegenerateButton({ lang, busy, onClick }: { lang: 'he' | 'en'; busy: bo
   )
 }
 
-export default function RecipeForm({ existing, reviewFindings, appliedFindingIndices }: RecipeFormProps) {
+export default function RecipeForm({ existing, reviewFindings, appliedFindingIndices, scrollToFieldOnMount }: RecipeFormProps) {
   const navigate = useNavigate()
   const { getToken } = useAuth()
   const { lang } = useLanguage()
@@ -180,6 +181,14 @@ export default function RecipeForm({ existing, reviewFindings, appliedFindingInd
   function fieldHighlightClass(field: string) {
     return highlightedField === field ? 'ring-2 ring-amber rounded-lg transition-shadow' : ''
   }
+  // Arrived here via a finding's "go to location" button on the recipe
+  // page rather than by clicking within this form - scroll once the form
+  // (and, for deep ingredient/step fields, its dynamic rows) has mounted.
+  useEffect(() => {
+    if (!scrollToFieldOnMount) return
+    const timer = setTimeout(() => scrollToField(scrollToFieldOnMount), 100)
+    return () => clearTimeout(timer)
+  }, [scrollToFieldOnMount])
 
   function snapshotDraft(): DraftSnapshot {
     return {
@@ -823,7 +832,7 @@ export default function RecipeForm({ existing, reviewFindings, appliedFindingInd
                           {group.items.map((item, ii) => (
                             <SortableRow key={item._key} id={item._key}>
                               {({ attributes: itemAttrs, listeners: itemListeners }) => (
-                                <div className="flex items-start gap-2">
+                                <div id={`field-ingredients.${gi}.${ii}`} className={`flex items-start gap-2 ${fieldHighlightClass(`ingredients.${gi}.${ii}`)}`}>
                                   <DragHandle attributes={itemAttrs} listeners={itemListeners} className="mt-2.5" />
                                   <div className="flex flex-col gap-2 flex-1 min-w-0">
                                     <div className="flex gap-2">
@@ -930,7 +939,7 @@ export default function RecipeForm({ existing, reviewFindings, appliedFindingInd
                           {group.items.map((step, si) => (
                             <SortableRow key={step._key} id={step._key} className="border-t border-tint/[0.06] pt-3 first:border-t-0 first:pt-0">
                               {({ attributes: itemAttrs, listeners: itemListeners }) => (
-                                <div className="flex gap-2">
+                                <div id={`field-steps.${gi}.${si}`} className={`flex gap-2 ${fieldHighlightClass(`steps.${gi}.${si}`)}`}>
                                   <DragHandle attributes={itemAttrs} listeners={itemListeners} className="mt-2" />
                                   <EditableImageField
                                     image={step.image}

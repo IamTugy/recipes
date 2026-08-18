@@ -50,6 +50,10 @@ export default function EditRecipePage() {
   // they're actually fixing it, not only on the read-only recipe page.
   const reviewFindings = recipe.qualityReview?.findings
 
+  // Coming from a finding's "go to location" button on the recipe page -
+  // scroll to and highlight that specific field as soon as the form mounts.
+  const scrollToFieldOnMount = searchParams.get('field') ?? undefined
+
   // Mutually exclusive - approving a dispute resets status away from
   // 'rejected', so only one of these ever shows at once. Rendered above
   // RecipeForm's own pt-20 section rather than inside it, since RecipeForm
@@ -81,7 +85,7 @@ export default function EditRecipePage() {
           {duplicateBanner}
         </div>
       )}
-      <RecipeForm existing={existing} reviewFindings={reviewFindings} appliedFindingIndices={appliedFindingIndices} />
+      <RecipeForm existing={existing} reviewFindings={reviewFindings} appliedFindingIndices={appliedFindingIndices} scrollToFieldOnMount={scrollToFieldOnMount} />
     </>
   )
 }
