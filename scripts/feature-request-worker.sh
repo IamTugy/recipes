@@ -36,6 +36,76 @@ WORKTREES_DIR="$REPO_ROOT/.worktrees"
 cd "$REPO_ROOT"
 mkdir -p "$WORKTREES_DIR"
 
+# Reads a claude -p log, looks for the "You've hit your weekly limit -
+# resets 10am (Asia/Jerusalem)" style message, and prints the epoch seconds
+# of the next occurrence of that time. Prints nothing and returns non-zero
+# if no such message is found. The parsed instant can be wrong by up to a
+# day (e.g. a weekly limit whose true reset is next week, not tomorrow) -
+# that's fine, a wrong-but-early retry just produces a fresh comment with
+# an updated reset time and we try again from there.
+parse_rate_limit_retry_epoch() {
+  local log_file="$1"
+  python3 - "$log_file" <<'PY'
+import re, sys, datetime
+try:
+    from zoneinfo import ZoneInfo
+except ImportError:
+    sys.exit(1)
+
+text = open(sys.argv[1]).read()
+m = re.search(
+    r"limit.*?resets\s+([0-9]{1,2})(:[0-9]{2})?\s*(am|pm)\s*\(([^)]+)\)",
+    text, re.IGNORECASE,
+)
+if not m:
+    sys.exit(1)
+
+hour = int(m.group(1)) % 12
+if m.group(3).lower() == "pm":
+    hour += 12
+minute = int(m.group(2)[1:]) if m.group(2) else 0
+
+try:
+    tz = ZoneInfo(m.group(4).strip())
+except Exception:
+    tz = ZoneInfo("UTC")
+
+now = datetime.datetime.now(tz)
+candidate = now.replace(hour=hour, minute=minute, second=0, microsecond=0)
+if candidate <= now:
+    candidate += datetime.timedelta(days=1)
+print(int(candidate.timestamp()))
+PY
+}
+
+# Issues left in claude-needs-input by a usage-limit failure carry a hidden
+# "retry-after=<epoch>" marker in their last comment (see process_issue).
+# Once that time has passed, flip them back to approved-for-claude so the
+# normal run_once loop picks them up again - no human has to re-approve.
+retry_rate_limited_issues() {
+  local now
+  now=$(date +%s)
+
+  local numbers
+  numbers=$(gh issue list -R "$REPO" --label "$LABEL_NEEDS_INPUT" --state open --json number --jq '.[].number')
+  [ -z "$numbers" ] && return
+
+  local number
+  for number in $numbers; do
+    local last_comment
+    last_comment=$(gh issue view "$number" -R "$REPO" --json comments --jq '.comments[-1].body // ""')
+
+    local retry_epoch
+    retry_epoch=$(echo "$last_comment" | grep -oE 'retry-after=[0-9]+' | grep -oE '[0-9]+' || true)
+    [ -z "$retry_epoch" ] && continue
+
+    if [ "$now" -ge "$retry_epoch" ]; then
+      echo "[feature-request-worker] Issue #$number's usage-limit reset time has passed, auto-retrying"
+      gh issue edit "$number" -R "$REPO" --remove-label "$LABEL_NEEDS_INPUT" --add-label "$LABEL_APPROVED"
+    fi
+  done
+}
+
 process_issue() {
   local number="$1" title="$2" body="$3"
   local branch="claude/issue-$number"
@@ -88,6 +158,25 @@ EOF
   commit_count=$(git -C "$worktree" rev-list --count main.."$branch")
 
   if [ "$commit_count" -eq 0 ]; then
+    local retry_epoch
+    retry_epoch=$(parse_rate_limit_retry_epoch "$claude_log" || true)
+
+    if [ -n "$retry_epoch" ]; then
+      echo "[feature-request-worker] Issue #$number hit a usage limit, will auto-retry after $(date -r "$retry_epoch")"
+      gh issue edit "$number" -R "$REPO" --remove-label "$LABEL_IN_PROGRESS" --add-label "$LABEL_NEEDS_INPUT"
+      gh issue comment "$number" -R "$REPO" --body "Claude hit a usage limit and produced no commits:
+
+\`\`\`
+$(tail -40 "$claude_log")
+\`\`\`
+
+This worker will automatically re-approve and retry once the limit resets - no action needed.
+
+<!-- feature-request-worker:retry-after=$retry_epoch -->"
+      echo "[feature-request-worker] Done with issue #$number -> rate-limited, scheduled for auto-retry"
+      return
+    fi
+
     echo "[feature-request-worker] No commits from issue #$number - unexpected, not opening a PR"
     gh issue edit "$number" -R "$REPO" --remove-label "$LABEL_IN_PROGRESS" --add-label "$LABEL_NEEDS_INPUT"
     gh issue comment "$number" -R "$REPO" --body "Claude ran but didn't produce any commits (unexpected - it's instructed to always finish with a working implementation, never stop to ask):
@@ -134,6 +223,8 @@ Worktree left at \`$worktree\` on this machine for review/iteration."
 }
 
 run_once() {
+  retry_rate_limited_issues
+
   local issues
   issues=$(gh issue list -R "$REPO" --label "$LABEL_APPROVED" --state open --json number,title,body)
   local count
