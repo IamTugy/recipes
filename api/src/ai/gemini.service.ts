@@ -51,6 +51,13 @@ export class GeminiService {
       config: { responseMimeType: 'application/json', ...(temperature !== undefined ? { temperature } : {}) },
     })
     if (!response.text) throw new Error('Gemini returned an empty response')
+    // A response cut off by the output token cap can still happen to end on
+    // valid JSON syntax (e.g. mid-array), which would parse "successfully"
+    // into truncated content instead of throwing - catch that case explicitly
+    // rather than risk silently truncated data downstream.
+    if (response.candidates?.[0]?.finishReason === 'MAX_TOKENS') {
+      throw new Error('Gemini response was cut off by the output token limit')
+    }
     return JSON.parse(response.text) as T
   }
 

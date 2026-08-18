@@ -91,7 +91,7 @@ export class RecipeQualityService {
     // issue reliably surfaces it again instead of the model happening to omit
     // it on one call and report it on the next.
     const response = await this.gemini.generateStructuredWithImage<GeminiReviewResponse>(prompt, data, mimeType, 0)
-    const findings = response.findings ?? []
+    const findings = (response.findings ?? []).map(f => this.sanitizeSuggestedFix(f, recipe))
     const score = this.computeScore(findings)
 
     return {
@@ -99,6 +99,29 @@ export class RecipeQualityService {
       checkedAt: new Date().toISOString(),
       findings,
     }
+  }
+
+  // The prompt asks Gemini to echo back the ENTIRE ingredients/steps array
+  // when suggesting a fix to either, not a diff - but it sometimes abbreviates
+  // a long array instead of faithfully reproducing it, which would silently
+  // truncate the recipe the moment the owner applies that fix. Only "removed
+  // a duplicate item" (-1) is a legitimate reason for the array to shrink;
+  // anything shrinking more than that is almost certainly a truncated echo,
+  // so drop it from the fix rather than let it overwrite real content.
+  private sanitizeSuggestedFix(finding: QualityFinding, recipe: Record<string, unknown>): QualityFinding {
+    if (!finding.suggestedFix) return finding
+
+    const sanitized: Record<string, unknown> = { ...finding.suggestedFix }
+    for (const key of ['ingredients', 'steps']) {
+      const original = recipe[key]
+      const proposed = sanitized[key]
+      if (Array.isArray(original) && Array.isArray(proposed) && proposed.length < original.length - 1) {
+        delete sanitized[key]
+      }
+    }
+
+    const hasAnyFix = Object.keys(sanitized).length > 0
+    return hasAnyFix ? { ...finding, suggestedFix: sanitized } : { ...finding, suggestedFix: undefined }
   }
 
   private computeScore(findings: QualityFinding[]): number {

@@ -101,6 +101,53 @@ describe('RecipeQualityService', () => {
     expect(result.findings[1].suggestedFix).toBeUndefined()
   })
 
+  it('drops a suggestedFix for ingredients/steps that is drastically shorter than the original (likely a truncated echo)', async () => {
+    const longRecipe = { ...recipe, ingredients: ['a', 'b', 'c', 'd', 'e'], steps: ['1', '2', '3', '4', '5'] }
+    generateStructuredWithImage.mockResolvedValue({
+      findings: [
+        { category: 'consistency', severity: 'major', bucket: 'required', message: 'ingredient mismatch', field: 'ingredients', suggestedFix: { ingredients: ['a', 'b'] } },
+        { category: 'consistency', severity: 'major', bucket: 'required', message: 'missing steps', field: 'steps', suggestedFix: { steps: ['1', '2', '3'] } },
+      ],
+    })
+    const service = await makeService()
+
+    const result = await service.review(longRecipe)
+
+    expect(result.findings[0].suggestedFix).toBeUndefined()
+    expect(result.findings[1].suggestedFix).toBeUndefined()
+  })
+
+  it('keeps a suggestedFix that only drops one item, e.g. removing a duplicate', async () => {
+    const longRecipe = { ...recipe, ingredients: ['a', 'b', 'c', 'd', 'e'] }
+    generateStructuredWithImage.mockResolvedValue({
+      findings: [
+        { category: 'consistency', severity: 'minor', bucket: 'required', message: 'duplicate ingredient', field: 'ingredients', suggestedFix: { ingredients: ['a', 'b', 'c', 'd'] } },
+      ],
+    })
+    const service = await makeService()
+
+    const result = await service.review(longRecipe)
+
+    expect(result.findings[0].suggestedFix).toEqual({ ingredients: ['a', 'b', 'c', 'd'] })
+  })
+
+  it('drops only the truncated array field from a suggestedFix, keeping other fields on it', async () => {
+    const longRecipe = { ...recipe, steps: ['1', '2', '3', '4', '5'] }
+    generateStructuredWithImage.mockResolvedValue({
+      findings: [
+        {
+          category: 'consistency', severity: 'major', bucket: 'required', message: 'multiple issues',
+          suggestedFix: { steps: ['1'], descriptionEn: 'A better description.' },
+        },
+      ],
+    })
+    const service = await makeService()
+
+    const result = await service.review(longRecipe)
+
+    expect(result.findings[0].suggestedFix).toEqual({ descriptionEn: 'A better description.' })
+  })
+
   it('sends the recipe image and JSON to Gemini', async () => {
     generateStructuredWithImage.mockResolvedValue({ findings: [] })
     const service = await makeService()
