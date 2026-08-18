@@ -3,7 +3,7 @@ export async function translateText(
   targetLang: 'he' | 'en',
   getToken: () => Promise<string | null>
 ): Promise<string> {
-  const trimmed = text.trim().slice(0, 500)
+  const trimmed = text.trim().slice(0, 5000)
   if (!trimmed) return ''
   try {
     const token = await getToken()
