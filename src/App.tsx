@@ -18,6 +18,7 @@ import MyRecipesPage from './components/MyRecipesPage'
 import MealPlanPage from './components/MealPlanPage'
 import ChefProfilePage from './components/ChefProfilePage'
 import FollowingFeedPage from './components/FollowingFeedPage'
+import PeoplePage from './components/PeoplePage'
 import LeaderboardPage from './components/LeaderboardPage'
 const CookHistoryPage = lazy(() => import('./components/CookHistoryPage'))
 const CookHistoryRecipePage = lazy(() => import('./components/CookHistoryRecipePage'))
@@ -192,6 +193,7 @@ export default function App() {
           <Route path="/meal-plan" element={<MealPlanPage onAddToShoppingList={shoppingList.addItems} />} />
           <Route path="/chef/:userId" element={<ChefProfilePage />} />
           <Route path="/following" element={<FollowingFeedPage />} />
+          <Route path="/people" element={<PeoplePage />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route
             path="/cook-history"

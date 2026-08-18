@@ -54,6 +54,59 @@ describe('UsersService', () => {
     expect(result).toEqual({})
   })
 
+  it('search matches by name (case-insensitive), excludes the searcher, and limits to 20', async () => {
+    const exec = jest.fn().mockResolvedValue([
+      { clerkUserId: 'user_2', name: 'Bob Baker', imageUrl: 'https://img.clerk.dev/b.jpg' },
+    ])
+    const lean = jest.fn().mockReturnValue({ exec })
+    const limit = jest.fn().mockReturnValue({ lean })
+    const find = jest.fn().mockReturnValue({ limit })
+    const moduleRef = await Test.createTestingModule({
+      providers: [UsersService, { provide: getModelToken(User.name), useValue: { find } }],
+    }).compile()
+
+    const service = moduleRef.get(UsersService)
+    const result = await service.search('bob', 'user_1')
+
+    expect(find).toHaveBeenCalledWith({
+      clerkUserId: { $ne: 'user_1' },
+      name: { $regex: 'bob', $options: 'i' },
+    })
+    expect(limit).toHaveBeenCalledWith(20)
+    expect(result).toEqual([{ userId: 'user_2', name: 'Bob Baker', imageUrl: 'https://img.clerk.dev/b.jpg' }])
+  })
+
+  it('search returns an empty array without querying for a blank query', async () => {
+    const find = jest.fn()
+    const moduleRef = await Test.createTestingModule({
+      providers: [UsersService, { provide: getModelToken(User.name), useValue: { find } }],
+    }).compile()
+
+    const service = moduleRef.get(UsersService)
+    const result = await service.search('   ', 'user_1')
+
+    expect(find).not.toHaveBeenCalled()
+    expect(result).toEqual([])
+  })
+
+  it('search escapes regex special characters in the query', async () => {
+    const exec = jest.fn().mockResolvedValue([])
+    const lean = jest.fn().mockReturnValue({ exec })
+    const limit = jest.fn().mockReturnValue({ lean })
+    const find = jest.fn().mockReturnValue({ limit })
+    const moduleRef = await Test.createTestingModule({
+      providers: [UsersService, { provide: getModelToken(User.name), useValue: { find } }],
+    }).compile()
+
+    const service = moduleRef.get(UsersService)
+    await service.search('a.b(c', 'user_1')
+
+    expect(find).toHaveBeenCalledWith({
+      clerkUserId: { $ne: 'user_1' },
+      name: { $regex: 'a\\.b\\(c', $options: 'i' },
+    })
+  })
+
   it('getPreferences returns lang/theme for a known user', async () => {
     const exec = jest.fn().mockResolvedValue({ lang: 'he', theme: 'dark' })
     const lean = jest.fn().mockReturnValue({ exec })
