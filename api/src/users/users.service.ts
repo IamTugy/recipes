@@ -38,6 +38,24 @@ export class UsersService {
     return profiles
   }
 
+  // Powers the "find people to follow" search - matches on name only (email
+  // is private) and excludes the searcher so they don't see themselves in
+  // their own results.
+  async search(query: string, excludeUserId: string): Promise<{ userId: string; name?: string; imageUrl?: string }[]> {
+    const trimmed = query.trim()
+    if (!trimmed) return []
+    const escaped = trimmed.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const users = await this.userModel
+      .find({
+        clerkUserId: { $ne: excludeUserId },
+        name: { $regex: escaped, $options: 'i' },
+      })
+      .limit(20)
+      .lean()
+      .exec()
+    return users.map(u => ({ userId: u.clerkUserId, name: u.name, imageUrl: u.imageUrl }))
+  }
+
   async getPreferences(clerkUserId: string): Promise<{ lang?: 'he' | 'en'; theme?: 'light' | 'dark' | 'system' }> {
     const user = await this.userModel.findOne({ clerkUserId }).select('lang theme').lean().exec()
     return { lang: user?.lang, theme: user?.theme }
