@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable, Logger, NotFoundException, OnModuleInit } from '@nestjs/common'
+import { BadGatewayException, BadRequestException, ForbiddenException, Injectable, Logger, NotFoundException, OnModuleInit } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
@@ -512,7 +512,18 @@ export class RecipesService implements OnModuleInit {
 
     recipe.duplicateReview = undefined
     recipe.disputeStatus = 'none'
-    const review = await this.qualityService.review(recipe.toObject())
+    let review: Awaited<ReturnType<typeof this.qualityService.review>>
+    try {
+      review = await this.qualityService.review(recipe.toObject())
+    } catch (err) {
+      // An uncaught error here (e.g. Gemini returning malformed JSON even
+      // after its own internal retry) would otherwise surface to the owner
+      // as a bare "Internal server error" with no indication it's worth
+      // retrying - a BadGatewayException carries a message the frontend
+      // actually shows.
+      this.logger.error('AI quality review failed', err instanceof Error ? err.stack : err)
+      throw new BadGatewayException('AI review failed - please try submitting again')
+    }
     await this.activityLogService.record(userId, id, 'ai_quality_review_used')
 
     if (review.score >= RecipesService.PUBLISH_THRESHOLD) {

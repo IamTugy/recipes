@@ -30,13 +30,24 @@ export class GeminiService {
   // this method resilient to SDK schema-type API changes across versions).
   async generateStructured<T>(prompt: string, temperature?: number): Promise<T> {
     const client = this.getClient()
-    const response = await client.models.generateContent({
+    const generate = () => client.models.generateContent({
       model: this.model,
       contents: prompt,
       config: { responseMimeType: 'application/json', ...(temperature !== undefined ? { temperature } : {}) },
     })
+    const response = await generate()
     if (!response.text) throw new Error('Gemini returned an empty response')
-    return JSON.parse(response.text) as T
+    try {
+      return JSON.parse(response.text) as T
+    } catch {
+      // Malformed JSON from the model is rare (e.g. an unescaped quote inside
+      // generated text breaking the surrounding string) but not unheard of -
+      // one retry almost always comes back clean rather than surfacing a
+      // hard failure to the caller for something transient.
+      const retry = await generate()
+      if (!retry.text) throw new Error('Gemini returned an empty response')
+      return JSON.parse(retry.text) as T
+    }
   }
 
   // Same JSON-structured contract as generateStructured, but with an image
@@ -45,20 +56,32 @@ export class GeminiService {
   // quality) in one call rather than a separate vision pass.
   async generateStructuredWithImage<T>(prompt: string, imageBase64: string, mimeType: string, temperature?: number): Promise<T> {
     const client = this.getClient()
-    const response = await client.models.generateContent({
+    const generate = () => client.models.generateContent({
       model: this.model,
       contents: [{ role: 'user', parts: [{ inlineData: { data: imageBase64, mimeType } }, { text: prompt }] }],
       config: { responseMimeType: 'application/json', ...(temperature !== undefined ? { temperature } : {}) },
     })
-    if (!response.text) throw new Error('Gemini returned an empty response')
-    // A response cut off by the output token cap can still happen to end on
-    // valid JSON syntax (e.g. mid-array), which would parse "successfully"
-    // into truncated content instead of throwing - catch that case explicitly
-    // rather than risk silently truncated data downstream.
-    if (response.candidates?.[0]?.finishReason === 'MAX_TOKENS') {
-      throw new Error('Gemini response was cut off by the output token limit')
+    const parseOnce = async (): Promise<T> => {
+      const response = await generate()
+      if (!response.text) throw new Error('Gemini returned an empty response')
+      // A response cut off by the output token cap can still happen to end on
+      // valid JSON syntax (e.g. mid-array), which would parse "successfully"
+      // into truncated content instead of throwing - catch that case explicitly
+      // rather than risk silently truncated data downstream.
+      if (response.candidates?.[0]?.finishReason === 'MAX_TOKENS') {
+        throw new Error('Gemini response was cut off by the output token limit')
+      }
+      return JSON.parse(response.text) as T
     }
-    return JSON.parse(response.text) as T
+    try {
+      return await parseOnce()
+    } catch (err) {
+      // Only malformed JSON is worth retrying - it's a transient formatting
+      // slip, not a real problem with the request. Empty-response and
+      // MAX_TOKENS errors are left to propagate immediately.
+      if (err instanceof SyntaxError) return await parseOnce()
+      throw err
+    }
   }
 
   // Plain text generation, no JSON constraint - not used by the recipe
