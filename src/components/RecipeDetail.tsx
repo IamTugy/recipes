@@ -1279,8 +1279,21 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
             // right after a save with no extra bookkeeping.
             const findingResolved = (f: QualityFinding): boolean => {
               if (!f.suggestedFix) return false
+              const fieldParts = f.field?.split('.') ?? []
               return Object.entries(f.suggestedFix).every(([key, value]) => {
                 const current = (recipe as unknown as Record<string, unknown>)[key]
+                // A fix scoped to one specific ingredient/step (f.field like
+                // "steps.4.0") only needs THAT item to match - comparing the
+                // whole array would mean any unrelated edit elsewhere in it
+                // (even a stray space in a different step) makes an already-
+                // applied fix look unresolved forever.
+                if ((key === 'ingredients' || key === 'steps') && fieldParts[0] === key && fieldParts.length === 3) {
+                  const gi = Number(fieldParts[1])
+                  const ii = Number(fieldParts[2])
+                  const currentItem = (current as { items?: unknown[] }[] | undefined)?.[gi]?.items?.[ii]
+                  const proposedItem = (value as { items?: unknown[] }[] | undefined)?.[gi]?.items?.[ii]
+                  return JSON.stringify(currentItem) === JSON.stringify(proposedItem)
+                }
                 return JSON.stringify(current) === JSON.stringify(value)
               })
             }

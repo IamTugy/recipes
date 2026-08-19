@@ -216,6 +216,16 @@ export default function RecipeForm({ existing, reviewFindings, appliedFindingInd
   function undo() { history.undo(snapshotDraft(), restoreDraft) }
   function redo() { history.redo(snapshotDraft(), restoreDraft) }
 
+  // Arriving via "Apply changes" bakes the AI's suggested fixes straight
+  // into the form's initial state (see `existing` in EditRecipePage) -
+  // no onChange/onBlur ever fires for that, so history.canUndo alone
+  // would stay false even though the draft already differs from what's
+  // saved server-side. Folding appliedFindingIndices in here keeps this
+  // one signal accurate for every place that needs "is there anything to
+  // save" - the Save button, the guard in handleSubmit, and the
+  // exit/beforeunload warnings below - so they can't disagree.
+  const hasUnsavedChanges = history.canUndo || !!appliedFindingIndices?.length
+
   // Undo/redo keyboard shortcuts - only when focus isn't inside a text
   // field, so the browser's own native per-field undo takes priority while
   // actively typing; the app-level stack takes over once focus leaves it.
@@ -240,12 +250,12 @@ export default function RecipeForm({ existing, reviewFindings, appliedFindingInd
   // since beforeunload can't show a custom confirm dialog.
   useEffect(() => {
     function handleBeforeUnload(e: BeforeUnloadEvent) {
-      if (!history.canUndo) return
+      if (!hasUnsavedChanges) return
       e.preventDefault()
     }
     window.addEventListener('beforeunload', handleBeforeUnload)
     return () => window.removeEventListener('beforeunload', handleBeforeUnload)
-  }, [history.canUndo])
+  }, [hasUnsavedChanges])
 
   // Tracks which translatable fields the user has typed into directly
   // (vs auto-filled/AI-filled content never touched by hand) - see
@@ -473,7 +483,7 @@ export default function RecipeForm({ existing, reviewFindings, appliedFindingInd
     // here too, not just via the button's disabled state, since a disabled
     // submit button doesn't stop Enter-key implicit submission in every
     // browser.
-    if (isEditing && !history.canUndo) return
+    if (isEditing && !hasUnsavedChanges) return
     setError(null)
     setSaving(true)
     try {
@@ -1058,12 +1068,12 @@ export default function RecipeForm({ existing, reviewFindings, appliedFindingInd
         </div>
 
         <div className="flex items-center gap-3">
-          <button type="submit" disabled={saving || (isEditing && !history.canUndo)} className="btn-primary disabled:opacity-50">
+          <button type="submit" disabled={saving || (isEditing && !hasUnsavedChanges)} className="btn-primary disabled:opacity-50">
             {saving
               ? (tx.saving)
               : isEditing ? (tx.saveChanges) : (tx.createRecipe)}
           </button>
-          <button type="button" onClick={() => history.canUndo ? setExitConfirmOpen(true) : navigate(-1)} className="btn-ghost">
+          <button type="button" onClick={() => hasUnsavedChanges ? setExitConfirmOpen(true) : navigate(-1)} className="btn-ghost">
             {tx.cancel}
           </button>
         </div>
