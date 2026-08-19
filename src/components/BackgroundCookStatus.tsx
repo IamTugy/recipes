@@ -144,8 +144,17 @@ const BackgroundCookStatus = forwardRef<BackgroundCookStatusHandle, BackgroundCo
       if (active) {
         // 0 = manual/on-demand capture only (via requestFrame() above),
         // not a fixed automatic sampling rate - see the redraw effect.
+        // Starts with zero frames until requestFrame() is called at least
+        // once - this effect can run AFTER the redraw effect's own
+        // requestFrame() call already found streamRef.current still null
+        // (effect ordering on first activation), leaving the widget
+        // genuinely blank/black until the next unrelated content change.
+        // Push one frame immediately so there's always something to show
+        // the instant the stream exists.
         const stream = canvas.captureStream(0)
         streamRef.current = stream
+        const initialTrack = stream.getVideoTracks()[0] as (MediaStreamTrack & { requestFrame?: () => void }) | undefined
+        initialTrack?.requestFrame?.()
         video.srcObject = stream
         video.play().catch(() => { /* will play once PiP/user-gesture unblocks it */ })
       } else {
