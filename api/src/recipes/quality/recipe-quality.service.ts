@@ -35,6 +35,18 @@ interface GeminiReviewResponse {
 // auditable across calls instead of a black-box number the model invents.
 const PENALTY: Record<FindingSeverity, number> = { critical: 25, major: 10, minor: 3 }
 
+// The only valid top-level keys a "suggestedFix" object can carry - matches
+// the field names the prompt tells Gemini to use. Guards against the model
+// mirroring a deep "field" pointer (e.g. "ingredients.4.6") into
+// suggestedFix's own shape (e.g. {"4": {...}}) instead of nesting the fix
+// under the real field name - that mistake would otherwise merge silently
+// meaningless keys onto the recipe while leaving the real field untouched.
+const KNOWN_TOP_LEVEL_FIELDS = new Set([
+  'title', 'titleHe', 'description', 'descriptionEn', 'category', 'difficulty',
+  'cuisine', 'kosherType', 'image', 'prepTime', 'cookTime', 'servings',
+  'nutrition', 'tags', 'tagsEn', 'tips', 'tipsEn', 'sources', 'ingredients', 'steps',
+])
+
 const REVIEW_PROMPT = `You are reviewing a home-cooking recipe submission before it's allowed to publish on a recipe-sharing app. You are given the recipe's photo and its full content as JSON below.
 
 Check for all of the following and report a finding for each problem you find (no finding for things that are fine):
@@ -64,7 +76,7 @@ For each finding, also set "bucket" to either "required" or "suggestion":
 
 Set "field" to point the owner at exactly where the problem is, using these exact names: "title", "titleHe", "description", "descriptionEn", "category", "difficulty", "cuisine", "kosherType", "image", "prepTime", "cookTime", "servings", "nutrition", "tags", "tagsEn", "tips", "tipsEn", "sources". When a finding is about ONE specific ingredient or step rather than the whole list, be precise: use "ingredients.<groupIndex>.<itemIndex>" or "steps.<groupIndex>.<itemIndex>", where both indexes are 0-based positions matching the exact position of that group/item in the "ingredients"/"steps" arrays in the recipe JSON below (e.g. the second ingredient in the first group is "ingredients.0.1"). Only use the bare "ingredients" or "steps" field name when the issue is about the list as a whole (missing an item, wrong order) rather than one specific entry. Omit "field" entirely if the finding isn't about one identifiable field.
 
-If you can confidently fix a finding by rewriting the affected field(s), include your fix in that finding's own "suggestedFix". Only set "suggestedFix" on a finding you're actually suggesting a change for. If you suggest a change to ingredients or steps, include the ENTIRE corrected ingredients or steps array in "suggestedFix" (not just the changed item) - it fully replaces the current value, it is not a partial patch, even when "field" points at one specific item. If two or more findings would both touch the same field, only put "suggestedFix" on ONE of them (the one whose fix should win) - never let two findings both claim a fix for the same field, since only one can actually be applied. IMPORTANT: if your "message" states a specific replacement value (a corrected amount, unit, name, number, or piece of text - e.g. "reduce MSG from 8g to 4g"), you MUST also set "suggestedFix" with that exact value - never describe a concrete fix in the message while leaving "suggestedFix" unset, since that's the only way the owner can actually apply it with one click instead of retyping it by hand.
+If you can confidently fix a finding by rewriting the affected field(s), include your fix in that finding's own "suggestedFix". Only set "suggestedFix" on a finding you're actually suggesting a change for. "suggestedFix" is ALWAYS keyed by the real top-level field name from the list above ("ingredients", "steps", "title", etc.) - NEVER by a group/item index, even when "field" points at one specific item. If you suggest a change to ingredients or steps, "suggestedFix" must be {"ingredients": [...]} or {"steps": [...]} containing the ENTIRE corrected array (not just the changed item, and not split into per-index keys like {"4": {...}} or {"0": ..., "1": ...}) - it fully replaces the current value, it is not a partial patch. For example, if "field" is "ingredients.4.6" because one specific ingredient's name is wrong, "suggestedFix" is still {"ingredients": [<all 5+ groups, unchanged, except item 6 of group 4 which has the corrected name>]} - the object has exactly one key, the literal word "ingredients". If two or more findings would both touch the same field, only put "suggestedFix" on ONE of them (the one whose fix should win) - never let two findings both claim a fix for the same field, since only one can actually be applied. IMPORTANT: if your "message" states a specific replacement value (a corrected amount, unit, name, number, or piece of text - e.g. "reduce MSG from 8g to 4g"), you MUST also set "suggestedFix" with that exact value - never describe a concrete fix in the message while leaving "suggestedFix" unset, since that's the only way the owner can actually apply it with one click instead of retyping it by hand.
 
 Return ONLY JSON matching this shape:
 {"findings": [{"category": string, "severity": "critical"|"major"|"minor", "bucket": "required"|"suggestion", "message": string, "field": string (optional), "suggestedFix": object (optional)}]}
@@ -113,7 +125,10 @@ export class RecipeQualityService {
   private sanitizeSuggestedFix(finding: QualityFinding, recipe: Record<string, unknown>): QualityFinding {
     if (!finding.suggestedFix) return finding
 
-    const sanitized: Record<string, unknown> = { ...finding.suggestedFix }
+    const sanitized: Record<string, unknown> = {}
+    for (const [key, value] of Object.entries(finding.suggestedFix)) {
+      if (KNOWN_TOP_LEVEL_FIELDS.has(key)) sanitized[key] = value
+    }
     for (const key of ['ingredients', 'steps']) {
       const original = recipe[key]
       const proposed = sanitized[key]

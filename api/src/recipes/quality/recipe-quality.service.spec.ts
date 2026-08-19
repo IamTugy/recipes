@@ -148,6 +148,38 @@ describe('RecipeQualityService', () => {
     expect(result.findings[0].suggestedFix).toEqual({ descriptionEn: 'A better description.' })
   })
 
+  it('drops suggestedFix keys that are not real field names, e.g. the model mirroring a deep field pointer into numeric keys', async () => {
+    generateStructuredWithImage.mockResolvedValue({
+      findings: [
+        {
+          category: 'consistency', severity: 'major', bucket: 'required', field: 'ingredients.4.6', message: 'wrong tomato type',
+          suggestedFix: { '0': { group: 'a' }, '4': { group: 'e' }, ingredients: [{ group: 'fixed', items: [] }] },
+        },
+      ],
+    })
+    const service = await makeService()
+
+    const result = await service.review(recipe)
+
+    expect(result.findings[0].suggestedFix).toEqual({ ingredients: [{ group: 'fixed', items: [] }] })
+  })
+
+  it('drops a suggestedFix entirely when none of its keys are real field names', async () => {
+    generateStructuredWithImage.mockResolvedValue({
+      findings: [
+        {
+          category: 'consistency', severity: 'major', bucket: 'required', field: 'ingredients.1.1', message: 'wrong unit',
+          suggestedFix: { '0': { group: 'a' }, '1': { group: 'b' } },
+        },
+      ],
+    })
+    const service = await makeService()
+
+    const result = await service.review(recipe)
+
+    expect(result.findings[0].suggestedFix).toBeUndefined()
+  })
+
   it('sends the recipe image and JSON to Gemini', async () => {
     generateStructuredWithImage.mockResolvedValue({ findings: [] })
     const service = await makeService()
