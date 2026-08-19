@@ -431,6 +431,34 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [reviewResult, setReviewResult] = useState<QualityReview | null>(null)
   const [selectedFindingIndices, setSelectedFindingIndices] = useState<Set<number>>(new Set())
+
+  // "Go to location" on an AI review finding scrolls within THIS page (not
+  // into edit mode - the owner just wants to see where the issue is) using
+  // the same id="field-<name>" convention the editor uses. titleHe/
+  // descriptionEn/tagsEn/tipsEn share the same displayed element as their
+  // he/en counterpart here (this page shows one merged translation, not
+  // separate fields per language), so they resolve to the same anchor.
+  const [highlightedField, setHighlightedField] = useState<string | null>(null)
+  useEffect(() => {
+    if (!highlightedField) return
+    const timer = setTimeout(() => setHighlightedField(null), 1600)
+    return () => clearTimeout(timer)
+  }, [highlightedField])
+  const FIELD_ALIASES: Record<string, string> = { titleHe: 'title', descriptionEn: 'description', tagsEn: 'tags', tipsEn: 'tips' }
+  function resolveFieldId(field: string) {
+    const [top, ...rest] = field.split('.')
+    return [FIELD_ALIASES[top] ?? top, ...rest].join('.')
+  }
+  function scrollToField(field: string) {
+    const resolved = resolveFieldId(field)
+    const el = document.getElementById(`field-${resolved}`)
+    if (!el) return
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    setHighlightedField(resolved)
+  }
+  function fieldHighlightClass(field: string) {
+    return highlightedField === field ? 'ring-2 ring-amber rounded-lg transition-shadow' : ''
+  }
   const [revisionsOpen, setRevisionsOpen] = useState(false)
   const [viewingRevision, setViewingRevision] = useState<RecipeRevision | null>(null)
   const [revisions, setRevisions] = useState<RecipeRevision[] | null>(null)
@@ -761,7 +789,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
     <div className="min-h-dvh bg-bg pt-14" dir={lang === 'he' ? 'rtl' : 'ltr'}>
       <RecipeSectionNav sections={sectionNavItems} lang={lang} />
       {/* Hero image */}
-      <div className="print:hidden relative h-64 sm:h-96 overflow-hidden">
+      <div id="field-image" className={`print:hidden relative h-64 sm:h-96 overflow-hidden ${fieldHighlightClass('image')}`}>
         {displayRecipe.image?.includes('assets.tugy.dev') ? (
           <SkeletonImage
             src={resizedImage(displayRecipe.image, 1200)}
@@ -1091,9 +1119,9 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
         {/* Header card */}
         <div className="card p-6 mb-6 print:p-0 print:mb-5 print:border-0 print:shadow-none print:bg-transparent">
           <div className="flex flex-wrap items-center gap-2 mb-3">
-            <span className="tag">{categoryEmoji[displayRecipe.category]} {tx.categories[displayRecipe.category]}</span>
-            {displayRecipe.cuisine && <span className="tag">{displayRecipe.cuisine}</span>}
-            <span className={`tag font-semibold ${difficultyColor[displayRecipe.difficulty]}`}>
+            <span id="field-category" className={`tag ${fieldHighlightClass('category')}`}>{categoryEmoji[displayRecipe.category]} {tx.categories[displayRecipe.category]}</span>
+            {displayRecipe.cuisine && <span id="field-cuisine" className={`tag ${fieldHighlightClass('cuisine')}`}>{displayRecipe.cuisine}</span>}
+            <span id="field-difficulty" className={`tag font-semibold ${difficultyColor[displayRecipe.difficulty]} ${fieldHighlightClass('difficulty')}`}>
               {tx.difficulty[displayRecipe.difficulty]}
             </span>
             {isViewingNonLatestRevision && (
@@ -1242,34 +1270,55 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
                 return next
               })
             }
-            const findingRow = (f: QualityFinding, i: number) => (
-              <li key={i} className="text-xs text-cream/60">
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={selectedFindingIndices.has(i)}
-                    disabled={!f.suggestedFix}
-                    onChange={() => toggleFinding(i)}
-                    className={`shrink-0 ${!f.suggestedFix ? 'opacity-30' : ''}`}
-                  />
-                  {findingBadge(f)}
-                  {f.field && (
-                    <button
-                      type="button"
-                      title={tx.goToFieldLocation}
-                      onClick={() => navigate(`/recipes/${id}/edit?field=${encodeURIComponent(f.field!)}`)}
-                      className="text-cream/40 hover:text-cream/80 transition-colors"
-                    >
-                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                      </svg>
-                    </button>
-                  )}
-                </div>
-                <p className="mt-1 ps-6">{f.message}</p>
-              </li>
-            )
-            const hasSelectableFindings = review.findings.some(f => !!f.suggestedFix)
+            // A finding whose suggestedFix already matches the recipe's
+            // current saved values has been addressed - whether the owner
+            // applied it through this panel or edited the field by hand -
+            // even though the stored review itself won't say so until the
+            // recipe is resubmitted. Comparing against the live `recipe`
+            // (not the translated `displayRecipe`) lets this stay accurate
+            // right after a save with no extra bookkeeping.
+            const findingResolved = (f: QualityFinding): boolean => {
+              if (!f.suggestedFix) return false
+              return Object.entries(f.suggestedFix).every(([key, value]) => {
+                const current = (recipe as unknown as Record<string, unknown>)[key]
+                return JSON.stringify(current) === JSON.stringify(value)
+              })
+            }
+            const findingRow = (f: QualityFinding, i: number) => {
+              const resolved = findingResolved(f)
+              return (
+                <li key={i} className="text-xs text-cream/60">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={resolved || selectedFindingIndices.has(i)}
+                      disabled={!f.suggestedFix || resolved}
+                      onChange={() => toggleFinding(i)}
+                      className={`shrink-0 ${!f.suggestedFix || resolved ? 'opacity-30' : ''}`}
+                    />
+                    {resolved ? (
+                      <span className="shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-herb/10 text-herb">
+                        {tx.autoFixed}
+                      </span>
+                    ) : findingBadge(f)}
+                    {f.field && (
+                      <button
+                        type="button"
+                        title={tx.goToFieldLocation}
+                        onClick={() => scrollToField(f.field!)}
+                        className="text-cream/40 hover:text-cream/80 transition-colors"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                  <p className={`mt-1 ps-6 ${resolved ? 'line-through text-cream/30' : ''}`}>{f.message}</p>
+                </li>
+              )
+            }
+            const hasUnresolvedSelectable = review.findings.some(f => !!f.suggestedFix && !findingResolved(f))
             return (
               <div className={`card p-4 mb-4 border ${review.score >= 95 ? 'border-herb/30' : 'border-red-400/20'}`}>
                 <div className="flex items-center justify-between mb-3">
@@ -1304,7 +1353,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
                     {tx.noIssuesFound}
                   </p>
                 )}
-                {recipe.status === 'rejected' && hasSelectableFindings && (
+                {recipe.status === 'rejected' && hasUnresolvedSelectable && (
                   <button
                     type="button"
                     onClick={() => {
@@ -1330,7 +1379,8 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
           )}
 
           <h1
-            className="font-serif text-3xl sm:text-4xl font-bold text-cream leading-tight mb-1"
+            id="field-title"
+            className={`font-serif text-3xl sm:text-4xl font-bold text-cream leading-tight mb-1 ${fieldHighlightClass('title')}`}
             dir={lang === 'he' ? 'rtl' : 'ltr'}
           >
             {titleLoading ? <span className="inline-block h-8 w-2/3 bg-tint/10 rounded animate-pulse" /> : displayTitle}
@@ -1344,7 +1394,8 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
             </p>
           )}
           <p
-            className="text-cream/70 text-base leading-relaxed mb-5"
+            id="field-description"
+            className={`text-cream/70 text-base leading-relaxed mb-5 ${fieldHighlightClass('description')}`}
             dir={lang === 'he' ? 'rtl' : 'ltr'}
           >
             {descriptionLoading ? <span className="inline-block h-4 w-full bg-tint/10 rounded animate-pulse" /> : displayDescription}
@@ -1430,12 +1481,16 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
           {/* Meta grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 print:grid-cols-5 gap-3 print:gap-2">
             {[
-              { label: tx.prep, value: formatTime(displayRecipe.prepTime), icon: '🔪' },
-              { label: tx.cook, value: formatTime(displayRecipe.cookTime), icon: '🔥' },
-              { label: tx.total, value: formatTime(totalTime), icon: '⏱' },
-              { label: tx.servings, value: scaledServings.toString(), icon: '🍽' },
+              { label: tx.prep, value: formatTime(displayRecipe.prepTime), icon: '🔪', field: 'prepTime' },
+              { label: tx.cook, value: formatTime(displayRecipe.cookTime), icon: '🔥', field: 'cookTime' },
+              { label: tx.total, value: formatTime(totalTime), icon: '⏱', field: undefined },
+              { label: tx.servings, value: scaledServings.toString(), icon: '🍽', field: 'servings' },
             ].map(item => (
-              <div key={item.label} className="bg-tint/[0.03] print:bg-transparent print:border print:border-tint/15 rounded-xl print:rounded-lg p-3 print:p-2 text-center border border-tint/5">
+              <div
+                key={item.label}
+                id={item.field ? `field-${item.field}` : undefined}
+                className={`bg-tint/[0.03] print:bg-transparent print:border print:border-tint/15 rounded-xl print:rounded-lg p-3 print:p-2 text-center border border-tint/5 ${item.field ? fieldHighlightClass(item.field) : ''}`}
+              >
                 <p className="text-xl mb-1">{item.icon}</p>
                 <p className="font-bold text-cream text-lg">{item.value}</p>
                 <p className="text-cream/40 text-xs">{item.label}</p>
@@ -1444,7 +1499,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
           </div>
 
           {hasNutrition && (
-            <div className="mt-5">
+            <div id="field-nutrition" className={`mt-5 ${fieldHighlightClass('nutrition')}`}>
               <h2 className="font-serif text-lg font-bold text-cream mb-2">{tx.nutritionTitle}</h2>
               <table className="w-full text-sm border-collapse">
                 <thead>
@@ -1519,7 +1574,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
 
         <div className="grid grid-cols-1 sm:grid-cols-5 print:grid-cols-5 gap-6 print:gap-0">
           {/* Ingredients */}
-          {displayRecipe.ingredients.length > 0 && <div className="sm:col-span-2 print:col-span-2 card p-5 bg-amber/[0.04] border-amber/10 h-fit print:p-0 print:pe-5 print:border-0 print:border-e print:border-tint/20 print:bg-transparent print:rounded-none">
+          {displayRecipe.ingredients.length > 0 && <div id="field-ingredients" className={`sm:col-span-2 print:col-span-2 card p-5 bg-amber/[0.04] border-amber/10 h-fit print:p-0 print:pe-5 print:border-0 print:border-e print:border-tint/20 print:bg-transparent print:rounded-none ${fieldHighlightClass('ingredients')}`}>
             <div className="flex items-center justify-between gap-2 mb-4">
               <h2 id="ingredients-heading" className="font-serif text-xl font-bold text-cream scroll-mt-20">{tx.ingredients}</h2>
               <button type="button"
@@ -1553,6 +1608,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
                         return (
                           <li
                             key={ii}
+                            id={`field-ingredients.${gi}.${ii}`}
                             onClick={() => toggleIngredient(ingredientKey)}
                             onKeyDown={e => {
                               if (e.key === 'Enter' || e.key === ' ') {
@@ -1563,7 +1619,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
                             role="checkbox"
                             aria-checked={checked}
                             tabIndex={0}
-                            className="flex gap-2 text-sm cursor-pointer"
+                            className={`flex gap-2 text-sm cursor-pointer rounded ${fieldHighlightClass(`ingredients.${gi}.${ii}`)}`}
                             dir={lang === 'he' ? 'rtl' : 'ltr'}
                           >
                             <span
@@ -1616,7 +1672,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
           </div>}
 
           {/* Steps */}
-          <div className="sm:col-span-3 print:col-span-3 print:ps-5">
+          <div id="field-steps" className={`sm:col-span-3 print:col-span-3 print:ps-5 ${fieldHighlightClass('steps')}`}>
             <div className={`flex items-center justify-between ${flatSteps.length > 0 ? 'mb-1' : 'mb-4'}`}>
               <h2 id="steps-heading" className="font-serif text-xl font-bold text-cream scroll-mt-20">{tx.instructions}</h2>
             </div>
@@ -1647,12 +1703,13 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
                         return (
                           <motion.div
                             key={si}
+                            id={`field-steps.${gi}.${si}`}
                             layout
                             className={`relative rounded-xl border p-4 transition-colors cursor-pointer print:rounded-none print:border-0 print:bg-transparent print:p-0 print:pb-3 print:break-inside-avoid ${
                               checked
                                 ? 'border-herb/30 bg-herb/5'
                                 : 'border-tint/5 bg-tint/[0.02] hover:border-tint/10'
-                            }`}
+                            } ${fieldHighlightClass(`steps.${gi}.${si}`)}`}
                             onClick={() => toggleStep(stepKey)}
                             onKeyDown={e => {
                               if (e.key === 'Enter' || e.key === ' ') {
@@ -1765,7 +1822,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
 
         {/* Tips */}
         {displayTipsCount > 0 && (
-          <div className="mt-8 card p-5 print:mt-6 print:p-0 print:border-0 print:border-t print:border-tint/15 print:pt-4 print:rounded-none print:bg-transparent print:break-inside-avoid">
+          <div id="field-tips" className={`mt-8 card p-5 print:mt-6 print:p-0 print:border-0 print:border-t print:border-tint/15 print:pt-4 print:rounded-none print:bg-transparent print:break-inside-avoid ${fieldHighlightClass('tips')}`}>
             <h2 id="tips-heading" className="font-serif text-lg font-bold text-cream mb-3 flex items-center gap-2 scroll-mt-20">
               <span>💡</span> {tx.tipsTitle}
             </h2>
@@ -1785,7 +1842,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
 
         {/* Tags */}
         {displayRecipe.tags.length > 0 && (
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div id="field-tags" className={`mt-4 flex flex-wrap gap-2 ${fieldHighlightClass('tags')}`}>
             {(lang === 'he' ? displayRecipe.tags : (displayRecipe.tagsEn ?? displayRecipe.tags)).map(tag => (
               <button type="button"
                 key={tag}
@@ -1800,7 +1857,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
 
         {/* Sources - hidden entirely when there are none */}
         {!!displayRecipe.sources?.length && (
-          <div className="mt-8 card p-5 print:mt-6 print:p-0 print:border-0 print:border-t print:border-tint/15 print:pt-4 print:rounded-none print:bg-transparent print:break-inside-avoid">
+          <div id="field-sources" className={`mt-8 card p-5 print:mt-6 print:p-0 print:border-0 print:border-t print:border-tint/15 print:pt-4 print:rounded-none print:bg-transparent print:break-inside-avoid ${fieldHighlightClass('sources')}`}>
             <h2 className="font-serif text-lg font-bold text-cream mb-3 flex items-center gap-2">
               <span>🔗</span> {tx.sources}
             </h2>

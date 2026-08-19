@@ -578,32 +578,31 @@ export default function RecipeForm({ existing, reviewFindings, appliedFindingInd
             <ul className="space-y-1.5">
               {reviewFindings.map((f, i) => {
                 const autoFixed = !!appliedFindingIndices?.includes(i)
-                const content = (
-                  <>
-                    <span className={`shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded ${
-                      autoFixed ? 'bg-herb/10 text-herb'
-                      : f.severity === 'critical' ? 'bg-red-500/10 text-red-400'
-                      : f.severity === 'major' ? 'bg-amber/10 text-amber'
-                      : 'bg-tint/10 text-cream/50'
-                    }`}>
-                      {autoFixed ? (tx.autoFixed) : f.severity}
-                    </span>
-                    <span>{f.message}{autoFixed ? (tx.doubleCheckTheFixBelow) : ''}</span>
-                  </>
-                )
-                return f.field ? (
-                  <li key={i}>
-                    <button
-                      type="button"
-                      onClick={() => scrollToField(f.field!)}
-                      className="flex items-start gap-2 text-xs text-cream/60 text-start hover:text-cream/90 transition-colors w-full"
-                    >
-                      {content}
-                    </button>
-                  </li>
-                ) : (
-                  <li key={i} className="flex items-start gap-2 text-xs text-cream/60">
-                    {content}
+                return (
+                  <li key={i} className="text-xs text-cream/60">
+                    <div className="flex items-center gap-2">
+                      <span className={`shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded ${
+                        autoFixed ? 'bg-herb/10 text-herb'
+                        : f.severity === 'critical' ? 'bg-red-500/10 text-red-400'
+                        : f.severity === 'major' ? 'bg-amber/10 text-amber'
+                        : 'bg-tint/10 text-cream/50'
+                      }`}>
+                        {autoFixed ? (tx.autoFixed) : f.severity}
+                      </span>
+                      {f.field && (
+                        <button
+                          type="button"
+                          title={tx.goToFieldLocation}
+                          onClick={() => scrollToField(f.field!)}
+                          className="text-cream/40 hover:text-cream/80 transition-colors"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+                    <p className="mt-1 ps-6">{f.message}{autoFixed ? (tx.doubleCheckTheFixBelow) : ''}</p>
                   </li>
                 )
               })}
