@@ -38,6 +38,30 @@ import { useTheme } from './hooks/useTheme'
 import { fetchPreferences } from './lib/preferences'
 import { t } from './i18n'
 
+// Minimal shape of the Launch Handler API's window.launchQueue - not yet in
+// TypeScript's DOM lib, so declared here rather than pulling in a
+// third-party types package for one interface.
+interface LaunchParams { targetURL: string }
+interface LaunchQueue { setConsumer(consumer: (params: LaunchParams) => void): void }
+
+// Shared by both the mount-time query-string read and the launchQueue
+// consumer below - a share link (?share=/recipes/<id>) or a Web Share
+// Target payload (?title=&text=&url=) resolves to the in-app route to
+// land on, or null if this search string carries neither.
+function resolveShareTarget(search: string): string | null {
+  const params = new URLSearchParams(search)
+  const shareTarget = params.get('share')
+  if (shareTarget) return shareTarget
+  const sharedTitle = params.get('title')
+  const sharedText = params.get('text')
+  const sharedUrl = params.get('url')
+  if (!sharedTitle && !sharedText && !sharedUrl) return null
+  return `/recipes/import?${new URLSearchParams({
+    ...(sharedUrl ? { url: sharedUrl } : {}),
+    ...((sharedText || sharedTitle) ? { text: [sharedTitle, sharedText].filter(Boolean).join(' ') } : {}),
+  })}`
+}
+
 export default function App() {
   const { lang, setLang } = useLanguage()
   const { timers, addTimer, toggleTimer, removeTimer, resetTimer } = useTimers()
@@ -92,22 +116,28 @@ export default function App() {
   // with the shared title/text/url silently ignored.
   useEffect(() => {
     if (!isLoaded || !isSignedIn) return
-    const params = new URLSearchParams(window.location.search)
-    const shareTarget = params.get('share')
-    const sharedTitle = params.get('title')
-    const sharedText = params.get('text')
-    const sharedUrl = params.get('url')
-    const target = shareTarget
-      ? shareTarget
-      : (sharedTitle || sharedText || sharedUrl)
-        ? `/recipes/import?${new URLSearchParams({
-            ...(sharedUrl ? { url: sharedUrl } : {}),
-            ...((sharedText || sharedTitle) ? { text: [sharedTitle, sharedText].filter(Boolean).join(' ') } : {}),
-          })}`
-        : null
+    const target = resolveShareTarget(window.location.search)
     if (!target) return
     window.history.replaceState(null, '', `${window.location.pathname}${window.location.hash}`)
     navigate(target)
+  }, [isLoaded, isSignedIn, navigate])
+
+  // Tapping a share link while the installed PWA is already open (even just
+  // backgrounded) doesn't remount this app - manifest's launch_handler:
+  // "navigate-existing" tells Chrome to navigate THIS window to the new URL
+  // instead of opening a fresh one, but that's a soft navigation the
+  // mount-only effect above never sees (window.location.search there is
+  // read once, at mount). The Launch Handler API's launchQueue delivers
+  // exactly this case via its own targetURL, independent of location.
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn) return
+    if (!('launchQueue' in window)) return
+    const queue = (window as unknown as { launchQueue: LaunchQueue }).launchQueue
+    queue.setConsumer(launchParams => {
+      const target = resolveShareTarget(new URL(launchParams.targetURL).search)
+      if (!target) return
+      navigate(target)
+    })
   }, [isLoaded, isSignedIn, navigate])
 
   // Mirrors the dock's own reported collapsed height onto a CSS custom
