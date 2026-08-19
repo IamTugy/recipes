@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useAuth } from '@clerk/react'
 import type { TimerState } from '../types'
+import { ensurePushSubscription, syncTimerStart, syncTimerRemoved } from '../lib/push'
 
 const SESSION_KEY = 'recipe-timers'
 let timerIdCounter = 0
@@ -32,6 +34,7 @@ function loadTimers(): TimerState[] {
 }
 
 export function useTimers() {
+  const { getToken } = useAuth()
   const [timers, setTimers] = useState<TimerState[]>(loadTimers)
   const intervalsRef = useRef<Map<string, ReturnType<typeof setInterval>>>(new Map())
 
@@ -43,13 +46,17 @@ export function useTimers() {
         if (resolved.done) {
           clearInterval(intervalsRef.current.get(id))
           intervalsRef.current.delete(id)
+          // Natural completion, seen in the foreground - delete the
+          // server-side row so the sweep never sends a redundant push for
+          // a timer the owner has already watched finish.
+          void syncTimerRemoved(getToken, id)
         }
         return resolved
       })
       saveTimers(next)
       return next
     })
-  }, [])
+  }, [getToken])
 
   // Restart intervals for timers that were running when restored from session
   useEffect(() => {
@@ -82,23 +89,25 @@ export function useTimers() {
   }, [])
 
   const addTimer = useCallback((label: string, minutes: number, recipeId: string, stepIndex: number) => {
-    if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
-      Notification.requestPermission().catch(() => { /* ignore - notifications are a nice-to-have */ })
-    }
     const id = `timer-${++timerIdCounter}`
     const totalSeconds = minutes * 60
+    const endsAt = Date.now() + totalSeconds * 1000
     setTimers(prev => {
       const next = [...prev, {
         id, label, totalSeconds, remainingSeconds: totalSeconds,
         running: true, done: false, recipeId, stepIndex,
-        endsAt: Date.now() + totalSeconds * 1000,
+        endsAt,
       }]
       saveTimers(next)
       return next
     })
     const interval = setInterval(() => tick(id), 1000)
     intervalsRef.current.set(id, interval)
-  }, [tick])
+    // Fire-and-forget, same tolerance-for-failure posture as this app's
+    // activityLog.record() calls - a denied permission or failed sync just
+    // means no background push for this timer, never a broken timer.
+    void ensurePushSubscription(getToken).then(() => syncTimerStart(getToken, id, recipeId, label, endsAt))
+  }, [tick, getToken])
 
   const toggleTimer = useCallback((id: string) => {
     setTimers(prev => {
@@ -108,31 +117,39 @@ export function useTimers() {
           clearInterval(intervalsRef.current.get(id))
           intervalsRef.current.delete(id)
           const resolved = resolveTimer(t)
+          // Paused - there's no valid endsAt to sweep for anymore, so the
+          // server-side row (if any) must go too, or the sweep would fire
+          // a push for a timer the owner deliberately stopped.
+          void syncTimerRemoved(getToken, id)
           return { ...resolved, running: false, endsAt: undefined }
         } else {
           const interval = setInterval(() => tick(id), 1000)
           intervalsRef.current.set(id, interval)
-          return { ...t, running: true, endsAt: Date.now() + t.remainingSeconds * 1000 }
+          const endsAt = Date.now() + t.remainingSeconds * 1000
+          void syncTimerStart(getToken, id, t.recipeId, t.label, endsAt)
+          return { ...t, running: true, endsAt }
         }
       })
       saveTimers(next)
       return next
     })
-  }, [tick])
+  }, [tick, getToken])
 
   const removeTimer = useCallback((id: string) => {
     clearInterval(intervalsRef.current.get(id))
     intervalsRef.current.delete(id)
+    void syncTimerRemoved(getToken, id)
     setTimers(prev => {
       const next = prev.filter(t => t.id !== id)
       saveTimers(next)
       return next
     })
-  }, [])
+  }, [getToken])
 
   const resetTimer = useCallback((id: string) => {
     clearInterval(intervalsRef.current.get(id))
     intervalsRef.current.delete(id)
+    void syncTimerRemoved(getToken, id)
     setTimers(prev => {
       const next = prev.map(t =>
         t.id !== id ? t : { ...t, remainingSeconds: t.totalSeconds, running: false, done: false, endsAt: undefined }
@@ -140,7 +157,7 @@ export function useTimers() {
       saveTimers(next)
       return next
     })
-  }, [])
+  }, [getToken])
 
   useEffect(() => {
     const intervals = intervalsRef.current
