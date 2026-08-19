@@ -120,10 +120,19 @@ const BackgroundCookStatus = forwardRef<BackgroundCookStatusHandle, BackgroundCo
       },
     }), [])
 
-    // Redraw whenever the step, timer countdown, or language changes.
+    // Redraw whenever the step, timer countdown, or language changes, then
+    // explicitly push that frame to the live stream (see below) - a fixed
+    // low-fps captureStream(1) only samples the canvas on its own internal
+    // timer, which in practice stops picking up new paints once a PiP
+    // window is already open (Next/Prev while floating kept showing the
+    // step active when PiP was opened, never advancing). requestFrame()
+    // pushes exactly the frame just drawn, on every actual content change,
+    // instead of hoping a timer-driven sampler happens to catch it.
     useEffect(() => {
       const ctx = canvasRef.current?.getContext('2d')
       if (ctx) drawFrame(ctx, props)
+      const track = streamRef.current?.getVideoTracks()[0] as (MediaStreamTrack & { requestFrame?: () => void }) | undefined
+      track?.requestFrame?.()
     // eslint-disable-next-line react-hooks/exhaustive-deps -- redraw on any prop that affects the frame
     }, [recipeTitle, stepLabel, stepText, nearestTimer, lang])
 
@@ -133,7 +142,9 @@ const BackgroundCookStatus = forwardRef<BackgroundCookStatusHandle, BackgroundCo
       const canvas = canvasRef.current
       if (!video || !canvas) return
       if (active) {
-        const stream = canvas.captureStream(1)
+        // 0 = manual/on-demand capture only (via requestFrame() above),
+        // not a fixed automatic sampling rate - see the redraw effect.
+        const stream = canvas.captureStream(0)
         streamRef.current = stream
         video.srcObject = stream
         video.play().catch(() => { /* will play once PiP/user-gesture unblocks it */ })
