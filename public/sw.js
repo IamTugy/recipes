@@ -2,7 +2,7 @@
 // recipe data + photos the user has actually looked at, so recipes stay
 // readable without a connection. Bump the cache names below whenever the
 // caching strategy changes, to drop stale entries from returning users.
-const SHELL_CACHE = 'shell-v2'
+const SHELL_CACHE = 'shell-v3'
 const RUNTIME_CACHE = 'runtime-v2'
 const SHELL_URLS = ['/', '/manifest.webmanifest', '/favicon.png']
 
@@ -21,6 +21,30 @@ self.addEventListener('activate', event => {
         keys.filter(key => key !== SHELL_CACHE && key !== RUNTIME_CACHE).map(key => caches.delete(key))
       ))
       .then(() => self.clients.claim())
+  )
+})
+
+self.addEventListener('push', event => {
+  if (!event.data) return
+  let payload
+  try { payload = event.data.json() } catch { payload = { title: 'Timer done', body: event.data.text() } }
+  event.waitUntil(
+    self.registration.showNotification(payload.title ?? 'Timer done', {
+      body: payload.body,
+      icon: '/favicon.png',
+      tag: 'timer-done',
+    })
+  )
+})
+
+self.addEventListener('notificationclick', event => {
+  event.notification.close()
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {
+      const existing = clientList.find(c => 'focus' in c)
+      if (existing) return existing.focus()
+      return self.clients.openWindow('/')
+    })
   )
 })
 
