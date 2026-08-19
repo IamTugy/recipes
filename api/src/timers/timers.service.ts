@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common'
+import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { Timer, TimerDocument } from './schemas/timer.schema'
@@ -7,16 +7,26 @@ import { PushService } from './push.service'
 const SWEEP_INTERVAL_MS = 5000
 
 @Injectable()
-export class TimersService implements OnModuleInit {
+export class TimersService implements OnModuleInit, OnModuleDestroy {
+  private sweepInterval?: ReturnType<typeof setInterval>
+
   constructor(
     @InjectModel(Timer.name) private readonly timerModel: Model<TimerDocument>,
     private readonly pushService: PushService,
   ) {}
 
   onModuleInit(): void {
-    setInterval(() => {
+    this.sweepInterval = setInterval(() => {
       this.sweepDueTimers().catch(() => { /* transient failure - the next tick retries */ })
     }, SWEEP_INTERVAL_MS)
+  }
+
+  // A plain setInterval isn't tracked by Nest's lifecycle on its own -
+  // without this, app.close() (e.g. in the e2e suite's afterAll) leaves the
+  // interval running forever, keeping the process alive and hanging the
+  // test runner indefinitely instead of exiting after the suite finishes.
+  onModuleDestroy(): void {
+    clearInterval(this.sweepInterval)
   }
 
   async upsert(userId: string, clientId: string, recipeId: string, label: string, endsAt: number): Promise<void> {
