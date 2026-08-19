@@ -414,72 +414,82 @@ export default function CookDock({
                 <div className="h-full bg-amber transition-all" style={{ width: `${((wizardIndex + 1) / steps.length) * 100}%` }} />
               </div>
               <div
-                className="flex-1 flex flex-col items-center justify-center px-6 text-center gap-6 overflow-y-auto py-8"
+                // justify-center on a container whose content can exceed the
+                // viewport clips the START of that content instead of just
+                // letting it scroll - centering math positions the oversized
+                // content symmetrically, pushing its top edge above the
+                // scrollable area's actual top. Plain overflow-y-auto here
+                // (no justify-center) plus m-auto on the inner wrapper below
+                // keeps the "centered when it fits" look while staying fully
+                // scrollable from the true top when content is too tall.
+                className="flex-1 overflow-y-auto px-6 py-8"
                 onClick={e => e.stopPropagation()}
                 onTouchStart={e => e.stopPropagation()}
                 onTouchEnd={e => e.stopPropagation()}
               >
-                <div className={`w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold ${
-                  checked ? 'bg-herb text-white' : 'bg-tint/10 text-cream/60'
-                }`}>
-                  {checked ? '✓' : step.stepNum}
-                </div>
-                <p className="max-w-lg text-xl sm:text-2xl leading-relaxed text-cream">
-                  <TranslatedText
-                    primary={lang === 'he' ? step.instructionHe : step.instructionEn}
-                    secondary={lang === 'he' ? step.instructionEn : step.instructionHe}
-                  />
-                </p>
-                {step.image && (
-                  <img
-                    src={resizedImage(step.image, 320)}
-                    alt=""
-                    onClick={() => onOpenLightbox(step.image!)}
-                    className="max-w-xs w-full max-h-52 object-cover rounded-xl cursor-zoom-in"
-                  />
-                )}
-                {step.tip && (
-                  <p className="max-w-md text-sm text-amber/70 flex items-start gap-1.5">
-                    <span className="mt-0.5">💡</span>
-                    <span>{step.tip}</span>
-                  </p>
-                )}
-                {stepTimer && (
-                  <div className="flex flex-col items-center gap-2">
-                    <button type="button"
-                      onClick={() => onToggleTimer(stepTimer.id)}
-                      aria-label={stepTimer.running ? tx.pauseTimer : tx.resumeTimer}
-                    >
-                      <TimerRing fraction={stepTimer.totalSeconds > 0 ? stepTimer.remainingSeconds / stepTimer.totalSeconds : 0} size={88}>
-                        {formatDockDuration(stepTimer.remainingSeconds)}
-                      </TimerRing>
-                    </button>
-                    <p className="text-xs text-cream/40 max-w-xs text-center">{tx.timerFor(stepTimer.label)}</p>
+                <div className="m-auto flex flex-col items-center text-center gap-6 max-w-lg">
+                  <div className={`w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold ${
+                    checked ? 'bg-herb text-white' : 'bg-tint/10 text-cream/60'
+                  }`}>
+                    {checked ? '✓' : step.stepNum}
                   </div>
-                )}
-                <div className="flex items-center gap-3">
-                  {step.timerMinutes && !(existingTimer && !existingTimer.done) && (
-                    <button type="button"
-                      onClick={() => onStartTimer(step.instruction.slice(0, 40), step.timerMinutes!, step.groupIdx, step.stepIdx)}
-                      className="px-4 py-2 rounded-lg text-sm font-medium bg-amber/10 border border-amber/30 text-amber hover:bg-amber/20 transition-colors"
-                    >
-                      ⏱ {lang === 'he' ? `התחל טיימר ${step.timerMinutes} דק'` : `Start ${step.timerMinutes}m timer`}
-                    </button>
+                  <p className="text-xl sm:text-2xl leading-relaxed text-cream">
+                    <TranslatedText
+                      primary={lang === 'he' ? step.instructionHe : step.instructionEn}
+                      secondary={lang === 'he' ? step.instructionEn : step.instructionHe}
+                    />
+                  </p>
+                  {step.image && (
+                    <img
+                      src={resizedImage(step.image, 320)}
+                      alt=""
+                      onClick={() => onOpenLightbox(step.image!)}
+                      className="max-w-xs w-full max-h-52 object-cover rounded-xl cursor-zoom-in"
+                    />
                   )}
-                  <button type="button"
-                    onClick={() => {
-                      if (!checked && !isLastStep) {
-                        const next = steps[wizardIndex + 1]
-                        if (next) onStepEntered(`${next.groupIdx}-${next.stepIdx}`, next.stepNum)
-                      }
-                      onMarkDone(stepKey)
-                    }}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
-                      checked ? 'border-herb/30 bg-herb/10 text-herb' : 'border-tint/10 text-cream/50 hover:text-cream/80'
-                    }`}
-                  >
-                    {checked ? (tx.done) : (tx.markDone)}
-                  </button>
+                  {step.tip && (
+                    <p className="max-w-md text-sm text-amber/70 flex items-start gap-1.5">
+                      <span className="mt-0.5">💡</span>
+                      <span>{step.tip}</span>
+                    </p>
+                  )}
+                  {stepTimer && (
+                    <div className="flex flex-col items-center gap-2">
+                      <button type="button"
+                        onClick={() => onToggleTimer(stepTimer.id)}
+                        aria-label={stepTimer.running ? tx.pauseTimer : tx.resumeTimer}
+                      >
+                        <TimerRing fraction={stepTimer.totalSeconds > 0 ? stepTimer.remainingSeconds / stepTimer.totalSeconds : 0} size={88}>
+                          {formatDockDuration(stepTimer.remainingSeconds)}
+                        </TimerRing>
+                      </button>
+                      <p className="text-xs text-cream/40 max-w-xs text-center">{tx.timerFor(stepTimer.label)}</p>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-3">
+                    {step.timerMinutes && !(existingTimer && !existingTimer.done) && (
+                      <button type="button"
+                        onClick={() => onStartTimer(step.instruction.slice(0, 40), step.timerMinutes!, step.groupIdx, step.stepIdx)}
+                        className="px-4 py-2 rounded-lg text-sm font-medium bg-amber/10 border border-amber/30 text-amber hover:bg-amber/20 transition-colors"
+                      >
+                        ⏱ {lang === 'he' ? `התחל טיימר ${step.timerMinutes} דק'` : `Start ${step.timerMinutes}m timer`}
+                      </button>
+                    )}
+                    <button type="button"
+                      onClick={() => {
+                        if (!checked && !isLastStep) {
+                          const next = steps[wizardIndex + 1]
+                          if (next) onStepEntered(`${next.groupIdx}-${next.stepIdx}`, next.stepNum)
+                        }
+                        onMarkDone(stepKey)
+                      }}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
+                        checked ? 'border-herb/30 bg-herb/10 text-herb' : 'border-tint/10 text-cream/50 hover:text-cream/80'
+                      }`}
+                    >
+                      {checked ? (tx.done) : (tx.markDone)}
+                    </button>
+                  </div>
                 </div>
               </div>
               <div className="flex items-center gap-3 px-6 py-4 border-t border-tint/[0.06] shrink-0" onClick={e => e.stopPropagation()}>
