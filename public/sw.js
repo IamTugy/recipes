@@ -2,7 +2,7 @@
 // recipe data + photos the user has actually looked at, so recipes stay
 // readable without a connection. Bump the cache names below whenever the
 // caching strategy changes, to drop stale entries from returning users.
-const SHELL_CACHE = 'shell-v1'
+const SHELL_CACHE = 'shell-v2'
 const RUNTIME_CACHE = 'runtime-v2'
 const SHELL_URLS = ['/', '/manifest.webmanifest', '/favicon.png']
 
@@ -55,9 +55,15 @@ self.addEventListener('fetch', event => {
 
   const url = new URL(request.url)
 
-  // The app uses a HashRouter, so every route is served from '/' - normalize
-  // navigations to the precached shell document instead of the hash URL.
-  if (request.mode === 'navigate') {
+  // /share/* is a real server route (ShareController) that serves crawler
+  // meta tags and its own redirect for a specific recipe - it must hit the
+  // network untouched. Rewriting it to '/' here served the bare SPA shell
+  // instead, with no ?share= query for the app to read, so a shared link
+  // silently landed on Home instead of the recipe.
+  if (request.mode === 'navigate' && !url.pathname.startsWith('/share/')) {
+    // The app uses a HashRouter, so every other route is served from '/' -
+    // normalize navigations to the precached shell document instead of the
+    // hash URL.
     event.respondWith(networkFirst(new Request('/'), SHELL_CACHE))
     return
   }
