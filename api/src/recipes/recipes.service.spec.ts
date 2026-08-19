@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common'
+import { BadGatewayException, BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { Test } from '@nestjs/testing'
 import { getModelToken } from '@nestjs/mongoose'
@@ -726,6 +726,18 @@ describe('RecipesService', () => {
     expect(recipe.status).toBe('rejected')
     expect(recipe.publishedRevision).toBeUndefined()
     expect(recipe.qualityReview).toEqual(review)
+  })
+
+  it('submitForReview surfaces a BadGatewayException with a clear message when the AI review itself throws, instead of an unhandled crash', async () => {
+    const recipe: any = completeRecipe()
+    const findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(recipe), select: jest.fn().mockReturnThis(), lean: jest.fn().mockReturnThis() })
+    const quality = { review: jest.fn().mockRejectedValue(new SyntaxError('Unexpected end of JSON input')) }
+    const service = await makeService({ findOne }, undefined, undefined, undefined, undefined, undefined, undefined, quality)
+
+    await expect(service.submitForReview('a', 'user_1', false)).rejects.toThrow(BadGatewayException)
+    await expect(service.submitForReview('a', 'user_1', false)).rejects.toThrow('AI review failed - please try submitting again')
+    expect(recipe.status).not.toBe('rejected')
+    expect(recipe.qualityReview).toBeUndefined()
   })
 
   it('submitForReview does not call the duplicate judge when there are no candidates', async () => {

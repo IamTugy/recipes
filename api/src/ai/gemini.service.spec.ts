@@ -64,6 +64,31 @@ describe('GeminiService', () => {
     await expect(service.generateStructured('x')).rejects.toThrow('Gemini returned an empty response')
   })
 
+  it('generateStructured includes temperature in the config when provided', async () => {
+    mockGenerateContent.mockResolvedValue({ text: '{"title":"Soup"}' })
+    const config = { get: jest.fn().mockReturnValue('test-key') }
+    const service = new GeminiService(config as unknown as ConfigService)
+
+    await service.generateStructured('extract this', 0.2)
+
+    expect(mockGenerateContent).toHaveBeenCalledWith({
+      model: 'gemini-3.5-flash',
+      contents: 'extract this',
+      config: { responseMimeType: 'application/json', temperature: 0.2 },
+    })
+  })
+
+  it('generateStructured throws when the retry after malformed JSON returns an empty response', async () => {
+    mockGenerateContent
+      .mockResolvedValueOnce({ text: '{"title": "Soup' })
+      .mockResolvedValueOnce({ text: undefined })
+    const config = { get: jest.fn().mockReturnValue('test-key') }
+    const service = new GeminiService(config as unknown as ConfigService)
+
+    await expect(service.generateStructured('extract this')).rejects.toThrow('Gemini returned an empty response')
+    expect(mockGenerateContent).toHaveBeenCalledTimes(2)
+  })
+
   it('generateStructuredWithImage sends the image inline and parses the JSON text response', async () => {
     mockGenerateContent.mockResolvedValue({ text: '{"score":90}' })
     const config = { get: jest.fn().mockReturnValue('test-key') }
@@ -122,6 +147,38 @@ describe('GeminiService', () => {
     const service = new GeminiService(config as unknown as ConfigService)
 
     await expect(service.generateStructuredWithImage('x', 'aW1n', 'image/jpeg')).rejects.toThrow('Gemini returned an empty response')
+  })
+
+  it('generateStructuredWithImage throws when the retry after malformed JSON returns an empty response', async () => {
+    mockGenerateContent
+      .mockResolvedValueOnce({ text: '{"score": 90' })
+      .mockResolvedValueOnce({ text: undefined })
+    const config = { get: jest.fn().mockReturnValue('test-key') }
+    const service = new GeminiService(config as unknown as ConfigService)
+
+    await expect(service.generateStructuredWithImage('review this', 'aW1n', 'image/jpeg')).rejects.toThrow('Gemini returned an empty response')
+    expect(mockGenerateContent).toHaveBeenCalledTimes(2)
+  })
+
+  it('generateStructuredWithImage throws when the retry after malformed JSON is cut off by MAX_TOKENS - only one retry is ever attempted', async () => {
+    mockGenerateContent
+      .mockResolvedValueOnce({ text: '{"score": 90' })
+      .mockResolvedValueOnce({ text: '{"score":9', candidates: [{ finishReason: 'MAX_TOKENS' }] })
+    const config = { get: jest.fn().mockReturnValue('test-key') }
+    const service = new GeminiService(config as unknown as ConfigService)
+
+    await expect(service.generateStructuredWithImage('review this', 'aW1n', 'image/jpeg'))
+      .rejects.toThrow('Gemini response was cut off by the output token limit')
+    expect(mockGenerateContent).toHaveBeenCalledTimes(2)
+  })
+
+  it('generateStructuredWithImage throws when both the original attempt and the retry return malformed JSON', async () => {
+    mockGenerateContent.mockResolvedValue({ text: '{"score": 90' })
+    const config = { get: jest.fn().mockReturnValue('test-key') }
+    const service = new GeminiService(config as unknown as ConfigService)
+
+    await expect(service.generateStructuredWithImage('review this', 'aW1n', 'image/jpeg')).rejects.toThrow(SyntaxError)
+    expect(mockGenerateContent).toHaveBeenCalledTimes(2)
   })
 
   it('generateText returns the plain text response', async () => {

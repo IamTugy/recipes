@@ -466,6 +466,14 @@ export default function RecipeForm({ existing, reviewFindings, appliedFindingInd
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    // Nothing to save when editing an existing recipe with no committed
+    // changes - same "has unsaved changes" signal (history.canUndo) already
+    // used for the exit-confirm and beforeunload warnings below, so this
+    // can't disagree with those about whether the draft is dirty. Guarded
+    // here too, not just via the button's disabled state, since a disabled
+    // submit button doesn't stop Enter-key implicit submission in every
+    // browser.
+    if (isEditing && !history.canUndo) return
     setError(null)
     setSaving(true)
     try {
@@ -1050,7 +1058,7 @@ export default function RecipeForm({ existing, reviewFindings, appliedFindingInd
         </div>
 
         <div className="flex items-center gap-3">
-          <button type="submit" disabled={saving} className="btn-primary disabled:opacity-50">
+          <button type="submit" disabled={saving || (isEditing && !history.canUndo)} className="btn-primary disabled:opacity-50">
             {saving
               ? (tx.saving)
               : isEditing ? (tx.saveChanges) : (tx.createRecipe)}

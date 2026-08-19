@@ -69,6 +69,17 @@ describe('RecipeQualityService', () => {
     expect(result.score).toBe(100)
   })
 
+  it('deducts points for a finding with a missing/malformed bucket, defaulting to required rather than silently dropping it from scoring', async () => {
+    generateStructuredWithImage.mockResolvedValue({
+      findings: [{ category: 'translation', severity: 'major', message: 'missing english' }],
+    })
+    const service = await makeService()
+
+    const result = await service.review(recipe)
+
+    expect(result.score).toBe(100 - 10)
+  })
+
   it('floors the score at 0 rather than going negative', async () => {
     generateStructuredWithImage.mockResolvedValue({
       findings: [
@@ -178,6 +189,22 @@ describe('RecipeQualityService', () => {
     const result = await service.review(recipe)
 
     expect(result.findings[0].suggestedFix).toBeUndefined()
+  })
+
+  it('drops a suggestedFix whose ingredients/steps value is not an array at all, not just too short', async () => {
+    generateStructuredWithImage.mockResolvedValue({
+      findings: [
+        {
+          category: 'consistency', severity: 'major', bucket: 'required', field: 'ingredients', message: 'malformed fix',
+          suggestedFix: { ingredients: 'not an array', descriptionEn: 'still a valid fix' },
+        },
+      ],
+    })
+    const service = await makeService()
+
+    const result = await service.review(recipe)
+
+    expect(result.findings[0].suggestedFix).toEqual({ descriptionEn: 'still a valid fix' })
   })
 
   it('sends the recipe image and JSON to Gemini', async () => {

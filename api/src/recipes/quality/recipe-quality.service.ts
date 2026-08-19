@@ -130,9 +130,16 @@ export class RecipeQualityService {
       if (KNOWN_TOP_LEVEL_FIELDS.has(key)) sanitized[key] = value
     }
     for (const key of ['ingredients', 'steps']) {
+      if (!(key in sanitized)) continue
       const original = recipe[key]
       const proposed = sanitized[key]
-      if (Array.isArray(original) && Array.isArray(proposed) && proposed.length < original.length - 1) {
+      // A non-array value here (Gemini returning an object or string instead
+      // of the array it was asked to echo back) would otherwise pass straight
+      // through to the frontend, which merges it directly onto the recipe -
+      // guard it the same way as the too-short-echo case below.
+      if (!Array.isArray(proposed)) {
+        delete sanitized[key]
+      } else if (Array.isArray(original) && proposed.length < original.length - 1) {
         delete sanitized[key]
       }
     }
@@ -142,8 +149,14 @@ export class RecipeQualityService {
   }
 
   private computeScore(findings: QualityFinding[]): number {
+    // The type says "bucket" is always set, but this is untyped JSON parsed
+    // from the model's response - a finding that omits it (schema drift,
+    // an off-spec response) must still count toward the score. Only an
+    // EXPLICIT "suggestion" opts out; anything else defaults to required,
+    // matching the frontend's own `f.bucket ?? 'required'` fallback so the
+    // two can't disagree about whether an unset bucket blocks publishing.
     const deduction = findings
-      .filter(f => f.bucket === 'required')
+      .filter(f => f.bucket !== 'suggestion')
       .reduce((sum, f) => sum + (PENALTY[f.severity] ?? 0), 0)
     return Math.max(0, 100 - deduction)
   }
