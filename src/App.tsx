@@ -283,6 +283,7 @@ export default function App() {
           onStop={cookSession.stopCooking}
           onStepEntered={cookSession.handleStepEntered}
           onExpand={() => cookSession.backgroundCookStatusRef.current?.exitFloatingView()}
+          onEnterPip={() => cookSession.backgroundCookStatusRef.current?.enterFloatingView()}
           onCollapsedHeightChange={setCookDockBarHeight}
           checkedSteps={cookSession.checkedSteps}
           nearestTimer={cookSession.nearestTimer}

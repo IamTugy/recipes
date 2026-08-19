@@ -50,6 +50,7 @@ interface CookDockProps {
   totalPausedMs: number
   onPauseCooking: () => void
   onResumeCooking: () => void
+  onEnterPip?: () => void
 }
 
 const SWIPE_THRESHOLD_PX = 60
@@ -83,7 +84,7 @@ export default function CookDock({
   steps, wizardIndex, onPrev, onAdvance, onMarkDone, onStop, onStepEntered, onExpand,
   checkedSteps, nearestTimer, onToggleNearestTimer, onToggleTimer, getTimerForStep, onStartTimer,
   onOpenLightbox, onCollapsedHeightChange, lightboxOpen, elapsedBaselineMs, startExpanded, onExpandConsumed,
-  cookingPaused, pausedAt, totalPausedMs, onPauseCooking, onResumeCooking,
+  cookingPaused, pausedAt, totalPausedMs, onPauseCooking, onResumeCooking, onEnterPip,
 }: CookDockProps) {
   const tx = t[lang]
   const dockRef = useRef<HTMLDivElement>(null)
@@ -276,6 +277,26 @@ export default function CookDock({
           <div className="flex items-center justify-between gap-3 px-4 h-14 border-b border-tint/[0.06] shrink-0">
             <span className="text-cream text-lg font-bold tabular-nums truncate min-w-0">{formatDockDuration(elapsedSeconds)}</span>
             <div className="flex items-center gap-2 shrink-0">
+              {onEnterPip && typeof document !== 'undefined' && document.pictureInPictureEnabled && (
+                // Android has no automatic "enter PiP when backgrounded" -
+                // requestPictureInPicture() must run inside a real tap's own
+                // event handler, synchronously, or the browser silently
+                // rejects it. This button IS that tap: pressing it before
+                // switching apps is the only reliable way to get the
+                // floating widget on Android (desktop still auto-enters via
+                // the video's autopictureinpicture attribute regardless).
+                <button type="button"
+                  onClick={e => { e.stopPropagation(); onEnterPip() }}
+                  aria-label={tx.minimizeToFloatingView}
+                  title={tx.minimizeToFloatingView}
+                  className="w-8 h-8 flex items-center justify-center rounded-full text-cream/55 bg-transparent hover:text-amber transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <rect x="12" y="12" width="8" height="6" rx="1" fill="currentColor" stroke="none" />
+                  </svg>
+                </button>
+              )}
               <button type="button"
                 onClick={e => { e.stopPropagation(); togglePauseCooking() }}
                 className="px-3 h-8 flex items-center justify-center rounded-full text-xs font-medium border border-tint/[0.12] text-cream/55 bg-transparent hover:border-amber/40 hover:text-amber transition-colors"
