@@ -225,10 +225,16 @@ const BackgroundCookStatus = forwardRef<BackgroundCookStatusHandle, BackgroundCo
         style={{ position: 'fixed', top: 0, left: 0, width: 2, height: 2, opacity: 0, pointerEvents: 'none', overflow: 'hidden' }}
       >
         <canvas ref={canvasRef} width={CANVAS_W} height={CANVAS_H} />
-        {/* autopictureinpicture (all-lowercase, no React typing yet) lets Chromium auto-enter PiP
-            when the tab is hidden; the enterFloatingView() handle covers browsers that need a
-            user-gesture-triggered call instead. */}
-        <video ref={videoRef} muted playsInline {...{ autopictureinpicture: 'true' }} />
+        {/* No autopictureinpicture attribute - PiP only ever enters via the
+            explicit "show as floating window" button (enterFloatingView(),
+            a real user gesture). This video plays continuously for the
+            entire cook session regardless of whether PiP was ever
+            requested; leaving the auto-enter attribute on it meant Chrome
+            could attempt its own automatic PiP entry on any backgrounding
+            (home button, app switch) with no requestFrame() call behind
+            it (capture is manual/on-demand - see the redraw effect above),
+            producing a blank/white frame instead of real content. */}
+        <video ref={videoRef} muted playsInline />
       </div>
     )
   },
