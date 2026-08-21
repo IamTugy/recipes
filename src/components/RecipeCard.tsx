@@ -85,11 +85,6 @@ export default function RecipeCard({
                   {statusBadge.label}
                 </span>
               )}
-              {recipe.aiGenerated && (
-                <span className="flex items-center gap-1 bg-amber/90 text-bg text-[10px] font-semibold px-2 py-0.5 rounded-full">
-                  <span>AI</span>
-                </span>
-              )}
               {editable && (
                 <button type="button"
                   onClick={e => { e.preventDefault(); e.stopPropagation(); navigate(`/recipes/${recipe.id}/edit`) }}
