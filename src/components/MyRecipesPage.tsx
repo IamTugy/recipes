@@ -13,7 +13,8 @@ import RecipeCardSkeleton from './RecipeCardSkeleton'
 import RecipePlaceholder from './RecipePlaceholder'
 import SubmissionsPage from './SubmissionsPage'
 import JobsPage from './JobsPage'
-import RecipeFilterBar, { type SortOption } from './RecipeFilterBar'
+import RecipeFilterBar, { type SortOption, type ViewMode } from './RecipeFilterBar'
+import RecipeTiles from './RecipeTiles'
 import AppSelect from './ui/AppSelect'
 import { DIETARY_KEYWORDS } from '../lib/filterDefinitions'
 import {
@@ -83,7 +84,7 @@ export default function MyRecipesPage() {
   const [activeKosher, setActiveKosher] = useState<Set<string>>(() => getSharedKosher())
   const [activeStatus, setActiveStatus] = useState<StatusFilter | null>(null)
   const [sortBy, setSortBy] = useState<SortOption>(() => (getSharedSort() as SortOption) || 'rating')
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [viewMode, setViewMode] = useState<ViewMode>('grid')
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const filtersKey = JSON.stringify([search, [...activeCategories], [...activeDifficulties], [...activeDietary], [...activeKosher], activeStatus, sortBy])
   const [prevFiltersKey, setPrevFiltersKey] = useState(filtersKey)
@@ -296,6 +297,8 @@ export default function MyRecipesPage() {
             <p className="text-sm tracking-widest uppercase mb-2">{tx.noResultsTitle}</p>
             <p className="text-xs">{tx.noResultsHint}</p>
           </div>
+        ) : viewMode === 'tiles' ? (
+          <RecipeTiles recipes={paged} lang={lang} />
         ) : viewMode === 'list' ? (
           <ul className="space-y-1.5">
             {paged.map(r => {

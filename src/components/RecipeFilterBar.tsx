@@ -14,6 +14,8 @@ export interface ExtraChip {
 
 export type SortOption = 'rating' | 'quickest' | 'newest'
 
+export type ViewMode = 'grid' | 'list' | 'tiles'
+
 interface RecipeFilterBarProps {
   lang: 'he' | 'en'
   categories: Category[]
@@ -34,8 +36,8 @@ interface RecipeFilterBarProps {
   advancedExtra?: ReactNode
   sortBy: SortOption
   onSortChange: (s: SortOption) => void
-  viewMode: 'grid' | 'list'
-  onViewModeChange: (v: 'grid' | 'list') => void
+  viewMode: ViewMode
+  onViewModeChange: (v: ViewMode) => void
   resultCount: number
   totalCount: number
   hasActiveFilters: boolean
@@ -229,6 +231,19 @@ export default function RecipeFilterBar({
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" />
               <rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
+            </svg>
+          </button>
+          <button type="button"
+            onClick={() => onViewModeChange('tiles')}
+            aria-label={tx.tilesView}
+            className={`h-full w-7 flex items-center justify-center rounded-md transition-colors ${
+              viewMode === 'tiles' ? 'bg-amber/10 text-amber' : 'text-cream/35 hover:text-cream/60'
+            }`}
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <rect x="3" y="3" width="5" height="5" rx="0.5" /><rect x="9.5" y="3" width="5" height="5" rx="0.5" /><rect x="16" y="3" width="5" height="5" rx="0.5" />
+              <rect x="3" y="9.5" width="5" height="5" rx="0.5" /><rect x="9.5" y="9.5" width="5" height="5" rx="0.5" /><rect x="16" y="9.5" width="5" height="5" rx="0.5" />
+              <rect x="3" y="16" width="5" height="5" rx="0.5" /><rect x="9.5" y="16" width="5" height="5" rx="0.5" /><rect x="16" y="16" width="5" height="5" rx="0.5" />
             </svg>
           </button>
           <button type="button"
