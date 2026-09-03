@@ -12,7 +12,8 @@ import RecipePlaceholder from './RecipePlaceholder'
 import SkeletonImage from './SkeletonImage'
 import TranslatedText from './TranslatedText'
 import VirtualRecipeGrid, { type GridItem } from './VirtualRecipeGrid'
-import RecipeFilterBar, { type SortOption } from './RecipeFilterBar'
+import RecipeTiles from './RecipeTiles'
+import RecipeFilterBar, { type SortOption, type ViewMode } from './RecipeFilterBar'
 import { DIETARY_KEYWORDS } from '../lib/filterDefinitions'
 import { resizedImage } from '../lib/image'
 import {
@@ -56,7 +57,7 @@ export default function Home() {
   const [sortBy, setSortBy] = useState<SortOption>(() => (searchParams.get('sort') as SortOption) || (getSharedSort() as SortOption) || 'rating')
   const [groupByDish, setGroupByDish] = useState(() => searchParams.get('grouped') === '1')
   const [activeGroupId, setActiveGroupId] = useState<string | null>(() => searchParams.get('group'))
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [viewMode, setViewMode] = useState<ViewMode>('grid')
   const { recipes, loading, error } = useRecipes()
   const { favoriteSlugs, toggle: toggleFavorite } = useFavorites()
   const { trending, loading: trendingLoading } = useTrending()
@@ -400,6 +401,8 @@ export default function Home() {
               </button>
             )}
           </div>
+        ) : viewMode === 'tiles' ? (
+          <RecipeTiles recipes={filtered} lang={lang} />
         ) : viewMode === 'list' ? (
           <ul className="space-y-1.5">
             {filtered.map(r => (
