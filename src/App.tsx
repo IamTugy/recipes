@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import { useAuth, SignIn } from '@clerk/react'
@@ -28,7 +28,9 @@ import ScrollToTopButton from './components/ScrollToTopButton'
 import KeyboardShortcutsHelp from './components/KeyboardShortcutsHelp'
 import BackgroundCookStatus from './components/BackgroundCookStatus'
 import CookDock from './components/CookDock'
+import CookTogetherPanel from './components/CookTogetherPanel'
 import { useCookSession } from './hooks/useCookSession'
+import { useCookTogether } from './hooks/useCookTogether'
 import { useTimers } from './hooks/useTimers'
 import { useShoppingList } from './hooks/useShoppingList'
 import { useSidebar } from './hooks/useSidebar'
@@ -66,6 +68,11 @@ export default function App() {
   const { lang, setLang } = useLanguage()
   const { timers, addTimer, toggleTimer, removeTimer, resetTimer } = useTimers()
   const cookSession = useCookSession(lang, timers, addTimer, toggleTimer)
+  const cookTogether = useCookTogether()
+  // The launchQueue consumer below is registered once, so it reads the
+  // latest join handler through a ref instead of capturing a stale one.
+  const joinFromSearchRef = useRef(cookTogether.joinFromSearch)
+  useEffect(() => { joinFromSearchRef.current = cookTogether.joinFromSearch }, [cookTogether.joinFromSearch])
   // Timers actually VISIBLE in TimerPanel - excludes only the one specific
   // timer CookDock is already showing (by id, not by recipe), so a second
   // concurrent timer or a just-finished one for the cooked recipe still
@@ -134,7 +141,9 @@ export default function App() {
     if (!('launchQueue' in window)) return
     const queue = (window as unknown as { launchQueue: LaunchQueue }).launchQueue
     queue.setConsumer(launchParams => {
-      const target = resolveShareTarget(new URL(launchParams.targetURL).search)
+      const search = new URL(launchParams.targetURL).search
+      if (joinFromSearchRef.current(search)) return
+      const target = resolveShareTarget(search)
       if (!target) return
       navigate(target)
     })
@@ -199,6 +208,8 @@ export default function App() {
       <Nav
         shoppingListCount={shoppingList.items.length}
         onOpenShoppingList={() => setShoppingListOpen(true)}
+        onOpenCookTogether={cookTogether.openPanel}
+        cookTogetherActive={!!cookTogether.room}
         onToggleMobileSidebar={() => sidebar.setMobileOpen(o => !o)}
       />
       <Sidebar sidebar={sidebar} />
@@ -249,6 +260,7 @@ export default function App() {
                 timers={timers}
                 onAddToShoppingList={shoppingList.addItems}
                 cookSession={cookSession}
+                cookTogether={cookTogether}
               />
             }
           />
@@ -350,6 +362,7 @@ export default function App() {
         lastCleared={shoppingList.lastCleared}
         onUndoClear={shoppingList.undoClear}
       />
+      <CookTogetherPanel cookTogether={cookTogether} />
       <ScrollToTopButton raised={visibleTimers.length > 0} />
       <KeyboardShortcutsHelp open={shortcutsHelpOpen} onClose={() => setShortcutsHelpOpen(false)} />
     </div>
