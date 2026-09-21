@@ -465,6 +465,21 @@ describe('CookSessionsService', () => {
     ])
   })
 
+  it('getReminders only looks up published recipes, so private recipes get no review nudge', async () => {
+    const oldEnough = new Date(Date.now() - 25 * 60 * 60 * 1000)
+    cookSessionFind.mockReturnValue({
+      select: () => ({ sort: () => ({ lean: () => ({ exec: jest.fn().mockResolvedValue([
+        { recipeId: 'recipe_private', finishedAt: oldEnough },
+      ]) }) }) }),
+    })
+    ratingFind.mockReturnValue({ exec: jest.fn().mockResolvedValue([]) })
+    recipeFind.mockReturnValue({ select: () => ({ lean: () => ({ exec: jest.fn().mockResolvedValue([]) }) }) })
+    const service = await makeService()
+    const result = await service.getReminders('user_1')
+    expect(recipeFind).toHaveBeenCalledWith(expect.objectContaining({ publishedRevision: { $ne: null } }))
+    expect(result).toEqual([])
+  })
+
   it('getReminders scopes the CookSession query to the given userId', async () => {
     cookSessionFind.mockReturnValue({
       select: () => ({ sort: () => ({ lean: () => ({ exec: jest.fn().mockResolvedValue([]) }) }) }),

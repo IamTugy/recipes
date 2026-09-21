@@ -273,9 +273,11 @@ export class CookSessionsService {
     const unreviewedRecipeIds = recipeIds.filter(id => !reviewedRecipeIds.has(id))
     if (unreviewedRecipeIds.length === 0) return []
 
+    // Private (never-published) recipes can be cooked but not reviewed, so
+    // they're left out of the review nudge.
     let recipes: { _id: unknown; title: string }[] = []
     try {
-      recipes = await this.recipeModel.find({ _id: { $in: unreviewedRecipeIds } }).select('title').lean().exec()
+      recipes = await this.recipeModel.find({ _id: { $in: unreviewedRecipeIds }, publishedRevision: { $ne: null } }).select('title').lean().exec()
     } catch (err) {
       this.logger.error('Failed to look up recipe titles for reminders', err instanceof Error ? err.stack : err)
     }
