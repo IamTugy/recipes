@@ -44,6 +44,13 @@ interface RecipeDetailProps {
 }
 
 const presetMultipliers = [0.5, 1, 1.5, 2, 3, 4]
+
+function readSavedMultiplier(recipeId: string | undefined): number {
+  try {
+    const n = parseFloat(sessionStorage.getItem(`multiplier-${recipeId}`) ?? '')
+    return n > 0 && isFinite(n) ? n : 1
+  } catch { return 1 }
+}
 const presetLabels: Record<number, string> = { 0.5: '½x', 1: '1x', 1.5: '1.5x', 2: '2x', 3: '3x', 4: '4x' }
 
 export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, cookSession }: RecipeDetailProps) {
@@ -146,6 +153,9 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
   function setMultiplierValue(m: number) {
     if (isActiveCookingRecipe) cookSession.setMultiplier(m)
     else setLocalMultiplier(m)
+    // Persist alongside the checklist state so leaving and returning to the
+    // recipe keeps the chosen servings.
+    try { sessionStorage.setItem(`multiplier-${id}`, String(m)) } catch { /* sessionStorage unavailable */ }
   }
   const [userRating, setUserRating] = useState<number | null>(null)
   const [hoverRating, setHoverRating] = useState<number | null>(null)
@@ -559,11 +569,32 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
       const saved = sessionStorage.getItem(`checked-ingredients-${id}`)
       setLocalCheckedIngredients(saved ? new Set(JSON.parse(saved)) : new Set())
     } catch { setLocalCheckedIngredients(new Set()) }
+    setLocalMultiplier(readSavedMultiplier(id))
     window.scrollTo({ top: 0, behavior: 'instant' })
     setViewingRevision(null)
     setRevisionsOpen(false)
     setRevisions(null)
   }, [id])
+
+  // Show a restored non-preset multiplier in the custom servings input
+  useEffect(() => {
+    const saved = readSavedMultiplier(id)
+    setCustomInput(
+      recipe && !presetMultipliers.includes(saved)
+        ? String(Math.round(recipe.servings * saved))
+        : '',
+    )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only re-derive when the loaded recipe changes, not on every recipe refetch
+  }, [id, recipe?.id])
+
+  // A resumed cook session (e.g. after a page reload) starts with the hook's
+  // default multiplier of 1 - re-apply the one saved for this recipe.
+  useEffect(() => {
+    if (!isActiveCookingRecipe) return
+    const saved = readSavedMultiplier(id)
+    if (saved !== cookSession.multiplier) cookSession.setMultiplier(saved)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- one-shot on session becoming active for this recipe; user changes write storage synchronously so they stay in sync
+  }, [isActiveCookingRecipe, id])
 
   // Cross-device resume (Phase D): on loading a recipe, check whether the
   // signed-in user already has an active cook session for it elsewhere -
