@@ -171,10 +171,11 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
   // CookReminderBanner (Phase G) catches the case where they never do.
   useEffect(() => {
     if (cookSession.justFinishedRecipeId === id && currentUserId && ratingLoaded && !hasPostedReview) {
-      setShowPostCookReviewModal(true)
+      // Private (never-published) recipes can't be reviewed - skip the nudge.
+      if (recipe?.publishedRevision != null) setShowPostCookReviewModal(true)
       cookSession.clearJustFinished()
     }
-  }, [cookSession.justFinishedRecipeId, id, currentUserId, ratingLoaded, hasPostedReview, cookSession])
+  }, [cookSession.justFinishedRecipeId, id, currentUserId, ratingLoaded, hasPostedReview, cookSession, recipe?.publishedRevision])
 
   // Sync the textarea once the saved note has loaded for this recipe
   useEffect(() => {
@@ -652,6 +653,11 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
       ? viewingRevision.revisionNumber === recipe.publishedRevision
       : recipe.status === 'published' && recipe.currentRevision === recipe.publishedRevision)
   )
+
+  // Cooking is personal, unlike ratings/favorites: the owner can cook their
+  // own private (unpublished) recipe. The wizard cooks the latest revision, so
+  // only offer it when that's what's on screen.
+  const canCook = isViewingPublishedContent || (canEdit && !isViewingNonLatestRevision)
 
   const totalTime = displayRecipe.prepTime + displayRecipe.cookTime
   const scaledServings = Math.round(displayRecipe.servings * multiplier)
@@ -1446,7 +1452,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
               </button>
             )}
 
-            {isViewingPublishedContent && !cookSession.cookSessionActive && (
+            {canCook && !cookSession.cookSessionActive && (
               <button type="button"
                 onClick={e => {
                   const btn = e.currentTarget
@@ -1466,7 +1472,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
               </button>
             )}
 
-            {isViewingPublishedContent && isActiveCookingRecipe && (
+            {canCook && isActiveCookingRecipe && (
               <button type="button"
                 onClick={() => {
                   if (cookSession.cookingPaused) cookSession.resumeCooking()
@@ -1478,7 +1484,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
               </button>
             )}
 
-            {isViewingPublishedContent && cookSession.cookSessionActive && !isActiveCookingRecipe && (
+            {canCook && cookSession.cookSessionActive && !isActiveCookingRecipe && (
               <div className="flex items-center gap-2 w-full sm:w-auto">
                 <button type="button"
                   disabled
