@@ -6,10 +6,12 @@ import { t } from "../i18n";
 interface NavProps {
   shoppingListCount: number
   onOpenShoppingList: () => void
+  onOpenCookTogether: () => void
+  cookTogetherActive: boolean
   onToggleMobileSidebar: () => void
 }
 
-export default function Nav({ shoppingListCount, onOpenShoppingList, onToggleMobileSidebar }: NavProps) {
+export default function Nav({ shoppingListCount, onOpenShoppingList, onOpenCookTogether, cookTogetherActive, onToggleMobileSidebar }: NavProps) {
   const navigate = useNavigate()
   const { lang } = useLanguage()
         const tx = t[lang]
@@ -38,6 +40,17 @@ export default function Nav({ shoppingListCount, onOpenShoppingList, onToggleMob
 
         <div className="flex items-center gap-0.5 sm:gap-2 shrink-0">
           <NotificationsBell />
+          <button type="button"
+            onClick={onOpenCookTogether}
+            className="relative h-10 w-10 sm:h-7 sm:w-7 flex items-center justify-center rounded-full text-cream/40 hover:text-cream/70 hover:bg-tint/[0.05] transition-colors"
+            title={tx.ctNavLabel}
+            aria-label={tx.ctNavLabel}
+          >
+            <span aria-hidden="true" className="text-sm leading-none">👥</span>
+            {cookTogetherActive && (
+              <span className="absolute top-1 end-1 sm:-top-0.5 sm:-end-0.5 w-2 h-2 rounded-full bg-herb" />
+            )}
+          </button>
           <button type="button"
             onClick={onOpenShoppingList}
             className="relative h-10 w-10 sm:h-7 sm:w-7 flex items-center justify-center rounded-full text-cream/40 hover:text-cream/70 hover:bg-tint/[0.05] transition-colors"

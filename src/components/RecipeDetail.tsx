@@ -35,18 +35,20 @@ import SkeletonImage from './SkeletonImage'
 import { useTranslatedText } from '../hooks/useTranslatedText'
 import TranslatedText from './TranslatedText'
 import { useCookSession } from '../hooks/useCookSession'
+import type { useCookTogether } from '../hooks/useCookTogether'
 
 interface RecipeDetailProps {
   onAddTimer: (label: string, minutes: number, recipeId: string, stepIndex: number) => void
   timers: TimerState[]
   onAddToShoppingList: (items: { name: string; amount: number | null; unit: string }[]) => void
   cookSession: ReturnType<typeof useCookSession>
+  cookTogether: ReturnType<typeof useCookTogether>
 }
 
 const presetMultipliers = [0.5, 1, 1.5, 2, 3, 4]
 const presetLabels: Record<number, string> = { 0.5: '½x', 1: '1x', 1.5: '1.5x', 2: '2x', 3: '3x', 4: '4x' }
 
-export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, cookSession }: RecipeDetailProps) {
+export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, cookSession, cookTogether }: RecipeDetailProps) {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -1470,6 +1472,36 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
                   <polygon points="8,5 19,12 8,19" />
                 </svg>
               </button>
+            )}
+
+            {isViewingPublishedContent && recipe && (
+              cookTogether.room?.recipeId === recipe.id ? (
+                <button type="button"
+                  onClick={cookTogether.openPanel}
+                  className="flex items-center justify-center gap-2 w-full sm:w-auto px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors border border-herb/40 text-herb hover:bg-herb/10"
+                >
+                  <span aria-hidden="true">👥</span>
+                  {tx.ctOpenRoom}
+                </button>
+              ) : (!cookTogether.room && !cookSession.cookSessionActive && (
+                <div className="flex items-center gap-3 w-full sm:w-auto">
+                  <button type="button"
+                    onClick={() => void cookTogether.create(recipe.id)}
+                    disabled={cookTogether.busy}
+                    title={tx.ctIntro}
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors border border-herb/40 text-herb hover:bg-herb/10 disabled:opacity-60"
+                  >
+                    <span aria-hidden="true">👥</span>
+                    {tx.ctStartTogether}
+                  </button>
+                  <button type="button"
+                    onClick={cookTogether.openPanel}
+                    className="text-xs text-cream/40 hover:text-cream/70 underline transition-colors"
+                  >
+                    {tx.ctJoinWithCode}
+                  </button>
+                </div>
+              ))
             )}
 
             {canCook && isActiveCookingRecipe && (
