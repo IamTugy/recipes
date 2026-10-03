@@ -655,6 +655,7 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
 
   const totalTime = displayRecipe.prepTime + displayRecipe.cookTime
   const scaledServings = Math.round(displayRecipe.servings * multiplier)
+  const multiplierLabel = presetLabels[multiplier] ?? `${multiplier}x`
 
   const nutrition = displayRecipe.nutrition
   const hasNutrition = !!nutrition && [nutrition.calories, nutrition.protein, nutrition.carbs, nutrition.fat].some(v => v !== undefined)
@@ -1584,6 +1585,12 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
             )}
           </div>
         </div>
+
+        {multiplier !== 1 && (
+          <div className="print:hidden mb-6 rounded-lg border border-amber/30 bg-amber/10 px-4 py-3 text-sm text-amber" dir={lang === 'he' ? 'rtl' : 'ltr'}>
+            {tx.scaledTextWarning(multiplierLabel)}
+          </div>
+        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-5 print:grid-cols-5 gap-6 print:gap-0">
           {/* Ingredients */}
