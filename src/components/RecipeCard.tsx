@@ -39,7 +39,10 @@ export default function RecipeCard({
     lang === 'he' ? recipe.description : recipe.descriptionEn,
     lang === 'he' ? recipe.descriptionEn : recipe.description,
   )
-  const displayTags = lang === 'he' ? recipe.tags : (recipe.tagsEn ?? recipe.tags)
+  const displayTags = (lang === 'he'
+    ? recipe.tags
+    : recipe.tags.map((tag, i) => recipe.tagsEn?.[i]?.trim() || tag)
+  ).filter(tag => tag.trim().length > 0)
   const isNew = isRecentlyAdded(recipe.createdAt)
 
   return (

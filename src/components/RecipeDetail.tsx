@@ -1856,7 +1856,10 @@ export default function RecipeDetail({ onAddTimer, timers, onAddToShoppingList, 
         {/* Tags */}
         {displayRecipe.tags.length > 0 && (
           <div id="field-tags" className={`mt-4 flex flex-wrap gap-2 ${fieldHighlightClass('tags')}`}>
-            {(lang === 'he' ? displayRecipe.tags : (displayRecipe.tagsEn ?? displayRecipe.tags)).map(tag => (
+            {(lang === 'he'
+              ? displayRecipe.tags
+              : displayRecipe.tags.map((tag, i) => displayRecipe.tagsEn?.[i]?.trim() || tag)
+            ).filter(tag => tag.trim().length > 0).map(tag => (
               <button type="button"
                 key={tag}
                 onClick={() => navigate(`/?tag=${encodeURIComponent(tag)}`)}
