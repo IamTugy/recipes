@@ -25,6 +25,7 @@ const CookHistoryRecipePage = lazy(() => import('./components/CookHistoryRecipeP
 import TimerPanel from './components/TimerPanel'
 import ShoppingListPanel from './components/ShoppingListPanel'
 import ScrollToTopButton from './components/ScrollToTopButton'
+import ScrollManager from './components/ScrollManager'
 import KeyboardShortcutsHelp from './components/KeyboardShortcutsHelp'
 import BackgroundCookStatus from './components/BackgroundCookStatus'
 import CookDock from './components/CookDock'
@@ -196,6 +197,7 @@ export default function App() {
 
   return (
     <div className="min-h-dvh bg-bg">
+      <ScrollManager />
       <Nav
         shoppingListCount={shoppingList.items.length}
         onOpenShoppingList={() => setShoppingListOpen(true)}
