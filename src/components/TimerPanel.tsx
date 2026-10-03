@@ -32,17 +32,20 @@ function MiniRing({ timer, size = 36 }: { timer: TimerState; size?: number }) {
   )
 }
 
-function TimerControls({ timer, onToggle, onReset, onRemove }: {
+function TimerControls({ timer, onToggle, onReset, onRemove, tx }: {
   timer: TimerState
   onToggle: (id: string) => void
   onReset: (id: string) => void
   onRemove: (id: string) => void
+  tx: typeof t['en']
 }) {
   return (
     <div className="flex items-center gap-0.5 shrink-0">
       {!timer.done && (
         <button type="button"
           onClick={() => onToggle(timer.id)}
+          aria-label={timer.running ? tx.pauseTimer : tx.resumeTimer}
+          title={timer.running ? tx.pauseTimer : tx.resumeTimer}
           className="w-8 h-8 flex items-center justify-center rounded-lg text-cream/60 hover:text-cream hover:bg-tint/[0.06] transition-colors"
         >
           {timer.running
@@ -51,10 +54,16 @@ function TimerControls({ timer, onToggle, onReset, onRemove }: {
           }
         </button>
       )}
-      <button type="button" onClick={() => onReset(timer.id)} className="w-8 h-8 flex items-center justify-center rounded-lg text-cream/30 hover:text-cream/60 hover:bg-tint/[0.06] transition-colors">
+      <button type="button" onClick={() => onReset(timer.id)}
+        aria-label={tx.resetTimer}
+        title={tx.resetTimer}
+        className="w-8 h-8 flex items-center justify-center rounded-lg text-cream/30 hover:text-cream/60 hover:bg-tint/[0.06] transition-colors">
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
       </button>
-      <button type="button" onClick={() => onRemove(timer.id)} className="w-8 h-8 flex items-center justify-center rounded-lg text-cream/30 hover:text-red-400 hover:bg-tint/[0.06] transition-colors">
+      <button type="button" onClick={() => onRemove(timer.id)}
+        aria-label={tx.cancelTimer}
+        title={tx.cancelTimer}
+        className="w-8 h-8 flex items-center justify-center rounded-lg text-cream/30 hover:text-red-400 hover:bg-tint/[0.06] transition-colors">
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
       </button>
     </div>
@@ -157,7 +166,7 @@ export default function TimerPanel({ timers, hiddenTimerId, onToggle, onRemove, 
                     </p>
                     <p className="text-[11px] text-cream/40 truncate mt-0.5 max-w-[130px]">{timer.label}</p>
                   </div>
-                  <TimerControls timer={timer} onToggle={onToggle} onReset={onReset} onRemove={onRemove} />
+                  <TimerControls timer={timer} onToggle={onToggle} onReset={onReset} onRemove={onRemove} tx={tx} />
                 </div>
               ))}
             </div>
@@ -171,6 +180,8 @@ export default function TimerPanel({ timers, hiddenTimerId, onToggle, onRemove, 
             {sorted.length > 1 && (
               <button type="button"
                 onClick={() => setMobileIdx(i => (i - 1 + sorted.length) % sorted.length)}
+                aria-label={tx.previousTimer}
+                title={tx.previousTimer}
                 className="w-7 h-7 flex items-center justify-center rounded-lg text-cream/30 hover:text-cream/60 hover:bg-tint/[0.06] transition-colors shrink-0"
               >
                 <svg className={`w-4 h-4 ${lang === 'he' ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
@@ -191,12 +202,14 @@ export default function TimerPanel({ timers, hiddenTimerId, onToggle, onRemove, 
               <p className="text-xs text-cream/40 truncate mt-0.5 max-w-[160px]">{mobileTimer.label}</p>
             </div>
 
-            <TimerControls timer={mobileTimer} onToggle={onToggle} onReset={onReset} onRemove={onRemove} />
+            <TimerControls timer={mobileTimer} onToggle={onToggle} onReset={onReset} onRemove={onRemove} tx={tx} />
 
             {/* Next arrow */}
             {sorted.length > 1 && (
               <button type="button"
                 onClick={() => setMobileIdx(i => (i + 1) % sorted.length)}
+                aria-label={tx.nextTimer}
+                title={tx.nextTimer}
                 className="w-7 h-7 flex items-center justify-center rounded-lg text-cream/30 hover:text-cream/60 hover:bg-tint/[0.06] transition-colors shrink-0"
               >
                 <svg className={`w-4 h-4 ${lang === 'he' ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/></svg>
