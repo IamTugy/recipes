@@ -23,6 +23,7 @@ import { FollowsModule } from './follows/follows.module'
 import { ReportsModule } from './reports/reports.module'
 import { NotificationsModule } from './notifications/notifications.module'
 import { TimersModule } from './timers/timers.module'
+import { CookTogetherModule } from './cook-together/cook-together.module'
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { TimersModule } from './timers/timers.module'
     ReportsModule,
     NotificationsModule,
     TimersModule,
+    CookTogetherModule,
   ],
   controllers: [HealthController],
 })
