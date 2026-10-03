@@ -24,6 +24,7 @@ import {
   getSharedSort, setSharedSort,
 } from '../lib/sharedRecipeFilters'
 import { logSearch } from '../lib/logSearch'
+import { normalizeForSearch } from '../lib/normalizeForSearch'
 
 const categories: Category[] = ['dessert', 'salad', 'soup', 'bread', 'sauce']
 
@@ -155,7 +156,7 @@ export default function Home() {
     if (activeGroupId) list = list.filter(r => r.dishGroupId === activeGroupId)
     let relevance: Map<string, number> | null = null
     if (search.trim()) {
-      const q = search.toLowerCase()
+      const q = normalizeForSearch(search)
       relevance = new Map()
       list = list.filter(r => {
         // Check both languages regardless of the active UI language - a
@@ -163,14 +164,14 @@ export default function Home() {
         // other language than the one currently displayed.
         const hasIngredient = r.ingredients.some(group =>
           group.items.some(item =>
-            item.name.toLowerCase().includes(q) || (item.nameEn ?? '').toLowerCase().includes(q)
+            normalizeForSearch(item.name).includes(q) || normalizeForSearch(item.nameEn ?? '').includes(q)
           )
         )
-        const titleMatch = r.title.toLowerCase().includes(q) || (r.titleHe ?? '').toLowerCase().includes(q)
-        const descriptionMatch = (r.description ?? '').toLowerCase().includes(q) || (r.descriptionEn ?? '').toLowerCase().includes(q)
-        const otherMatch = r.tags.some(t => t.toLowerCase().includes(q))
-          || (r.tagsEn ?? []).some(t => t.toLowerCase().includes(q))
-          || (r.cuisine?.toLowerCase().includes(q))
+        const titleMatch = normalizeForSearch(r.title).includes(q) || normalizeForSearch(r.titleHe ?? '').includes(q)
+        const descriptionMatch = normalizeForSearch(r.description ?? '').includes(q) || normalizeForSearch(r.descriptionEn ?? '').includes(q)
+        const otherMatch = r.tags.some(t => normalizeForSearch(t).includes(q))
+          || (r.tagsEn ?? []).some(t => normalizeForSearch(t).includes(q))
+          || (r.cuisine ? normalizeForSearch(r.cuisine).includes(q) : false)
 
         // Recipes matching in title/description outrank ones that only
         // match via an ingredient name or tag, so "white onion soup"

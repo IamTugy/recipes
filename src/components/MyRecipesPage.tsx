@@ -17,6 +17,7 @@ import RecipeFilterBar, { type SortOption, type ViewMode } from './RecipeFilterB
 import RecipeTiles from './RecipeTiles'
 import AppSelect from './ui/AppSelect'
 import { DIETARY_KEYWORDS } from '../lib/filterDefinitions'
+import { normalizeForSearch } from '../lib/normalizeForSearch'
 import {
   getSharedCategories, setSharedCategories,
   getSharedDifficulties, setSharedDifficulties,
@@ -137,11 +138,11 @@ export default function MyRecipesPage() {
     }
     if (activeKosher.size) list = list.filter(r => r.kosherType && activeKosher.has(r.kosherType))
     if (search.trim()) {
-      const q = search.toLowerCase()
+      const q = normalizeForSearch(search)
       list = list.filter(r =>
-        r.title.toLowerCase().includes(q) ||
-        (r.titleHe ?? '').toLowerCase().includes(q) ||
-        (r.description ?? '').toLowerCase().includes(q)
+        normalizeForSearch(r.title).includes(q) ||
+        normalizeForSearch(r.titleHe ?? '').includes(q) ||
+        normalizeForSearch(r.description ?? '').includes(q)
       )
     }
     if (sortBy === 'rating') {

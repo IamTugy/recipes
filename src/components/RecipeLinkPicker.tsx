@@ -4,6 +4,7 @@ import Modal from './Modal'
 import { useMyRecipes, useRecipes } from '../hooks/useRecipes'
 import { useLanguage } from '../hooks/useLanguage'
 import { t } from "../i18n";
+import { normalizeForSearch } from '../lib/normalizeForSearch'
 
 interface LinkTarget {
   id: string
@@ -33,9 +34,9 @@ export default function RecipeLinkPicker({ excludeId, onSelect, onClose }: Recip
       if (r.id === excludeId) continue
       merged.set(r.id, { id: r.id, title: r.title, titleHe: r.titleHe })
     }
-    const q = query.trim().toLowerCase()
+    const q = normalizeForSearch(query.trim())
     return [...merged.values()]
-      .filter(r => !q || r.title.toLowerCase().includes(q) || (r.titleHe ?? '').toLowerCase().includes(q))
+      .filter(r => !q || normalizeForSearch(r.title).includes(q) || normalizeForSearch(r.titleHe ?? '').includes(q))
       .slice(0, 50)
   }, [mine, published, query, excludeId])
 
