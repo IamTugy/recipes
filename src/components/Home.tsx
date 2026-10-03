@@ -158,21 +158,19 @@ export default function Home() {
       const q = search.toLowerCase()
       relevance = new Map()
       list = list.filter(r => {
+        // Check both languages regardless of the active UI language - a
+        // translation may be missing, or the query may be typed in the
+        // other language than the one currently displayed.
         const hasIngredient = r.ingredients.some(group =>
-          group.items.some(item => {
-            const name = lang === 'en' ? (item.nameEn ?? item.name) : item.name
-            return name.toLowerCase().includes(q)
-          })
+          group.items.some(item =>
+            item.name.toLowerCase().includes(q) || (item.nameEn ?? '').toLowerCase().includes(q)
+          )
         )
-        const titleMatch = lang === 'en'
-          ? r.title.toLowerCase().includes(q)
-          : (r.titleHe ?? r.title).toLowerCase().includes(q)
-        const descriptionMatch = lang === 'en'
-          ? (r.descriptionEn ?? r.description).toLowerCase().includes(q)
-          : (r.description ?? '').toLowerCase().includes(q)
-        const otherMatch = lang === 'en'
-          ? (r.tagsEn ?? r.tags).some(t => t.toLowerCase().includes(q)) || (r.cuisine?.toLowerCase().includes(q))
-          : r.tags.some(t => t.toLowerCase().includes(q)) || (r.cuisine?.toLowerCase().includes(q))
+        const titleMatch = r.title.toLowerCase().includes(q) || (r.titleHe ?? '').toLowerCase().includes(q)
+        const descriptionMatch = (r.description ?? '').toLowerCase().includes(q) || (r.descriptionEn ?? '').toLowerCase().includes(q)
+        const otherMatch = r.tags.some(t => t.toLowerCase().includes(q))
+          || (r.tagsEn ?? []).some(t => t.toLowerCase().includes(q))
+          || (r.cuisine?.toLowerCase().includes(q))
 
         // Recipes matching in title/description outrank ones that only
         // match via an ingredient name or tag, so "white onion soup"
@@ -196,7 +194,7 @@ export default function Home() {
       list = [...list].sort((a, b) => (rel.get(b.id) ?? 0) - (rel.get(a.id) ?? 0))
     }
     return list
-  }, [search, activeCategories, activeDifficulties, activeDietary, activeKosher, lang, recipes, showFavoritesOnly, showMineOnly, userId, favoriteSlugs, sortBy, activeGroupId])
+  }, [search, activeCategories, activeDifficulties, activeDietary, activeKosher, recipes, showFavoritesOnly, showMineOnly, userId, favoriteSlugs, sortBy, activeGroupId])
 
   // Whether grouping would actually collapse anything in the current
   // filtered set - the toggle to enable it only shows up when it would.
