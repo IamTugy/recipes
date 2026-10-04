@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Popover } from '@base-ui/react/popover'
 import type { IngredientGroup, TimerState } from '../types'
 import { formatDockDuration, scaleAmount } from '../utils/format'
 import { heUnit, canonicalUnit, t } from '../i18n'
@@ -37,6 +38,8 @@ interface CookDockProps {
   nearestTimer: TimerState | null
   onToggleNearestTimer: () => void
   onToggleTimer: (id: string) => void
+  onRemoveTimer: (id: string) => void
+  timers: TimerState[]
   getTimerForStep: (groupIdx: number, stepIdx: number) => TimerState | undefined
   onStartTimer: (label: string, minutes: number, groupIdx: number, stepIdx: number) => void
   onOpenLightbox: (url: string) => void
@@ -79,10 +82,90 @@ function TimerRing({ fraction, children, size = 56 }: { fraction: number; childr
   )
 }
 
+// Full-screen cook mode (CookDock expanded) covers the whole viewport at
+// z-[70], so TimerPanel below it (z-[65]) - the only other place running
+// timers are shown - becomes invisible the moment a second step timer
+// starts while the dock is open. This button/popover lets every active
+// timer stay reachable (with its step label and pause/cancel) regardless
+// of which step is currently on screen.
+function ActiveTimersButton({ timers, lang, tx, onToggle, onRemove }: {
+  timers: TimerState[]
+  lang: 'he' | 'en'
+  tx: typeof t.en
+  onToggle: (id: string) => void
+  onRemove: (id: string) => void
+}) {
+  const active = timers.filter(timer => !timer.done)
+  if (active.length === 0) return null
+  const sorted = [...active].sort((a, b) => {
+    if (a.running !== b.running) return a.running ? -1 : 1
+    return a.remainingSeconds - b.remainingSeconds
+  })
+  return (
+    <Popover.Root>
+      <Popover.Trigger
+        onClick={e => e.stopPropagation()}
+        aria-label={tx.activeTimers}
+        title={tx.activeTimers}
+        className="relative w-8 h-8 flex items-center justify-center rounded-full text-cream/55 bg-transparent hover:text-amber transition-colors"
+      >
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <circle cx="12" cy="13" r="8" />
+          <path strokeLinecap="round" d="M12 9v4l3 2M9 2h6" />
+        </svg>
+        {sorted.length > 1 && (
+          <span className="absolute -top-1 -end-1 min-w-[16px] h-4 px-1 rounded-full bg-amber text-[10px] font-bold text-bg flex items-center justify-center">
+            {sorted.length}
+          </span>
+        )}
+      </Popover.Trigger>
+      <Popover.Portal>
+        <Popover.Positioner sideOffset={8} className="z-[75]" align="end">
+          <Popover.Popup
+            dir={lang === 'he' ? 'rtl' : 'ltr'}
+            onClick={e => e.stopPropagation()}
+            className="w-72 max-w-[calc(100vw-2rem)] rounded-xl border border-tint/10 bg-card shadow-2xl p-2 max-h-[60vh] overflow-y-auto"
+          >
+            <p className="px-2 py-1 text-xs font-semibold text-cream/50">{tx.activeTimers}</p>
+            <ul className="space-y-1">
+              {sorted.map(timer => (
+                <li key={timer.id} className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 hover:bg-tint/[0.05]">
+                  <span className={`font-mono text-sm font-semibold tabular-nums shrink-0 ${timer.running ? 'text-amber' : 'text-cream/50'}`}>
+                    {formatDockDuration(timer.remainingSeconds)}
+                  </span>
+                  <span className="flex-1 min-w-0 text-sm text-cream/80 truncate">{timer.label}</span>
+                  <button type="button"
+                    onClick={() => onToggle(timer.id)}
+                    aria-label={timer.running ? tx.pauseTimer : tx.resumeTimer}
+                    className="w-7 h-7 shrink-0 flex items-center justify-center rounded-lg text-cream/60 hover:text-cream hover:bg-tint/[0.08] transition-colors"
+                  >
+                    {timer.running
+                      ? <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>
+                      : <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    }
+                  </button>
+                  <button type="button"
+                    onClick={() => onRemove(timer.id)}
+                    aria-label={tx.cancelTimer}
+                    title={tx.cancelTimer}
+                    className="w-7 h-7 shrink-0 flex items-center justify-center rounded-lg text-cream/30 hover:text-red-400 hover:bg-tint/[0.08] transition-colors"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </Popover.Popup>
+        </Popover.Positioner>
+      </Popover.Portal>
+    </Popover.Root>
+  )
+}
+
 export default function CookDock({
   lang, ingredients, checkedIngredients, onToggleIngredient, multiplier,
   steps, wizardIndex, onPrev, onAdvance, onMarkDone, onStop, onStepEntered, onExpand,
-  checkedSteps, nearestTimer, onToggleNearestTimer, onToggleTimer, getTimerForStep, onStartTimer,
+  checkedSteps, nearestTimer, onToggleNearestTimer, onToggleTimer, onRemoveTimer, timers, getTimerForStep, onStartTimer,
   onOpenLightbox, onCollapsedHeightChange, lightboxOpen, elapsedBaselineMs, startExpanded, onExpandConsumed,
   cookingPaused, pausedAt, totalPausedMs, onPauseCooking, onResumeCooking, onEnterPip,
 }: CookDockProps) {
@@ -277,6 +360,7 @@ export default function CookDock({
           <div className="flex items-center justify-between gap-3 px-4 h-14 border-b border-tint/[0.06] shrink-0">
             <span className="text-cream text-lg font-bold tabular-nums truncate min-w-0">{formatDockDuration(elapsedSeconds)}</span>
             <div className="flex items-center gap-2 shrink-0">
+              <ActiveTimersButton timers={timers} lang={lang} tx={tx} onToggle={onToggleTimer} onRemove={onRemoveTimer} />
               {onEnterPip && typeof document !== 'undefined' && document.pictureInPictureEnabled && (
                 // Android has no automatic "enter PiP when backgrounded" -
                 // requestPictureInPicture() must run inside a real tap's own

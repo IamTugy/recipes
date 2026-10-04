@@ -291,6 +291,8 @@ export default function App() {
           nearestTimer={cookSession.nearestTimer}
           onToggleNearestTimer={cookSession.pipToggleNearestTimer}
           onToggleTimer={toggleTimer}
+          onRemoveTimer={removeTimer}
+          timers={timers}
           getTimerForStep={cookSession.getTimerForStep}
           onStartTimer={cookSession.startTimer}
           onOpenLightbox={cookSession.setLightboxUrl}
